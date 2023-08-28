@@ -1,6 +1,7 @@
 ## Doom8088
 Doom8088 is a port of Doom for PCs with a 16-bit processor like an 8088 or a 286.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
+Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
 **What's special?:**
  - No sound and music
