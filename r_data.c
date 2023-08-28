@@ -174,7 +174,7 @@ const texture_t* R_GetTexture(int16_t texture)
     if (texture >= _g->numtextures)
         I_Error("R_GetTexture: Texture %d not in range.", texture);
 #endif
-
+texture = 2; //FIXME not everything has to be a door
     if (!textures[texture])
         R_LoadTexture(texture);
 
