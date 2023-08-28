@@ -206,7 +206,7 @@ static void P_LoadNodes (int16_t lump)
  * if the thing in question is expected to be available.
  */
 
-#define NOMONSTERS
+//#define NOMONSTERS
 
 static boolean P_IsDoomnumAllowed(int16_t doomnum)
 {
