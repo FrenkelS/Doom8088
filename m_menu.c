@@ -653,8 +653,8 @@ static void M_EndGame(int32_t choice)
 
 static void M_ChangeMessages(int32_t choice)
 {
-  // warning: unused parameter `int32_t choice'
-  choice = 0;
+  UNUSED(choice);
+
   _g->showMessages = 1 - _g->showMessages;
 
   if (!_g->showMessages)
@@ -670,8 +670,8 @@ static void M_ChangeMessages(int32_t choice)
 
 static void M_ChangeAlwaysRun(int32_t choice)
 {
-    // warning: unused parameter `int32_t choice'
-    choice = 0;
+    UNUSED(choice);
+
     _g->alwaysRun = 1 - _g->alwaysRun;
 
     if (!_g->alwaysRun)
@@ -684,8 +684,8 @@ static void M_ChangeAlwaysRun(int32_t choice)
 
 static void M_ChangeDetail(int32_t choice)
 {
-    // warning: unused parameter `int32_t choice'
-    choice = 0;
+    UNUSED(choice);
+
     _g->highDetail = 1 - _g->highDetail;
 
     if (!_g->highDetail)
