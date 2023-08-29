@@ -30,7 +30,9 @@ Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
 2) Run `setenvwc.bat` and then `compwc16.bat`
 
-3) Doom8088 needs an IWAD file that has been processed by [GbaWadUtil](https://github.com/doomhack/GbaWadUtil).
+3) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
+
+4) Doom8088 needs an IWAD file that has been processed by [GbaWadUtil](https://github.com/doomhack/GbaWadUtil).
    Some lumps in the WAD need to be replaced by the raw pictures from the WAD directory of this repository.
 
 It's possible to build a 32-bit version of Doom8088 with Watcom and [DJGPP](https://github.com/andrewwutw/build-djgpp). For debugging purposes, the Zone memory can be increased significantly this way.
