@@ -42,7 +42,7 @@
 #include "st_stuff.h" /* jff 2/16/98 need loc of status bar */
 #include "w_wad.h"
 #include "s_sound.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "sounds.h"
 #include "g_game.h"
 #include "r_main.h"
@@ -70,7 +70,6 @@
 
 //
 // Builtin map names.
-// The actual names can be found in DStrings.h.
 //
 // Ty 03/27/98 - externalized map name arrays - now in d_deh.c
 // and converted to arrays of pointers to char *

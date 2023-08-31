@@ -26,7 +26,6 @@ file i_audio.obj
 file i_main.obj
 file i_system.obj
 file info.obj
-file m_bbox.obj
 file m_cheat.obj
 file m_menu.obj
 file m_random.obj

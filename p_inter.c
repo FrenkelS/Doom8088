@@ -34,7 +34,7 @@
  *-----------------------------------------------------------------------------*/
 
 #include "doomstat.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "m_random.h"
 #include "am_map.h"
 #include "r_main.h"

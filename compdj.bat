@@ -22,7 +22,6 @@ set CFLAGS=-march=i386
 @set GLOBOBJS=%GLOBOBJS% i_main.c
 @set GLOBOBJS=%GLOBOBJS% i_system.c
 @set GLOBOBJS=%GLOBOBJS% info.c
-@set GLOBOBJS=%GLOBOBJS% m_bbox.c
 @set GLOBOBJS=%GLOBOBJS% m_cheat.c
 @set GLOBOBJS=%GLOBOBJS% m_menu.c
 @set GLOBOBJS=%GLOBOBJS% m_random.c

@@ -434,6 +434,25 @@ static void P_AddLineToSector(const line_t* li, sector_t* sector)
   sector->lines[sector->linecount++] = li;
 }
 
+static void M_ClearBox (fixed_t *box)
+{
+    box[BOXTOP]    = box[BOXRIGHT] = INT32_MIN;
+    box[BOXBOTTOM] = box[BOXLEFT]  = INT32_MAX;
+}
+
+static void M_AddToBox(fixed_t* box,fixed_t x,fixed_t y)
+{
+    if (x<box[BOXLEFT])
+        box[BOXLEFT]  = x;
+    else if (x>box[BOXRIGHT])
+        box[BOXRIGHT] = x;
+
+    if (y<box[BOXBOTTOM])
+        box[BOXBOTTOM] = y;
+    else if (y>box[BOXTOP])
+        box[BOXTOP]    = y;
+}
+
 static void P_GroupLines (void)
 {
     register const line_t *li;

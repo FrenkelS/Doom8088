@@ -31,7 +31,6 @@
  * DESCRIPTION:
  *  Printed strings for translation.
  *  English language support (default).
- *  See dstrings.h for suggestions about foreign language BEX support
  *
  *-----------------------------------------------------------------------------*/
 

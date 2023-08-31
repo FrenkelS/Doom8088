@@ -39,7 +39,7 @@
 #include "s_sound.h"
 #include "sounds.h"
 #include "r_main.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 
 #include "globdata.h"
 

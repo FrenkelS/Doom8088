@@ -42,7 +42,7 @@
 #include "s_sound.h"
 #include "sounds.h"
 #include "f_finale.h" // CPhipps - hmm...
-#include "dstrings.h"
+#include "d_englsh.h"
 
 #include "globdata.h"
 

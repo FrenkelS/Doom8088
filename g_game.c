@@ -64,7 +64,7 @@
 #include "r_main.h"
 #include "p_map.h"
 #include "s_sound.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "sounds.h"
 #include "r_data.h"
 #include "m_fixed.h"

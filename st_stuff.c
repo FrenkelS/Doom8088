@@ -45,7 +45,7 @@
 #include "am_map.h"
 #include "s_sound.h"
 #include "sounds.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 
 #include "globdata.h"
 

@@ -39,7 +39,6 @@ GLOBOBJS = &
  i_main.obj &
  i_system.obj &
  info.obj &
- m_bbox.obj &
  m_cheat.obj &
  m_menu.obj &
  m_random.obj &

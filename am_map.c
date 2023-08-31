@@ -49,7 +49,7 @@
 #include "v_video.h"
 #include "p_spec.h"
 #include "am_map.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "g_game.h"
 
 #include "globdata.h"
