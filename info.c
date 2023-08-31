@@ -539,7 +539,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_bgact,    // activesound
-    MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL // killough |MF_TRANSLUCENT,   // flags     // phares
+    MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL   // flags
   },
 
   {   // MT_SERGEANT
@@ -639,7 +639,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     8,    // damage
     sfx_None,   // activesound
-    MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT   // flags  killough 2/21/98
+    MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY   // flags
   },
 
   {   // MT_BARREL
@@ -689,7 +689,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     3,    // damage
     sfx_None,   // activesound
-    MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT // flags // phares
+    MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY // flags
   },
 
   {   // MT_ROCKET
@@ -739,7 +739,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT // flags // phares
+    MF_NOBLOCKMAP|MF_NOGRAVITY // flags
   },
 
   {   // MT_BLOOD
@@ -789,7 +789,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT // flags // phares
+    MF_NOBLOCKMAP|MF_NOGRAVITY // flags
   },
 
   {   // MT_IFOG
@@ -814,7 +814,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT // flags // phares
+    MF_NOBLOCKMAP|MF_NOGRAVITY // flags
   },
 
   {   // MT_TELEPORTMAN
@@ -1089,7 +1089,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_SPECIAL|MF_COUNTITEM|MF_TRANSLUCENT    // flags   // killough 2/21/98
+    MF_SPECIAL|MF_COUNTITEM    // flags
   },
 
   {   // MT_INS
@@ -1114,7 +1114,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_SPECIAL|MF_COUNTITEM|MF_TRANSLUCENT    // flags // killough 2/21/98
+    MF_SPECIAL|MF_COUNTITEM    // flags
   },
 
   {   // MT_MISC14

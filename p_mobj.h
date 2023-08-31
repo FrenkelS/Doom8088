@@ -209,9 +209,6 @@
 #define MF_POOLED      (uint32_t)(0x0000000010000000)
 #define MF_UNUSED       (uint32_t)(0x0000000020000000)
 
-    // Translucent sprite?                                          // phares
-#define MF_TRANSLUCENT  (uint32_t)(0x0000000040000000)
-
 #define MF_FRIEND       (uint32_t)(0x0000000080000000)
 
 
