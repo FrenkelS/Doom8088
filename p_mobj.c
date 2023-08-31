@@ -674,6 +674,7 @@ mobj_t* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
     if (_g->gameskill != sk_nightmare)
         mobj->reactiontime = info->reactiontime;
 
+    P_Random(); // only to call random for compatibiltiy
     // do not set the state with P_SetMobjState,
     // because action routines can not be called yet
 

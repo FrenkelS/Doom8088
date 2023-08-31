@@ -383,16 +383,7 @@ static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
       return !solid;
     }
 
-  // killough 3/16/98: Allow non-solid moving objects to move through solid
-  // ones, by allowing the moving thing (tmthing) to move if it's non-solid,
-  // despite another solid thing being in the way.
-  // killough 4/11/98: Treat no-clipping things as not blocking
-  // ...but not in demo_compatibility mode
-
-  return !(thing->flags & MF_SOLID)
-    || ((thing->flags & MF_NOCLIP || !(_g->tmthing->flags & MF_SOLID)));
-
-  // return !(thing->flags & MF_SOLID);   // old code -- killough
+  return !(thing->flags & MF_SOLID);
 }
 
 
@@ -516,40 +507,22 @@ boolean P_TryMove(mobj_t* thing,fixed_t x,fixed_t y,
 
     if ( !(thing->flags & MF_NOCLIP) )
     {
-        // killough 7/26/98: reformatted slightly
-        // killough 8/1/98: Possibly allow escape if otherwise stuck
+        if (_g->tmceilingz - _g->tmfloorz < thing->height)
+            return false;	// doesn't fit
 
-        if (_g->tmceilingz - _g->tmfloorz < thing->height ||     // doesn't fit
-                // mobj must lower to fit
-                (_g->floatok = true, !(thing->flags & MF_TELEPORT) &&
-                 _g->tmceilingz - thing->z < thing->height) ||
-                // too big a step up
-                (!(thing->flags & MF_TELEPORT) &&
-                 _g->tmfloorz - thing->z > 24*FRACUNIT))
-            return _g->tmunstuck
-                    && !(_g->ceilingline && untouched(_g->ceilingline))
-                    && !(  _g->floorline && untouched(  _g->floorline));
+        _g->floatok = true;
 
-        /* killough 3/15/98: Allow certain objects to drop off
-       * killough 7/24/98, 8/1/98:
-       * Prevent monsters from getting stuck hanging off ledges
-       * killough 10/98: Allow dropoffs in controlled circumstances
-       * killough 11/98: Improve symmetry of clipping on stairs
-       */
+        if ( !(thing->flags & MF_TELEPORT)
+             && _g->tmceilingz - thing->z < thing->height)
+            return false;	// mobj must lower itself to fit
 
-        if (!(thing->flags & (MF_DROPOFF|MF_FLOAT))) {
-            if (!dropoff || (dropoff==2 &&  // large jump down (e.g. dogs)
-                             (_g->tmfloorz-_g->tmdropoffz > 128*FRACUNIT ||
-                              !thing->target || thing->target->z >_g->tmdropoffz)))
-            {
-                if (_g->tmfloorz - _g->tmdropoffz > 24*FRACUNIT)
-                    return false;
-            }
-            else { /* dropoff allowed -- check for whether it fell more than 24 */
-                _g->felldown = !(thing->flags & MF_NOGRAVITY) &&
-                        thing->z - _g->tmfloorz > 24*FRACUNIT;
-            }
-        }
+        if ( !(thing->flags & MF_TELEPORT)
+             && _g->tmfloorz - thing->z > 24*FRACUNIT )
+            return false;	// too big a step up
+
+        if ( !(thing->flags & (MF_DROPOFF|MF_FLOAT))
+             && _g->tmfloorz - _g->tmdropoffz > 24*FRACUNIT )
+            return false;	// don't stand over a dropoff
     }
 
     // the move is ok,
