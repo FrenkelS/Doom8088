@@ -1,7 +1,12 @@
 ## Doom8088
-Doom8088 is a port of Doom for PCs with a 16-bit processor like an 8088 or a 286.
+![Doom8088](readme_imgs/doom8088.png?raw=true)
+
+Doom was originally designed in 1993 for 32-bit DOS computers with 4 MB of RAM.
+Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
 Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
+
+Watch what it looks like on a real 286 [here](https://www.twitch.tv/videos/1911540009?t=0h12m48s).
 
 **What's special?:**
  - No sound and music
@@ -25,6 +30,9 @@ Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 |Weapon down |A + L |Enter, Space & Shift + <|
 |Menu        |Start |Esc                     |
 |Quit to DOS |      |F10                     |
+
+## Troubleshoot
+When you get the error message "Can't open VIEWANGX.LMP", you need to add `FILES=30` to your `CONFIG.SYS`.
 
 ## Building:
 1) Install [Watcom](https://github.com/open-watcom/open-watcom-v2)
