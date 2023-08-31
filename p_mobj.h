@@ -192,10 +192,6 @@
 // Neither a cacodemon nor a missile.
 #define MF_SKULLFLY     (uint32_t)(0x0000000001000000)
 
-// Don't spawn this object
-//  in death match mode (e.g. key cards).
-#define MF_NOTDMATCH    (uint32_t)(0x0000000002000000)
-
 #define MF_POOLED      (uint32_t)(0x0000000010000000)
 
 #define MF_FRIEND       (uint32_t)(0x0000000080000000)

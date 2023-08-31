@@ -464,7 +464,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_SOLID|MF_SHOOTABLE|MF_DROPOFF|MF_PICKUP|MF_NOTDMATCH    // flags
+    MF_SOLID|MF_SHOOTABLE|MF_DROPOFF|MF_PICKUP    // flags
   },
 
   {   // MT_POSSESSED
@@ -964,7 +964,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_SPECIAL|MF_NOTDMATCH    // flags
+    MF_SPECIAL    // flags
   },
 
   {   // MT_MISC5
@@ -989,7 +989,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_SPECIAL|MF_NOTDMATCH    // flags
+    MF_SPECIAL    // flags
   },
 
   {   // MT_MISC6
@@ -1014,7 +1014,7 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     100,    // mass
     0,    // damage
     sfx_None,   // activesound
-    MF_SPECIAL|MF_NOTDMATCH    // flags
+    MF_SPECIAL    // flags
   },
 
   {   // MT_MISC10
