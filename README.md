@@ -8,8 +8,8 @@ Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
  - No saving and loading
  - No multiplayer
  - No PWADs
- - Demos don't sync
  - Supports only Doom 1 Episode 1
+ - Only demo3 is in sync
  - Lots of crashes due to memory issues
  
 ## Controls:
