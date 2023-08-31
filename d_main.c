@@ -84,7 +84,6 @@ const boolean nomusicparm = true;
 
 const boolean nodrawers = false;
 
-static const char* timedemo = NULL;//"demo3";
 
 /*
  * D_PostEvent - Event handling
@@ -415,6 +414,31 @@ static void LoadIWAD(void)
 }
 
 
+/*
+=================
+=
+= M_CheckParm
+=
+= Checks for the given parameter in the program's command line arguments
+=
+= Returns the argument number (1 to argc - 1) or 0 if not present
+=
+=================
+*/
+
+int    myargc;
+char **myargv;
+
+static int16_t M_CheckParm(char *check)
+{
+	for (int16_t i = 1; i < myargc; i++)
+		if (!stricmp(check, myargv[i]))
+			return i;
+
+	return 0;
+}
+
+
 //
 // D_DoomMainSetup
 //
@@ -460,11 +484,12 @@ static void D_DoomMainSetup(void)
 
     I_InitGraphics();
 
-    if (timedemo)
+    int16_t p = M_CheckParm("-timedemo");
+    if (p && p < myargc - 1)
     {
         _g->singletics = true;
         _g->timingdemo = true;            // show stats after quit
-        G_DeferedPlayDemo(timedemo);
+        G_DeferedPlayDemo(myargv[p + 1]);
         _g->singledemo = true;            // quit after one demo
     }
     else

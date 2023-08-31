@@ -101,11 +101,13 @@ int x = 0;
 	printf("\n");
 }
 
+extern int    myargc;
+extern char **myargv;
 
-int main(int argc, const char * const * argv)
+int main(int argc, char **argv)
 {
-	UNUSED(argc);
-	UNUSED(argv);
+	myargc = argc;
+	myargv = argv;
 
 	/* cphipps - call to video specific startup code */
 	I_InitScreen();
