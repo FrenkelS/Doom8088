@@ -342,8 +342,7 @@ static boolean P_Move(mobj_t *actor, boolean dropoff) /* killough 9/12/98 */
        * Boom v2.02 and LxDoom return good && (P_Random(pr_trywalk)&3)
        * MBF plays even more games
        */
-      if (!good) return good;
-  return ((P_Random() >= 230) ^ (good & 1));
+      return good;
     }
   else
     actor->flags &= ~MF_INFLOAT;
@@ -364,32 +363,7 @@ static boolean P_Move(mobj_t *actor, boolean dropoff) /* killough 9/12/98 */
 
 static boolean P_SmartMove(mobj_t *actor)
 {
-  mobj_t *target = actor->target;
-  int32_t on_lift, dropoff = false, under_damage;
-
-  /* killough 9/12/98: Stay on a lift if target is on one */
-  on_lift = target && target->health > 0
-    && target->subsector->sector->tag==actor->subsector->sector->tag && P_IsOnLift(actor);
-
-
-
-  if (!P_Move(actor, dropoff))
-    return false;
-
-  under_damage = P_IsUnderDamage(actor);
-
-  // killough 9/9/98: avoid crushing ceilings or other damaging areas
-  if (
-      (on_lift && P_Random() < 230 &&      // Stay on lift
-       !P_IsOnLift(actor))
-      ||
-      (!under_damage &&  // Get away from damage
-       (under_damage = P_IsUnderDamage(actor)) &&
-       (under_damage < 0 || P_Random() < 200))
-      )
-    actor->movedir = DI_NODIR;    // avoid the area (most of the time anyway)
-
-  return true;
+    return P_Move(actor, false);
 }
 
 //
@@ -605,17 +579,11 @@ static void P_NewChaseDir(mobj_t *actor)
 
 static boolean P_IsVisible(mobj_t *actor, mobj_t *mo, boolean allaround)
 {
-    fixed_t dist = P_AproxDistance(mo->x-actor->x, mo->y-actor->y);
-
-    //Fix for icon of sin being blind, and having the others have bad depth perception ~Kippykip
-    if (dist > LOOKRANGE)
-        return false;
-
     if (!allaround)
     {
         angle_t an = R_PointToAngle2(actor->x, actor->y, mo->x, mo->y) - actor->angle;
 
-        if (an > ANG90 && an < ANG270 && dist > MELEERANGE)
+        if (an > ANG90 && an < ANG270 && P_AproxDistance(mo->x-actor->x, mo->y-actor->y) > MELEERANGE)
             return false;
     }
     return P_CheckSight(actor, mo);
@@ -696,17 +664,8 @@ void A_Look(mobj_t *actor)
 
         if ( actor->flags & MF_AMBUSH )
         {
-            fixed_t dist = P_AproxDistance(actor->x - targ->x, actor->y - targ->y);
-
-            if(dist <= LOOKRANGE)
-            {
-                if (P_CheckSight (actor, actor->target))
-                    seen = true;
-            }
-            else
-            {
-                return;
-            }
+            if (P_CheckSight (actor, actor->target))
+                seen = true;
         }
         else
             seen = true;
