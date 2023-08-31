@@ -196,18 +196,7 @@
 //  in death match mode (e.g. key cards).
 #define MF_NOTDMATCH    (uint32_t)(0x0000000002000000)
 
-// Player sprites in multiplayer modes are modified
-//  using an internal color lookup table for re-indexing.
-// If 0x4 0x8 or 0xc,
-//  use a translation table for player colormaps
-#define MF_TRANSLATION  (uint32_t)(0x000000000c000000)
-#define MF_TRANSLATION1 (uint32_t)(0x0000000004000000)
-#define MF_TRANSLATION2 (uint32_t)(0x0000000008000000)
-// Hmm ???.
-#define MF_TRANSSHIFT 26
-
 #define MF_POOLED      (uint32_t)(0x0000000010000000)
-#define MF_UNUSED       (uint32_t)(0x0000000020000000)
 
 #define MF_FRIEND       (uint32_t)(0x0000000080000000)
 
