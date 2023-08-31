@@ -193,9 +193,7 @@ static void P_XYMovement (mobj_t* mo)
             xmove = ymove = 0;
         }
 
-        // killough 3/15/98: Allow objects to drop off
-
-        if (!P_TryMove (mo, ptryx, ptryy, true))
+        if (!P_TryMove (mo, ptryx, ptryy))
         {
             // blocked move
 
@@ -1026,9 +1024,7 @@ static void P_CheckMissileSpawn (mobj_t* th)
   if (!(th->flags & MF_MISSILE))
     return;
 
-  // killough 3/15/98: no dropoff (really = don't care for missiles)
-
-  if (!P_TryMove (th, th->x, th->y, false))
+  if (!P_TryMove (th, th->x, th->y))
     P_ExplodeMissile (th);
   }
 

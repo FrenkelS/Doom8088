@@ -494,8 +494,7 @@ boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
 // Attempt to move to a new position,
 // crossing special lines unless MF_TELEPORT is set.
 //
-boolean P_TryMove(mobj_t* thing,fixed_t x,fixed_t y,
-                  boolean dropoff) // killough 3/15/98: allow dropoff as option
+boolean P_TryMove(mobj_t* thing,fixed_t x,fixed_t y)
 {
     fixed_t oldx;
     fixed_t oldy;
@@ -788,9 +787,7 @@ void P_SlideMove(mobj_t *mo)
 
   stairstep:
 
-    /* killough 3/15/98: Allow objects to drop off ledges
-     *
-     * phares 5/4/98: kill momentum if you can't move at all
+    /* phares 5/4/98: kill momentum if you can't move at all
      * This eliminates player bobbing if pressed against a wall
      * while on ice.
      *
@@ -799,8 +796,8 @@ void P_SlideMove(mobj_t *mo)
      * cph 2000/09//23: buggy code was only in Boom v2.01
      */
 
-    if (!P_TryMove(mo, mo->x, mo->y + mo->momy, true))
-      P_TryMove(mo, mo->x + mo->momx, mo->y, true);
+    if (!P_TryMove(mo, mo->x, mo->y + mo->momy))
+      P_TryMove(mo, mo->x + mo->momx, mo->y);
 
 
     break;
@@ -813,9 +810,7 @@ void P_SlideMove(mobj_t *mo)
     fixed_t newx = FixedMul(mo->momx, _g->bestslidefrac);
     fixed_t newy = FixedMul(mo->momy, _g->bestslidefrac);
 
-    // killough 3/15/98: Allow objects to drop off ledges
-
-    if (!P_TryMove(mo, mo->x+newx, mo->y+newy, true))
+    if (!P_TryMove(mo, mo->x+newx, mo->y+newy))
       goto stairstep;
   }
 
@@ -847,8 +842,8 @@ void P_SlideMove(mobj_t *mo)
     if (D_abs(P_MobjIsPlayer(mo)->momy) > D_abs(_g->tmymove))
       P_MobjIsPlayer(mo)->momy = _g->tmymove;
   }
-    }  // killough 3/15/98: Allow objects to drop off ledges:
-  while (!P_TryMove(mo, mo->x+_g->tmxmove, mo->y+_g->tmymove, true));
+    }
+  while (!P_TryMove(mo, mo->x+_g->tmxmove, mo->y+_g->tmymove));
 }
 
 //

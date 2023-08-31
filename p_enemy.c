@@ -274,7 +274,7 @@ static int32_t P_IsUnderDamage(mobj_t *actor)
 static const fixed_t xspeed[8] = {FRACUNIT,47000,0,-47000,-FRACUNIT,-47000,0,47000};
 static const fixed_t yspeed[8] = {0,47000,FRACUNIT,47000,0,-47000,-FRACUNIT,-47000};
 
-static boolean P_Move(mobj_t *actor, boolean dropoff) /* killough 9/12/98 */
+static boolean P_Move(mobj_t *actor)
 {
   fixed_t tryx, tryy, deltax, deltay, origx, origy;
   boolean try_ok;
@@ -293,7 +293,7 @@ static boolean P_Move(mobj_t *actor, boolean dropoff) /* killough 9/12/98 */
   tryx = (origx = actor->x) + (deltax = speed * xspeed[actor->movedir]);
   tryy = (origy = actor->y) + (deltay = speed * yspeed[actor->movedir]);
 
-  try_ok = P_TryMove(actor, tryx, tryy, dropoff);
+  try_ok = P_TryMove(actor, tryx, tryy);
 
   if (!try_ok)
     {      // open any specials
@@ -355,16 +355,6 @@ static boolean P_Move(mobj_t *actor, boolean dropoff) /* killough 9/12/98 */
   return true;
 }
 
-/*
- * P_SmartMove
- *
- * killough 9/12/98: Same as P_Move, except smarter
- */
-
-static boolean P_SmartMove(mobj_t *actor)
-{
-    return P_Move(actor, false);
-}
 
 //
 // TryWalk
@@ -380,7 +370,7 @@ static boolean P_SmartMove(mobj_t *actor)
 
 static boolean P_TryWalk(mobj_t *actor)
 {
-  if (!P_SmartMove(actor))
+  if (!P_Move(actor))
     return false;
   actor->movecount = P_Random()&15;
   return true;
@@ -822,7 +812,7 @@ void A_Chase(mobj_t *actor)
     }
 
     // chase towards player
-    if (--actor->movecount<0 || !P_SmartMove(actor))
+    if (--actor->movecount<0 || !P_Move(actor))
         P_NewChaseDir(actor);
 
     // make active sound
