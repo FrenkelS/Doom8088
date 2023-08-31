@@ -31,7 +31,7 @@ Watch what it looks like on a real 286 [here](https://www.twitch.tv/videos/19115
 |Menu        |Start |Esc                     |
 |Quit to DOS |      |F10                     |
 
-## Troubleshoot
+## Troubleshooting:
 When you get the error message "Can't open VIEWANGX.LMP", you need to add `FILES=30` to your `CONFIG.SYS`.
 
 ## Building:
