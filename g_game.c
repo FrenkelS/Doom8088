@@ -706,7 +706,7 @@ static void G_DoWorldDone (void)
 // or savegame. This is used to prevent problems, in
 // case more players in a game are supported later.
 
-#define MIN_MAXPLAYERS 32
+#define MIN_MAXPLAYERS 4
 
 
 inline static void LoadSRAM(byte* eeprom, uint32_t size, uint32_t offset)
