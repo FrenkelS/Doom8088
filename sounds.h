@@ -50,19 +50,14 @@ struct sfxinfo_struct {
   // up to 6-character name
   const char *name; // CPhipps - const
 
-  int32_t singularity;
-
   // Sfx priority
-  int32_t priority;
+  int8_t priority;
 
   // referenced sound if a link
   const sfxinfo_t *link;
 
-  // volume if a link
-  int32_t volume;
-
   //Length of clip
-  int32_t ticks;
+  int8_t ticks;
 };
 
 //

@@ -176,7 +176,7 @@ static void S_StartSoundAtVolume(mobj_t *origin, int32_t sfx_id, int32_t volume)
     // Initialize sound parameters
     if (sfx->link)
     {
-        volume += sfx->volume;
+        volume += 150;
 
         if (volume < 1)
             return;
@@ -310,7 +310,7 @@ void S_UpdateSounds(void)
 
 				if (sfx->link)
 				{
-					volume += sfx->volume;
+					volume += 150;
 					
 					if (volume < 1)
 					{
