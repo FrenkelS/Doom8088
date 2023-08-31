@@ -11,6 +11,7 @@ Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
  - Supports only Doom 1 Episode 1
  - Only demo3 is in sync
  - Lots of crashes due to memory issues
+ - Super slow because for every frame every necessary image is read from the hard disk and for every calculation involving a lookup table the hard disk is also accessed
  
 ## Controls:
 |Action      |GBA   |DOS                     |
