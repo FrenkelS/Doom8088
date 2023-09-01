@@ -49,22 +49,12 @@
 extern int32_t numnodes;
 extern const mapnode_t *nodes;
 
-extern fixed_t  viewx, viewy, viewz;
-
-extern angle_t  viewangle;
-
-extern const lighttable_t *fullcolormap;
 extern const lighttable_t *colormaps;
-extern const lighttable_t* fixedcolormap;
-
-extern int32_t extralight;                           // bumped light from gun blasts
 
 extern fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
 
 extern int16_t       *flattranslation;             // for global animation
 extern int16_t       *texturetranslation;
-
-extern fixed_t  viewcos, viewsin;
 
 extern boolean highDetail;
 

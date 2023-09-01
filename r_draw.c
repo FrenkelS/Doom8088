@@ -249,9 +249,9 @@ static byte columnCache[128*128];
 int32_t numnodes;
 const mapnode_t *nodes;
 
-fixed_t  viewx, viewy, viewz;
+static fixed_t  viewx, viewy, viewz;
 
-angle_t  viewangle;
+static angle_t  viewangle;
 
 static byte solidcol[SCREENWIDTH];
 
@@ -294,12 +294,12 @@ static fixed_t  rw_midtexturemid;
 static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
-const lighttable_t *fullcolormap;
+static const lighttable_t *fullcolormap;
 const lighttable_t *colormaps;
 
-const lighttable_t* fixedcolormap;
+static const lighttable_t* fixedcolormap;
 
-int32_t extralight;                           // bumped light from gun blasts
+static int32_t extralight;                           // bumped light from gun blasts
 
 
 static int16_t   *mfloorclip;   // dropoff overflow
@@ -320,7 +320,7 @@ int16_t       *texturetranslation;
 
 static fixed_t basexscale, baseyscale;
 
-fixed_t  viewcos, viewsin;
+static fixed_t  viewcos, viewsin;
 
 static fixed_t  topfrac;
 static fixed_t  topstep;
