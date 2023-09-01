@@ -40,6 +40,8 @@
 #include "r_data.h"
 
 
+#define LOBYTE(w)	(((uint8_t *)&w)[0])
+
 #define LOWORD(dw)	(((uint16_t *)&dw)[0])
 #define HIWORD(dw)	(((uint16_t *)&dw)[1])
 
@@ -95,8 +97,6 @@ extern boolean highDetail;
 
 angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2);
 subsector_t *R_PointInSubsector(fixed_t x, fixed_t y);
-
-void R_SetDefaultDrawColumnVars(draw_column_vars_t *dcvars);
 
 uint32_t R_GetColumn(const texture_t* texture, int32_t texcolumn);
 

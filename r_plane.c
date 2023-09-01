@@ -28,6 +28,10 @@
 
 #include "globdata.h"
 
+
+#define FLAT_SPAN
+
+
 //
 // R_DrawSpan
 // With DOOM style restrictions on view orientation,
@@ -40,6 +44,83 @@
 // In consequence, flats are not stored by column (like walls),
 //  and the inner loop has to step in texture space u and v.
 //
+
+static byte spanstart[SCREENHEIGHT];
+
+#if defined FLAT_SPAN
+static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, uint16_t color)
+{
+	uint16_t* dest = _g->screen + ScreenYToOffset(y) + x1;
+
+	uint32_t count = x2 - x1;
+	uint32_t l = count >> 4;
+
+	while (l--)
+	{
+		*dest++ = color;
+		*dest++ = color;
+		*dest++ = color;
+		*dest++ = color;
+
+		*dest++ = color;
+		*dest++ = color;
+		*dest++ = color;
+		*dest++ = color;
+
+		*dest++ = color;
+		*dest++ = color;
+		*dest++ = color;
+		*dest++ = color;
+
+		*dest++ = color;
+		*dest++ = color;
+		*dest++ = color;
+		*dest++ = color;
+	}
+
+	switch (count & 15)
+	{
+		case 15:	*dest++ = color;
+		case 14:	*dest++ = color;
+		case 13:	*dest++ = color;
+		case 12:	*dest++ = color;
+		case 11:	*dest++ = color;
+		case 10:	*dest++ = color;
+		case  9:	*dest++ = color;
+		case  8:	*dest++ = color;
+		case  7:	*dest++ = color;
+		case  6:	*dest++ = color;
+		case  5:	*dest++ = color;
+		case  4:	*dest++ = color;
+		case  3:	*dest++ = color;
+		case  2:	*dest++ = color;
+		case  1:	*dest   = color;
+	}
+}
+
+
+//
+// R_MakeSpans
+//
+
+static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32_t b2, uint16_t color)
+{
+	for (; t1 < t2 && t1 <= b1; t1++)
+		R_DrawSpan(t1, spanstart[t1], x, color);
+
+	for (; b1 > b2 && b1 >= t1; b1--)
+		R_DrawSpan(b1, spanstart[b1], x, color);
+
+	while (t2 < t1 && t2 <= b2)
+		spanstart[t2++] = x;
+
+	while (b2 > b1 && b2 >= t2)
+		spanstart[b2--] = x;
+}
+
+
+#else
+
 
 inline static void R_DrawSpanPixel(uint16_t* dest, const byte* source, const byte* colormap, uint32_t position)
 {
@@ -198,8 +279,6 @@ static void R_MapPlane(uint32_t y, uint32_t x1, uint32_t x2, draw_span_vars_t *d
 // R_MakeSpans
 //
 
-static byte spanstart[SCREENHEIGHT];
-
 static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32_t b2, draw_span_vars_t *dsvars)
 {
     for (; t1 < t2 && t1 <= b1; t1++)
@@ -214,6 +293,7 @@ static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32
     while (b2 > b1 && b2 >= t2)
         spanstart[b2--] = x;
 }
+#endif
 
 
 #define ANGLETOSKYSHIFT         22
@@ -273,23 +353,37 @@ static void R_DoDrawPlane(visplane_t *pl)
         else
         {
             // regular flat
+#if defined FLAT_SPAN
+            const int32_t stop = pl->maxx + 1;
+
+            pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
+
+            uint16_t color = LOBYTE(pl->picnum);
+            color = (color << 8) | color;
+
+            for (register int32_t x = pl->minx; x <= stop; x++)
+            {
+                R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], color);
+            }
+#else
             draw_span_vars_t dsvars;
 
-            dsvars.source = W_GetLumpByNum(_g->firstflat + flattranslation[pl->picnum]);
+            dsvars.source   = W_GetLumpByNum(_g->firstflat + flattranslation[pl->picnum]);
             dsvars.colormap = R_LoadColorMap(pl->lightlevel);
 
-            planeheight = D_abs(pl->height-viewz);
+            planeheight = D_abs(pl->height - viewz);
 
             const int32_t stop = pl->maxx + 1;
 
-            pl->top[pl->minx-1] = pl->top[stop] = 0xff; // dropoff overflow
+            pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
 
-            for (register int32_t x = pl->minx ; x <= stop ; x++)
+            for (register int32_t x = pl->minx; x <= stop; x++)
             {
-                R_MakeSpans(x,pl->top[x-1],pl->bottom[x-1], pl->top[x],pl->bottom[x], &dsvars);
+                R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], &dsvars);
             }
 
             Z_Free(dsvars.source);
+#endif
         }
     }
 }
@@ -323,7 +417,6 @@ void R_DrawPlanes (void)
 //
 
 static const int16_t viewheight  = SCREENHEIGHT - ST_SCALED_HEIGHT;
-static const fixed_t iprojection = 1092; //( (1 << FRACUNIT) / (SCREENWIDTH / 2))
 
 void R_ClearPlanes(void)
 {
@@ -338,6 +431,10 @@ void R_ClearPlanes(void)
 
     _g->lastopening = _g->openings;
 
+#if !defined FLAT_SPAN
+    static const fixed_t iprojection = 1092; //( (1 << FRACUNIT) / (SCREENWIDTH / 2))
+
     basexscale = FixedMul(viewsin,iprojection);
     baseyscale = FixedMul(viewcos,iprojection);
+#endif
 }

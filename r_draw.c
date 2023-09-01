@@ -829,7 +829,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
 }
 
 
-void R_SetDefaultDrawColumnVars(draw_column_vars_t *dcvars)
+static void R_SetDefaultDrawColumnVars(draw_column_vars_t *dcvars)
 {
 	dcvars->x           = 0;
 	dcvars->yl          = 0;
