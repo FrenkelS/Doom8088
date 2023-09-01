@@ -463,7 +463,6 @@ boolean onground; // whether player is on ground or in air
 //r_data.c
 //******************************************************************************
 
-int16_t       firstflat;
 int16_t       firstspritelump, lastspritelump;
 
 

@@ -264,24 +264,6 @@ static void R_InitTextures()
 		texturetranslation[i] = i;
 }
 
-//
-// R_InitFlats
-//
-static void R_InitFlats(void)
-{
-  _g->firstflat     = W_GetNumForName("F_START") + 1;
-  int16_t lastflat  = W_GetNumForName("F_END")   - 1;
-  int16_t numflats  = lastflat - _g->firstflat + 1;
-
-  // Create translation table for global animation.
-  // killough 4/9/98: make column offsets 32-bit;
-  // clean up malloc-ing to use sizeof
-
-  flattranslation = Z_MallocStatic((numflats+1)*sizeof(*flattranslation));
-
-  for (int16_t i = 0; i < numflats; i++)
-    flattranslation[i] = i;
-}
 
 //
 // R_InitSpriteLumps
@@ -316,17 +298,4 @@ void R_Init(void)
   R_InitFlats();
   R_InitSpriteLumps();
   R_InitColormaps();                    // killough 3/20/98
-}
-
-//
-// R_FlatNumForName
-// Retrieval, get a flat number for a flat name.
-//
-// killough 4/17/98: changed to use ns_flats namespace
-//
-
-int16_t R_FlatNumForName(const char *name)    // killough -- const added
-{
-  int16_t i = W_GetNumForName(name);
-  return i - _g->firstflat;
 }

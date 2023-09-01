@@ -31,6 +31,10 @@
 
 #define FLAT_SPAN
 
+int16_t *flattranslation;             // for global animation
+
+static int16_t firstflat;
+
 
 //
 // R_DrawSpan
@@ -44,8 +48,6 @@
 // In consequence, flats are not stored by column (like walls),
 //  and the inner loop has to step in texture space u and v.
 //
-
-static byte spanstart[SCREENHEIGHT];
 
 #if defined FLAT_SPAN
 static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, uint16_t color)
@@ -105,6 +107,8 @@ static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, uint16_t color)
 
 static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32_t b2, uint16_t color)
 {
+	static byte spanstart[SCREENHEIGHT];
+
 	for (; t1 < t2 && t1 <= b1; t1++)
 		R_DrawSpan(t1, spanstart[t1], x, color);
 
@@ -281,6 +285,8 @@ static void R_MapPlane(uint32_t y, uint32_t x1, uint32_t x2, draw_span_vars_t *d
 
 static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32_t b2, draw_span_vars_t *dsvars)
 {
+    static byte spanstart[SCREENHEIGHT];
+
     for (; t1 < t2 && t1 <= b1; t1++)
         R_MapPlane(t1, spanstart[t1], x, dsvars);
 
@@ -368,7 +374,7 @@ static void R_DoDrawPlane(visplane_t *pl)
 #else
             draw_span_vars_t dsvars;
 
-            dsvars.source   = W_GetLumpByNum(_g->firstflat + flattranslation[pl->picnum]);
+            dsvars.source   = W_GetLumpByNum(firstflat + flattranslation[pl->picnum]);
             dsvars.colormap = R_LoadColorMap(pl->lightlevel);
 
             planeheight = D_abs(pl->height - viewz);
@@ -437,4 +443,36 @@ void R_ClearPlanes(void)
     basexscale = FixedMul(viewsin,iprojection);
     baseyscale = FixedMul(viewcos,iprojection);
 #endif
+}
+
+
+//
+// R_InitFlats
+//
+
+void R_InitFlats(void)
+{
+	firstflat        = W_GetNumForName("F_START") + 1;
+	int16_t lastflat = W_GetNumForName("F_END")   - 1;
+	int16_t numflats = lastflat - firstflat + 1;
+
+	// Create translation table for global animation.
+
+	flattranslation = Z_MallocStatic((numflats + 1) * sizeof(*flattranslation));
+
+	for (int16_t i = 0; i < numflats; i++)
+		flattranslation[i] = i;
+}
+
+
+//
+// R_FlatNumForName
+// Retrieval, get a flat number for a flat name.
+//
+//
+
+int16_t R_FlatNumForName(const char *name)
+{
+	int16_t i = W_GetNumForName(name);
+	return i - firstflat;
 }

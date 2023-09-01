@@ -225,7 +225,6 @@ static int16_t      *maskedtexturecol; // dropoff overflow
 
 fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
 
-int16_t       *flattranslation;             // for global animation
 int16_t       *texturetranslation;
 
 fixed_t  viewcos, viewsin;
