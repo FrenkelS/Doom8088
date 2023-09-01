@@ -240,19 +240,22 @@ static fixed_t distscale(uint8_t x)
 	return distscaleTable[x];
 }
 #else
+static FILE *fileDistScale;
+static FILE *fileYSlope;
+
 static fixed_t yslope(uint8_t y)
 {
 	fixed_t s;
-	fseek(_g->fileYSlope, y * sizeof(fixed_t), SEEK_SET);
-	fread(&s, sizeof(fixed_t), 1, _g->fileYSlope);
+	fseek(fileYSlope, y * sizeof(fixed_t), SEEK_SET);
+	fread(&s, sizeof(fixed_t), 1, fileYSlope);
 	return s;
 }
 
 static fixed_t distscale(uint8_t x)
 {
 	fixed_t d;
-	fseek(_g->fileDistScale, x * sizeof(fixed_t), SEEK_SET);
-	fread(&d, sizeof(fixed_t), 1, _g->fileDistScale);
+	fseek(fileDistScale, x * sizeof(fixed_t), SEEK_SET);
+	fread(&d, sizeof(fixed_t), 1, fileDistScale);
 	return d;
 }
 #endif
@@ -462,6 +465,18 @@ void R_InitFlats(void)
 
 	for (int16_t i = 0; i < numflats; i++)
 		flattranslation[i] = i;
+
+#if !defined FLAT_SPAN
+	// DistScale
+	fileDistScale = fopen("DISTSCAL.LMP", "rb");
+	if (fileDistScale == NULL)
+		I_Error("Can't open DISTSCAL.LMP.");
+
+	// YSlope
+	fileYSlope = fopen("YSLOPE.LMP", "rb");
+	if (fileYSlope == NULL)
+		I_Error("Can't open YSLOPE.LMP.");
+#endif
 }
 
 

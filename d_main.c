@@ -377,11 +377,6 @@ static void LoadIWAD(void)
 	if (_g->fileWAD == NULL)
 		I_Error("Can't open DOOM1.WAD.");
 
-	// DistScale
-	_g->fileDistScale = fopen("DISTSCAL.LMP", "rb");
-	if (_g->fileDistScale == NULL)
-		I_Error("Can't open DISTSCAL.LMP.");
-
 	// FineSine
 	_g->fileFineSine = fopen("FINESINE.LMP", "rb");
 	if (_g->fileFineSine == NULL)
@@ -406,11 +401,6 @@ static void LoadIWAD(void)
 	_g->fileXToViewAngle = fopen("XVIEWANG.LMP", "rb");
 	if (_g->fileXToViewAngle == NULL)
 		I_Error("Can't open XVIEWANG.LMP.");
-
-	// YSlope
-	_g->fileYSlope = fopen("YSLOPE.LMP", "rb");
-	if (_g->fileYSlope == NULL)
-		I_Error("Can't open YSLOPE.LMP.");
 }
 
 

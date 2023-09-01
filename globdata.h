@@ -76,14 +76,12 @@ uint32_t fps_frames;
 uint16_t fps_framerate;
 
 // files
-FILE *fileDistScale;
 FILE *fileFineSine;
 FILE *fileFineTan;
 FILE *fileTanToAngle;
 FILE *fileViewAngleToX;
 FILE *fileWAD;
 FILE *fileXToViewAngle;
-FILE *fileYSlope;
 
 
 //******************************************************************************
