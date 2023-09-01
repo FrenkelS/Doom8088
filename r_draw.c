@@ -276,18 +276,6 @@ static const fixed_t pspriteyiscale = ((UINT32_MAX) / ((((int32_t)SCREENHEIGHT) 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
 
 
-//********************************************
-// On the GBA we exploit that an 8 bit write
-// will mirror to the upper 8 bits too.
-// it saves an OR and Shift per pixel.
-//********************************************
-typedef uint16_t pixel;
-
-
-//********************************************
-// This goes here as we want the Thumb code
-// to BX to ARM as Thumb long mul is very slow.
-//********************************************
 #if defined __WATCOMC__
 //
 #else
@@ -592,11 +580,9 @@ const lighttable_t* R_LoadColorMap(int32_t lightlevel)
 
 inline static void R_DrawColumnPixel(uint16_t* dest, const byte* source, const byte* colormap, uint32_t frac)
 {
-    pixel* d = (pixel*)dest;
+	uint16_t color = colormap[source[frac>>COLBITS]];
 
-    uint32_t color = colormap[source[frac>>COLBITS]];
-
-    *d = (color | (color << 8));
+	*dest = (color | (color << 8));
 }
 
 
