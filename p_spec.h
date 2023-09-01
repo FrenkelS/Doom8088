@@ -743,23 +743,6 @@ typedef struct {
 } pusher_t;
 
 
-//
-// Animating textures and planes
-// There is another anim_t used in wi_stuff, unrelated.
-//
-typedef struct
-{
-    boolean     istexture;
-    int16_t         picnum;
-    int16_t         basepic;
-    int16_t         numpics;
-    int16_t         speed;
-
-} anim_t;
-
-
-#define MAXANIMS 32
-
 ////////////////////////////////////////////////////////////////
 //
 // Linedef and sector special utility function prototypes
@@ -1016,8 +999,8 @@ int32_t EV_DoGenLockedDoor
 ////////////////////////////////////////////////////////////////
 
 // at game start
-void P_InitPicAnims
-( void );
+void P_InitPicAnims(void);
+void P_InitAnimatedFlat(void);
 
 void P_InitSwitchList
 ( void );
@@ -1027,8 +1010,8 @@ void P_SpawnSpecials
 ( void );
 
 // every tic
-void P_UpdateSpecials
-( void );
+void P_UpdateSpecials(void);
+void P_UpdateAnimatedFlat(void);
 
 // when needed
 boolean P_UseSpecialLine

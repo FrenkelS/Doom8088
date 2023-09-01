@@ -84,7 +84,6 @@ extern const lighttable_t* fixedcolormap;
 
 extern fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
 
-extern int16_t       *flattranslation;             // for global animation
 extern int16_t       *texturetranslation;
 
 extern fixed_t  viewcos, viewsin;

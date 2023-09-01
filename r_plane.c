@@ -31,8 +31,6 @@
 
 #define FLAT_SPAN
 
-int16_t *flattranslation;             // for global animation
-
 static int16_t firstflat;
 
 
@@ -260,6 +258,7 @@ static fixed_t distscale(uint8_t x)
 }
 #endif
 
+static int16_t *flattranslation;             // for global animation
 
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
@@ -456,6 +455,8 @@ void R_ClearPlanes(void)
 void R_InitFlats(void)
 {
 	firstflat        = W_GetNumForName("F_START") + 1;
+
+#if !defined FLAT_SPAN
 	int16_t lastflat = W_GetNumForName("F_END")   - 1;
 	int16_t numflats = lastflat - firstflat + 1;
 
@@ -466,7 +467,6 @@ void R_InitFlats(void)
 	for (int16_t i = 0; i < numflats; i++)
 		flattranslation[i] = i;
 
-#if !defined FLAT_SPAN
 	// DistScale
 	fileDistScale = fopen("DISTSCAL.LMP", "rb");
 	if (fileDistScale == NULL)
@@ -491,3 +491,30 @@ int16_t R_FlatNumForName(const char *name)
 	int16_t i = W_GetNumForName(name);
 	return i - firstflat;
 }
+
+
+#if defined FLAT_SPAN
+void P_InitAnimatedFlat(void) {}
+void P_UpdateAnimatedFlat(void) {}
+
+
+#else
+static int16_t  animated_flat_basepic;
+
+void P_InitAnimatedFlat(void)
+{
+	animated_flat_basepic = R_FlatNumForName("NUKAGE1");
+	                        R_FlatNumForName("NUKAGE3");
+}
+
+
+void P_UpdateAnimatedFlat(void)
+{
+	uint32_t t = _g->leveltime >> 3;
+
+	int16_t pic = animated_flat_basepic + (t % 3);
+
+	for (int16_t i = animated_flat_basepic; i < animated_flat_basepic + 3; i++)
+		flattranslation[i] = pic;
+}
+#endif

@@ -61,99 +61,29 @@
 
 #include "globdata.h"
 
-                 // no longer a strict limit -- killough
-
 
 //
-//      source animation definition
+// Animating textures and planes
 //
-//
-
-
-typedef PACKEDATTR_PRE struct
-{
-  int8_t istexture; //jff 3/23/98 make char for comparison // cph - make signed
-  char        endname[9];           //  if false, it is a flat
-  char        startname[9];
-} PACKEDATTR_POST animdef_t; //jff 3/23/98 pack to read from memory
-
-
-//
-// P_InitPicAnims
-//
-
-// Floor/ceiling animation sequences,
-//  defined by first and last frame,
-//  i.e. the flat (64x64 tile) name to
-//  be used.
-// The full animation sequence is given
-//  using all the flats between the start
-//  and end entry, in the order found in
-//  the WAD file.
-//
-static const animdef_t		animdefs[] =
-{
-    {false,	"NUKAGE3",	"NUKAGE1"},
-
-    {true,	"SLADRIP3",	"SLADRIP1"},
-
-    {-1}
-};
-
-
-// killough 3/7/98: Initialize generalized scrolling
-static void P_SpawnScrollers(void);
+static int16_t  animated_texture_basepic;
 
 //
 // P_InitPicAnims
 //
 // Load the table of animation definitions, checking for existence of
-// the start and end of each frame. If the start doesn't exist the sequence
-// is skipped, if the last doesn't exist, BOOM exits.
+// the start and end of each frame. If the start doesn't exist or
+// the last doesn't exist, BOOM exits.
 //
 // Wall/Flat animation sequences, defined by name of first and last frame,
 // The full animation sequence is given using all lumps between the start
 // and end entry, in the order found in the WAD file.
 //
-// This routine modified to read its data from a predefined lump or
-// PWAD lump called ANIMATED rather than a static table in this module to
-// allow wad designers to insert or modify animation sequences.
-//
-// Lump format is an array of byte packed animdef_t structures, terminated
-// by a structure with istexture == -1. The lump can be generated from a
-// text source file using SWANTBLS.EXE, distributed with the BOOM utils.
-// The standard list of switches and animations is contained in the example
-// source text file DEFSWANI.DAT also in the BOOM util distribution.
-//
-//
 void P_InitPicAnims (void)
 {
-    //	Init animation
-    _g->lastanim = _g->anims;
-    for (int8_t i=0 ; animdefs[i].istexture != -1 ; i++)
-    {
-        if (animdefs[i].istexture)
-        {
-            _g->lastanim->picnum  = R_CheckTextureNumForName (animdefs[i].endname);
-            _g->lastanim->basepic = R_CheckTextureNumForName (animdefs[i].startname);
-        }
-        else
-        {
-            _g->lastanim->picnum  = R_FlatNumForName (animdefs[i].endname);
-            _g->lastanim->basepic = R_FlatNumForName (animdefs[i].startname);
-        }
+	P_InitAnimatedFlat();
 
-        _g->lastanim->istexture = animdefs[i].istexture;
-        _g->lastanim->numpics = _g->lastanim->picnum - _g->lastanim->basepic + 1;
-
-        if (_g->lastanim->numpics < 2)
-            I_Error ("P_InitPicAnims: bad cycle from %s to %s",
-                     animdefs[i].startname,
-                     animdefs[i].endname);
-
-        _g->lastanim++;
-    }
-
+	animated_texture_basepic = R_CheckTextureNumForName ("SLADRIP1");
+	                           R_CheckTextureNumForName ("SLADRIP3");
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2185,35 +2115,24 @@ void P_PlayerInSpecialSector (player_t* player)
 //  levelFragLimit, levelFragLimitCount
 //
 
+static void P_UpdateAnimatedTexture(void)
+{
+	uint32_t t = _g->leveltime >> 3;
+
+	int16_t pic = animated_texture_basepic + (t % 3);
+
+	for (int16_t i = animated_texture_basepic; i < animated_texture_basepic + 3; i++)
+		texturetranslation[i] = pic;
+}
 
 void P_UpdateSpecials (void)
 {
-    anim_t*     anim;
-    int32_t         pic;
-    int32_t         i;
-
     // Animate flats and textures globally
-    for (anim = _g->anims ; anim < _g->lastanim ; anim++)
-    {
-        uint32_t t = (_g->leveltime >> 3);
-        uint32_t n = anim->numpics;
-
-        if((n & (n - 1)) == 0)
-            pic = anim->basepic + (t & (n - 1));
-        else
-            pic = anim->basepic + (t % n);
-
-        for(i = anim->basepic; i<anim->basepic+anim->numpics; i++)
-        {
-            if(anim->istexture)
-                texturetranslation[i] = pic;
-            else
-                flattranslation[i] = pic;
-        }
-    }
+    P_UpdateAnimatedFlat();
+    P_UpdateAnimatedTexture();
 
     // Check buttons (retriggerable switches) and change texture on timeout
-    for (i = 0; i < MAXBUTTONS; i++)
+    for (int8_t i = 0; i < MAXBUTTONS; i++)
     {
         if (_g->buttonlist[i].btimer)
         {
@@ -2251,6 +2170,9 @@ void P_UpdateSpecials (void)
 // Sector and Line special thinker spawning at level startup
 //
 //////////////////////////////////////////////////////////////////////
+
+// killough 3/7/98: Initialize generalized scrolling
+static void P_SpawnScrollers(void);
 
 //
 // P_SpawnSpecials
