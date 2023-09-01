@@ -80,8 +80,6 @@ subsector_t *R_PointInSubsector(fixed_t x, fixed_t y);
 //
 
 void R_RenderPlayerView(player_t *player);   // Called by G_Drawer.
-void R_Init(void);                           // Called by startup code.
-void R_SetupFrame (player_t *player);
 
 
 #endif

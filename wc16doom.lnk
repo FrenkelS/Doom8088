@@ -51,7 +51,6 @@ file p_tick.obj
 file p_user.obj
 file r_data.obj
 file r_draw.obj
-file r_main.obj
 file r_things.obj
 file s_sound.obj
 file sounds.obj

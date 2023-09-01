@@ -3183,6 +3183,39 @@ static void R_ClearPlanes(void)
     baseyscale = FixedMul(viewcos,iprojection);
 }
 
+
+//
+// R_SetupFrame
+//
+
+static void R_SetupFrame (player_t *player)
+{
+    viewx = player->mo->x;
+    viewy = player->mo->y;
+    viewz = player->viewz;
+    viewangle = player->mo->angle;
+
+    extralight = player->extralight;
+
+    viewsin = finesine(  viewangle>>ANGLETOFINESHIFT);
+    viewcos = finecosine(viewangle>>ANGLETOFINESHIFT);
+
+    fullcolormap = &colormaps[0];
+
+    if (player->fixedcolormap)
+    {
+        fixedcolormap = fullcolormap   // killough 3/20/98: use fullcolormap
+                + player->fixedcolormap*256*sizeof(lighttable_t);
+    }
+    else
+        fixedcolormap = 0;
+
+    _g->validcount++;
+
+    highDetail = _g->highDetail;
+}
+
+
 //
 // R_RenderView
 //

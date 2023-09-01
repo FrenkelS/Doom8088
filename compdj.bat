@@ -47,7 +47,6 @@ set CFLAGS=-march=i386
 @set GLOBOBJS=%GLOBOBJS% p_user.c
 @set GLOBOBJS=%GLOBOBJS% r_data.c
 @set GLOBOBJS=%GLOBOBJS% r_draw.c
-@set GLOBOBJS=%GLOBOBJS% r_main.c
 @set GLOBOBJS=%GLOBOBJS% r_things.c
 @set GLOBOBJS=%GLOBOBJS% s_sound.c
 @set GLOBOBJS=%GLOBOBJS% sounds.c

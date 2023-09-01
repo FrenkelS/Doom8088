@@ -1362,12 +1362,3 @@ fixed_t finecosine(int16_t x)
 	return c;
 #endif
 }
-
-// R_LoadTrigTables
-// Load trig tables from a wad file lump
-// CPhipps 24/12/98 - fix endianness (!)
-//
-void R_LoadTrigTables(void)
-{
-
-}

@@ -59,8 +59,6 @@
 
 typedef uint32_t angle_t;
 
-// Load trig tables if needed
-void R_LoadTrigTables(void);
 
 fixed_t finesine(  int16_t x);
 fixed_t finecosine(int16_t x);

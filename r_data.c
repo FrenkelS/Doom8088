@@ -302,13 +302,13 @@ static void R_InitColormaps (void)
 }
 
 //
-// R_InitData
+// R_Init
 // Locates all the lumps
 //  that will be used by all views
 // Must be called after W_Init.
 //
 
-void R_InitData(void)
+void R_Init(void)
 {
   R_InitTextures();
   R_InitFlats();
