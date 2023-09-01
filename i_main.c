@@ -101,10 +101,10 @@ int x = 0;
 	printf("\n");
 }
 
-extern int    myargc;
-extern char **myargv;
+extern int myargc;
+extern const char * const * myargv;
 
-int main(int argc, char **argv)
+int main(int argc, const char * const * argv)
 {
 	myargc = argc;
 	myargv = argv;

@@ -426,8 +426,8 @@ static void LoadIWAD(void)
 =================
 */
 
-int    myargc;
-char **myargv;
+int myargc;
+const char * const * myargv;
 
 static int16_t M_CheckParm(char *check)
 {
