@@ -168,10 +168,12 @@ static void R_LoadTexture(int16_t texture_num)
     textures[texture_num] = texture;
 }
 
+static int16_t numtextures;
+
 const texture_t* R_GetTexture(int16_t texture)
 {
 #ifdef RANGECHECK
-    if (texture >= _g->numtextures)
+    if (texture >= numtextures)
         I_Error("R_GetTexture: Texture %d not in range.", texture);
 #endif
 texture = 2; //FIXME not everything has to be a door
@@ -194,7 +196,7 @@ static int16_t R_GetTextureNumForName(const char* tex_name)
     const int32_t *maptex = W_GetLumpByName("TEXTURE1");
     const int32_t *directory = maptex+1;
 
-    for (int16_t i = 0; i < _g->numtextures; i++)
+    for (int16_t i = 0; i < numtextures; i++)
     {
         int32_t offset = *directory++;
 
@@ -247,18 +249,18 @@ int16_t PUREFUNC R_CheckTextureNumForName (const char *tex_name)
 static void R_InitTextures()
 {
 	const int32_t* mtex1 = W_GetLumpByName("TEXTURE1");
-	_g->numtextures = *mtex1;
+	numtextures = *mtex1;
 	Z_Free(mtex1);
 
-	textures = Z_MallocStatic(_g->numtextures*sizeof*textures);
-	memset(textures, 0, _g->numtextures*sizeof*textures);
+	textures = Z_MallocStatic(numtextures*sizeof*textures);
+	memset(textures, 0, numtextures*sizeof*textures);
 
-	textureheight = Z_MallocStatic(_g->numtextures*sizeof*textureheight);
-	memset(textureheight, 0, _g->numtextures*sizeof*textureheight);
+	textureheight = Z_MallocStatic(numtextures*sizeof*textureheight);
+	memset(textureheight, 0, numtextures*sizeof*textureheight);
 
-	texturetranslation = Z_MallocStatic((_g->numtextures + 1)*sizeof*texturetranslation);
+	texturetranslation = Z_MallocStatic((numtextures + 1)*sizeof*texturetranslation);
 
-	for (int16_t i = 0; i < _g->numtextures; i++)
+	for (int16_t i = 0; i < numtextures; i++)
 		texturetranslation[i] = i;
 }
 
@@ -269,15 +271,15 @@ static void R_InitFlats(void)
 {
   _g->firstflat     = W_GetNumForName("F_START") + 1;
   int16_t lastflat  = W_GetNumForName("F_END")   - 1;
-  _g->numflats  = lastflat - _g->firstflat + 1;
+  int16_t numflats  = lastflat - _g->firstflat + 1;
 
   // Create translation table for global animation.
   // killough 4/9/98: make column offsets 32-bit;
   // clean up malloc-ing to use sizeof
 
-  flattranslation = Z_MallocStatic((_g->numflats+1)*sizeof(*flattranslation));
+  flattranslation = Z_MallocStatic((numflats+1)*sizeof(*flattranslation));
 
-  for (int16_t i = 0; i < _g->numflats; i++)
+  for (int16_t i = 0; i < numflats; i++)
     flattranslation[i] = i;
 }
 
