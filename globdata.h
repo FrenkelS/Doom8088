@@ -462,8 +462,6 @@ int16_t       firstspritelump, lastspritelump;
 //r_hotpatch_iwram.c
 //******************************************************************************
 
-int32_t fuzzpos;
-
 uint16_t validcount;         // increment every time a check is made
 
 visplane_t *visplanes[MAXVISPLANES];   // killough

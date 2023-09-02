@@ -749,7 +749,7 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
 #define FUZZOFF (SCREENWIDTH)
 #define FUZZTABLE 50
 
-static const int32_t fuzzoffset[FUZZTABLE] =
+static const int8_t fuzzoffset[FUZZTABLE] =
 {
     FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
     FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
@@ -787,22 +787,21 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
     if (count <= 0)
         return;
 
-    const byte* colormap = &fullcolormap[6*256];
+    const byte* colormap = &fullcolormap[6 * 256];
 
     uint16_t* dest = _g->screen + ScreenYToOffset(dc_yl) + dcvars->x;
 
-    uint32_t fuzzpos = _g->fuzzpos;
+    static int16_t fuzzpos = 0;
 
     do
     {        
-        R_DrawColumnPixel(dest, (const byte*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += SCREENWIDTH;  fuzzpos++;
+        R_DrawColumnPixel(dest, (const byte*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += SCREENWIDTH;
 
-        if(fuzzpos >= 50)
+        fuzzpos++;
+        if (fuzzpos >= FUZZTABLE)
             fuzzpos = 0;
 
     } while(--count);
-
-    _g->fuzzpos = fuzzpos;
 }
 
 #pragma GCC pop_options
