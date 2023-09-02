@@ -154,7 +154,7 @@ static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, const draw_span_var
 
     uint32_t l = (count >> 4);
 
-    while(l--)
+    while (l--)
     {
         R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
         R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
@@ -177,9 +177,7 @@ static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, const draw_span_var
         R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
     }
 
-    uint8_t r = (count & 15);
-
-    switch(r)
+    switch (count & 15)
     {
         case 15:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
         case 14:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
@@ -187,15 +185,15 @@ static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, const draw_span_var
         case 12:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
         case 11:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
         case 10:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 9:     R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 8:     R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 7:     R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 6:     R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 5:     R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 4:     R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 3:     R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 2:     R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 1:     R_DrawSpanPixel(dest, source, colormap, position);
+        case  9:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+        case  8:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+        case  7:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+        case  6:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+        case  5:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+        case  4:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+        case  3:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+        case  2:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+        case  1:    R_DrawSpanPixel(dest, source, colormap, position);
     }
 }
 

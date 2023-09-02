@@ -60,14 +60,15 @@
 #include "globdata.h"
 
 
+#define FLAT_WALL
+
+
 #if 0
 static const int8_t viewangletoxTable[4096];
 static const angle_t _huge tantoangleTable[2049];
 static const fixed_t _huge finetangentTable[4096];
-#endif
 
 
-#if 0
 static int8_t viewangletox(int16_t viewangle)
 {
 	return viewangletoxTable[viewangle];
@@ -109,8 +110,6 @@ static fixed_t finetangent(int16_t x)
 #endif
 
 
-static uint32_t columnCacheEntries[128];
-
 int16_t floorclip[SCREENWIDTH];
 int16_t ceilingclip[SCREENWIDTH];
 
@@ -145,14 +144,6 @@ static int16_t negonearray[SCREENWIDTH] =
 	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1
 };
-
-
-//*****************************************
-//Column cache stuff.
-//GBA has 16kb of Video Memory for columns
-//*****************************************
-
-static byte columnCache[128*128];
 
 
 //*****************************************
@@ -593,21 +584,21 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     if (count <= 0)
         return;
 
-    const byte *source = dcvars->source;
+    const byte *source   = dcvars->source;
     const byte *colormap = dcvars->colormap;
 
     uint16_t* dest = _g->screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
-    uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery)*dcvars->iscale) << COLEXTRABITS;
+    uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery) * dcvars->iscale) << COLEXTRABITS;
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
     // This is as fast as it gets.
 
-    uint32_t l = (count >> 4);
+    uint32_t l = count >> 4;
 
-    while(l--)
+    while (l--)
     {
         R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
         R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
@@ -630,9 +621,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
         R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
     }
 
-    uint32_t r = (count & 15);
-
-    switch(r)
+    switch (count & 15)
     {
         case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
         case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
@@ -640,17 +629,78 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
         case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
         case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
         case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 9:     R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 8:     R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 7:     R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 6:     R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 5:     R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 4:     R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 3:     R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 2:     R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 1:     R_DrawColumnPixel(dest, source, colormap, frac);
+        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
     }
 }
+
+
+#if defined FLAT_WALL
+static void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
+{
+	int32_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
+
+	const uint16_t color = (texture << 8) | texture;
+
+	uint16_t* dest = _g->screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+
+	uint32_t l = count >> 4;
+
+	while (l--)
+	{
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+	}
+
+	switch (count & 15)
+	{
+		case 15:	*dest = color; dest += SCREENWIDTH;
+		case 14:	*dest = color; dest += SCREENWIDTH;
+		case 13:	*dest = color; dest += SCREENWIDTH;
+		case 12:	*dest = color; dest += SCREENWIDTH;
+		case 11:	*dest = color; dest += SCREENWIDTH;
+		case 10:	*dest = color; dest += SCREENWIDTH;
+		case  9:	*dest = color; dest += SCREENWIDTH;
+		case  8:	*dest = color; dest += SCREENWIDTH;
+		case  7:	*dest = color; dest += SCREENWIDTH;
+		case  6:	*dest = color; dest += SCREENWIDTH;
+		case  5:	*dest = color; dest += SCREENWIDTH;
+		case  4:	*dest = color; dest += SCREENWIDTH;
+		case  3:	*dest = color; dest += SCREENWIDTH;
+		case  2:	*dest = color; dest += SCREENWIDTH;
+		case  1:	*dest = color;
+	}
+}
+#endif
+
 
 static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
 {
@@ -1637,6 +1687,9 @@ inline static void ByteCopy(byte* dest, const byte* src, uint32_t count)
 }
 
 
+#if defined FLAT_WALL
+#define R_DrawSegTextureColumn(x,y,z) R_DrawColumnFlat(x,z)
+#else
 static void R_DrawColumnInCache(const column_t* patch, byte* cache, int16_t originy, int16_t cacheheight)
 {
     while (patch->topdelta != 0xff)
@@ -1676,6 +1729,9 @@ static void R_DrawColumnInCache(const column_t* patch, byte* cache, int16_t orig
 #define CACHE_ENTRY(c, t) ((c << 16 | t))
 
 #define CACHE_HASH(c, t) (((c >> 1) ^ t) & CACHE_KEY_MASK)
+
+static byte columnCache[128*128];
+static uint32_t columnCacheEntries[128];
 
 static uint32_t FindColumnCacheItem(int16_t texture, uint32_t column)
 {
@@ -1798,6 +1854,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_colu
         R_DrawColumn (dcvars);
     }
 }
+#endif
 
 //
 // R_RenderSegLoop
