@@ -330,11 +330,11 @@ static struct
 const demostates[] =
 {
     {D_DrawTitle1, NULL},
+    {G_DeferedPlayDemo, "demo3"},
+    {D_SetPageName, NULL},
     {G_DeferedPlayDemo, "demo1"},
     {D_SetPageName, NULL},
     {G_DeferedPlayDemo, "demo2"},
-    {D_SetPageName, NULL},
-    {G_DeferedPlayDemo, "demo3"},
     {NULL, NULL},
 };
 
