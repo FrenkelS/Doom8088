@@ -113,7 +113,6 @@ static fixed_t finetangent(int16_t x)
 int16_t floorclip[SCREENWIDTH];
 int16_t ceilingclip[SCREENWIDTH];
 
-static vissprite_t* vissprite_ptrs[96];
 
 static int16_t screenheightarray[SCREENWIDTH] =
 {
@@ -236,8 +235,6 @@ static int32_t      worldlow;
 
 static lighttable_t current_colormap[256];
 static const lighttable_t* current_colormap_ptr;
-
-static size_t num_vissprite;
 
 boolean highDetail = false;
 
@@ -874,6 +871,33 @@ static void R_SetDefaultDrawColumnVars(draw_column_vars_t *dcvars)
 
 
 //
+// A vissprite_t is a thing that will be drawn during a refresh.
+// i.e. a sprite object that is partly visible.
+//
+
+typedef struct vissprite_s
+{
+  int16_t x1, x2;
+  fixed_t gx, gy;              // for line side calculation
+  fixed_t gz;                   // global bottom for silhouette clipping
+  fixed_t startfrac;           // horizontal position of x1
+  fixed_t scale;
+  fixed_t xiscale;             // negative if flipped
+  fixed_t texturemid;
+  fixed_t iscale;
+
+  int16_t patch_num;
+  int16_t patch_topoffset;
+
+  uint32_t mobjflags;
+
+  // for color translation and shadow draw, maxbright frames as well
+  const lighttable_t *colormap;
+
+} vissprite_t;
+
+
+//
 // R_DrawVisSprite
 //  mfloorclip and mceilingclip should also be set.
 //
@@ -1311,14 +1335,19 @@ static int compare (const void* l, const void* r)
     return vr->scale - vl->scale;
 }
 
+#define MAXVISSPRITES 96
+static int8_t num_vissprite;
+static vissprite_t vissprites[MAXVISSPRITES];
+static vissprite_t* vissprite_ptrs[MAXVISSPRITES];
+
 static void R_SortVisSprites (void)
 {
-    int32_t i = num_vissprite;
+    int8_t i = num_vissprite;
 
     if (i)
     {
-        while (--i>=0)
-            vissprite_ptrs[i] = _g->vissprites+i;
+        while (--i >= 0)
+            vissprite_ptrs[i] = vissprites + i;
 
         qsort(vissprite_ptrs, num_vissprite, sizeof (vissprite_t*), compare);
     }
@@ -1330,7 +1359,6 @@ static void R_SortVisSprites (void)
 
 static void R_DrawMasked(void)
 {
-    int32_t i;
     drawseg_t *ds;
     drawseg_t* drawsegs = _g->drawsegs;
 
@@ -1338,7 +1366,7 @@ static void R_DrawMasked(void)
     R_SortVisSprites();
 
     // draw all vissprites back to front
-    for (i = num_vissprite ;--i>=0; )
+    for (int8_t i = num_vissprite; --i >= 0; )
         R_DrawSprite(vissprite_ptrs[i]);         // killough
 
     // render any remaining masked mid textures
@@ -1351,6 +1379,34 @@ static void R_DrawMasked(void)
             R_RenderMaskedSegRange(ds, ds->x1, ds->x2);
 
     R_DrawPlayerSprites ();
+}
+
+
+//
+// R_NewVisSprite
+//
+static vissprite_t *R_NewVisSprite(void)
+{
+    if (num_vissprite >= MAXVISSPRITES)
+    {
+#ifdef RANGECHECK
+        I_Error("Vissprite overflow.");
+#endif
+        return NULL;
+    }
+
+    return vissprites + num_vissprite++;
+}
+
+
+//
+// R_ClearSprites
+// Called at frame start.
+//
+
+static void R_ClearSprites(void)
+{
+    num_vissprite = 0;
 }
 
 
@@ -1378,23 +1434,6 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 
   return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
-}
-
-
-//
-// R_NewVisSprite
-//
-static vissprite_t *R_NewVisSprite(void)
-{
-    if (num_vissprite >= MAXVISSPRITES)
-    {
-#ifdef RANGECHECK
-        I_Error("Vissprite overflow.");
-#endif
-        return NULL;
-    }
-
-    return _g->vissprites + num_vissprite++;
 }
 
 
@@ -2833,16 +2872,6 @@ static void R_ClearDrawSegs(void)
 static void R_ClearClipSegs (void)
 {
     memset(solidcol, 0, SCREENWIDTH);
-}
-
-//
-// R_ClearSprites
-// Called at frame start.
-//
-
-static void R_ClearSprites(void)
-{
-    num_vissprite = 0;            // killough
 }
 
 

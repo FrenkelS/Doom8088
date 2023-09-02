@@ -62,8 +62,6 @@
 
 #define MAXOPENINGS (SCREENWIDTH*16)
 
-#define MAXVISSPRITES 96
-
 //
 // INTERNAL MAP TYPES
 //  used by play and refresh
@@ -342,31 +340,6 @@ typedef struct
 // column_t is a list of 0 or more post_t, (byte)-1 terminated
 typedef post_t	column_t;
 
-//
-// A vissprite_t is a thing that will be drawn during a refresh.
-// i.e. a sprite object that is partly visible.
-//
-
-typedef struct vissprite_s
-{
-  int16_t x1, x2;
-  fixed_t gx, gy;              // for line side calculation
-  fixed_t gz;                   // global bottom for silhouette clipping
-  fixed_t startfrac;           // horizontal position of x1
-  fixed_t scale;
-  fixed_t xiscale;             // negative if flipped
-  fixed_t texturemid;
-  fixed_t iscale;
-
-  int16_t patch_num;
-  int16_t patch_topoffset;
-
-  uint32_t mobjflags;
-
-  // for color translation and shadow draw, maxbright frames as well
-  const lighttable_t *colormap;
-
-} vissprite_t;
 
 //
 // Sprites are patches with a special naming convention
