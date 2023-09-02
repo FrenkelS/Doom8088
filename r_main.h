@@ -107,6 +107,7 @@ const lighttable_t* R_LoadColorMap(int32_t lightlevel);
 void R_RenderPlayerView(player_t *player);   // Called by G_Drawer.
 
 void R_DrawColumn (const draw_column_vars_t *dcvars);
+void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
 
 void R_DrawPlanes (void);
 void R_ClearPlanes(void);

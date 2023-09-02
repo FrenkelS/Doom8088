@@ -642,8 +642,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
 }
 
 
-#if defined FLAT_WALL
-static void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
+void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 {
 	int32_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -699,7 +698,6 @@ static void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 		case  1:	*dest = color;
 	}
 }
-#endif
 
 
 static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
@@ -852,7 +850,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
             dcvars->yh = yh;
             dcvars->yl = yl;
 
-            // Drawn by either R_DrawColumn
+            // Drawn by either R_DrawColumn, R_DrawColumnHiRes
             //  or (SHADOW) R_DrawFuzzColumn.
             colfunc (dcvars);
         }

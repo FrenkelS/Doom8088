@@ -30,6 +30,9 @@
 #include "globdata.h"
 
 
+#define FLAT_SKY
+
+
 static int16_t skytexture;
 
 
@@ -39,6 +42,18 @@ void R_DrawSky(visplane_t *pl)
 {
 	draw_column_vars_t dcvars;
 
+#if defined FLAT_SKY
+	for (int16_t x = pl->minx; x <= pl->maxx; x++)
+	{
+		if (pl->top[x] != 0xff &&  pl->top[x] <= pl->bottom[x])
+		{
+			dcvars.x = x;
+			dcvars.yl = pl->top[x];
+			dcvars.yh = pl->bottom[x];
+			R_DrawColumnFlat(skytexture, &dcvars);
+		}
+	}
+#else
 	// Normal Doom sky, only one allowed per level
 	dcvars.texturemid = 100 * FRACUNIT;    // Default y-offset
 
@@ -70,6 +85,7 @@ void R_DrawSky(visplane_t *pl)
 			Z_Free(patch);
 		}
 	}
+#endif
 }
 
 
