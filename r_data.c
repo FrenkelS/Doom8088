@@ -266,18 +266,6 @@ static void R_InitTextures()
 
 
 //
-// R_InitSpriteLumps
-// Finds the width and offset of all sprites in the wad,
-// so the sprite does not need to be cached completely
-// just for having the header info ready during rendering.
-//
-static void R_InitSpriteLumps(void)
-{
-	_g->firstspritelump = W_GetNumForName("S_START") + 1;
-	_g->lastspritelump  = W_GetNumForName("S_END")   - 1;
-}
-
-//
 // R_InitColormaps
 //
 static void R_InitColormaps (void)

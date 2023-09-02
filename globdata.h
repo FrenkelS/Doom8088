@@ -455,7 +455,7 @@ boolean onground; // whether player is on ground or in air
 //r_data.c
 //******************************************************************************
 
-int16_t       firstspritelump, lastspritelump;
+int16_t       firstspritelump;
 
 
 //******************************************************************************
@@ -507,9 +507,6 @@ int16_t skyflatnum;
 
 spritedef_t *sprites;
 
-
-spriteframe_t sprtemp[MAX_SPRITE_FRAMES];
-int32_t maxframe;
 
 vissprite_t vissprites[MAXVISSPRITES];
 
