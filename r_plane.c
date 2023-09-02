@@ -310,7 +310,6 @@ static const fixed_t skyiscale = (FRACUNIT * 200) / ((SCREENHEIGHT - ST_HEIGHT) 
 static void R_DrawSky(visplane_t *pl)
 {
 	draw_column_vars_t dcvars;
-	dcvars.translation = NULL;
 
 	// Normal Doom sky, only one allowed per level
 	dcvars.texturemid = skytexturemid;    // Default y-offset
