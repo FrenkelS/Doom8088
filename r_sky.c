@@ -29,6 +29,10 @@
 
 #include "globdata.h"
 
+
+static int16_t skytexture;
+
+
 #define ANGLETOSKYSHIFT         22
 
 void R_DrawSky(visplane_t *pl)
@@ -47,7 +51,7 @@ void R_DrawSky(visplane_t *pl)
 
 	dcvars.iscale = (FRACUNIT * 200) / ((SCREENHEIGHT - ST_HEIGHT) + 16);
 
-	const texture_t* tex = R_GetTexture(_g->skytexture);
+	const texture_t* tex = R_GetTexture(skytexture);
 
 	// killough 10/98: Use sky scrolling offset
 	for (int16_t x = pl->minx; (dcvars.x = x) <= pl->maxx; x++)
@@ -66,4 +70,17 @@ void R_DrawSky(visplane_t *pl)
 			Z_Free(patch);
 		}
 	}
+}
+
+
+// Set the sky map.
+void R_InitSky(void)
+{
+	skytexture = R_CheckTextureNumForName("SKY1");
+
+	// First thing, we have a dummy sky texture name,
+	//  a flat. The data is in the WAD only because
+	//  we look for an actual index, instead of simply
+	//  setting one.
+	_g->skyflatnum = R_FlatNumForName("F_SKY1");
 }

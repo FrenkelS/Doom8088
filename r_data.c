@@ -296,6 +296,7 @@ void R_Init(void)
 {
   R_InitTextures();
   R_InitFlats();
+  R_InitSky();
   R_InitSpriteLumps();
   R_InitColormaps();                    // killough 3/20/98
 }

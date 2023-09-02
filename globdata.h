@@ -499,7 +499,6 @@ int16_t* lastopening;
 // sky mapping
 //
 int16_t skyflatnum;
-int16_t skytexture;
 
 
 //******************************************************************************

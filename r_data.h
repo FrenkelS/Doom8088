@@ -75,6 +75,7 @@ typedef struct
 // I/O, setting up the stuff.
 void R_Init(void);
 void R_InitFlats(void);
+void R_InitSky(void);
 
 
 // Retrieval.

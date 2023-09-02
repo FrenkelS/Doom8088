@@ -302,24 +302,8 @@ void G_BuildTiccmd(ticcmd_t* cmd)
 // G_DoLoadLevel
 //
 
-/* SKY, store the number for name. */
-#define SKYFLATNAME  "F_SKY1"
-
 static void G_DoLoadLevel (void)
 {
-    // Set the sky map.
-    // First thing, we have a dummy sky texture name,
-    //  a flat. The data is in the WAD only because
-    //  we look for an actual index, instead of simply
-    //  setting one.
-
-    _g->skyflatnum = R_FlatNumForName ( SKYFLATNAME );
-
-    // DOOM determines the sky texture to be used
-    _g->skytexture = R_CheckTextureNumForName("SKY1");
-
-    /* cph 2006/07/31 - took out unused levelstarttic variable */
-
     if (_g->wipegamestate == GS_LEVEL)
         _g->wipegamestate = -1;             // force a wipe
 

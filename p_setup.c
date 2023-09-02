@@ -566,9 +566,6 @@ void P_SetupLevel(int32_t map)
 
     P_FreeLevelData();
 
-    //Load the sky texture.
-    R_GetTexture(_g->skytexture);
-
     P_InitThinkers();
 
     _g->leveltime = 0;
