@@ -1,0 +1,69 @@
+/*-----------------------------------------------------------------------------
+ *
+ *
+ *  Copyright (C) 2023 Frenkel Smeijers
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ * DESCRIPTION:
+ *      Render sky
+ *
+ *-----------------------------------------------------------------------------*/
+
+#include "r_defs.h"
+#include "r_main.h"
+#include "st_stuff.h"
+
+#include "globdata.h"
+
+#define ANGLETOSKYSHIFT         22
+
+void R_DrawSky(visplane_t *pl)
+{
+	draw_column_vars_t dcvars;
+
+	// Normal Doom sky, only one allowed per level
+	dcvars.texturemid = 100 * FRACUNIT;    // Default y-offset
+
+	// Sky is always drawn full bright, i.e. colormaps[0] is used.
+	// Because of this hack, sky is not affected by INVUL inverse mapping.
+	// Until Boom fixed this.
+
+	if (!(dcvars.colormap = fixedcolormap))
+		dcvars.colormap = fullcolormap;
+
+	dcvars.iscale = (FRACUNIT * 200) / ((SCREENHEIGHT - ST_HEIGHT) + 16);
+
+	const texture_t* tex = R_GetTexture(_g->skytexture);
+
+	// killough 10/98: Use sky scrolling offset
+	for (int16_t x = pl->minx; (dcvars.x = x) <= pl->maxx; x++)
+	{
+		if ((dcvars.yl = pl->top[x]) != -1 && dcvars.yl <= (dcvars.yh = pl->bottom[x])) // dropoff overflow
+		{
+			int32_t xc = (viewangle + xtoviewangle(x)) >> ANGLETOSKYSHIFT;
+
+			uint32_t r = R_GetColumn(tex, xc);
+			const patch_t* patch = W_GetLumpByNum(HIWORD(r));
+			xc = LOWORD(r);
+			const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[xc]);
+
+			dcvars.source = (const byte*)column + 3;
+			R_DrawColumn(&dcvars);
+			Z_Free(patch);
+		}
+	}
+}

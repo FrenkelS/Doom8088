@@ -302,50 +302,6 @@ static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32
 #endif
 
 
-#define ANGLETOSKYSHIFT         22
-
-static const fixed_t skytexturemid = 100 * FRACUNIT;
-static const fixed_t skyiscale = (FRACUNIT * 200) / ((SCREENHEIGHT - ST_HEIGHT) + 16);
-
-static void R_DrawSky(visplane_t *pl)
-{
-	draw_column_vars_t dcvars;
-
-	// Normal Doom sky, only one allowed per level
-	dcvars.texturemid = skytexturemid;    // Default y-offset
-
-	// Sky is always drawn full bright, i.e. colormaps[0] is used.
-	// Because of this hack, sky is not affected by INVUL inverse mapping.
-	// Until Boom fixed this.
-
-	if (!(dcvars.colormap = fixedcolormap))
-		dcvars.colormap = fullcolormap;          // killough 3/20/98
-
-	// proff 09/21/98: Changed for high-res
-	dcvars.iscale = skyiscale;
-
-	const texture_t* tex = R_GetTexture(_g->skytexture);
-
-	// killough 10/98: Use sky scrolling offset
-	for (register int32_t x = pl->minx; (dcvars.x = x) <= pl->maxx; x++)
-	{
-		if ((dcvars.yl = pl->top[x]) != -1 && dcvars.yl <= (dcvars.yh = pl->bottom[x])) // dropoff overflow
-		{
-			int32_t xc = (viewangle + xtoviewangle(x)) >> ANGLETOSKYSHIFT;
-
-			uint32_t r = R_GetColumn(tex, xc);
-			const patch_t* patch = W_GetLumpByNum(HIWORD(r));
-			xc = LOWORD(r);
-			const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[xc]);
-
-			dcvars.source = (const byte*)column + 3;
-			R_DrawColumn(&dcvars);
-			Z_Free(patch);
-		}
-	}
-}
-
-
 static void R_DoDrawPlane(visplane_t *pl)
 {
     if (pl->minx <= pl->maxx)

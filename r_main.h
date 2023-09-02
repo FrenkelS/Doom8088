@@ -111,4 +111,6 @@ void R_DrawColumn (const draw_column_vars_t *dcvars);
 void R_DrawPlanes (void);
 void R_ClearPlanes(void);
 
+void R_DrawSky(visplane_t *pl);
+
 #endif

@@ -52,6 +52,7 @@ file p_user.obj
 file r_data.obj
 file r_draw.obj
 file r_plane.obj
+file r_sky.obj
 file r_things.obj
 file s_sound.obj
 file sounds.obj
