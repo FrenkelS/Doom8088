@@ -1547,12 +1547,17 @@ static msecnode_t* P_DelSecnode(msecnode_t* node)
 
 // Delete an entire sector list
 
-void P_DelSeclist(msecnode_t* node)
+void P_DelSeclist(void)
+{
+	if (_g->sector_list)
+	{
+		msecnode_t* node = _g->sector_list;
+		while (node)
+			node = P_DelSecnode(node);
 
-  {
-  while (node)
-    node = P_DelSecnode(node);
-  }
+		_g->sector_list = NULL;
+	}
+}
 
 
 // phares 3/14/98

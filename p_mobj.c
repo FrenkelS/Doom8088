@@ -713,12 +713,7 @@ void P_RemoveMobj (mobj_t* mobj)
   P_UnsetThingPosition (mobj);
 
   // Delete all nodes on the current sector_list               phares 3/16/98
-
-  if (_g->sector_list)
-    {
-    P_DelSeclist(_g->sector_list);
-    _g->sector_list = NULL;
-    }
+  P_DelSeclist();
 
   // stop any playing sound
 

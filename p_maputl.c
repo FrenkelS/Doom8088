@@ -360,7 +360,7 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
 
     for ( ; *list != -1 ; list++)                                   // phares
     {
-        const int32_t lineno = *list;
+        const int16_t lineno = *list;
 
         linedata_t *lt = &_g->linedata[lineno];
 

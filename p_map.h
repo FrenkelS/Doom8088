@@ -67,7 +67,7 @@ boolean P_CheckPosition(mobj_t *thing, fixed_t x, fixed_t y);
 //jff 3/19/98 P_CheckSector(): new routine to replace P_ChangeSector()
 boolean P_CheckSector(sector_t *sector, boolean crunch);
 void    P_SetSecnodeFirstpoolToNull(void);
-void    P_DelSeclist(msecnode_t*);                          // phares 3/16/98
+void    P_DelSeclist(void);
 void    P_CreateSecNodeList(mobj_t*,fixed_t,fixed_t);       // phares 3/14/98
 
 /* cphipps 2004/08/30 */
