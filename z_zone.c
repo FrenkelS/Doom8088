@@ -81,7 +81,7 @@ typedef char assertMemblockSize[sizeof(memblock_t) <= PARAGRAPH_SIZE ? 1 : -1];
 static uint8_t    *mainzone;
 static uint8_t     mainzone_blocklist_buffer[32];
 static memblock_t *mainzone_blocklist;
-static segment     mainzone_rover;
+static segment     mainzone_rover_segment;
 
 
 static segment pointerToSegment(const memblock_t* ptr)
@@ -142,13 +142,13 @@ void Z_Init (void)
 
     // set the entire zone to one free block
     block = (memblock_t *)mainzone;
-    mainzone_blocklist->next =
-    mainzone_blocklist->prev = pointerToSegment(block);
+    mainzone_rover_segment = pointerToSegment(block);
+
+    mainzone_blocklist->next = mainzone_rover_segment;
+    mainzone_blocklist->prev = mainzone_rover_segment;
 
     mainzone_blocklist->user = (void *)mainzone;
     mainzone_blocklist->tag  = PU_STATIC;
-
-    mainzone_rover = pointerToSegment(block);
 
     block->prev = block->next = pointerToSegment(mainzone_blocklist);
 
@@ -202,11 +202,11 @@ void Z_Free (const void* ptr)
     {
         // merge with previous free block
         other->size += block->size;
-        other->next = block->next;
-        segmentToPointer(other->next)->prev = pointerToSegment(other);
+        other->next  = block->next;
+        segmentToPointer(other->next)->prev = block->prev; // == pointerToSegment(other);
 
-        if (pointerToSegment(block) == mainzone_rover)
-            mainzone_rover = pointerToSegment(other);
+        if (pointerToSegment(block) == mainzone_rover_segment)
+            mainzone_rover_segment = block->prev; // == pointerToSegment(other);
 
         block = other;
     }
@@ -216,11 +216,11 @@ void Z_Free (const void* ptr)
     {
         // merge the next free block onto the end
         block->size += other->size;
-        block->next = other->next;
+        block->next  = other->next;
         segmentToPointer(block->next)->prev = pointerToSegment(block);
 
-        if (pointerToSegment(other) == mainzone_rover)
-            mainzone_rover = pointerToSegment(block);
+        if (pointerToSegment(other) == mainzone_rover_segment)
+            mainzone_rover_segment = pointerToSegment(block);
     }
 }
 
@@ -229,7 +229,9 @@ static uint32_t Z_GetLargestFreeBlockSize(void)
 {
 	uint32_t largestFreeBlockSize = 0;
 
-	for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); pointerToSegment(block) != pointerToSegment(mainzone_blocklist); block = segmentToPointer(block->next))
+	segment mainzone_blocklist_segment = pointerToSegment(mainzone_blocklist);
+
+	for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); pointerToSegment(block) != mainzone_blocklist_segment; block = segmentToPointer(block->next))
 		if (!block->user && block->size > largestFreeBlockSize)
 			largestFreeBlockSize = block->size;
 
@@ -240,7 +242,9 @@ static uint32_t Z_GetTotalFreeMemory(void)
 {
 	uint32_t totalFreeMemory = 0;
 
-	for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); pointerToSegment(block) != pointerToSegment(mainzone_blocklist); block = segmentToPointer(block->next))
+	segment mainzone_blocklist_segment = pointerToSegment(mainzone_blocklist);
+
+	for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); pointerToSegment(block) != mainzone_blocklist_segment; block = segmentToPointer(block->next))
 		if (!block->user)
 			totalFreeMemory += block->size;
 
@@ -269,17 +273,18 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
 
     // if there is a free block behind the rover,
     //  back up over them
-    memblock_t* base = segmentToPointer(mainzone_rover);
+    memblock_t* base = segmentToPointer(mainzone_rover_segment);
 
-    if (!segmentToPointer(base->prev)->user)
-        base = segmentToPointer(base->prev);
+    memblock_t* previous_block = segmentToPointer(base->prev);
+    if (!previous_block->user)
+        base = previous_block;
 
-    memblock_t* rover = base;
-    memblock_t* start = segmentToPointer(base->prev);
+    memblock_t* rover     = base;
+    segment start_segment = base->prev;
 
     do
     {
-        if (rover == start)
+        if (pointerToSegment(rover) == start_segment)
         {
             // scanned all the way around the list
             I_Error ("Z_Malloc: failed to allocate %li B, max free block %li B, total free %li", size, Z_GetLargestFreeBlockSize(), Z_GetTotalFreeMemory());
@@ -308,25 +313,27 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
             rover = segmentToPointer(rover->next);
 
     } while (base->user || base->size < size);
-
-
     // found a block big enough
-    int32_t extra = base->size - size;
 
-    if (extra > MINFRAGMENT)
+    int32_t newblock_size = base->size - size;
+    if (newblock_size > MINFRAGMENT)
     {
         // there will be a free fragment after the allocated block
-        memblock_t* newblock = segmentToPointer(pointerToSegment(base) + size / PARAGRAPH_SIZE);
-        newblock->size = extra;
+        segment base_segment     = pointerToSegment(base);
+        segment newblock_segment = base_segment + size / PARAGRAPH_SIZE;
 
-        // NULL indicates free block.
-        newblock->user = NULL;
+        memblock_t* newblock = segmentToPointer(newblock_segment);
+        newblock->size = newblock_size;
+        newblock->user = NULL; // NULL indicates free block.
         newblock->tag  = 0;
-        newblock->prev = pointerToSegment(base);
+#if defined _M_I86
+        newblock->id   = ZONEID;
+#endif
+        newblock->prev = base_segment;
         newblock->next = base->next;
-        segmentToPointer(newblock->next)->prev = pointerToSegment(newblock);
 
-        base->next = pointerToSegment(newblock);
+        segmentToPointer(base->next)->prev = newblock_segment;
+        base->next = newblock_segment;
         base->size = size;
     }
 
@@ -351,7 +358,7 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
 #endif
 
     // next allocation will start looking here
-    mainzone_rover = base->next;
+    mainzone_rover_segment = base->next;
 
 #if defined INSTRUMENTED
     running_count += base->size;
@@ -416,9 +423,11 @@ void Z_FreeTags(void)
 //
 void Z_CheckHeap (void)
 {
+    segment mainzone_blocklist_segment = pointerToSegment(mainzone_blocklist);
+
     for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); ; block = segmentToPointer(block->next))
     {
-        if (block->next == pointerToSegment(mainzone_blocklist))
+        if (block->next == mainzone_blocklist_segment)
         {
             // all blocks have been hit
             break;

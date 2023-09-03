@@ -36,6 +36,5 @@ void*	Z_CallocLevSpec(int32_t size);
 void	Z_Free(const void *ptr);
 void	Z_FreeTags(void);
 void	Z_CheckHeap(void);
-void	Z_CheckHeap(void);
 
 #endif
