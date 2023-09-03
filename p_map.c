@@ -1433,7 +1433,7 @@ boolean P_CheckSector(sector_t* sector,boolean crunch)
 
 #include "z_bmallo.h"
 
-static struct block_memory_alloc_s secnodezone = { NULL, sizeof(msecnode_t), 32, "SecNodes"};
+static struct block_memory_alloc_s secnodezone = { NULL, sizeof(msecnode_t), 32 };
 
 void P_SetSecnodeFirstpoolToNull(void)
 {

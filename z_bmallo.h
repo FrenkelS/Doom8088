@@ -34,10 +34,9 @@
  *-----------------------------------------------------------------------------*/
 
 struct block_memory_alloc_s {
-  void  *firstpool;
-  size_t size;
-  size_t perpool;
-  const char *desc;
+	void  *firstpool;
+	size_t size;
+	size_t perpool;
 };
 
 void* Z_BMalloc(struct block_memory_alloc_s *pzone);
