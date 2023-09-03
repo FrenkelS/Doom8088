@@ -120,17 +120,13 @@ void D_PostEvent(event_t *ev)
 
 static void D_Display (void)
 {
-
-    boolean wipe;
-    boolean viewactive = false;
-
     if (nodrawers)                    // for comparative timing / profiling
         return;
 
     I_StartDisplay();
 
     // save the current screen if about to wipe
-    wipe = (_g->gamestate != _g->wipegamestate);
+    boolean wipe = (_g->gamestate != _g->wipegamestate);
 
     if (wipe)
         wipe_StartScreen();
@@ -166,7 +162,7 @@ static void D_Display (void)
         HU_Erase();
 
         // Work out if the player view is visible, and if there is a border
-        viewactive = (!(_g->automapmode & am_active) || (_g->automapmode & am_overlay));
+        boolean viewactive = (!(_g->automapmode & am_active) || (_g->automapmode & am_overlay));
 
         // Now do the drawing
         if (viewactive)

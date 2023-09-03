@@ -178,7 +178,7 @@ boolean P_TeleportMove (mobj_t* thing,fixed_t x,fixed_t y, boolean boss)
  * assuming NO movement occurs -- used to avoid sticky situations.
  */
 
-static int32_t untouched(const line_t *ld)
+static boolean untouched(const line_t *ld)
 {
   fixed_t x, y, tmbbox[4];
   return
@@ -747,7 +747,7 @@ isblocking:
 
 void P_SlideMove(mobj_t *mo)
 {
-  int32_t hitcount = 3;
+  int8_t hitcount = 3;
 
   _g->slidemo = mo; // the object that's sliding
 
