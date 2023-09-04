@@ -50,7 +50,7 @@
 #include "globdata.h"
 
 
-#if 0
+#if 1
 static const fixed_t finesineTable[10240] =
 {
     25,75,125,175,226,276,326,376,
@@ -1356,42 +1356,50 @@ static const angle_t xtoviewangleTable[121] =
     3806330880,3800039424,3793747968,3787456512,3781165056,3775397888,3769630720,3763339264,3221225472,
 };
 
-#endif
-
 
 fixed_t finesine(int16_t x)
 {
-#if 0
 	return finesineTable[x];
-#else
-	fixed_t s;
-	fseek(_g->fileFineSine, x * sizeof(fixed_t), SEEK_SET);
-	fread(&s, sizeof(fixed_t), 1, _g->fileFineSine);
-	return s;
-#endif
 }
 
 fixed_t finecosine(int16_t x)
 {
-#if 0
 	return finecosineTable[x];
-#else
-	fixed_t c;
-	fseek(_g->fileFineSine, x * sizeof(fixed_t) + (FINEANGLES/4) * sizeof(fixed_t), SEEK_SET);
-	fread(&c, sizeof(fixed_t), 1, _g->fileFineSine);
-	return c;
-#endif
 }
 
 
 angle_t xtoviewangle(int8_t x)
 {
-#if 0
 	return xtoviewangleTable[x];
+}
+
+
 #else
+
+
+fixed_t finesine(int16_t x)
+{
+	fixed_t s;
+	fseek(_g->fileFineSine, x * sizeof(fixed_t), SEEK_SET);
+	fread(&s, sizeof(fixed_t), 1, _g->fileFineSine);
+	return s;
+}
+
+fixed_t finecosine(int16_t x)
+{
+	fixed_t c;
+	fseek(_g->fileFineSine, x * sizeof(fixed_t) + (FINEANGLES/4) * sizeof(fixed_t), SEEK_SET);
+	fread(&c, sizeof(fixed_t), 1, _g->fileFineSine);
+	return c;
+}
+
+
+angle_t xtoviewangle(int8_t x)
+{
 	angle_t viewangle;
 	fseek(_g->fileXToViewAngle, x * sizeof(angle_t), SEEK_SET);
 	fread(&viewangle, sizeof(angle_t), 1, _g->fileXToViewAngle);
 	return viewangle;
-#endif
 }
+
+#endif
