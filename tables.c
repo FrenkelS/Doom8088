@@ -50,7 +50,7 @@
 #include "globdata.h"
 
 
-#if 1
+#if 0
 static const fixed_t finesineTable[10240] =
 {
     25,75,125,175,226,276,326,376,
