@@ -65,8 +65,8 @@
 
 #if 0
 static const int8_t viewangletoxTable[4096];
-static const angle_t _huge tantoangleTable[2049];
-static const fixed_t _huge finetangentTable[4096];
+static const angle_t tantoangleTable[2049];
+static const fixed_t finetangentTable[4096];
 
 
 static int8_t viewangletox(int16_t viewangle)
@@ -1254,7 +1254,10 @@ static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
 
     // off the side
     if (x2 < 0 || x1 > SCREENWIDTH)
+    {
+        Z_Free(patch);
         return;
+    }
 
     // store information in a vissprite
     vis = &avis;
@@ -1500,17 +1503,26 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
 
     // off the side?
     if(xl > (((int32_t)SCREENWIDTH) << FRACBITS))
+    {
+        Z_Free(patch);
         return;
+    }
 
     fixed_t xr = (centerxfrac + FixedMul(tx + (((int32_t)patch->width) << FRACBITS),xscale)) - FRACUNIT;
 
     // off the side?
     if(xr < 0)
+    {
+        Z_Free(patch);
         return;
+    }
 
     //Too small.
     if(xr <= (xl + (FRACUNIT >> 2)))
+    {
+        Z_Free(patch);
         return;
+    }
 
 
     const int32_t x1 = (xl >> FRACBITS);
@@ -1521,7 +1533,10 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
 
     //No more vissprites.
     if(!vis)
+    {
+        Z_Free(patch);
         return;
+    }
 
     vis->mobjflags       = thing->flags;
     vis->scale           = FixedDiv(projectiony, tz);
@@ -1848,7 +1863,10 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
             const int16_t x1 = patch->originx;
 
             if (xc < x1)
+            {
+                Z_Free(realpatch);
                 continue;
+            }
 
             const int16_t x2 = x1 + realpatch->width;
 
@@ -3196,7 +3214,7 @@ static const int8_t viewangletoxTable[4096] =
 //
 // Effective size is 2049;
 // The +1 size is to handle the case when x==y without additional checking.
-static const angle_t _huge tantoangleTable[2049] =
+static const angle_t tantoangleTable[2049] =
 {
     0,333772,667544,1001315,1335086,1668857,2002626,2336395,
     2670163,3003929,3337694,3671457,4005219,4338979,4672736,5006492,
@@ -3459,7 +3477,7 @@ static const angle_t _huge tantoangleTable[2049] =
 
 // Tangens LUT.
 // Should work with BAM fairly well (12 of 16bit, effectively, by shifting).
-static const fixed_t _huge finetangentTable[4096] =
+static const fixed_t finetangentTable[4096] =
 {
     -170910304,-56965752,-34178904,-24413316,-18988036,-15535599,-13145455,-11392683,
     -10052327,-8994149,-8137527,-7429880,-6835455,-6329090,-5892567,-5512368,
