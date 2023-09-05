@@ -23,13 +23,13 @@
 //16-bit
 #include <i86.h>
 
-typedef uint16_t segment;
+typedef uint16_t segment_t;
 
 #else
 //32-bit
 #define halloc(numb,size) malloc(numb*size)
 
-typedef uint32_t segment;
+typedef uint32_t segment_t;
 
 #define MK_FP(s,o) (void*)((s<<4)+o)
 #define FP_SEG(p)  (((uint32_t)p)>>4)
