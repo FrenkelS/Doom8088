@@ -373,7 +373,6 @@ typedef struct
 
 } spriteframe_t;
 
-#define SPR_FLIPPED(s, r) (s->flipmask & (1 << r))
 
 //
 // A sprite definition:

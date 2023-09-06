@@ -837,7 +837,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
             yl = cclip_x + 1;
 
         // killough 3/2/98, 3/27/98: Failsafe against overflow/crash:
-        if (yh < viewheight && yl <= yh)
+        if (yl <= yh && yh < viewheight)
         {
             dcvars->source =  (const byte*)column + 3;
 
@@ -1036,7 +1036,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int32_t x1, int32_t x2)
     curline = ds->curline;  // OPTIMIZE: get rid of LIGHTSEGSHIFT globally
 
     frontsector = SG_FRONTSECTOR(curline);
-    backsector = SG_BACKSECTOR(curline);
+    backsector  = SG_BACKSECTOR(curline);
 
     texnum = _g->sides[curline->sidenum].midtexture;
     texnum = texturetranslation[texnum];
@@ -1047,8 +1047,8 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int32_t x1, int32_t x2)
     maskedtexturecol = ds->maskedtexturecol;
 
     rw_scalestep = ds->scalestep;
-    spryscale = ds->scale1 + (x1 - ds->x1)*rw_scalestep;
-    mfloorclip = ds->sprbottomclip;
+    spryscale    = ds->scale1 + (x1 - ds->x1) * rw_scalestep;
+    mfloorclip   = ds->sprbottomclip;
     mceilingclip = ds->sprtopclip;
 
     // find positioning
@@ -1136,7 +1136,7 @@ static void R_DrawSprite (const vissprite_t* spr)
     fixed_t scale;
     fixed_t lowscale;
 
-    for (int32_t x = spr->x1 ; x<=spr->x2 ; x++)
+    for (int32_t x = spr->x1; x <= spr->x2; x++)
     {
         clipbot[x] = viewheight;
         cliptop[x] = -1;
@@ -1164,12 +1164,12 @@ static void R_DrawSprite (const vissprite_t* spr)
         if (ds->scale1 > ds->scale2)
         {
             lowscale = ds->scale2;
-            scale = ds->scale1;
+            scale    = ds->scale1;
         }
         else
         {
             lowscale = ds->scale1;
-            scale = ds->scale2;
+            scale    = ds->scale2;
         }
 
         if (scale < spr->scale || (lowscale < spr->scale && !R_PointOnSegSide (spr->gx, spr->gy, ds->curline)))
@@ -1190,14 +1190,13 @@ static void R_DrawSprite (const vissprite_t* spr)
                 if (clipbot[x] == viewheight)
                     clipbot[x] = ds->sprbottomclip[x];
             }
-
         }
 
         fixed_t gzt = spr->gz + (((int32_t)spr->patch_topoffset) << FRACBITS);
 
         if (ds->silhouette & SIL_TOP && gzt > ds->tsilheight)   // top sil
         {
-            for (int32_t x=r1; x <= r2; x++)
+            for (int32_t x = r1; x <= r2; x++)
             {
                 if (cliptop[x] == -1)
                     cliptop[x] = ds->sprtopclip[x];
@@ -1206,7 +1205,7 @@ static void R_DrawSprite (const vissprite_t* spr)
     }
 
     // all clipping has been performed, so draw the sprite
-    mfloorclip = clipbot;
+    mfloorclip   = clipbot;
     mceilingclip = cliptop;
     R_DrawVisSprite (spr);
 }
@@ -1216,6 +1215,7 @@ static void R_DrawSprite (const vissprite_t* spr)
 // R_DrawPSprite
 //
 
+#define SPR_FLIPPED(s, r) (s->flipmask & (1 << r))
 #define BASEYCENTER 100
 
 static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
@@ -1314,7 +1314,7 @@ static void R_DrawPlayerSprites(void)
   pspdef_t *psp;
 
   // clip to screen bounds
-  mfloorclip = screenheightarray;
+  mfloorclip   = screenheightarray;
   mceilingclip = negonearray;
 
   // add all active psprites
@@ -1332,10 +1332,15 @@ static void R_DrawPlayerSprites(void)
 //
 static int compare (const void* l, const void* r)
 {
-    const vissprite_t* vl = *(const vissprite_t**)l;
-    const vissprite_t* vr = *(const vissprite_t**)r;
+	const vissprite_t* vl = *(const vissprite_t**)l;
+	const vissprite_t* vr = *(const vissprite_t**)r;
 
-    return vr->scale - vl->scale;
+	if (vr->scale < vl->scale)
+		return -1;
+	else if (vr->scale > vl->scale)
+		return 1;
+	else
+		return 0;
 }
 
 #define MAXVISSPRITES 96
@@ -1457,7 +1462,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     const fixed_t tr_x = fx - viewx;
     const fixed_t tr_y = fy - viewy;
 
-    const fixed_t tz = FixedMul(tr_x,viewcos)-(-FixedMul(tr_y,viewsin));
+    const fixed_t tz = FixedMul(tr_x, viewcos) - (-FixedMul(tr_y, viewsin));
 
     // thing is behind view plane?
     if (tz < MINZ)
@@ -1467,14 +1472,14 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     if(tz > MAXZ)
         return;
 
-    fixed_t tx = -(FixedMul(tr_y,viewcos)+(-FixedMul(tr_x,viewsin)));
+    fixed_t tx = -(FixedMul(tr_y, viewcos) + (-FixedMul(tr_x, viewsin)));
 
     // too far off the side?
     if (D_abs(tx)>(tz<<2))
         return;
 
     // decide which patch to use for sprite relative to player
-    const spritedef_t* sprdef = &_g->sprites[thing->sprite];
+    const spritedef_t*   sprdef   = &_g->sprites[thing->sprite];
     const spriteframe_t* sprframe = &sprdef->spriteframes[thing->frame & FF_FRAMEMASK];
 
     uint32_t rot = 0;
@@ -1483,7 +1488,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     {
         // choose a different rotation based on player view
         angle_t ang = R_PointToAngle(fx, fy);
-        rot = (ang-thing->angle+(uint32_t)(ANG45/2)*9)>>29;
+        rot = (ang - thing->angle + (uint32_t)(ANG45/2)*9)>>29;
     }
 
     const boolean flip = (boolean)SPR_FLIPPED(sprframe, rot);
@@ -1502,23 +1507,23 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     fixed_t xl = (centerxfrac + FixedMul(tx,xscale));
 
     // off the side?
-    if(xl > (((int32_t)SCREENWIDTH) << FRACBITS))
+    if (xl > (((int32_t)SCREENWIDTH) << FRACBITS))
     {
         Z_Free(patch);
         return;
     }
 
-    fixed_t xr = (centerxfrac + FixedMul(tx + (((int32_t)patch->width) << FRACBITS),xscale)) - FRACUNIT;
+    fixed_t xr = (centerxfrac + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale)) - FRACUNIT;
 
     // off the side?
-    if(xr < 0)
+    if (xr < 0)
     {
         Z_Free(patch);
         return;
     }
 
     //Too small.
-    if(xr <= (xl + (FRACUNIT >> 2)))
+    if (xr <= (xl + (FRACUNIT >> 2)))
     {
         Z_Free(patch);
         return;
@@ -2242,9 +2247,9 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
             // from being displayed on the automap.
 
             ds_p->silhouette = SIL_BOTH;
+            ds_p->sprtopclip = screenheightarray;
             ds_p->sprbottomclip = negonearray;
             ds_p->bsilheight = INT32_MAX;
-            ds_p->sprtopclip = screenheightarray;
             ds_p->tsilheight = INT32_MIN;
 
         }
@@ -2344,7 +2349,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         markceiling = false;
 
     // calculate incremental stepping values for texture edges
-    worldtop >>= 4;
+    worldtop    >>= 4;
     worldbottom >>= 4;
 
     topstep = -FixedMul (rw_scalestep, worldtop);
@@ -2356,7 +2361,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     if (backsector)
     {
         worldhigh >>= 4;
-        worldlow >>= 4;
+        worldlow  >>= 4;
 
         if (worldhigh < worldtop)
         {
@@ -2457,7 +2462,7 @@ static void R_RecalcLineFlags(void)
 
     const side_t* side = &_g->sides[curline->sidenum];
 
-    linedata->r_validcount = (_g->gametic & 0xffff);
+    linedata->r_validcount = LOWORD(_g->gametic);
 
     /* First decide if the line is closed, normal, or invisible */
     if (!(linedef->flags & ML_TWOSIDED)
@@ -2643,7 +2648,7 @@ static void R_AddLine (const seg_t *line)
     linedef = &_g->lines[curline->linenum];
     linedata_t* linedata = &_g->linedata[linedef->lineno];
 
-    if (linedata->r_validcount != (_g->gametic & 0xffff))
+    if (linedata->r_validcount != LOWORD(_g->gametic))
         R_RecalcLineFlags();
 
     if (linedata->r_flags & RF_IGNORE)
