@@ -1292,21 +1292,21 @@ inline static void P_PutSecnode(msecnode_t* node)
 // P_AddSecnode() searches the current list to see if this sector is
 // already there. If not, it adds a sector node at the head of the list of
 // sectors this object appears in. This is called when creating a list of
-// nodes that will get linked in later. Returns a pointer to the new node.
+// nodes that will get linked in later.
 
-static msecnode_t* P_AddSecnode(sector_t* s, mobj_t* thing, msecnode_t* nextnode)
+static void P_AddSecnode(sector_t* s, mobj_t* thing)
   {
   msecnode_t* node;
 
-  node = nextnode;
 int16_t infiniteLoopDetector = 0;
+  node = _g->sector_list;
   while (node)
     {
-if (infiniteLoopDetector++ > 10000) I_Error("P_AddSecnode: Infinite loop");
+if (infiniteLoopDetector++ > 10000) I_Error("P_AddSecnode: Infinite loop in frame %li", _g->gametic);
     if (node->m_sector == s)   // Already have a node for this sector?
       {
       node->m_thing = thing; // Yes. Setting m_thing says 'keep it'.
-      return(nextnode);
+      return;
       }
     node = node->m_tnext;
     }
@@ -1322,9 +1322,9 @@ if (infiniteLoopDetector++ > 10000) I_Error("P_AddSecnode: Infinite loop");
   node->m_sector = s;       // sector
   node->m_thing  = thing;     // mobj
   node->m_tprev  = NULL;    // prev node on Thing thread
-  node->m_tnext  = nextnode;  // next node on Thing thread
-  if (nextnode)
-    nextnode->m_tprev = node; // set back link on Thing
+  node->m_tnext  = _g->sector_list;  // next node on Thing thread
+  if (_g->sector_list)
+    _g->sector_list->m_tprev = node; // set back link on Thing
 
   // Add new node at head of sector thread starting at s->touching_thinglist
 
@@ -1333,7 +1333,7 @@ if (infiniteLoopDetector++ > 10000) I_Error("P_AddSecnode: Infinite loop");
   if (s->touching_thinglist)
     node->m_snext->m_sprev = node;
   s->touching_thinglist = node;
-  return(node);
+  _g->sector_list = node;
   }
 
 
@@ -1422,7 +1422,7 @@ static boolean PIT_GetSectors(const line_t* ld)
   // allowed to move to this position, then the sector_list
   // will be attached to the Thing's mobj_t at touching_sectorlist.
 
-  _g->sector_list = P_AddSecnode(LN_FRONTSECTOR(ld),_g->tmthing,_g->sector_list);
+  P_AddSecnode(LN_FRONTSECTOR(ld),_g->tmthing);
 
   /* Don't assume all lines are 2-sided, since some Things
    * like MT_TFOG are allowed regardless of whether their radius takes
@@ -1434,7 +1434,7 @@ static boolean PIT_GetSectors(const line_t* ld)
    * cph - DEMOSYNC? */
 
   if (LN_BACKSECTOR(ld) && LN_BACKSECTOR(ld) != LN_FRONTSECTOR(ld))
-    _g->sector_list = P_AddSecnode(LN_BACKSECTOR(ld), _g->tmthing, _g->sector_list);
+    P_AddSecnode(LN_BACKSECTOR(ld), _g->tmthing);
 
   return true;
   }
@@ -1491,7 +1491,7 @@ void P_CreateSecNodeList(mobj_t* thing,fixed_t x,fixed_t y)
 
   // Add the sector of the (x,y) point to sector_list.
 
-  _g->sector_list = P_AddSecnode(thing->subsector->sector,thing,_g->sector_list);
+  P_AddSecnode(thing->subsector->sector,thing);
 
   // Now delete any nodes that won't be used. These are the ones where
   // m_thing is still NULL.
@@ -1500,7 +1500,7 @@ int16_t infiniteLoopDetector = 0;
   node = _g->sector_list;
   while (node)
     {
-if (infiniteLoopDetector++ > 10000) I_Error("P_CreateSecNodeList: Infinite loop");
+if (infiniteLoopDetector++ > 10000) I_Error("P_CreateSecNodeList: Infinite loop in frame %li", _g->gametic);
     if (node->m_thing == NULL)
       {
       if (node == _g->sector_list)
