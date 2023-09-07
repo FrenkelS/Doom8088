@@ -36,6 +36,8 @@
 
 #include "doomstat.h"
 #include "r_main.h"
+#include "m_random.h"
+#include "p_inter.h"
 #include "p_map.h"
 #include "p_spec.h"
 #include "p_tick.h"
@@ -43,6 +45,173 @@
 #include "sounds.h"
 
 #include "globdata.h"
+
+
+//
+// P_ThingHeightClip
+// Takes a valid thing and adjusts the thing->floorz,
+// thing->ceilingz, and possibly thing->z.
+// This is called for all nearby monsters
+// whenever a sector changes height.
+// If the thing doesn't fit,
+// the z will be set to the lowest value
+// and false will be returned.
+//
+
+static boolean P_ThingHeightClip (mobj_t* thing)
+{
+  boolean   onfloor;
+
+  onfloor = (thing->z == thing->floorz);
+
+  P_CheckPosition (thing, thing->x, thing->y);
+
+  /* what about stranding a monster partially off an edge?
+   * killough 11/98: Answer: see below (upset balance if hanging off ledge)
+   */
+
+  thing->floorz = _g->tmfloorz;
+  thing->ceilingz = _g->tmceilingz;
+  thing->dropoffz = _g->tmdropoffz;    /* killough 11/98: remember dropoffs */
+
+  if (onfloor)
+    {
+
+    // walking monsters rise and fall with the floor
+
+    thing->z = thing->floorz;
+    }
+  else
+    {
+
+  // don't adjust a floating monster unless forced to
+
+    if (thing->z+thing->height > thing->ceilingz)
+      thing->z = thing->ceilingz - thing->height;
+    }
+
+  return thing->ceilingz - thing->floorz >= thing->height;
+}
+
+
+//
+// SECTOR HEIGHT CHANGING
+// After modifying a sectors floor or ceiling height,
+// call this routine to adjust the positions
+// of all things that touch the sector.
+//
+// If anything doesn't fit anymore, true will be returned.
+// If crunch is true, they will take damage
+//  as they are being crushed.
+// If Crunch is false, you should set the sector height back
+//  the way it was and call P_ChangeSector again
+//  to undo the changes.
+//
+
+
+//
+// PIT_ChangeSector
+//
+
+static boolean PIT_ChangeSector (mobj_t* thing)
+  {
+  mobj_t* mo;
+
+  if (P_ThingHeightClip (thing))
+    return true; // keep checking
+
+  // crunch bodies to giblets
+
+  if (thing->health <= 0)
+    {
+    P_SetMobjState (thing, S_GIBS);
+
+    thing->flags &= ~MF_SOLID;
+    thing->height = 0;
+    thing->radius = 0;
+    return true; // keep checking
+    }
+
+  // crunch dropped items
+
+  if (thing->flags & MF_DROPPED)
+    {
+    P_RemoveMobj (thing);
+
+    // keep checking
+    return true;
+    }
+
+  if (! (thing->flags & MF_SHOOTABLE) )
+    {
+    // assume it is bloody gibs or something
+    return true;
+    }
+
+  _g->nofit = true;
+
+  if (_g->crushchange && !(_g->leveltime&3)) {
+    int32_t t;
+    P_DamageMobj(thing,NULL,NULL,10);
+
+    // spray blood in a random direction
+    mo = P_SpawnMobj (thing->x,
+                      thing->y,
+                      thing->z + thing->height/2, MT_BLOOD);
+
+    /* killough 8/10/98: remove dependence on order of evaluation */
+    t = P_Random();
+    mo->momx = (t - P_Random ())<<12;
+    t = P_Random();
+    mo->momy = (t - P_Random ())<<12;
+  }
+
+  // keep checking (crush other things)
+  return true;
+  }
+
+
+//
+// P_CheckSector
+// jff 3/19/98 added to just check monsters on the periphery
+// of a moving sector instead of all in bounding box of the
+// sector. Both more accurate and faster.
+//
+
+static boolean P_CheckSector(sector_t* sector,boolean crunch)
+  {
+  msecnode_t *n;
+
+  _g->nofit = false;
+  _g->crushchange = crunch;
+
+  // killough 4/4/98: scan list front-to-back until empty or exhausted,
+  // restarting from beginning after each thing is processed. Avoids
+  // crashes, and is sure to examine all things in the sector, and only
+  // the things which are in the sector, until a steady-state is reached.
+  // Things can arbitrarily be inserted and removed and it won't mess up.
+  //
+  // killough 4/7/98: simplified to avoid using complicated counter
+
+  // Mark all things invalid
+
+  for (n=sector->touching_thinglist; n; n=n->m_snext)
+    n->visited = false;
+
+  do
+    for (n=sector->touching_thinglist; n; n=n->m_snext)  // go through list
+      if (!n->visited)               // unprocessed thing found
+        {
+        n->visited  = true;          // mark thing as processed
+        if (!(n->m_thing->flags & MF_NOBLOCKMAP)) //jff 4/7/98 don't do these
+          PIT_ChangeSector(n->m_thing);    // process it
+        break;                 // exit and start over
+        }
+  while (n);  // repeat from scratch until all things left are marked valid
+
+  return _g->nofit;
+  }
+
 
 ///////////////////////////////////////////////////////////////////////
 //

@@ -64,8 +64,7 @@ void    P_LineAttack(mobj_t *t1, angle_t angle, fixed_t distance,
 void    P_RadiusAttack(mobj_t *spot, mobj_t *source, int32_t damage);
 boolean P_CheckPosition(mobj_t *thing, fixed_t x, fixed_t y);
 
-//jff 3/19/98 P_CheckSector(): new routine to replace P_ChangeSector()
-boolean P_CheckSector(sector_t *sector, boolean crunch);
+
 void    P_SetSecnodeFirstpoolToNull(void);
 void    P_DelSeclist(void);
 void    P_CreateSecNodeList(mobj_t*,fixed_t,fixed_t);       // phares 3/14/98
