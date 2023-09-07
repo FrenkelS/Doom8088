@@ -47,11 +47,7 @@
 typedef struct bmalpool_s {
 	struct bmalpool_s *nextpool;
 	size_t             blocks;
-#if defined __WATCOMC__
 	byte               used[];
-#else
-	byte               used[0];
-#endif
 } bmalpool_t;
 
 
