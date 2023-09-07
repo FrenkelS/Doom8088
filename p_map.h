@@ -67,7 +67,7 @@ boolean P_CheckPosition(mobj_t *thing, fixed_t x, fixed_t y);
 
 void    P_SetSecnodeFirstpoolToNull(void);
 void    P_DelSeclist(void);
-void    P_CreateSecNodeList(mobj_t*,fixed_t,fixed_t);       // phares 3/14/98
+void    P_CreateSecNodeList(mobj_t*);
 
 /* cphipps 2004/08/30 */
 void	P_MapStart(void);

@@ -1445,15 +1445,8 @@ static boolean PIT_GetSectors(const line_t* ld)
 // P_CreateSecNodeList alters/creates the sector_list that shows what sectors
 // the object resides in.
 
-void P_CreateSecNodeList(mobj_t* thing,fixed_t x,fixed_t y)
+void P_CreateSecNodeList(mobj_t* thing)
 {
-  int32_t xl;
-  int32_t xh;
-  int32_t yl;
-  int32_t yh;
-  int32_t bx;
-  int32_t by;
-  msecnode_t* node;
   mobj_t* saved_tmthing = _g->tmthing; /* cph - see comment at func end */
 
   // First, clear out the existing m_thing fields. As each node is
@@ -1461,7 +1454,7 @@ void P_CreateSecNodeList(mobj_t* thing,fixed_t x,fixed_t y)
   // finished, delete all nodes where m_thing is still NULL. These
   // represent the sectors the Thing has vacated.
 
-  node = _g->sector_list;
+  msecnode_t* node = _g->sector_list;
   while (node)
     {
     node->m_thing = NULL;
@@ -1470,23 +1463,23 @@ void P_CreateSecNodeList(mobj_t* thing,fixed_t x,fixed_t y)
 
   _g->tmthing = thing;
 
-  _g->tmx = x;
-  _g->tmy = y;
+  _g->tmx = thing->x;
+  _g->tmy = thing->y;
 
-  _g->tmbbox[BOXTOP]  = y + _g->tmthing->radius;
-  _g->tmbbox[BOXBOTTOM] = y - _g->tmthing->radius;
-  _g->tmbbox[BOXRIGHT]  = x + _g->tmthing->radius;
-  _g->tmbbox[BOXLEFT]   = x - _g->tmthing->radius;
+  _g->tmbbox[BOXTOP]    = thing->y + _g->tmthing->radius;
+  _g->tmbbox[BOXBOTTOM] = thing->y - _g->tmthing->radius;
+  _g->tmbbox[BOXRIGHT]  = thing->x + _g->tmthing->radius;
+  _g->tmbbox[BOXLEFT]   = thing->x - _g->tmthing->radius;
 
   _g->validcount++; // used to make sure we only process a line once
 
-  xl = (_g->tmbbox[BOXLEFT] - _g->bmaporgx)>>MAPBLOCKSHIFT;
-  xh = (_g->tmbbox[BOXRIGHT] - _g->bmaporgx)>>MAPBLOCKSHIFT;
-  yl = (_g->tmbbox[BOXBOTTOM] - _g->bmaporgy)>>MAPBLOCKSHIFT;
-  yh = (_g->tmbbox[BOXTOP] - _g->bmaporgy)>>MAPBLOCKSHIFT;
+  int32_t xl = (_g->tmbbox[BOXLEFT]   - _g->bmaporgx) >> MAPBLOCKSHIFT;
+  int32_t xh = (_g->tmbbox[BOXRIGHT]  - _g->bmaporgx) >> MAPBLOCKSHIFT;
+  int32_t yl = (_g->tmbbox[BOXBOTTOM] - _g->bmaporgy) >> MAPBLOCKSHIFT;
+  int32_t yh = (_g->tmbbox[BOXTOP]    - _g->bmaporgy) >> MAPBLOCKSHIFT;
 
-  for (bx=xl ; bx<=xh ; bx++)
-    for (by=yl ; by<=yh ; by++)
+  for (int32_t bx = xl; bx <= xh; bx++)
+    for (int32_t by = yl; by <= yh; by++)
       P_BlockLinesIterator(bx,by,PIT_GetSectors);
 
   // Add the sector of the (x,y) point to sector_list.
