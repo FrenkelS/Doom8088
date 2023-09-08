@@ -176,7 +176,7 @@ const texture_t* R_GetTexture(int16_t texture)
     if (texture >= numtextures)
         I_Error("R_GetTexture: Texture %d not in range.", texture);
 #endif
-texture = 7; //FIXME not everything has to be the same texture
+texture = 46; //FIXME not everything has to be the same texture
     if (!textures[texture])
         R_LoadTexture(texture);
 
