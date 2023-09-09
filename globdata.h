@@ -387,7 +387,7 @@ side_t   *sides;
 //
 // Blockmap size.
 
-int32_t       bmapwidth, bmapheight;  // size in mapblocks
+int16_t       bmapwidth, bmapheight;  // size in mapblocks
 
 // killough 3/1/98: remove blockmap limit internally:
 const int16_t      *blockmap;              // was short -- killough

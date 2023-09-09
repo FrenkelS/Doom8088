@@ -399,7 +399,7 @@ static void P_LoadBlockMap (int16_t lump)
 
     _g->bmaporgx = ((int32_t)_g->blockmaplump[0])<<FRACBITS;
     _g->bmaporgy = ((int32_t)_g->blockmaplump[1])<<FRACBITS;
-    _g->bmapwidth = _g->blockmaplump[2];
+    _g->bmapwidth  = _g->blockmaplump[2];
     _g->bmapheight = _g->blockmaplump[3];
 
 

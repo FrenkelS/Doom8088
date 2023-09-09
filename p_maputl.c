@@ -303,7 +303,7 @@ void P_SetThingPosition(mobj_t *thing)
       // inert things don't need to be in blockmap
       int32_t blockx = (thing->x - _g->bmaporgx)>>MAPBLOCKSHIFT;
       int32_t blocky = (thing->y - _g->bmaporgy)>>MAPBLOCKSHIFT;
-      if (blockx>=0 && blockx < _g->bmapwidth && blocky>=0 && blocky < _g->bmapheight)
+      if (0 <= blockx && blockx < _g->bmapwidth && 0 <= blocky && blocky < _g->bmapheight)
         {
         // killough 8/11/98: simpler scheme using pointer-to-pointer prev
         // pointers, allows head nodes to be treated like everything else
@@ -341,7 +341,7 @@ void P_SetThingPosition(mobj_t *thing)
 boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
 {
 
-    if (x<0 || y<0 || x>=_g->bmapwidth || y>=_g->bmapheight)
+    if (!(0 <= x && x < _g->bmapwidth && 0 <= y && y <_g->bmapheight))
         return true;
 
     const int32_t offset = _g->blockmap[y*_g->bmapwidth+x];
@@ -386,7 +386,7 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
 boolean P_BlockThingsIterator(int32_t x, int32_t y, boolean func(mobj_t*))
 {
   mobj_t *mobj;
-  if (!(x<0 || y<0 || x>=_g->bmapwidth || y>=_g->bmapheight))
+  if (0 <= x && x < _g->bmapwidth && 0 <= y && y < _g->bmapheight)
     for (mobj = _g->blocklinks[y*_g->bmapwidth+x]; mobj; mobj = mobj->bnext)
       if (!func(mobj))
         return false;
