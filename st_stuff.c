@@ -50,6 +50,9 @@
 #include "globdata.h"
 
 
+#define DISABLE_STATUS_BAR
+
+
 // Size of statusbar.
 // Now sensitive for scaling.
 
@@ -609,12 +612,13 @@ static void ST_refreshBackground(void)
 
 static void ST_doRefresh(void)
 {
+#if !defined DISABLE_STATUS_BAR
   // draw status bar background to off-screen buff
   ST_refreshBackground();
 
   // and refresh all widgets
   ST_drawWidgets();
-
+#endif
 }
 
 static boolean ST_NeedUpdate()
