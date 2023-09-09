@@ -42,11 +42,6 @@
 #define USERANGE        (64*FRACUNIT)
 #define MELEERANGE      (64*FRACUNIT)
 #define MISSILERANGE    (32*64*FRACUNIT)
-#define LOOKRANGE       (768*FRACUNIT)
-
-// MAXRADIUS is for precalculated sector block boxes the spider demon
-// is larger, but we do not have any moving sectors nearby
-#define MAXRADIUS       (32*FRACUNIT)
 
 boolean P_TryMove(mobj_t *thing, fixed_t x, fixed_t y);
 

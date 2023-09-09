@@ -51,6 +51,8 @@
 #include "globdata.h"
 
 
+// MAXRADIUS is for precalculated sector block boxes
+#define MAXRADIUS       (32*FRACUNIT)
 
 
 //
