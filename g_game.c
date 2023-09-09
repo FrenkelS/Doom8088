@@ -1095,7 +1095,7 @@ void G_CheckDemoStatus (void)
         int32_t endtime = I_GetTime();
         // killough -- added fps information and made it work for longer demos:
         uint32_t realtics = endtime-_g->starttime;
-        uint32_t resultfps = TICRATE * 1000 * _g->gametic / realtics;
+        uint32_t resultfps = TICRATE * 1000L * _g->gametic / realtics;
         I_Error ("Timed %lu gametics in %lu realtics = %lu.%.3lu frames per second",
                  (uint32_t) _g->gametic,realtics,
                  resultfps / 1000, resultfps % 1000);

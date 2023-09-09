@@ -40,6 +40,7 @@
 #include <string.h>
 
 #include "doomtype.h"
+#include "compiler.h"
 #include "z_zone.h"
 #include "z_bmallo.h"
 #include "i_system.h"
@@ -57,10 +58,17 @@ __inline static void* getelem(bmalpool_t *p, size_t size, size_t n)
 }
 
 
+__inline static PUREFUNC uint32_t linearAddress(const void* ptr)
+{
+	uint32_t seg = FP_SEG(ptr);
+	uint16_t off = FP_OFF(ptr);
+	return seg * 16 + off;
+}
+
+
 __inline static PUREFUNC int32_t iselem(const bmalpool_t *pool, size_t size, const void* p)
 {
-	// CPhipps - need portable # of bytes between pointers
-	int32_t dif = (const char*)p - (const char*)pool;
+	int32_t dif = linearAddress(p) - linearAddress(pool);
 
 	dif -= sizeof(bmalpool_t);
 	dif -= pool->blocks;

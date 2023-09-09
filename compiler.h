@@ -33,7 +33,7 @@ typedef uint32_t segment_t;
 
 #define MK_FP(s,o) (void*)((s<<4)+o)
 #define FP_SEG(p)  (((uint32_t)p)>>4)
-#define FP_OFF(p)  0
+#define FP_OFF(p)  (((uint32_t)p)&15)
 #endif
 
 

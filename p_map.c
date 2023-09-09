@@ -1298,11 +1298,9 @@ static void P_AddSecnode(sector_t* s, mobj_t* thing)
   {
   msecnode_t* node;
 
-int16_t infiniteLoopDetector = 0;
   node = _g->sector_list;
   while (node)
     {
-if (infiniteLoopDetector++ > 10000) I_Error("P_AddSecnode: Infinite loop in frame %li", _g->gametic);
     if (node->m_sector == s)   // Already have a node for this sector?
       {
       node->m_thing = thing; // Yes. Setting m_thing says 'keep it'.
@@ -1489,11 +1487,9 @@ void P_CreateSecNodeList(mobj_t* thing)
   // Now delete any nodes that won't be used. These are the ones where
   // m_thing is still NULL.
 
-int16_t infiniteLoopDetector = 0;
   node = _g->sector_list;
   while (node)
     {
-if (infiniteLoopDetector++ > 10000) I_Error("P_CreateSecNodeList: Infinite loop in frame %li", _g->gametic);
     if (node->m_thing == NULL)
       {
       if (node == _g->sector_list)
