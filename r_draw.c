@@ -980,7 +980,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 }
 
 
-uint32_t R_GetColumn(const texture_t* texture, int32_t texcolumn)
+void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c)
 {
     const uint8_t patchcount = texture->patchcount;
     const uint16_t widthmask = texture->widthmask;
@@ -990,7 +990,9 @@ uint32_t R_GetColumn(const texture_t* texture, int32_t texcolumn)
     if (patchcount == 1)
     {
         //simple texture.
-        return (((uint32_t)texture->patches[0].patch_num) << 16) + xc;
+        *patch_num = texture->patches[0].patch_num;
+        *x_c = xc;
+        return;
     }
     else
     {
@@ -1008,13 +1010,15 @@ uint32_t R_GetColumn(const texture_t* texture, int32_t texcolumn)
             const int16_t x2 = x1 + V_NumPatchWidth(patch->patch_num);
 
             if (xc < x2)
-                return (((uint32_t)patch->patch_num) << 16) + xc - x1;
-
+            {
+                *patch_num = patch->patch_num;
+                *x_c = xc - x1;
+                return;
+            }
         } while (++i < patchcount);
     }
 
     I_Error("R_GetColumn: can't find texcolumn");
-    return 0;
 }
 
 
@@ -1083,10 +1087,11 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int32_t x1, int32_t x2)
             dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
 
             // draw the texture
-            uint32_t r = R_GetColumn(texture, xc);
-            const patch_t* patch = W_GetLumpByNum(HIWORD(r));
-            xc = LOWORD(r);
-            const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[xc]);
+            int16_t patch_num;
+            int16_t x_c;
+            R_GetColumn(texture, xc, &patch_num, &x_c);
+            const patch_t* patch = W_GetLumpByNum(patch_num);
+            const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
 
             R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
             Z_Free(patch);
@@ -1897,10 +1902,11 @@ static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_colu
 
     if (!tex->overlapped)
     {
-        uint32_t r = R_GetColumn(tex, texcolumn);
-        const patch_t* patch = W_GetLumpByNum(HIWORD(r));
-        texcolumn = LOWORD(r);
-        const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[texcolumn]);
+        int16_t patch_num;
+        int16_t x_c;
+        R_GetColumn(tex, texcolumn, &patch_num, &x_c);
+        const patch_t* patch = W_GetLumpByNum(patch_num);
+        const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
 
         dcvars->source = (const byte*)column + 3;
         R_DrawColumn (dcvars);

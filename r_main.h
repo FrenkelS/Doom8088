@@ -43,7 +43,6 @@
 #define LOBYTE(w)	(((uint8_t *)&w)[0])
 
 #define LOWORD(dw)	(((uint16_t *)&dw)[0])
-#define HIWORD(dw)	(((uint16_t *)&dw)[1])
 
 
 #define MAXVISPLANES 32    /* must be a power of 2 */
@@ -96,7 +95,7 @@ extern boolean highDetail;
 angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2);
 subsector_t *R_PointInSubsector(fixed_t x, fixed_t y);
 
-uint32_t R_GetColumn(const texture_t* texture, int32_t texcolumn);
+void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c);
 
 const lighttable_t* R_LoadColorMap(int32_t lightlevel);
 

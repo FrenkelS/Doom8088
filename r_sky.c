@@ -75,10 +75,11 @@ void R_DrawSky(visplane_t *pl)
 		{
 			int32_t xc = (viewangle + xtoviewangle(x)) >> ANGLETOSKYSHIFT;
 
-			uint32_t r = R_GetColumn(tex, xc);
-			const patch_t* patch = W_GetLumpByNum(HIWORD(r));
-			xc = LOWORD(r);
-			const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[xc]);
+			int16_t patch_num;
+			int16_t x_c;
+			R_GetColumn(tex, xc, &patch_num, &x_c);
+			const patch_t* patch = W_GetLumpByNum(patch_num);
+			const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
 
 			dcvars.source = (const byte*)column + 3;
 			R_DrawColumn(&dcvars);
