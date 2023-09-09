@@ -113,12 +113,12 @@ static boolean P_ThingHeightClip (mobj_t* thing)
 // PIT_ChangeSector
 //
 
-static boolean PIT_ChangeSector (mobj_t* thing)
+static void PIT_ChangeSector (mobj_t* thing)
   {
   mobj_t* mo;
 
   if (P_ThingHeightClip (thing))
-    return true; // keep checking
+    return;
 
   // crunch bodies to giblets
 
@@ -129,7 +129,7 @@ static boolean PIT_ChangeSector (mobj_t* thing)
     thing->flags &= ~MF_SOLID;
     thing->height = 0;
     thing->radius = 0;
-    return true; // keep checking
+    return;
     }
 
   // crunch dropped items
@@ -138,14 +138,13 @@ static boolean PIT_ChangeSector (mobj_t* thing)
     {
     P_RemoveMobj (thing);
 
-    // keep checking
-    return true;
+    return;
     }
 
   if (! (thing->flags & MF_SHOOTABLE) )
     {
     // assume it is bloody gibs or something
-    return true;
+    return;
     }
 
   _g->nofit = true;
@@ -165,9 +164,6 @@ static boolean PIT_ChangeSector (mobj_t* thing)
     t = P_Random();
     mo->momy = (t - P_Random ())<<12;
   }
-
-  // keep checking (crush other things)
-  return true;
   }
 
 
