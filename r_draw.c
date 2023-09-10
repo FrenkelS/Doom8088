@@ -886,7 +886,7 @@ typedef struct vissprite_s
   fixed_t texturemid;
   fixed_t iscale;
 
-  int16_t patch_num;
+  int16_t sprite_num;
   int16_t patch_topoffset;
 
   uint32_t mobjflags;
@@ -936,7 +936,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
     sprtopscreen = centeryfrac - FixedMul(dcvars.texturemid, spryscale);
 
 
-    const patch_t *patch = W_GetLumpByNum(vis->patch_num);
+    const patch_t *patch = R_GetSprite(vis->sprite_num);
 
     fixed_t xiscale = vis->xiscale;
 
@@ -976,7 +976,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
         dcvars.odd_pixel = false;
     }
 
-    Z_Free(patch);
+    Z_ChangeTagToCache(patch);
 }
 
 
@@ -1241,7 +1241,7 @@ static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
 
     flip = (boolean) SPR_FLIPPED(sprframe, 0);
 
-    const patch_t* patch = W_GetLumpByNum(sprframe->lump[0]+_g->firstspritelump);
+    const patch_t* patch = R_GetSprite(sprframe->lump[0]);
     // calculate edges of the shape
     fixed_t       tx;
     tx = psp->sx-160*FRACUNIT;
@@ -1260,7 +1260,7 @@ static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
     // off the side
     if (x2 < 0 || x1 > SCREENWIDTH)
     {
-        Z_Free(patch);
+        Z_ChangeTagToCache(patch);
         return;
     }
 
@@ -1290,9 +1290,9 @@ static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
     if (vis->x1 > x1)
         vis->startfrac += vis->xiscale*(vis->x1-x1);
 
-    vis->patch_num       = sprframe->lump[0] + _g->firstspritelump;
+    vis->sprite_num      = sprframe->lump[0];
     vis->patch_topoffset = patch->topoffset;
-    Z_Free(patch);
+    Z_ChangeTagToCache(patch);
 
     if (_g->player.powers[pw_invisibility] > 4*32 || _g->player.powers[pw_invisibility] & 8)
         vis->colormap = NULL;                    // shadow draw
@@ -1497,7 +1497,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     }
 
     const boolean flip = (boolean)SPR_FLIPPED(sprframe, rot);
-    const patch_t* patch = W_GetLumpByNum(sprframe->lump[rot] + _g->firstspritelump);
+    const patch_t* patch = R_GetSprite(sprframe->lump[rot]);
 
     /* calculate edges of the shape
      * cph 2003/08/1 - fraggle points out that this offset must be flipped
@@ -1514,7 +1514,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     // off the side?
     if (xl > (((int32_t)SCREENWIDTH) << FRACBITS))
     {
-        Z_Free(patch);
+        Z_ChangeTagToCache(patch);
         return;
     }
 
@@ -1523,14 +1523,14 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     // off the side?
     if (xr < 0)
     {
-        Z_Free(patch);
+        Z_ChangeTagToCache(patch);
         return;
     }
 
     //Too small.
     if (xr <= (xl + (FRACUNIT >> 2)))
     {
-        Z_Free(patch);
+        Z_ChangeTagToCache(patch);
         return;
     }
 
@@ -1544,14 +1544,14 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     //No more vissprites.
     if(!vis)
     {
-        Z_Free(patch);
+        Z_ChangeTagToCache(patch);
         return;
     }
 
     vis->mobjflags       = thing->flags;
     vis->scale           = FixedDiv(projectiony, tz);
     vis->iscale          = tz >> 7;
-    vis->patch_num       = sprframe->lump[rot] + _g->firstspritelump;
+    vis->sprite_num      = sprframe->lump[rot];
     vis->patch_topoffset = patch->topoffset;
     vis->gx              = fx;
     vis->gy              = fy;
@@ -1575,7 +1575,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
         vis->xiscale = iscale;
     }
 
-    Z_Free(patch);
+    Z_ChangeTagToCache(patch);
 
     if (vis->x1 > x1)
         vis->startfrac += vis->xiscale*(vis->x1-x1);

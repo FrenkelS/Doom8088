@@ -73,6 +73,8 @@ typedef struct
 #endif
 } memblock_t;
 
+#define UNOWNED MK_FP(0,2)
+
 #define PARAGRAPH_SIZE 16
 
 typedef char assertMemblockSize[sizeof(memblock_t) <= PARAGRAPH_SIZE ? 1 : -1];
@@ -159,31 +161,42 @@ void Z_Init (void)
 }
 
 
-//
-// Z_Free
-//
-void Z_Free (const void* ptr)
+void Z_ChangeTagToStatic(const void* ptr)
 {
-    memblock_t*		block;
-    memblock_t*		other;
+	memblock_t* block = segmentToPointer(pointerToSegment(ptr) - 1);
+#if defined _M_I86
+	if (block->id != ZONEID)
+		I_Error("Z_ChangeTagToStatic: block has id %x instead of ZONEID", block->id);
+#endif
+	block->tag = PU_STATIC;
+}
 
-    if (ptr == NULL)
-        return;
 
-    block = segmentToPointer(pointerToSegment(ptr) - 1);
+void Z_ChangeTagToCache(const void* ptr)
+{
+	memblock_t* block = segmentToPointer(pointerToSegment(ptr) - 1);
+#if defined _M_I86
+	if (block->id != ZONEID)
+		I_Error("Z_ChangeTagToCache: block has id %x instead of ZONEID", block->id);
+#endif
+	block->tag = PU_CACHE;
+}
 
+
+static void Z_FreeBlock(memblock_t* block)
+{
 #if defined _M_I86
     if (block->id != ZONEID)
-        I_Error("Z_Free: freed a pointer without ZONEID");
+        I_Error("Z_FreeBlock: block has id %x instead of ZONEID", block->id);
 #endif
 
-    if (block->user > (void **)0x100)
+    if (FP_SEG(block->user) != 0)
     {
-        // smaller values are not pointers
-        // Note: OS-dependend?
+        // far pointers with segment 0 are not user pointers
+        // Note: OS-dependend
 
         // clear the user's mark
-        *block->user = 0;
+        *block->user = NULL;
     }
 
     // mark as free
@@ -196,7 +209,7 @@ void Z_Free (const void* ptr)
     printf("Free: %ld\n", running_count);
 #endif
 
-    other = segmentToPointer(block->prev);
+    memblock_t* other = segmentToPointer(block->prev);
 
     if (!other->user)
     {
@@ -222,6 +235,15 @@ void Z_Free (const void* ptr)
         if (pointerToSegment(other) == mainzone_rover_segment)
             mainzone_rover_segment = pointerToSegment(block);
     }
+}
+
+
+//
+// Z_Free
+//
+void Z_Free (const void* ptr)
+{
+	Z_FreeBlock(segmentToPointer(pointerToSegment(ptr) - 1));
 }
 
 
@@ -279,8 +301,8 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
     if (!previous_block->user)
         base = previous_block;
 
-    memblock_t* rover     = base;
-    segment_t start_segment = base->prev;
+    memblock_t* rover         = base;
+    segment_t   start_segment = base->prev;
 
     do
     {
@@ -304,7 +326,7 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
 
                 // the rover can be the base block
                 base  = segmentToPointer(base->prev);
-                Z_Free(segmentToPointer(pointerToSegment(rover) + 1));
+                Z_FreeBlock(rover);
                 base  = segmentToPointer(base->next);
                 rover = segmentToPointer(base->next);
             }
@@ -341,7 +363,6 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
     {
         // mark as an in use block
         base->user = user;
-        *(void **)user = segmentToPointer(pointerToSegment(base) + 1);
     }
     else
     {
@@ -349,7 +370,7 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
             I_Error ("Z_Malloc: an owner is required for purgable blocks");
 
         // mark as in use, but unowned
-        base->user = (void *)2;
+        base->user = UNOWNED;
     }
 
     base->tag = tag;
@@ -375,17 +396,15 @@ void* Z_MallocStatic(int32_t size)
 }
 
 
-void* Z_MallocLevel(int32_t size, void **user)
+void* Z_MallocStaticWithUser(int32_t size, void **user)
 {
-	return Z_Malloc(size, PU_LEVEL, user);
+	return Z_Malloc(size, PU_STATIC, user);
 }
 
 
-void* Z_CallocLevSpec(int32_t size)
+void* Z_MallocLevel(int32_t size, void **user)
 {
-	void *ptr = Z_Malloc(size, PU_LEVSPEC, NULL);
-	memset(ptr, 0, size);
-	return ptr;
+	return Z_Malloc(size, PU_LEVEL, user);
 }
 
 
@@ -394,6 +413,14 @@ void* Z_CallocLevel(int32_t size)
     void* ptr = Z_Malloc(size, PU_LEVEL, NULL);
     memset(ptr, 0, size);
     return ptr;
+}
+
+
+void* Z_CallocLevSpec(int32_t size)
+{
+	void *ptr = Z_Malloc(size, PU_LEVSPEC, NULL);
+	memset(ptr, 0, size);
+	return ptr;
 }
 
 
@@ -414,7 +441,7 @@ void Z_FreeTags(void)
             continue;
 
         if (PU_LEVEL <= block->tag && block->tag <= (PU_PURGELEVEL - 1))
-            Z_Free(segmentToPointer(pointerToSegment(block) + 1));
+            Z_FreeBlock(block);
     }
 }
 

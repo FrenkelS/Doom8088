@@ -199,10 +199,24 @@ const void* PUREFUNC W_GetLumpByNum(int16_t num)
 }
 
 
+const void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
+{
+	const filelump_t* lump = W_FindLumpByNum(num);
+
+	void* ptr = Z_MallocStaticWithUser(lump->size, user);
+
+	fseek(_g->fileWAD, lump->filepos, SEEK_SET);
+	fread(ptr, lump->size, 1, _g->fileWAD);
+	return ptr;
+}
+
+
 const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 {
 	const filelump_t* lump = W_FindLumpByNum(num);
+
 	void* ptr = Z_MallocLevel(lump->size, NULL);
+
 	fseek(_g->fileWAD, lump->filepos, SEEK_SET);
 	fread(ptr, lump->size, 1, _g->fileWAD);
 	return ptr;
