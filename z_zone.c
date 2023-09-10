@@ -73,6 +73,8 @@ typedef struct
 #endif
 } memblock_t;
 
+static void* UNOWNED = MK_FP(0, 2);
+
 #define PARAGRAPH_SIZE 16
 
 typedef char assertMemblockSize[sizeof(memblock_t) <= PARAGRAPH_SIZE ? 1 : -1];
@@ -188,10 +190,10 @@ static void Z_FreeBlock(memblock_t* block)
         I_Error("Z_FreeBlock: block has id %x instead of ZONEID", block->id);
 #endif
 
-    if (block->user > (void **)0x100)
+    if (FP_SEG(block->user) != 0)
     {
-        // smaller values are not pointers
-        // Note: OS-dependend?
+        // far pointers with segment 0 are not user pointers
+        // Note: OS-dependend
 
         // clear the user's mark
         *block->user = NULL;
@@ -368,7 +370,7 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
             I_Error ("Z_Malloc: an owner is required for purgable blocks");
 
         // mark as in use, but unowned
-        base->user = (void *)2;
+        base->user = UNOWNED;
     }
 
     base->tag = tag;
