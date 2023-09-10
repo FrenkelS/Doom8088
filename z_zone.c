@@ -73,7 +73,7 @@ typedef struct
 #endif
 } memblock_t;
 
-static void* UNOWNED = MK_FP(0, 2);
+#define UNOWNED MK_FP(0,2)
 
 #define PARAGRAPH_SIZE 16
 
