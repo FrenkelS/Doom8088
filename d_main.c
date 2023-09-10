@@ -388,11 +388,6 @@ static void LoadIWAD(void)
 	if (_g->fileTanToAngle == NULL)
 		I_Error("Can't open TAN2ANG.LMP.");
 
-	// ViewAngleToX
-	_g->fileViewAngleToX = fopen("VIEWANGX.LMP", "rb");
-	if (_g->fileViewAngleToX == NULL)
-		I_Error("Can't open VIEWANGX.LMP.");
-
 	// XToViewAngle
 	_g->fileXToViewAngle = fopen("XVIEWANG.LMP", "rb");
 	if (_g->fileXToViewAngle == NULL)
