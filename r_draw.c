@@ -986,14 +986,7 @@ void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num
 
     const int32_t xc = texcolumn & widthmask;
 
-    if (patchcount == 1)
-    {
-        //simple texture.
-        *patch_num = texture->patches[0].patch_num;
-        *x_c = xc;
-        return;
-    }
-    else
+    if (patchcount != 1)
     {
         uint8_t i = 0;
 
@@ -1015,9 +1008,14 @@ void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num
                 return;
             }
         } while (++i < patchcount);
+
+        printf("R_GetColumn: can't find texcolumn");
     }
 
-    I_Error("R_GetColumn: can't find texcolumn");
+    //patchcount == 1
+    //simple texture.
+    *patch_num = texture->patches[0].patch_num;
+    *x_c = xc;
 }
 
 
