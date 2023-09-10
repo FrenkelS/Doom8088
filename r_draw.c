@@ -1738,15 +1738,6 @@ static visplane_t *R_CheckPlane(visplane_t *pl, int32_t start, int32_t stop)
 }
 
 
-inline static void ByteCopy(byte* dest, const byte* src, uint32_t count)
-{
-    do
-    {
-        *dest++ = *src++;
-    } while(--count);
-}
-
-
 #if defined FLAT_WALL
 #define R_DrawSegTextureColumn(x,y,z) R_DrawColumnFlat(x,z)
 #else
@@ -1768,7 +1759,7 @@ static void R_DrawColumnInCache(const column_t* patch, byte* cache, int16_t orig
             count = cacheheight - position;
 
         if (count > 0)
-            ByteCopy(cache + position, source, count);
+            memcpy(cache + position, source, count);
 
         patch = (const column_t *)(  (const byte *)patch + patch->length + 4);
     }
@@ -2137,12 +2128,6 @@ inline static fixed_t CONSTFUNC FixedMod(fixed_t a, fixed_t b)
 }
 
 
-inline static CONSTFUNC int32_t IDiv32 (int32_t a, int32_t b)
-{
-    return a / b;
-}
-
-
 //
 // R_StoreWallRange
 // A wall segment will be drawn
@@ -2199,7 +2184,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     if (stop > start)
     {
         ds_p->scale2 = R_ScaleFromGlobalAngle (viewangle + xtoviewangle(stop));
-        ds_p->scalestep = rw_scalestep = IDiv32(ds_p->scale2-rw_scale, stop-start);
+        ds_p->scalestep = rw_scalestep = (ds_p->scale2 - rw_scale) / (stop - start);
     }
     else
         ds_p->scale2 = ds_p->scale1;
@@ -2428,14 +2413,14 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     // save sprite clipping info
     if ((ds_p->silhouette & SIL_TOP || maskedtexture) && !ds_p->sprtopclip)
     {
-        ByteCopy((byte*)_g->lastopening, (const byte*)(ceilingclip+start), sizeof(int16_t)*(rw_stopx-start));
+        memcpy((byte*)_g->lastopening, (const byte*)(ceilingclip+start), sizeof(int16_t)*(rw_stopx-start));
         ds_p->sprtopclip = _g->lastopening - start;
         _g->lastopening += rw_stopx - start;
     }
 
     if ((ds_p->silhouette & SIL_BOTTOM || maskedtexture) && !ds_p->sprbottomclip)
     {
-        ByteCopy((byte*)_g->lastopening, (const byte*)(floorclip+start), sizeof(int16_t)*(rw_stopx-start));
+        memcpy((byte*)_g->lastopening, (const byte*)(floorclip+start), sizeof(int16_t)*(rw_stopx-start));
         ds_p->sprbottomclip = _g->lastopening - start;
         _g->lastopening += rw_stopx - start;
     }
@@ -2513,29 +2498,6 @@ static void R_RecalcLineFlags(void)
 }
 
 
-inline static void ByteSet(byte* dest, byte val, uint32_t count)
-{
-    do
-    {
-        *dest++ = val;
-    } while(--count);
-}
-
-
-inline static void* ByteFind(byte* mem, byte val, uint32_t count)
-{
-    do
-    {
-        if(*mem == val)
-            return mem;
-
-        mem++;
-    } while(--count);
-
-    return NULL;
-}
-
-
 // CPhipps -
 // R_ClipWallSegment
 //
@@ -2549,7 +2511,7 @@ static void R_ClipWallSegment(int8_t first, int8_t last, boolean solid)
     {
         if (solidcol[first])
         {
-            if (!(p = ByteFind(solidcol+first, 0, last-first)))
+            if (!(p = memchr(solidcol+first, 0, last-first)))
                 return; // All solid
 
             first = p - solidcol;
@@ -2557,7 +2519,7 @@ static void R_ClipWallSegment(int8_t first, int8_t last, boolean solid)
         else
         {
             int8_t to;
-            if (!(p = ByteFind(solidcol+first, 1, last-first)))
+            if (!(p = memchr(solidcol+first, 1, last-first)))
                 to = last;
             else
                 to = p - solidcol;
@@ -2566,8 +2528,7 @@ static void R_ClipWallSegment(int8_t first, int8_t last, boolean solid)
 
             if (solid)
             {
-                //memset(solidcol+first,1,to-first);
-                ByteSet(solidcol+first, 1, to-first);
+                memset(solidcol + first, 1, to - first);
             }
 
             first = to;
@@ -2794,7 +2755,7 @@ static boolean R_CheckBBox(const int16_t *bspcoord)
         if (sx1 == sx2)
             return false;
 
-        if (!ByteFind(solidcol+sx1, 0, sx2-sx1)) return false;
+        if (!memchr(solidcol+sx1, 0, sx2-sx1)) return false;
         // All columns it covers are already solidly covered
     }
 
