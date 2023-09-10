@@ -363,7 +363,6 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
     {
         // mark as an in use block
         base->user = user;
-        *(void **)user = segmentToPointer(pointerToSegment(base) + 1);
     }
     else
     {
@@ -399,13 +398,20 @@ void* Z_MallocStatic(int32_t size)
 
 void* Z_MallocStaticWithUser(int32_t size, void **user)
 {
-	return Z_Malloc(size, PU_STATIC, user);
+	void* ptr = Z_Malloc(size, PU_STATIC, user);
+	*user = ptr;
+	return ptr;
 }
 
 
 void* Z_MallocLevel(int32_t size, void **user)
 {
-	return Z_Malloc(size, PU_LEVEL, user);
+	void* ptr = Z_Malloc(size, PU_LEVEL, user);
+
+	if (user)
+		*user = ptr;
+
+	return ptr;
 }
 
 
