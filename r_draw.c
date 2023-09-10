@@ -65,6 +65,16 @@
 
 static const int8_t viewangletoxTable[2039];
 
+static int8_t viewangletox(int16_t viewangle)
+{
+	if (viewangle < 1034)
+		return 120;
+	else if (3073 <= viewangle)
+		return 0;
+	else //if (1034 <= viewangle && viewangle < 3073)
+		return viewangletoxTable[viewangle - 1034];
+}
+
 
 #if 0
 static const angle_t tantoangleTable[2049];
@@ -81,16 +91,6 @@ static fixed_t finetangent(int16_t x)
 	return finetangentTable[x];
 }
 #else
-static int8_t viewangletox(int16_t viewangle)
-{
-	if (viewangle < 1034)
-		return 120;
-	else if (3073 <= viewangle)
-		return 0;
-	else //if (1034 <= viewangle && viewangle < 3073)
-		return viewangletoxTable[viewangle - 1034];
-}
-
 static angle_t tantoangle(int16_t tan)
 {
 	angle_t angle;
