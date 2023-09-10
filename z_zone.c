@@ -181,22 +181,11 @@ void Z_ChangeTagToCache(const void* ptr)
 }
 
 
-//
-// Z_Free
-//
-void Z_Free (const void* ptr)
+static void Z_FreeBlock(memblock_t* block)
 {
-    memblock_t*		block;
-    memblock_t*		other;
-
-    if (ptr == NULL)
-        return;
-
-    block = segmentToPointer(pointerToSegment(ptr) - 1);
-
 #if defined _M_I86
     if (block->id != ZONEID)
-        I_Error("Z_Free: block has id %x instead of ZONEID", block->id);
+        I_Error("Z_FreeBlock: block has id %x instead of ZONEID", block->id);
 #endif
 
     if (block->user > (void **)0x100)
@@ -205,7 +194,7 @@ void Z_Free (const void* ptr)
         // Note: OS-dependend?
 
         // clear the user's mark
-        *block->user = 0;
+        *block->user = NULL;
     }
 
     // mark as free
@@ -218,7 +207,7 @@ void Z_Free (const void* ptr)
     printf("Free: %ld\n", running_count);
 #endif
 
-    other = segmentToPointer(block->prev);
+    memblock_t* other = segmentToPointer(block->prev);
 
     if (!other->user)
     {
@@ -244,6 +233,15 @@ void Z_Free (const void* ptr)
         if (pointerToSegment(other) == mainzone_rover_segment)
             mainzone_rover_segment = pointerToSegment(block);
     }
+}
+
+
+//
+// Z_Free
+//
+void Z_Free (const void* ptr)
+{
+	Z_FreeBlock(segmentToPointer(pointerToSegment(ptr) - 1));
 }
 
 
@@ -326,7 +324,7 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
 
                 // the rover can be the base block
                 base  = segmentToPointer(base->prev);
-                Z_Free(segmentToPointer(pointerToSegment(rover) + 1));
+                Z_FreeBlock(rover);
                 base  = segmentToPointer(base->next);
                 rover = segmentToPointer(base->next);
             }
@@ -441,7 +439,7 @@ void Z_FreeTags(void)
             continue;
 
         if (PU_LEVEL <= block->tag && block->tag <= (PU_PURGELEVEL - 1))
-            Z_Free(segmentToPointer(pointerToSegment(block) + 1));
+            Z_FreeBlock(block);
     }
 }
 
