@@ -381,7 +381,7 @@ typedef struct
 
 typedef struct
 {
-  int32_t numframes;
+  int8_t numframes;
   spriteframe_t *spriteframes;
 } spritedef_t;
 
