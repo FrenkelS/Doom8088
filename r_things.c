@@ -48,7 +48,10 @@ static int8_t maxframe;
 #define MAX_SPRITE_FRAMES 29
 static spriteframe_t sprtemp[MAX_SPRITE_FRAMES];
 
-static int16_t lastspritelump;
+static int16_t firstspritelump;
+static int16_t numentries;
+
+static const patch_t **sprites;
 
 //
 // Sprite rotation 0 is facing the viewer,
@@ -82,7 +85,7 @@ static void R_InstallSpriteLump(int16_t lump, uint8_t frame,
       {
           if (sprtemp[frame].lump[r]==-1)
           {
-              sprtemp[frame].lump[r] = lump - _g->firstspritelump;
+              sprtemp[frame].lump[r] = lump - firstspritelump;
 
               if(flipped)
                 sprtemp[frame].flipmask |= (1 << r);
@@ -97,7 +100,7 @@ static void R_InstallSpriteLump(int16_t lump, uint8_t frame,
 
   if (sprtemp[frame].lump[--rotation] == -1)
   {
-      sprtemp[frame].lump[rotation] = lump - _g->firstspritelump;
+      sprtemp[frame].lump[rotation] = lump - firstspritelump;
 
       if(flipped)
         sprtemp[frame].flipmask |= (1 << rotation);
@@ -136,7 +139,6 @@ static void R_InstallSpriteLump(int16_t lump, uint8_t frame,
 
 void R_InitSprites(void)
 {
-  size_t numentries = lastspritelump - _g->firstspritelump + 1;
   struct { int16_t index, next; } *hash;
   int16_t i;
 
@@ -157,7 +159,7 @@ void R_InitSprites(void)
 
   for (i=0; i<numentries; i++)             // Prepend each sprite to hash chain
     {                                      // prepend so that later ones win
-      const char* sn = W_GetNameForNum(i+_g->firstspritelump);
+      const char* sn = W_GetNameForNum(i + firstspritelump);
 
       int16_t j = R_SpriteNameHash(sn) % numentries;
       hash[i].next = hash[j].index;
@@ -178,7 +180,7 @@ void R_InitSprites(void)
           maxframe = -1;
           do
             {
-              const char* sn = W_GetNameForNum(j + _g->firstspritelump);
+              const char* sn = W_GetNameForNum(j + firstspritelump);
 
               // Fast portable comparison -- killough
               // (using int32_t pointer cast is nonportable):
@@ -188,12 +190,12 @@ void R_InitSprites(void)
                     (sn[2] ^ spritename[2]) |
                     (sn[3] ^ spritename[3])))
                 {
-                  R_InstallSpriteLump(j+_g->firstspritelump,
+                  R_InstallSpriteLump(j + firstspritelump,
                                       sn[4] - 'A',
                                       sn[5] - '0',
                                       false);
                   if (sn[6])
-                    R_InstallSpriteLump(j+_g->firstspritelump,
+                    R_InstallSpriteLump(j + firstspritelump,
                                         sn[6] - 'A',
                                         sn[7] - '0',
                                         true);
@@ -243,6 +245,22 @@ void R_InitSprites(void)
 
 void R_InitSpriteLumps(void)
 {
-	_g->firstspritelump = W_GetNumForName("S_START") + 1;
-	lastspritelump      = W_GetNumForName("S_END")   - 1;
+	firstspritelump        = W_GetNumForName("S_START") + 1;
+	int16_t lastspritelump = W_GetNumForName("S_END")   - 1;
+
+	numentries = lastspritelump - firstspritelump + 1;
+
+	sprites = Z_MallocStatic(numentries * sizeof(*sprites));
+	memset(sprites, 0, numentries * sizeof(*sprites));
+}
+
+
+const patch_t* R_GetSprite(int16_t sprite_num)
+{
+	if (sprites[sprite_num])
+		Z_ChangeTagToStatic(sprites[sprite_num]);
+	else
+		sprites[sprite_num] = W_GetLumpByNumWithUser(sprite_num + firstspritelump, (void**)&sprites[sprite_num]);
+
+	return sprites[sprite_num];
 }

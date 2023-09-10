@@ -159,6 +159,28 @@ void Z_Init (void)
 }
 
 
+void Z_ChangeTagToStatic(const void* ptr)
+{
+	memblock_t* block = segmentToPointer(pointerToSegment(ptr) - 1);
+#if defined _M_I86
+	if (block->id != ZONEID)
+		I_Error("Z_ChangeTagToStatic: block has id %x instead of ZONEID", block->id);
+#endif
+	block->tag = PU_STATIC;
+}
+
+
+void Z_ChangeTagToCache(const void* ptr)
+{
+	memblock_t* block = segmentToPointer(pointerToSegment(ptr) - 1);
+#if defined _M_I86
+	if (block->id != ZONEID)
+		I_Error("Z_ChangeTagToCache: block has id %x instead of ZONEID", block->id);
+#endif
+	block->tag = PU_CACHE;
+}
+
+
 //
 // Z_Free
 //
@@ -174,7 +196,7 @@ void Z_Free (const void* ptr)
 
 #if defined _M_I86
     if (block->id != ZONEID)
-        I_Error("Z_Free: freed a pointer without ZONEID");
+        I_Error("Z_Free: block has id %x instead of ZONEID", block->id);
 #endif
 
     if (block->user > (void **)0x100)
@@ -279,8 +301,8 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
     if (!previous_block->user)
         base = previous_block;
 
-    memblock_t* rover     = base;
-    segment_t start_segment = base->prev;
+    memblock_t* rover         = base;
+    segment_t   start_segment = base->prev;
 
     do
     {
@@ -375,17 +397,15 @@ void* Z_MallocStatic(int32_t size)
 }
 
 
-void* Z_MallocLevel(int32_t size, void **user)
+void* Z_MallocStaticWithUser(int32_t size, void **user)
 {
-	return Z_Malloc(size, PU_LEVEL, user);
+	return Z_Malloc(size, PU_STATIC, user);
 }
 
 
-void* Z_CallocLevSpec(int32_t size)
+void* Z_MallocLevel(int32_t size, void **user)
 {
-	void *ptr = Z_Malloc(size, PU_LEVSPEC, NULL);
-	memset(ptr, 0, size);
-	return ptr;
+	return Z_Malloc(size, PU_LEVEL, user);
 }
 
 
@@ -394,6 +414,14 @@ void* Z_CallocLevel(int32_t size)
     void* ptr = Z_Malloc(size, PU_LEVEL, NULL);
     memset(ptr, 0, size);
     return ptr;
+}
+
+
+void* Z_CallocLevSpec(int32_t size)
+{
+	void *ptr = Z_Malloc(size, PU_LEVSPEC, NULL);
+	memset(ptr, 0, size);
+	return ptr;
 }
 
 

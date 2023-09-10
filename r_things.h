@@ -39,4 +39,6 @@
 void R_InitSprites(void);
 void R_InitSpriteLumps(void);
 
+const patch_t* R_GetSprite(int16_t sprite_num);
+
 #endif

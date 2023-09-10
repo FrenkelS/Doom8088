@@ -30,9 +30,12 @@
 
 void	Z_Init(void);
 void*	Z_MallocStatic(int32_t size);
-void*	Z_MallocLevel(int32_t size, void **ptr);
+void*	Z_MallocStaticWithUser(int32_t size, void **user); 
+void*	Z_MallocLevel(int32_t size, void **user);
 void*	Z_CallocLevel(int32_t size);
 void*	Z_CallocLevSpec(int32_t size);
+void	Z_ChangeTagToStatic(const void *ptr);
+void	Z_ChangeTagToCache(const void *ptr);
 void	Z_Free(const void *ptr);
 void	Z_FreeTags(void);
 void	Z_CheckHeap(void);
