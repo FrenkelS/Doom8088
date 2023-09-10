@@ -394,7 +394,7 @@ void P_AddActivePlat(plat_t* plat)
 {
     platlist_t* old_head = _g->activeplats;
 
-    platlist_t *list = Z_MallocLevel(sizeof *list, (void **)&_g->activeplats);
+    platlist_t *list = _g->activeplats = Z_MallocLevel(sizeof *list, (void **)&_g->activeplats);
     list->plat = plat;
     plat->list = list;
     if ((list->next = old_head))

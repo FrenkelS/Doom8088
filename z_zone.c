@@ -398,20 +398,13 @@ void* Z_MallocStatic(int32_t size)
 
 void* Z_MallocStaticWithUser(int32_t size, void **user)
 {
-	void* ptr = Z_Malloc(size, PU_STATIC, user);
-	*user = ptr;
-	return ptr;
+	return Z_Malloc(size, PU_STATIC, user);
 }
 
 
 void* Z_MallocLevel(int32_t size, void **user)
 {
-	void* ptr = Z_Malloc(size, PU_LEVEL, user);
-
-	if (user)
-		*user = ptr;
-
-	return ptr;
+	return Z_Malloc(size, PU_LEVEL, user);
 }
 
 
