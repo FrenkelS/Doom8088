@@ -43,7 +43,7 @@
 #include "globdata.h"
 
 
-static int32_t maxframe;
+static int8_t maxframe;
 
 #define MAX_SPRITE_FRAMES 29
 static spriteframe_t sprtemp[MAX_SPRITE_FRAMES];
@@ -62,23 +62,23 @@ static int16_t lastspritelump;
 // Local function for R_InitSprites.
 //
 
-static void R_InstallSpriteLump(int16_t lump, uint32_t frame,
-                                uint32_t rotation, boolean flipped)
+static void R_InstallSpriteLump(int16_t lump, uint8_t frame,
+                                uint8_t rotation, boolean flipped)
 {
   if (frame >= MAX_SPRITE_FRAMES || rotation > 8)
     I_Error("R_InstallSpriteLump: Bad frame characters in lump %i", lump);
 
-  if ((int32_t) frame > maxframe)
+  if ((int8_t) frame > maxframe)
     maxframe = frame;
 
 
   if (rotation == 0)
   {    // the lump should be used for all rotations
-      int32_t r;
+      int8_t r;
 
       sprtemp[frame].flipmask = 0;
 
-      for (r=0 ; r<8 ; r++)
+      for (r=0; r<8; r++)
       {
           if (sprtemp[frame].lump[r]==-1)
           {
@@ -132,13 +132,13 @@ static void R_InstallSpriteLump(int16_t lump, uint32_t frame,
 // Empirically verified to have excellent hash
 // properties across standard Doom sprites:
 
-#define R_SpriteNameHash(s) ((uint32_t)((s)[0]-((s)[1]*3-(s)[3]*2-(s)[2])*2))
+#define R_SpriteNameHash(s) ((uint16_t)((s)[0]-((s)[1]*3-(s)[3]*2-(s)[2])*2))
 
 void R_InitSprites(void)
 {
   size_t numentries = lastspritelump - _g->firstspritelump + 1;
-  struct { int32_t index, next; } *hash;
-  int32_t i;
+  struct { int16_t index, next; } *hash;
+  int16_t i;
 
   if (!numentries || !*sprnames)
     return;
@@ -152,14 +152,14 @@ void R_InitSprites(void)
 
   hash = Z_MallocStatic(sizeof(*hash)*numentries); // allocate hash table
 
-  for (i=0; (size_t)i<numentries; i++)             // initialize hash table as empty
+  for (i=0; i<numentries; i++)             // initialize hash table as empty
     hash[i].index = -1;
 
-  for (i=0; (size_t)i<numentries; i++)             // Prepend each sprite to hash chain
+  for (i=0; i<numentries; i++)             // Prepend each sprite to hash chain
     {                                      // prepend so that later ones win
       const char* sn = W_GetNameForNum(i+_g->firstspritelump);
 
-      int32_t j = R_SpriteNameHash(sn) % numentries;
+      int16_t j = R_SpriteNameHash(sn) % numentries;
       hash[i].next = hash[j].index;
       hash[j].index = i;
     }
@@ -170,7 +170,7 @@ void R_InitSprites(void)
   for (i=0 ; i<NUMSPRITES ; i++)
     {
       const char *spritename = sprnames[i];
-      int32_t j = hash[R_SpriteNameHash(spritename) % numentries].index;
+      int16_t j = hash[R_SpriteNameHash(spritename) % numentries].index;
 
       if (j >= 0)
         {
@@ -204,9 +204,9 @@ void R_InitSprites(void)
           // check the frames that were found for completeness
           if ((_g->sprites[i].numframes = ++maxframe))  // killough 1/31/98
             {
-              int32_t frame;
+              int8_t frame;
               for (frame = 0; frame < maxframe; frame++)
-                switch ((int32_t) sprtemp[frame].rotate)
+                switch ((int16_t) sprtemp[frame].rotate)
                   {
                   case -1:
                     // no rotations were found for that frame at all
@@ -221,7 +221,7 @@ void R_InitSprites(void)
                   case 1:
                     // must have all 8 frames
                     {
-                      int32_t rotation;
+                      int8_t rotation;
                       for (rotation=0 ; rotation<8 ; rotation++)
                         if (sprtemp[frame].lump[rotation] == -1)
                           I_Error ("R_InitSprites: Sprite %.8s frame %c "
