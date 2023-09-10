@@ -77,7 +77,6 @@ uint16_t fps_framerate;
 
 // files
 FILE *fileFineSine;
-FILE *fileFineTan;
 FILE *fileTanToAngle;
 FILE *fileWAD;
 FILE *fileXToViewAngle;

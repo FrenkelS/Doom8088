@@ -378,11 +378,6 @@ static void LoadIWAD(void)
 	if (_g->fileFineSine == NULL)
 		I_Error("Can't open FINESINE.LMP.");
 
-	// FineTan
-	_g->fileFineTan = fopen("FINETAN.LMP", "rb");
-	if (_g->fileFineTan == NULL)
-		I_Error("Can't open FINETAN.LMP.");
-
 	// TanToAngle
 	_g->fileTanToAngle = fopen("TAN2ANG.LMP", "rb");
 	if (_g->fileTanToAngle == NULL)
