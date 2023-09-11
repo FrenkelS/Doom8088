@@ -68,7 +68,7 @@ typedef struct
     void**    user;		// NULL if a free block
     segment_t next;
     segment_t prev;
-#if defined _M_I86
+#if defined ZONEIDCHECK
     uint16_t id;		// should be ZONEID
 #endif
 } memblock_t;
@@ -164,7 +164,7 @@ void Z_Init (void)
 void Z_ChangeTagToStatic(const void* ptr)
 {
 	memblock_t* block = segmentToPointer(pointerToSegment(ptr) - 1);
-#if defined _M_I86
+#if defined ZONEIDCHECK
 	if (block->id != ZONEID)
 		I_Error("Z_ChangeTagToStatic: block has id %x instead of ZONEID", block->id);
 #endif
@@ -175,7 +175,7 @@ void Z_ChangeTagToStatic(const void* ptr)
 void Z_ChangeTagToCache(const void* ptr)
 {
 	memblock_t* block = segmentToPointer(pointerToSegment(ptr) - 1);
-#if defined _M_I86
+#if defined ZONEIDCHECK
 	if (block->id != ZONEID)
 		I_Error("Z_ChangeTagToCache: block has id %x instead of ZONEID", block->id);
 #endif
@@ -185,7 +185,7 @@ void Z_ChangeTagToCache(const void* ptr)
 
 static void Z_FreeBlock(memblock_t* block)
 {
-#if defined _M_I86
+#if defined ZONEIDCHECK
     if (block->id != ZONEID)
         I_Error("Z_FreeBlock: block has id %x instead of ZONEID", block->id);
 #endif
@@ -348,7 +348,7 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
         newblock->size = newblock_size;
         newblock->user = NULL; // NULL indicates free block.
         newblock->tag  = 0;
-#if defined _M_I86
+#if defined ZONEIDCHECK
         newblock->id   = ZONEID;
 #endif
         newblock->prev = base_segment;
@@ -374,7 +374,7 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
     }
 
     base->tag = tag;
-#if defined _M_I86
+#if defined ZONEIDCHECK
     base->id  = ZONEID;
 #endif
 
@@ -460,7 +460,7 @@ void Z_CheckHeap (void)
             break;
         }
 
-#if defined _M_I86
+#if defined ZONEIDCHECK
         if (block->id != ZONEID)
             I_Error("Z_CheckHeap: block has id %x instead of ZONEID", block->id);
 #endif
