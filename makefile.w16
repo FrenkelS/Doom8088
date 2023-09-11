@@ -15,7 +15,7 @@
 #      oa  relax aliasing checking
 #      od  do not optimize
 #  oe[=#]  expand functions inline, # = quads (default 20)
-#      oh  repeated omptimizations
+#      oh  repeated optimizations
 #      oi  use the inline library functions
 #      ol+ loop optimizations, inclusing loop unrolling
 #      os  optimize for space
@@ -30,6 +30,7 @@
 # --------------------------------------------------------------------------
 
 CCOPTS = -oaxes -oh -ol+ -zp1 -0 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxet -oh -ol+ -zp1 -2 -j -zq -s -ml -wx -za99
 
 GLOBOBJS = &
  am_map.obj &
