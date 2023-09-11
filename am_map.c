@@ -55,20 +55,19 @@
 #include "globdata.h"
 
 
-static const int32_t mapcolor_back = 247;    // map background
-static const int32_t mapcolor_wall = 23;    // normal 1s wall color
-static const int32_t mapcolor_fchg = 55;    // line at floor height change color
-static const int32_t mapcolor_cchg = 215;    // line at ceiling height change color
-static const int32_t mapcolor_clsd = 208;    // line at sector with floor=ceiling color
-static const int32_t mapcolor_rdor = 175;    // red door color  (diff from keys to allow option)
-static const int32_t mapcolor_bdor = 204;    // blue door color (of enabling one but not other )
-static const int32_t mapcolor_ydor = 231;    // yellow door color
-static const int32_t mapcolor_tele = 119;    // teleporter line color
-static const int32_t mapcolor_secr = 252;    // secret sector boundary color
-static const int32_t mapcolor_exit = 0;    // jff 4/23/98 add exit line color
-static const int32_t mapcolor_unsn = 104;    // computer map unseen line color
-static const int32_t mapcolor_flat = 88;    // line with no floor/ceiling changes
-static const int32_t mapcolor_sngl = 208;    // single player arrow color
+static const uint8_t mapcolor_back = 247;    // map background
+static const uint8_t mapcolor_wall = 23;    // normal 1s wall color
+static const uint8_t mapcolor_fchg = 55;    // line at floor height change color
+static const uint8_t mapcolor_cchg = 215;    // line at ceiling height change color
+static const uint8_t mapcolor_clsd = 208;    // line at sector with floor=ceiling color
+static const uint8_t mapcolor_rdor = 175;    // red door color  (diff from keys to allow option)
+static const uint8_t mapcolor_bdor = 204;    // blue door color (of enabling one but not other )
+static const uint8_t mapcolor_ydor = 231;    // yellow door color
+static const uint8_t mapcolor_tele = 119;    // teleporter line color
+static const uint8_t mapcolor_secr = 252;    // secret sector boundary color
+static const uint8_t mapcolor_unsn = 104;    // computer map unseen line color
+static const uint8_t mapcolor_flat = 88;    // line with no floor/ceiling changes
+static const uint8_t mapcolor_sngl = 208;    // single player arrow color
 
 static const int32_t f_w = (SCREENWIDTH*2);
 static const int32_t f_h = SCREENHEIGHT-ST_SCALED_HEIGHT;// to allow runtime setting of width/height
@@ -733,7 +732,7 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
 #undef DOOUTCODE
 
 
-static void V_PlotPixel(int32_t x, int32_t y, int32_t color)
+static void V_PlotPixel(int32_t x, int32_t y, uint8_t color)
 {
     byte* fb = (byte*)_g->screen;
 
@@ -755,7 +754,7 @@ static void V_PlotPixel(int32_t x, int32_t y, int32_t color)
 
         uint16_t old = *dest16;
 
-        *dest16 = ((color & 0xff) | (old & 0xff00));
+        *dest16 = (color | (old & 0xff00));
     }
 }
 
@@ -769,7 +768,7 @@ static void V_PlotPixel(int32_t x, int32_t y, int32_t color)
 // Passed the frame coordinates of line, and the color to be drawn
 // Returns nothing
 //
-static void V_DrawLine(fline_t* fl, int32_t color)
+static void V_DrawLine(fline_t* fl, uint8_t color)
 {
     int32_t x0 = fl->a.x;
     int32_t x1 = fl->b.x;
@@ -820,12 +819,10 @@ static void V_DrawLine(fline_t* fl, int32_t color)
 // in the defaults file.
 // Returns nothing.
 //
-static void AM_drawMline(mline_t* ml,int32_t color)
+static void AM_drawMline(mline_t* ml, uint8_t color)
 {
     fline_t fl;
 
-    if (color==-1)  // jff 4/3/98 allow not drawing any sort of line
-        return;       // by setting its color to -1
     if (color==247) // jff 4/3/98 if color is 247 (xparent), use black
         color=0;
 
@@ -963,21 +960,6 @@ static void AM_drawWalls(void)
                     }
                 }
             }
-            if /* jff 4/23/98 add exit lines to automap */
-            (
-            mapcolor_exit &&
-                    (
-                        line_special==11 ||
-                        line_special==52 ||
-                        line_special==197 ||
-                        line_special==51  ||
-                        line_special==124 ||
-                        line_special==198
-                        )
-                    ) {
-                AM_drawMline(&l, mapcolor_exit); /* exit line */
-                continue;
-            }
 
             if(!backsector)
             {
@@ -1056,28 +1038,20 @@ static void AM_drawWalls(void)
 //
 // Draws a vector graphic according to numerous parameters
 //
-// Passed the structure defining the vector graphic shape, the number
-// of vectors in it, the scale to draw it at, the angle to draw it at,
-// the color to draw it with, and the map coordinates to draw it at.
+// Passed the angle to draw it at, and the map coordinates to draw it at.
 // Returns nothing
 //
-static void AM_drawLineCharacter(const mline_t* lineguy, int32_t lineguylines, fixed_t scale, angle_t angle, int32_t color, fixed_t x, fixed_t y)
+static void AM_drawLineCharacter(angle_t angle, fixed_t x, fixed_t y)
 {
     int32_t   i;
     mline_t l;
 
     if (_g->automapmode & am_rotate) angle -= _g->player.mo->angle - ANG90; // cph
 
-    for (i=0;i<lineguylines;i++)
+    for (i=0;i<NUMPLYRLINES;i++)
     {
-        l.a.x = lineguy[i].a.x;
-        l.a.y = lineguy[i].a.y;
-
-        if (scale)
-        {
-            l.a.x = FixedMul(scale, l.a.x);
-            l.a.y = FixedMul(scale, l.a.y);
-        }
+        l.a.x = player_arrow[i].a.x;
+        l.a.y = player_arrow[i].a.y;
 
         if (angle)
             AM_rotate(&l.a.x, &l.a.y, angle, 0, 0);
@@ -1085,14 +1059,8 @@ static void AM_drawLineCharacter(const mline_t* lineguy, int32_t lineguylines, f
         l.a.x += x;
         l.a.y += y;
 
-        l.b.x = lineguy[i].b.x;
-        l.b.y = lineguy[i].b.y;
-
-        if (scale)
-        {
-            l.b.x = FixedMul(scale, l.b.x);
-            l.b.y = FixedMul(scale, l.b.y);
-        }
+        l.b.x = player_arrow[i].b.x;
+        l.b.y = player_arrow[i].b.y;
 
         if (angle)
             AM_rotate(&l.b.x, &l.b.y, angle, 0, 0);
@@ -1100,7 +1068,7 @@ static void AM_drawLineCharacter(const mline_t* lineguy, int32_t lineguylines, f
         l.b.x += x;
         l.b.y += y;
 
-        AM_drawMline(&l, color);
+        AM_drawMline(&l, mapcolor_sngl);
     }
 }
 
@@ -1113,16 +1081,7 @@ static void AM_drawLineCharacter(const mline_t* lineguy, int32_t lineguylines, f
 //
 static void AM_drawPlayers(void)
 {    
-    AM_drawLineCharacter
-            (
-                player_arrow,
-                NUMPLYRLINES,
-                0,
-                _g->player.mo->angle,
-                mapcolor_sngl,      //jff color
-                _g->player.mo->x >> FRACTOMAPBITS,//e6y
-                _g->player.mo->y >> FRACTOMAPBITS);//e6y
-
+    AM_drawLineCharacter(_g->player.mo->angle, _g->player.mo->x >> FRACTOMAPBITS, _g->player.mo->y >> FRACTOMAPBITS);
 }
 
 
