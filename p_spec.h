@@ -827,11 +827,6 @@ boolean P_SectorActive
 ( special_e t,
   const sector_t* s );
 
-boolean P_IsSecret
-( const sector_t *sec );
-
-boolean P_WasSecret
-( const sector_t *sec );
 
 void P_ChangeSwitchTexture
 ( const line_t* line,

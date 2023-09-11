@@ -874,6 +874,37 @@ static int32_t AM_DoorColor(int32_t type)
     }
 }
 
+
+//
+// P_IsSecret()
+//
+// Passed a sector, returns if the sector secret type is still active, i.e.
+// secret type is set and the secret has not yet been obtained.
+//
+// jff 3/14/98 added to simplify checks for whether sector is secret
+//  in automap and other places
+//
+static boolean PUREFUNC P_IsSecret(const sector_t *sec)
+{
+  return (sec->special==9 || (sec->special&SECRET_MASK));
+}
+
+
+//
+// P_WasSecret()
+//
+// Passed a sector, returns if the sector secret type was active, i.e.
+// secret type was set and the secret has been obtained already.
+//
+// jff 3/14/98 added to simplify checks for whether sector is secret
+//  in automap and other places
+//
+static boolean PUREFUNC P_WasSecret(const sector_t *sec)
+{
+  return (sec->oldspecial==9 || (sec->oldspecial&SECRET_MASK));
+}
+
+
 //
 // Determines visible lines, draws them.
 // This is LineDef based, not LineSeg based.
