@@ -76,22 +76,9 @@ static int8_t viewangletox(int16_t viewangle)
 }
 
 
-#if 0
 static const angle_t tantoangleTable[2049];
 
-static angle_t tantoangle(int16_t tan)
-{
-	return tantoangleTable[tan];
-}
-#else
-static angle_t tantoangle(int16_t tan)
-{
-	angle_t angle;
-	fseek(_g->fileTanToAngle, tan * sizeof(angle_t), SEEK_SET);
-	fread(&angle, sizeof(angle_t), 1, _g->fileTanToAngle);
-	return angle;
-}
-#endif
+#define tantoangle(t) tantoangleTable[t]
 
 
 static const uint16_t finetangentTable_part_3[1024];
@@ -3049,7 +3036,7 @@ static const int8_t viewangletoxTable[2039] =
     2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1
 };
 
-#if 0
+
 // ArcTan LUT,
 //  maps tan(angle) to angle fast. Gotta search.
 //
@@ -3315,7 +3302,7 @@ static const angle_t tantoangleTable[2049] =
     535533216,535700704,535868128,536035456,536202720,536369888,536536992,536704000,
     536870912
 };
-#endif
+
 
 // Tangens LUT.
 // Should work with BAM fairly well (12 of 16bit, effectively, by shifting).
