@@ -13,6 +13,8 @@ Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 Watch what it looks like on a real 286 [here](https://www.twitch.tv/videos/1911540009?t=0h12m48s).
 
 **What's special?:**
+ - No textures
+ - No status bar
  - No sound and music
  - No saving and loading
  - No multiplayer
@@ -22,8 +24,7 @@ Watch what it looks like on a real 286 [here](https://www.twitch.tv/videos/19115
  - Supports only Doom 1 Episode 1
  - Only demo3 is in sync
  - Lots of crashes due to memory issues
- - Super slow because for every frame every necessary image is read from the hard disk and for every calculation involving a lookup table the hard disk is also accessed
- 
+
 ## Controls:
 |Action      |GBA   |DOS                     |
 |------------|------|------------------------|
@@ -36,9 +37,6 @@ Watch what it looks like on a real 286 [here](https://www.twitch.tv/videos/19115
 |Weapon down |A + L |Enter, Space & Shift + <|
 |Menu        |Start |Esc                     |
 |Quit to DOS |      |F10                     |
-
-## Troubleshooting:
-When you get the error message "Can't open VIEWANGX.LMP", you need to add `FILES=30` to your `CONFIG.SYS`.
 
 ## Building:
 1) Install [Watcom](https://github.com/open-watcom/open-watcom-v2)
