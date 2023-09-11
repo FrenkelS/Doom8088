@@ -69,7 +69,6 @@ static const int32_t mapcolor_exit = 0;    // jff 4/23/98 add exit line color
 static const int32_t mapcolor_unsn = 104;    // computer map unseen line color
 static const int32_t mapcolor_flat = 88;    // line with no floor/ceiling changes
 static const int32_t mapcolor_sngl = 208;    // single player arrow color
-static const int32_t map_secret_after = 0;
 
 static const int32_t f_w = (SCREENWIDTH*2);
 static const int32_t f_h = SCREENHEIGHT-ST_SCALED_HEIGHT;// to allow runtime setting of width/height
@@ -876,21 +875,6 @@ static int32_t AM_DoorColor(int32_t type)
 
 
 //
-// P_IsSecret()
-//
-// Passed a sector, returns if the sector secret type is still active, i.e.
-// secret type is set and the secret has not yet been obtained.
-//
-// jff 3/14/98 added to simplify checks for whether sector is secret
-//  in automap and other places
-//
-static boolean PUREFUNC P_IsSecret(const sector_t *sec)
-{
-  return (sec->special==9 || (sec->special&SECRET_MASK));
-}
-
-
-//
 // P_WasSecret()
 //
 // Passed a sector, returns if the sector secret type was active, i.e.
@@ -998,20 +982,7 @@ static void AM_drawWalls(void)
             if(!backsector)
             {
                 // jff 1/10/98 add new color for 1S secret sector boundary
-                if (mapcolor_secr && //jff 4/3/98 0 is disable
-                        (
-                            (
-                                map_secret_after &&
-                                P_WasSecret(frontsector) &&
-                                !P_IsSecret(frontsector)
-                                )
-                            ||
-                            (
-                                !map_secret_after &&
-                                P_WasSecret(frontsector)
-                                )
-                            )
-                        )
+                if (mapcolor_secr && P_WasSecret(frontsector))
                     AM_drawMline(&l, mapcolor_secr); // line bounding secret sector
                 else                               //jff 2/16/98 fixed bug
                     AM_drawMline(&l, mapcolor_wall); // special was cleared
@@ -1042,26 +1013,7 @@ static void AM_drawWalls(void)
                 {
                     AM_drawMline(&l, mapcolor_clsd);      // non-secret closed door
                 } //jff 1/6/98 show secret sector 2S lines
-                else if
-                        (
-                         mapcolor_secr && //jff 2/16/98 fixed bug
-                         (                    // special was cleared after getting it
-                                              (map_secret_after &&
-                                               (
-                                                   (P_WasSecret(frontsector)
-                                                    && !P_IsSecret(frontsector)) ||
-                                                   (P_WasSecret(backsector)
-                                                    && !P_IsSecret(backsector))
-                                                   )
-                                               )
-                                              ||  //jff 3/9/98 add logic to not show secret til after entered
-                                              (   // if map_secret_after is true
-                                                  !map_secret_after &&
-                                                  (P_WasSecret(frontsector) ||
-                                                   P_WasSecret(backsector))
-                                                  )
-                                              )
-                         )
+                else if (mapcolor_secr && (P_WasSecret(frontsector) || P_WasSecret(backsector)))
                 {
                     AM_drawMline(&l, mapcolor_secr); // line bounding secret sector
                 } //jff 1/6/98 end secret sector line change
