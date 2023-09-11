@@ -368,11 +368,6 @@ void D_StartTitle (void)
 
 static void LoadIWAD(void)
 {
-	// IWAD
-	_g->fileWAD = fopen("DOOM1.WAD", "rb");
-	if (_g->fileWAD == NULL)
-		I_Error("Can't open DOOM1.WAD.");
-
 	// FineSine
 	_g->fileFineSine = fopen("FINESINE.LMP", "rb");
 	if (_g->fileFineSine == NULL)
