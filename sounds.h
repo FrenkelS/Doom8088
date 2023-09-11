@@ -53,9 +53,6 @@ struct sfxinfo_struct {
   // Sfx priority
   int8_t priority;
 
-  // referenced sound if a link
-  const sfxinfo_t *link;
-
   //Length of clip
   int8_t ticks;
 };
