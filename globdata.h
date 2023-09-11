@@ -75,9 +75,6 @@ uint32_t fps_timebefore;
 uint32_t fps_frames;
 uint16_t fps_framerate;
 
-// files
-FILE *fileFineSine;
-
 
 //******************************************************************************
 //f_finale.c

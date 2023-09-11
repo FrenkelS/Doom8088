@@ -366,15 +366,6 @@ void D_StartTitle (void)
 }
 
 
-static void LoadIWAD(void)
-{
-	// FineSine
-	_g->fileFineSine = fopen("FINESINE.LMP", "rb");
-	if (_g->fileFineSine == NULL)
-		I_Error("Can't open FINESINE.LMP.");
-}
-
-
 /*
 =================
 =
@@ -408,8 +399,6 @@ static int16_t M_CheckParm(char *check)
 
 static void D_DoomMainSetup(void)
 {
-    LoadIWAD();
-
     // init subsystems
 
     G_ReloadDefaults();    // killough 3/4/98: set defaults just loaded.
