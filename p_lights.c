@@ -303,11 +303,8 @@ void P_SpawnGlowingLight(sector_t*  sector)
 // Start strobing lights (usually from a trigger)
 //
 // Passed the line that activated the strobing
-// Returns true
 //
-// jff 2/12/98 added int32_t return value, fixed return
-//
-int32_t EV_StartLightStrobing(const line_t* line)
+void EV_StartLightStrobing(const line_t* line)
 {
   int32_t   secnum;
   sector_t* sec;
@@ -323,7 +320,6 @@ int32_t EV_StartLightStrobing(const line_t* line)
 
     P_SpawnStrobeFlash (sec,SLOWDARK, 0);
   }
-  return 1;
 }
 
 //
@@ -332,11 +328,8 @@ int32_t EV_StartLightStrobing(const line_t* line)
 // Turn line's tagged sector's lights to min adjacent neighbor level
 //
 // Passed the line that activated the lights being turned off
-// Returns true
 //
-// jff 2/12/98 added int32_t return value, fixed return
-//
-int32_t EV_TurnTagLightsOff(const line_t* line)
+void EV_TurnTagLightsOff(const line_t* line)
 {
   int32_t j;
 
@@ -354,7 +347,6 @@ int32_t EV_TurnTagLightsOff(const line_t* line)
     min = tsec->lightlevel;
       sector->lightlevel = min;
     }
-  return 1;
 }
 
 //
@@ -364,11 +356,8 @@ int32_t EV_TurnTagLightsOff(const line_t* line)
 //
 // Passed the activating line, and a level to set the light to
 // If level passed is 0, the maximum neighbor lighting is used
-// Returns true
 //
-// jff 2/12/98 added int32_t return value, fixed return
-//
-int32_t EV_LightTurnOn(const line_t *line, int32_t bright)
+void EV_LightTurnOn(const line_t *line, int32_t bright)
 {
   int32_t i;
 
@@ -390,7 +379,6 @@ int32_t EV_LightTurnOn(const line_t *line, int32_t bright)
 
       sector->lightlevel = tbright;
     }
-  return 1;
 }
 
 /* killough 10/98:
@@ -403,10 +391,9 @@ int32_t EV_LightTurnOn(const line_t *line, int32_t bright)
  * Sets the light to min on 0, max on 1, and interpolates in-between.
  * Used for doors with gradual lighting effects.
  *
- * Returns true
  */
 
-int32_t EV_LightTurnOnPartway(const line_t *line, fixed_t level)
+void EV_LightTurnOnPartway(const line_t *line, fixed_t level)
 {
   int32_t i;
 
@@ -433,6 +420,5 @@ int32_t EV_LightTurnOnPartway(const line_t *line, fixed_t level)
       sector->lightlevel =   // Set level in-between extremes
   (level * bright + (FRACUNIT-level) * min) >> FRACBITS;
     }
-  return 1;
 }
 

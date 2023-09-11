@@ -246,17 +246,17 @@ void T_MoveCeiling (ceiling_t* ceiling)
 // Passed the linedef activating the function and the type of function desired
 // returns true if a thinker started
 //
-int32_t EV_DoCeiling
+boolean EV_DoCeiling
 ( const line_t* line,
   ceiling_e type )
 {
   int32_t   secnum;
-  int32_t   rtn;
+  boolean   rtn;
   sector_t* sec;
   ceiling_t*  ceiling;
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
 
   // Reactivate in-stasis ceilings...for certain types.
   // This restarts a crusher after it has been stopped
@@ -281,7 +281,7 @@ int32_t EV_DoCeiling
       continue;
 
     // create a new ceiling thinker
-    rtn = 1;
+    rtn = true;
     ceiling = Z_CallocLevSpec(sizeof(*ceiling));
     P_AddThinker (&ceiling->thinker);
     sec->ceilingdata = ceiling;               //jff 2/22/98
@@ -368,10 +368,10 @@ int32_t EV_DoCeiling
 // Returns true if a ceiling reactivated
 //
 //jff 4/5/98 return if activated
-int32_t P_ActivateInStasisCeiling(const line_t *line)
+boolean P_ActivateInStasisCeiling(const line_t *line)
 {
   ceilinglist_t *cl;
-  int32_t rtn=0;
+  boolean rtn=false;
 
   for (cl=_g->activeceilings; cl; cl=cl->next)
   {
@@ -381,7 +381,7 @@ int32_t P_ActivateInStasisCeiling(const line_t *line)
       ceiling->direction = ceiling->olddirection;
       ceiling->thinker.function = T_MoveCeiling;
       //jff 4/5/98 return if activated
-      rtn=1;
+      rtn=true;
     }
   }
   return rtn;
@@ -395,9 +395,9 @@ int32_t P_ActivateInStasisCeiling(const line_t *line)
 // Passed the linedef stopping the ceilings
 // Returns true if a ceiling put in stasis
 //
-int32_t EV_CeilingCrushStop(const line_t* line)
+boolean EV_CeilingCrushStop(const line_t* line)
 {
-  int32_t rtn=0;
+  boolean rtn=false;
 
   ceilinglist_t *cl;
   for (cl=_g->activeceilings; cl; cl=cl->next)
@@ -408,7 +408,7 @@ int32_t EV_CeilingCrushStop(const line_t* line)
       ceiling->olddirection = ceiling->direction;
       ceiling->direction = 0;
       ceiling->thinker.function = NULL;
-      rtn=1;
+      rtn=true;
     }
   }
   return rtn;

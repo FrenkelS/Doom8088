@@ -278,7 +278,7 @@ void T_VerticalDoor (vldoor_t* door)
 // and the thing that activated the line
 // Returns true if a thinker created
 //
-int32_t EV_DoLockedDoor
+boolean EV_DoLockedDoor
 ( const line_t* line,
   vldoor_e  type,
   mobj_t* thing )
@@ -289,7 +289,7 @@ int32_t EV_DoLockedDoor
   p = P_MobjIsPlayer(thing);
 
   if (!p)
-    return 0;
+    return false;
 
   // check type of linedef, and if key is possessed to open it
   switch(LN_SPECIAL(line))
@@ -300,7 +300,7 @@ int32_t EV_DoLockedDoor
       {
         p->message = PD_BLUEO;             // Ty 03/27/98 - externalized
         S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
-        return 0;
+        return false;
       }
       break;
 
@@ -310,7 +310,7 @@ int32_t EV_DoLockedDoor
       {
         p->message = PD_REDO;              // Ty 03/27/98 - externalized
         S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
-        return 0;
+        return false;
       }
       break;
 
@@ -320,7 +320,7 @@ int32_t EV_DoLockedDoor
       {
         p->message = PD_YELLOWO;           // Ty 03/27/98 - externalized
         S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
-        return 0;
+        return false;
       }
       break;
   }
@@ -338,16 +338,17 @@ int32_t EV_DoLockedDoor
 // Passed the line activating the door and the type of door
 // Returns true if a thinker created
 //
-int32_t EV_DoDoor
+boolean EV_DoDoor
 ( const line_t* line,
   vldoor_e  type )
 {
-  int32_t   secnum,rtn;
+  int32_t   secnum;
+  boolean   rtn;
   sector_t* sec;
   vldoor_t* door;
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
 
   // open all doors with the same tag as the activating line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
@@ -358,7 +359,7 @@ int32_t EV_DoDoor
         continue;
 
     // new door thinker
-    rtn = 1;
+    rtn = true;
     door = Z_CallocLevSpec(sizeof(*door));
     P_AddThinker (&door->thinker);
     sec->ceilingdata = door; //jff 2/22/98
@@ -428,11 +429,8 @@ int32_t EV_DoDoor
 // Handle opening a door manually, no tag value
 //
 // Passed the line activating the door and the thing activating it
-// Returns true if a thinker created
 //
-// jff 2/12/98 added int32_t return value, fixed all returns
-//
-int32_t EV_VerticalDoor
+void EV_VerticalDoor
 ( const line_t* line,
   mobj_t* thing )
 {
@@ -448,36 +446,36 @@ int32_t EV_VerticalDoor
     case 26: // Blue Lock
     case 32:
       if ( !player )
-        return 0;
+        return;
       if (!player->cards[it_bluecard] && !player->cards[it_blueskull])
       {
           player->message = PD_BLUEK;         // Ty 03/27/98 - externalized
           S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
-          return 0;
+          return;
       }
       break;
 
     case 27: // Yellow Lock
     case 34:
       if ( !player )
-          return 0;
+          return;
       if (!player->cards[it_yellowcard] && !player->cards[it_yellowskull])
       {
           player->message = PD_YELLOWK;       // Ty 03/27/98 - externalized
           S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
-          return 0;
+          return;
       }
       break;
 
     case 28: // Red Lock
     case 33:
       if ( !player )
-          return 0;
+          return;
       if (!player->cards[it_redcard] && !player->cards[it_redskull])
       {
           player->message = PD_REDK;          // Ty 03/27/98 - externalized
           S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
-          return 0;
+          return;
       }
       break;
 
@@ -489,7 +487,7 @@ int32_t EV_VerticalDoor
   if (line->sidenum[1]==NO_INDEX)                     // killough
   {
     S_StartSound(player->mo,sfx_oof);           // killough 3/20/98
-    return 0;
+    return;
   }
 
   // get the sector on the second side of activating linedef
@@ -544,13 +542,13 @@ int32_t EV_VerticalDoor
           printf("EV_VerticalDoor: unknown thinker.function in thinker corruption emulation\n");
         }
 
-        return 1;
+        return;
       }
     }
     /* Either we're in prboom >=v2.3 and it's not a door, or it's a door but
      * we're a monster and don't want to shut it; exit with no action.
      */
-    return 0;
+    return;
   }
 
   // emit proper sound
@@ -616,7 +614,6 @@ int32_t EV_VerticalDoor
   // find the top and bottom of the movement range
   door->topheight = P_FindLowestCeilingSurrounding(sec);
   door->topheight -= 4*FRACUNIT;
-  return 1;
 }
 
 

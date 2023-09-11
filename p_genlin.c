@@ -805,7 +805,7 @@ int32_t EV_DoGenCrusher
 ( const line_t*       line )
 {
   int32_t                   secnum;
-  int32_t                   rtn;
+  boolean                   rtn;
   boolean               manual;
   sector_t*             sec;
   ceiling_t*            ceiling;
@@ -849,7 +849,7 @@ manual_crusher:
     }
 
     // new ceiling thinker
-    rtn = 1;
+    rtn = true;
     ceiling = Z_CallocLevSpec(sizeof(*ceiling));
     P_AddThinker (&ceiling->thinker);
     sec->ceilingdata = ceiling; //jff 2/22/98

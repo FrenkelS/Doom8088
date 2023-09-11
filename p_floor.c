@@ -554,18 +554,18 @@ static void T_MoveElevator(elevator_t* elevator)
 // Passed the line that activated the floor and the type of floor motion
 // Returns true if a thinker was created.
 //
-int32_t EV_DoFloor
+boolean EV_DoFloor
 ( const line_t*       line,
   floor_e       floortype )
 {
   int32_t           secnum;
-  int32_t           rtn;
+  boolean           rtn;
   int32_t           i;
   sector_t*     sec;
   floormove_t*  floor;
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
   // move all floors with the same tag as the linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
@@ -576,7 +576,7 @@ int32_t EV_DoFloor
       continue;
 
     // new floor thinker
-    rtn = 1;
+    rtn = true;
     floor = Z_CallocLevSpec(sizeof(*floor));
     P_AddThinker (&floor->thinker);
     sec->floordata = floor; //jff 2/22/98
@@ -770,23 +770,23 @@ int32_t EV_DoFloor
 //
 // jff 3/15/98 added to better support generalized sector types
 //
-int32_t EV_DoChange
+boolean EV_DoChange
 ( const line_t*       line,
   change_e      changetype )
 {
   int32_t                   secnum;
-  int32_t                   rtn;
+  boolean                   rtn;
   sector_t*             sec;
   sector_t*             secm;
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
   // change all sectors with the same tag as the linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
     sec = &_g->sectors[secnum];
 
-    rtn = 1;
+    rtn = true;
 
     // handle trigger or numeric change type
     switch(changetype)
@@ -846,7 +846,7 @@ static inline int32_t P_FindSectorFromLineTagWithLowerBound
   return start;
 }
 
-int32_t EV_BuildStairs
+boolean EV_BuildStairs
 ( const line_t*       line,
   stair_e       type )
 {
@@ -855,7 +855,7 @@ int32_t EV_BuildStairs
    * into the inner blocks helps too */
   int32_t                   ssec = -1;
   int32_t                   minssec = -1;
-  int32_t                   rtn = 0;
+  boolean                   rtn = false;
 
   // start a stair at each sector tagged the same as the linedef
   while ((ssec = P_FindSectorFromLineTagWithLowerBound(line,ssec,minssec)) >= 0)
@@ -872,7 +872,7 @@ int32_t EV_BuildStairs
     int32_t           ok;
 
     // create new floor thinker for first step
-    rtn = 1;
+    rtn = true;
     floor = Z_CallocLevSpec(sizeof(*floor));
     P_AddThinker (&floor->thinker);
     sec->floordata = floor;
@@ -972,18 +972,18 @@ int32_t EV_BuildStairs
 // Passed the linedef that triggered the donut
 // Returns whether a thinker was created
 //
-int32_t EV_DoDonut(const line_t*  line)
+boolean EV_DoDonut(const line_t*  line)
 {
   sector_t* s1;
   sector_t* s2;
   sector_t* s3;
   int32_t       secnum;
-  int32_t       rtn;
+  boolean       rtn;
   int32_t       i;
   floormove_t* floor;
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
   // do function on all sectors with same tag as linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
@@ -1010,7 +1010,7 @@ int32_t EV_DoDonut(const line_t*  line)
         if (!LN_BACKSECTOR((s2->lines[i])) || LN_BACKSECTOR((s2->lines[i])) == s1)
             continue;
 
-      rtn = 1; //jff 1/26/98 no donut action - no switch change on return
+      rtn = true; //jff 1/26/98 no donut action - no switch change on return
 
       s3 = LN_BACKSECTOR((s2->lines[i]));      // s3 is model sector for changes
 
@@ -1054,17 +1054,17 @@ int32_t EV_DoDonut(const line_t*  line)
 //
 // jff 2/22/98 new type to move floor and ceiling in parallel
 //
-int32_t EV_DoElevator
+boolean EV_DoElevator
 ( const line_t*       line,
   elevator_e    elevtype )
 {
   int32_t                   secnum;
-  int32_t                   rtn;
+  boolean                   rtn;
   sector_t*             sec;
   elevator_t*           elevator;
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
   // act on all sectors with the same tag as the triggering linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
@@ -1075,7 +1075,7 @@ int32_t EV_DoElevator
       continue;
 
     // create and initialize new elevator thinker
-    rtn = 1;
+    rtn = true;
     elevator = Z_CallocLevSpec(sizeof(*elevator));
     P_AddThinker (&elevator->thinker);
     sec->floordata = elevator; //jff 2/22/98

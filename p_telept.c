@@ -66,7 +66,7 @@ static mobj_t* P_TeleportDestination(const line_t* line)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-int32_t EV_Teleport(const line_t *line, int32_t side, mobj_t *thing)
+boolean EV_Teleport(const line_t *line, int32_t side, mobj_t *thing)
 {
   mobj_t    *m;
 
@@ -74,7 +74,7 @@ int32_t EV_Teleport(const line_t *line, int32_t side, mobj_t *thing)
   // Don't teleport if hit back of line,
   //  so you can get out of teleporter.
   if (side || thing->flags & MF_MISSILE)
-    return 0;
+    return false;
 
   // killough 1/31/98: improve performance by using
   // P_FindSectorFromLineTag instead of simple linear search.
@@ -89,7 +89,7 @@ int32_t EV_Teleport(const line_t *line, int32_t side, mobj_t *thing)
             player = NULL;
 
           if (!P_TeleportMove(thing, m->x, m->y, false)) /* killough 8/9/98 */
-            return 0;
+            return false;
 
             thing->z = thing->floorz;
 
@@ -120,9 +120,9 @@ int32_t EV_Teleport(const line_t *line, int32_t side, mobj_t *thing)
 
 
 
-          return 1;
+          return true;
         }
-  return 0;
+  return false;
 }
 
 //
@@ -130,7 +130,7 @@ int32_t EV_Teleport(const line_t *line, int32_t side, mobj_t *thing)
 // Primarily for rooms-over-rooms etc.
 //
 
-int32_t EV_SilentTeleport(const line_t *line, int32_t side, mobj_t *thing)
+boolean EV_SilentTeleport(const line_t *line, int32_t side, mobj_t *thing)
 {
   mobj_t    *m;
 
@@ -139,7 +139,7 @@ int32_t EV_SilentTeleport(const line_t *line, int32_t side, mobj_t *thing)
   // so you can get out of teleporter.
 
   if (side || thing->flags & MF_MISSILE)
-    return 0;
+    return false;
 
   if ((m = P_TeleportDestination(line)) != NULL)
         {
@@ -166,7 +166,7 @@ int32_t EV_SilentTeleport(const line_t *line, int32_t side, mobj_t *thing)
 
           // Attempt to teleport, aborting if blocked
           if (!P_TeleportMove(thing, m->x, m->y, false)) /* killough 8/9/98 */
-            return 0;
+            return false;
 
           // Rotate thing according to difference in angles
           thing->angle += angle;
@@ -197,9 +197,9 @@ int32_t EV_SilentTeleport(const line_t *line, int32_t side, mobj_t *thing)
           
 
 
-          return 1;
+          return true;
         }
-  return 0;
+  return false;
 }
 
 //
@@ -212,14 +212,14 @@ int32_t EV_SilentTeleport(const line_t *line, int32_t side, mobj_t *thing)
 // maximum fixed_t units to move object to avoid hiccups
 #define FUDGEFACTOR 10
 
-int32_t EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t *thing,
+boolean EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t *thing,
                           boolean reverse)
 {
   int32_t i;
   const line_t *l;
 
   if (side || thing->flags & MF_MISSILE)
-    return 0;
+    return false;
 
   for (i = -1; (i = P_FindLineFromLineTag(line, i)) >= 0;)
     if ((l=_g->lines+i) != line && LN_BACKSECTOR(l))
@@ -293,7 +293,7 @@ int32_t EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t *thing,
 
         // Attempt to teleport, aborting if blocked
         if (!P_TeleportMove(thing, x, y, false)) /* killough 8/9/98 */
-          return 0;
+          return false;
 
 
 
@@ -329,7 +329,7 @@ int32_t EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t *thing,
             player->deltaviewheight = deltaviewheight;
           }
 
-        return 1;
+        return true;
       }
-  return 0;
+  return false;
 }

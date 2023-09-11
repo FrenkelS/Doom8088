@@ -749,7 +749,7 @@ typedef struct {
 //
 ////////////////////////////////////////////////////////////////
 
-int32_t twoSided
+boolean twoSided
 ( int32_t sector,
   int32_t line );
 
@@ -816,7 +816,7 @@ sector_t* getNextSector
 ( const line_t* line,
   sector_t* sec );
 
-int32_t P_CheckTag
+boolean P_CheckTag
 (const line_t *line); // jff 2/27/98
 
 boolean P_CanUnlockGenDoor
@@ -879,19 +879,19 @@ void T_MoveFloor
 
 // p_telept
 
-int32_t EV_Teleport
+boolean EV_Teleport
 ( const line_t* line,
   int32_t side,
   mobj_t* thing );
 
 // killough 2/14/98: Add silent teleporter
-int32_t EV_SilentTeleport
+boolean EV_SilentTeleport
 ( const line_t* line,
   int32_t side,
   mobj_t* thing );
 
 // killough 1/31/98: Add silent line teleporter
-int32_t EV_SilentLineTeleport
+boolean EV_SilentLineTeleport
 ( const line_t* line,
   int32_t side,
   mobj_t* thing,
@@ -899,74 +899,74 @@ int32_t EV_SilentLineTeleport
 
 // p_floor
 
-int32_t
+boolean
 EV_DoElevator
 ( const line_t* line,
   elevator_e type );
 
-int32_t EV_BuildStairs
+boolean EV_BuildStairs
 ( const line_t* line,
   stair_e type );
 
-int32_t EV_DoFloor
+boolean EV_DoFloor
 ( const line_t* line,
   floor_e floortype );
 
 // p_ceilng
 
-int32_t EV_DoCeiling
+boolean EV_DoCeiling
 ( const line_t* line,
   ceiling_e type );
 
-int32_t EV_CeilingCrushStop
+boolean EV_CeilingCrushStop
 ( const line_t* line );
 
 // p_doors
 
-int32_t EV_VerticalDoor
+void EV_VerticalDoor
 ( const line_t* line,
   mobj_t* thing );
 
-int32_t EV_DoDoor
+boolean EV_DoDoor
 ( const line_t* line,
   vldoor_e type );
 
-int32_t EV_DoLockedDoor
+boolean EV_DoLockedDoor
 ( const line_t* line,
   vldoor_e type,
   mobj_t* thing );
 
 // p_lights
 
-int32_t EV_StartLightStrobing
+void EV_StartLightStrobing
 ( const line_t* line );
 
-int32_t EV_TurnTagLightsOff
+void EV_TurnTagLightsOff
 ( const line_t* line );
 
-int32_t EV_LightTurnOn
+void EV_LightTurnOn
 ( const line_t* line,
   int32_t   bright );
 
-int32_t EV_LightTurnOnPartway(const line_t* line, fixed_t level); // killough 10/10/98
+void EV_LightTurnOnPartway(const line_t* line, fixed_t level); // killough 10/10/98
 
 // p_floor
 
-int32_t EV_DoChange
+boolean EV_DoChange
 ( const line_t* line,
   change_e changetype );
 
-int32_t EV_DoDonut
+boolean EV_DoDonut
 ( const line_t* line );
 
 // p_plats
 
-int32_t EV_DoPlat
+boolean EV_DoPlat
 ( const line_t* line,
   plattype_e  type,
   int32_t amount );
 
-int32_t EV_StopPlat
+void EV_StopPlat
 ( const line_t* line );
 
 // p_genlin
@@ -1070,7 +1070,7 @@ void P_RemoveAllActiveCeilings
 void P_AddActiveCeiling
 ( ceiling_t* c );
 
-int32_t P_ActivateInStasisCeiling
+boolean P_ActivateInStasisCeiling
 ( const line_t* line );
 
 #endif

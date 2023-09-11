@@ -178,18 +178,18 @@ void T_PlatRaise(plat_t* plat)
 // and for some plat types, an amount to raise
 // Returns true if a thinker is started, or restarted from stasis
 //
-int32_t EV_DoPlat
+boolean EV_DoPlat
 ( const line_t*       line,
   plattype_e    type,
   int32_t           amount )
 {
   plat_t* plat;
   int32_t             secnum;
-  int32_t             rtn;
+  boolean             rtn;
   sector_t*       sec;
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
 
 
   // Activate all <type> plats that are in_stasis
@@ -201,7 +201,7 @@ int32_t EV_DoPlat
 
     case toggleUpDn:
       P_ActivateInStasis(line->tag);
-      rtn=1;
+      rtn=true;
       break;
 
     default:
@@ -218,7 +218,7 @@ int32_t EV_DoPlat
       continue;
 
     // Create a thinker
-    rtn = 1;
+    rtn = true;
     plat = Z_CallocLevSpec(sizeof(*plat));
     P_AddThinker(&plat->thinker);
 
@@ -362,11 +362,8 @@ void P_ActivateInStasis(int32_t tag)
 // Handler for "stop perpetual floor" linedef type
 //
 // Passed the linedef that stopped the plat
-// Returns true if a plat was put in stasis
 //
-// jff 2/12/98 added int32_t return value, fixed return
-//
-int32_t EV_StopPlat(const line_t* line)
+void EV_StopPlat(const line_t* line)
 {
   platlist_t *pl;
   for (pl=_g->activeplats; pl; pl=pl->next)  // search the active plats
@@ -379,7 +376,6 @@ int32_t EV_StopPlat(const line_t* line)
       plat->thinker.function = NULL;
     }
   }
-  return 1;
 }
 
 //

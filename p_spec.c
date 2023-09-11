@@ -137,7 +137,7 @@ static sector_t* getSector
 // modified to return actual two-sidedness rather than presence
 // of 2S flag unless compatibility optioned
 //
-int32_t twoSided
+boolean twoSided
 ( int32_t   sector,
   int32_t   line )
 {
@@ -820,12 +820,12 @@ boolean PUREFUNC P_SectorActive(special_e t, const sector_t *sec)
 //
 // jff 2/27/98 Added to check for zero tag allowed for regular special types
 //
-int32_t P_CheckTag(const line_t *line)
+boolean P_CheckTag(const line_t *line)
 {
   /* tag not zero, allowed, or
    * killough 11/98: compatibility option */
   if (line->tag)
-    return 1;
+    return true;
 
   switch(LN_SPECIAL(line))
   {
@@ -881,12 +881,12 @@ int32_t P_CheckTag(const line_t *line)
 
     case 48:                // Scrolling walls
     case 85:
-      return 1;   // zero tag allowed
+      return true;   // zero tag allowed
 
     default:
       break;
   }
-  return 0;       // zero tag not allowed
+  return false;       // zero tag not allowed
 }
 
 
@@ -908,7 +908,7 @@ boolean PUREFUNC P_IsSecret(const sector_t *sec)
 //
 // P_WasSecret()
 //
-// Passed a sector, returns if the sector secret type is was active, i.e.
+// Passed a sector, returns if the sector secret type was active, i.e.
 // secret type was set and the secret has been obtained already.
 //
 // jff 3/14/98 added to simplify checks for whether sector is secret
@@ -1134,14 +1134,14 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
 
     case 12:
       // Light Turn On - brightest near
-      if (EV_LightTurnOn(line,0))
-        LN_SPECIAL(line) = 0;
+      EV_LightTurnOn(line,0);
+      LN_SPECIAL(line) = 0;
       break;
 
     case 13:
       // Light Turn On 255
-      if (EV_LightTurnOn(line,255))
-        LN_SPECIAL(line) = 0;
+      EV_LightTurnOn(line,255);
+      LN_SPECIAL(line) = 0;
       break;
 
     case 16:
@@ -1152,8 +1152,8 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
 
     case 17:
       // Start Light Strobing
-      if (EV_StartLightStrobing(line))
-        LN_SPECIAL(line) = 0;
+      EV_StartLightStrobing(line);
+      LN_SPECIAL(line) = 0;
       break;
 
     case 19:
@@ -1183,8 +1183,8 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
 
     case 35:
       // Lights Very Dark
-      if (EV_LightTurnOn(line,35))
-        LN_SPECIAL(line) = 0;
+      EV_LightTurnOn(line,35);
+      LN_SPECIAL(line) = 0;
       break;
 
     case 36:
@@ -1238,8 +1238,8 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
 
     case 54:
       // Platform Stop
-      if (EV_StopPlat(line))
-        LN_SPECIAL(line) = 0;
+      EV_StopPlat(line);
+      LN_SPECIAL(line) = 0;
       break;
 
     case 56:
@@ -1274,8 +1274,8 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
 
     case 104:
       // Turn lights off in sector(tag)
-      if (EV_TurnTagLightsOff(line))
-        LN_SPECIAL(line) = 0;
+      EV_TurnTagLightsOff(line);
+      LN_SPECIAL(line) = 0;
       break;
 
     case 108:
