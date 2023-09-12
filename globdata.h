@@ -48,7 +48,6 @@ enum automapmode_e automapmode; // Mode that the automap is in
 //d_client.c
 //******************************************************************************
 
-ticcmd_t         netcmd;
 int32_t maketic;
 
 

@@ -57,7 +57,7 @@ void G_ReloadDefaults(void);     // killough 3/1/98: loads game defaults
 void G_Compatibility(void);
 void G_PlayerReborn(void);
 void G_DoVictory(void);
-void G_BuildTiccmd (ticcmd_t* cmd); // CPhipps - move decl to header
+void G_BuildTiccmd (void);
 void G_MakeSpecialEvent(buttoncode_t bc, ...); /* cph - new event stuff */
 
 void G_UpdateSaveGameStrings();

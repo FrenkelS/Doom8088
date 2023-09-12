@@ -121,7 +121,7 @@ static void G_DoSaveGame (void);
 static void G_DoNewGame (void);
 static void G_DoPlayDemo(void);
 static void G_InitNew(skill_t skill, int32_t map);
-static void G_ReadDemoTiccmd (ticcmd_t* cmd);
+static void G_ReadDemoTiccmd (void);
 
 
 typedef struct gba_save_data_t
@@ -168,7 +168,9 @@ static inline int8_t fudgef(int8_t b)
     return b;
 }
 
-void G_BuildTiccmd(ticcmd_t* cmd)
+static ticcmd_t netcmd;
+
+void G_BuildTiccmd(void)
 {
     int32_t speed;
     int32_t tspeed;
@@ -176,7 +178,7 @@ void G_BuildTiccmd(ticcmd_t* cmd)
     int32_t side;
     int32_t newweapon;                                          // phares
     /* cphipps - remove needless I_BaseTiccmd call, just set the ticcmd to zero */
-    memset(cmd,0,sizeof*cmd);
+    memset(&netcmd,0,sizeof(ticcmd_t));
 
     //Use button negates the always run setting.
     speed = (_g->gamekeydown[key_use] ^ _g->alwaysRun);
@@ -198,9 +200,9 @@ void G_BuildTiccmd(ticcmd_t* cmd)
     // let movement keys cancel each other out
 
     if (_g->gamekeydown[key_right])
-        cmd->angleturn -= angleturn[tspeed];
+        netcmd.angleturn -= angleturn[tspeed];
     if (_g->gamekeydown[key_left])
-        cmd->angleturn += angleturn[tspeed];
+        netcmd.angleturn += angleturn[tspeed];
 
     if (_g->gamekeydown[key_up])
         forward += forwardmove[speed];
@@ -214,11 +216,11 @@ void G_BuildTiccmd(ticcmd_t* cmd)
         side -= sidemove[speed];
 
     if (_g->gamekeydown[key_fire])
-        cmd->buttons |= BT_ATTACK;
+        netcmd.buttons |= BT_ATTACK;
 
     if (_g->gamekeydown[key_use])
     {
-        cmd->buttons |= BT_USE;
+        netcmd.buttons |= BT_USE;
     }
 
     // Toggle between the top 2 favorite weapons.                   // phares
@@ -280,8 +282,8 @@ void G_BuildTiccmd(ticcmd_t* cmd)
 
     if (newweapon != wp_nochange)
     {
-        cmd->buttons |= BT_CHANGE;
-        cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
+        netcmd.buttons |= BT_CHANGE;
+        netcmd.buttons |= newweapon<<BT_WEAPONSHIFT;
     }
 
     if (forward > MAXPLMOVE)
@@ -293,8 +295,8 @@ void G_BuildTiccmd(ticcmd_t* cmd)
     else if (side < -MAXPLMOVE)
         side = -MAXPLMOVE;
 
-    cmd->forwardmove += fudgef((int8_t)forward);
-    cmd->sidemove += side;
+    netcmd.forwardmove += fudgef((int8_t)forward);
+    netcmd.sidemove += side;
 }
 
 
@@ -448,12 +450,10 @@ void G_Ticker (void)
     {
         if (_g->playeringame)
         {
-            ticcmd_t *cmd = &_g->player.cmd;
-
-            memcpy(cmd, &_g->netcmd, sizeof *cmd);
+            memcpy(&_g->player.cmd, &netcmd, sizeof(ticcmd_t));
 
             if (_g->demoplayback)
-                G_ReadDemoTiccmd (cmd);
+                G_ReadDemoTiccmd ();
         }
     }
 
@@ -935,7 +935,7 @@ static void G_InitNew(skill_t skill, int32_t map)
 
 #define DEMOMARKER    0x80
 
-static void G_ReadDemoTiccmd (ticcmd_t* cmd)
+static void G_ReadDemoTiccmd (void)
 {
     uint8_t at; // e6y: tasdoom stuff
 
@@ -948,6 +948,7 @@ static void G_ReadDemoTiccmd (ticcmd_t* cmd)
     }
     else
     {
+        ticcmd_t* cmd = &_g->player.cmd;
         cmd->forwardmove = ((int8_t)*_g->demo_p++);
         cmd->sidemove = ((int8_t)*_g->demo_p++);
         cmd->angleturn = ((uint8_t)(at = *_g->demo_p++))<<8;

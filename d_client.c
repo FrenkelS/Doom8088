@@ -63,9 +63,6 @@
 #include "globdata.h"
 
 
-static int32_t lastmadetic;
-
-
 void D_InitNetGame (void)
 {
     _g->playeringame = true;
@@ -73,6 +70,7 @@ void D_InitNetGame (void)
 
 void D_BuildNewTiccmds(void)
 {
+    static int32_t lastmadetic = 0;
     int32_t newtics = I_GetTime() - lastmadetic;
     lastmadetic += newtics;
 
@@ -82,7 +80,7 @@ void D_BuildNewTiccmds(void)
         if (_g->maketic - _g->gametic > 3)
             break;
 
-        G_BuildTiccmd(&_g->netcmd);
+        G_BuildTiccmd();
         _g->maketic++;
     }
 }
