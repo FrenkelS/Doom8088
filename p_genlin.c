@@ -61,11 +61,11 @@
 // jff 02/04/98 Added this routine (and file) to handle generalized
 // floor movers using bit fields in the line special type.
 //
-int32_t EV_DoGenFloor
+boolean EV_DoGenFloor
 ( const line_t*       line )
 {
   int32_t                   secnum;
-  int32_t                   rtn;
+  boolean                   rtn;
   boolean               manual;
   sector_t*             sec;
   floormove_t*          floor;
@@ -81,7 +81,7 @@ int32_t EV_DoGenFloor
   int32_t Sped = (value & FloorSpeed) >> FloorSpeedShift;
   int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
 
-  rtn = 0;
+  rtn = false;
 
   // check if a manual trigger, if so do just the sector on the backside
   manual = false;
@@ -111,7 +111,7 @@ manual_floor:
     }
 
     // new floor thinker
-    rtn = 1;
+    rtn = true;
     floor = Z_CallocLevSpec(sizeof(*floor));
     P_AddThinker (&floor->thinker);
     sec->floordata = floor;
@@ -263,11 +263,11 @@ manual_floor:
 // jff 02/04/98 Added this routine (and file) to handle generalized
 // floor movers using bit fields in the line special type.
 //
-int32_t EV_DoGenCeiling
+boolean EV_DoGenCeiling
 ( const line_t*       line )
 {
   int32_t                   secnum;
-  int32_t                   rtn;
+  boolean                   rtn;
   boolean               manual;
   fixed_t               targheight;
   sector_t*             sec;
@@ -284,7 +284,7 @@ int32_t EV_DoGenCeiling
   int32_t Sped = (value & CeilingSpeed) >> CeilingSpeedShift;
   int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
 
-  rtn = 0;
+  rtn = false;
 
   // check if a manual trigger, if so do just the sector on the backside
   manual = false;
@@ -314,7 +314,7 @@ manual_ceiling:
     }
 
     // new ceiling thinker
-    rtn = 1;
+    rtn = true;
     ceiling = Z_CallocLevSpec(sizeof(*ceiling));
     P_AddThinker (&ceiling->thinker);
     sec->ceilingdata = ceiling; //jff 2/22/98
@@ -468,12 +468,12 @@ manual_ceiling:
 // Passed the linedef activating the lift
 // Returns true if a thinker is created
 //
-int32_t EV_DoGenLift
+boolean EV_DoGenLift
 ( const line_t*       line )
 {
   plat_t*         plat;
   int32_t             secnum;
-  int32_t             rtn;
+  boolean             rtn;
   boolean         manual;
   sector_t*       sec;
   uint32_t        value = (uint32_t)LN_SPECIAL(line) - GenLiftBase;
@@ -486,7 +486,7 @@ int32_t EV_DoGenLift
   int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
 
   // Activate all <type> plats that are in_stasis
 
@@ -520,7 +520,7 @@ manual_lift:
     }
 
     // Setup the plat thinker
-    rtn = 1;
+    rtn = true;
     plat = Z_CallocLevSpec(sizeof(*plat));
     P_AddThinker(&plat->thinker);
 
@@ -617,7 +617,7 @@ manual_lift:
 // Passed the linedef activating the stairs
 // Returns true if a thinker is created
 //
-int32_t EV_DoGenStairs
+boolean EV_DoGenStairs
 ( const line_t*       line )
 {
   int32_t                   secnum;
@@ -626,8 +626,8 @@ int32_t EV_DoGenStairs
   int32_t                   i;
   int32_t                   newsecnum;
   int32_t                   texture;
-  int32_t                   ok;
-  int32_t                   rtn;
+  boolean                   ok;
+  boolean                   rtn;
   boolean               manual;
 
   sector_t*             sec;
@@ -648,7 +648,7 @@ int32_t EV_DoGenStairs
   int32_t Sped = (value & StairSpeed) >> StairSpeedShift;
   int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
 
-  rtn = 0;
+  rtn = false;
 
   // check if a manual trigger, if so do just the sector on the backside
   manual = false;
@@ -680,7 +680,7 @@ manual_stair:
     }
 
     // new floor thinker
-    rtn = 1;
+    rtn = true;
     floor = Z_CallocLevSpec(sizeof(*floor));
     P_AddThinker (&floor->thinker);
     sec->floordata = floor;
@@ -737,7 +737,7 @@ manual_stair:
     // 2.     Other side is the next sector to raise
     do
     {
-      ok = 0;
+      ok = false;
       for (i = 0;i < sec->linecount;i++)
       {
 
@@ -779,7 +779,7 @@ manual_stair:
         floor->crush = false;
         floor->type = genBuildStair; // jff 3/31/98 do not leave uninited
 
-        ok = 1;
+        ok = true;
         break;
       }
     } while(ok);
@@ -801,7 +801,7 @@ manual_stair:
 // Passed the linedef activating the crusher
 // Returns true if a thinker created
 //
-int32_t EV_DoGenCrusher
+boolean EV_DoGenCrusher
 ( const line_t*       line )
 {
   int32_t                   secnum;
@@ -898,10 +898,11 @@ manual_crusher:
 // Passed the linedef activating the generalized locked door
 // Returns true if a thinker created
 //
-int32_t EV_DoGenLockedDoor
+boolean EV_DoGenLockedDoor
 ( const line_t* line )
 {
-  int32_t   secnum,rtn;
+  int32_t   secnum;
+  boolean   rtn;
   sector_t* sec;
   vldoor_t* door;
   boolean manual;
@@ -913,7 +914,7 @@ int32_t EV_DoGenLockedDoor
   int32_t Sped = (value & LockedSpeed) >> LockedSpeedShift;
   int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
 
-  rtn = 0;
+  rtn = false;
 
   // check if a manual trigger, if so do just the sector on the backside
   manual = false;
@@ -927,7 +928,7 @@ int32_t EV_DoGenLockedDoor
   }
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
 
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
@@ -944,7 +945,7 @@ manual_locked:
     }
 
     // new door thinker
-    rtn = 1;
+    rtn = true;
     door = Z_CallocLevSpec(sizeof(*door));
     P_AddThinker (&door->thinker);
     sec->ceilingdata = door; //jff 2/22/98
@@ -1004,10 +1005,11 @@ manual_locked:
 // Passed the linedef activating the generalized door
 // Returns true if a thinker created
 //
-int32_t EV_DoGenDoor
+boolean EV_DoGenDoor
 ( const line_t* line )
 {
-  int32_t   secnum,rtn;
+  int32_t   secnum;
+  boolean   rtn;
   sector_t* sec;
   boolean   manual;
   vldoor_t* door;
@@ -1020,7 +1022,7 @@ int32_t EV_DoGenDoor
   int32_t Sped = (value & DoorSpeed) >> DoorSpeedShift;
   int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
 
-  rtn = 0;
+  rtn = false;
 
   // check if a manual trigger, if so do just the sector on the backside
   manual = false;
@@ -1035,7 +1037,7 @@ int32_t EV_DoGenDoor
 
 
   secnum = -1;
-  rtn = 0;
+  rtn = false;
 
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
@@ -1052,7 +1054,7 @@ manual_door:
     }
 
     // new door thinker
-    rtn = 1;
+    rtn = true;
     door = Z_CallocLevSpec(sizeof(*door));
     P_AddThinker (&door->thinker);
     sec->ceilingdata = door; //jff 2/22/98

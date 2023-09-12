@@ -933,7 +933,7 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
 
     // pointer to line function is NULL by default, set non-null if
     // line special is walkover generalized linedef type
-    int32_t (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t *line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
@@ -1795,7 +1795,7 @@ void P_ShootSpecialLine
 {
     // pointer to line function is NULL by default, set non-null if
     // line special is gun triggered generalized linedef type
-    int32_t (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t *line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
@@ -1894,12 +1894,12 @@ void P_ShootSpecialLine
   // Impacts that other things can activate.
   if (!P_MobjIsPlayer(thing))
   {
-    int32_t ok = 0;
+    boolean ok = false;
     switch(LN_SPECIAL(line))
     {
       case 46:
         // 46 GR Open door on impact weapon is monster activatable
-        ok = 1;
+        ok = true;
         break;
     }
     if (!ok)

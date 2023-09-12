@@ -247,7 +247,7 @@ P_UseSpecialLine
   {
     // pointer to line function is NULL by default, set non-null if
     // line special is push or switch generalized linedef type
-    int32_t (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t *line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)

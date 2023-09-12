@@ -966,25 +966,25 @@ void EV_StopPlat
 
 // p_genlin
 
-int32_t EV_DoGenFloor
+boolean EV_DoGenFloor
 ( const line_t* line );
 
-int32_t EV_DoGenCeiling
+boolean EV_DoGenCeiling
 ( const line_t* line );
 
-int32_t EV_DoGenLift
+boolean EV_DoGenLift
 ( const line_t* line );
 
-int32_t EV_DoGenStairs
+boolean EV_DoGenStairs
 ( const line_t* line );
 
-int32_t EV_DoGenCrusher
+boolean EV_DoGenCrusher
 ( const line_t* line );
 
-int32_t EV_DoGenDoor
+boolean EV_DoGenDoor
 ( const line_t* line );
 
-int32_t EV_DoGenLockedDoor
+boolean EV_DoGenLockedDoor
 ( const line_t* line );
 
 ////////////////////////////////////////////////////////////////
