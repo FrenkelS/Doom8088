@@ -5,7 +5,7 @@
 #
 #       0  use 8088 instructions
 #       2  use 286 instructions
-#      4r  use 80486 timings and register argument passing
+#       3  use 386 instructions
 #       c  compile only
 #      d1  include line number debugging information
 #      d2  include full sybolic debugging information
@@ -30,7 +30,11 @@
 # --------------------------------------------------------------------------
 
 CCOPTS = -oaxes -oh -ol+ -zp1 -0 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxet -oh -ol+ -zp1 -0 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -2 -j -zq -s -ml -wx -za99
 #CCOPTS = -oaxet -oh -ol+ -zp1 -2 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -3 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxet -oh -ol+ -zp1 -3 -j -zq -s -ml -wx -za99
 
 GLOBOBJS = &
  am_map.obj &
