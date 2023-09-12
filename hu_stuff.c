@@ -286,7 +286,7 @@ static void HUlib_drawTextLine(hu_textline_t* l)
 
 	// free the heads-up font
 	for (i = 0; i < HU_FONTSIZE; i++)
-		Z_Free(hu_font[i]);
+		Z_ChangeTagToCache(hu_font[i]);
 }
 
 

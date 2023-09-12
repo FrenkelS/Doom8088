@@ -194,15 +194,6 @@ static const filelump_t* PUREFUNC W_GetFileInfoForName(const char *name)
 }
 
 
-static const void* PUREFUNC W_GetLump(const filelump_t* lump)
-{
-	void* ptr = Z_MallocStatic(lump->size);
-	fseek(fileWAD, lump->filepos, SEEK_SET);
-	fread(ptr, lump->size, 1, fileWAD);
-	return ptr;
-}
-
-
 static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user);
 const void* PUREFUNC W_GetLumpByNum(int16_t num)
 {
@@ -241,8 +232,8 @@ const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 
 const void* PUREFUNC W_GetLumpByName(const char *name)
 {
-	const filelump_t* lump = W_GetFileInfoForName(name);
-	return W_GetLump(lump);
+	int16_t num = W_GetNumForName(name);
+	return W_GetLumpByNum(num);
 }
 
 

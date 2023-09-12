@@ -168,7 +168,7 @@ static void V_DrawBackground(const char* flatname)
         }
     }
 
-    Z_Free(src);
+    Z_ChangeTagToCache(src);
 }
 
 
@@ -238,7 +238,7 @@ static void F_TextWrite (void)
 
 	// free the heads-up font
 	for (i = 0; i < HU_FONTSIZE; i++)
-		Z_Free(hu_font[i]);
+		Z_ChangeTagToCache(hu_font[i]);
 }
 
 

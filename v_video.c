@@ -198,7 +198,7 @@ void V_DrawNamePatch(int32_t x, int32_t y, const char *name)
 {
 	const patch_t* patch = W_GetLumpByName(name);
 	V_DrawPatch(x, y, patch);
-	Z_Free(patch);
+	Z_ChangeTagToCache(patch);
 }
 
 
