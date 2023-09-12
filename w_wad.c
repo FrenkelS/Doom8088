@@ -86,6 +86,8 @@ static wadinfo_t header;
 
 static filelump_t fileinfo;
 
+static void **lumpcache;
+
 //
 // LUMP BASED ROUTINES.
 //
@@ -149,6 +151,9 @@ void W_Init(void)
 
 	fseek(fileWAD, 0, SEEK_SET);
 	fread(&header, sizeof(header), 1, fileWAD);
+
+	lumpcache = Z_MallocStatic(header.numlumps * sizeof(*lumpcache));
+	memset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
 }
 
 
@@ -200,12 +205,16 @@ static const void* PUREFUNC W_GetLump(const filelump_t* lump)
 
 const void* PUREFUNC W_GetLumpByNum(int16_t num)
 {
-	const filelump_t* lump = W_FindLumpByNum(num);
-	return W_GetLump(lump);
+	if (lumpcache[num])
+		Z_ChangeTagToStatic(lumpcache[num]);
+	else
+		lumpcache[num] = W_GetLumpByNumWithUser(num, &lumpcache[num]);
+
+	return lumpcache[num];
 }
 
 
-const void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
+static const void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
 {
 	const filelump_t* lump = W_FindLumpByNum(num);
 

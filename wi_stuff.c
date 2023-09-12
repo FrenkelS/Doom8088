@@ -157,7 +157,7 @@ int16_t V_NumPatchWidth(int16_t num)
 {
 	const patch_t* patch = W_GetLumpByNum(num);
 	int16_t width = patch->width;
-	Z_Free(patch);
+	Z_ChangeTagToCache(patch);
 	return width;
 }
 

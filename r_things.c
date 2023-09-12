@@ -51,7 +51,6 @@ static spriteframe_t sprtemp[MAX_SPRITE_FRAMES];
 static int16_t firstspritelump;
 static int16_t numentries;
 
-static const patch_t **sprites;
 
 //
 // Sprite rotation 0 is facing the viewer,
@@ -249,18 +248,10 @@ void R_InitSpriteLumps(void)
 	int16_t lastspritelump = W_GetNumForName("S_END")   - 1;
 
 	numentries = lastspritelump - firstspritelump + 1;
-
-	sprites = Z_MallocStatic(numentries * sizeof(*sprites));
-	memset(sprites, 0, numentries * sizeof(*sprites));
 }
 
 
 const patch_t* R_GetSprite(int16_t sprite_num)
 {
-	if (sprites[sprite_num])
-		Z_ChangeTagToStatic(sprites[sprite_num]);
-	else
-		sprites[sprite_num] = W_GetLumpByNumWithUser(sprite_num + firstspritelump, (void**)&sprites[sprite_num]);
-
-	return sprites[sprite_num];
+	return W_GetLumpByNum(sprite_num + firstspritelump);
 }

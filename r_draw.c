@@ -1079,7 +1079,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int32_t x1, int32_t x2)
             const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
 
             R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
-            Z_Free(patch);
+            Z_ChangeTagToCache(patch);
             maskedtexturecol[dcvars.x] = SHRT_MAX; // dropoff overflow
         }
     }
@@ -1850,7 +1850,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
 
             if (xc < x1)
             {
-                Z_Free(realpatch);
+                Z_ChangeTagToCache(realpatch);
                 continue;
             }
 
@@ -1862,7 +1862,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
 
                 R_DrawColumnInCache (patchcol, tmpCache, patch->originy, tex->height);
             }
-            Z_Free(realpatch);
+            Z_ChangeTagToCache(realpatch);
         } while(++i < patchcount);
 
         //Block copy will drop low 2 bits of len.
@@ -1886,7 +1886,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_colu
 
         dcvars->source = (const byte*)column + 3;
         R_DrawColumn (dcvars);
-        Z_Free(patch);
+        Z_ChangeTagToCache(patch);
     }
     else
     {
