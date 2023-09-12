@@ -92,6 +92,23 @@ static void **lumpcache;
 // LUMP BASED ROUTINES.
 //
 
+void W_Init(void)
+{
+	printf("\tadding doom1.wad\n");
+	printf("\tshareware version.\n");
+
+	fileWAD = fopen("DOOM1.WAD", "rb");
+	if (fileWAD == NULL)
+		I_Error("Can't open DOOM1.WAD.");
+
+	fseek(fileWAD, 0, SEEK_SET);
+	fread(&header, sizeof(header), 1, fileWAD);
+
+	lumpcache = Z_MallocStatic(header.numlumps * sizeof(*lumpcache));
+	memset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
+}
+
+
 static const filelump_t* PUREFUNC W_FindLumpByNum(int16_t num)
 {
 #ifdef RANGECHECK
@@ -108,7 +125,7 @@ static const filelump_t* PUREFUNC W_FindLumpByNum(int16_t num)
 // W_GetNumForName
 // bombs out if not found.
 //
-int16_t PUREFUNC W_GetNumForName(const char *name)     // killough -- const added
+int16_t PUREFUNC W_GetNumForName(const char *name)
 {
 	int64_t nameint;
 	strncpy((char*)&nameint, name, 8);
@@ -137,23 +154,6 @@ const char* PUREFUNC W_GetNameForNum(int16_t num)
 {
 	const filelump_t* lump = W_FindLumpByNum(num);
 	return lump->name;
-}
-
-
-void W_Init(void)
-{
-	printf("\tadding doom1.wad\n");
-	printf("\tshareware version.\n");
-
-	fileWAD = fopen("DOOM1.WAD", "rb");
-	if (fileWAD == NULL)
-		I_Error("Can't open DOOM1.WAD.");
-
-	fseek(fileWAD, 0, SEEK_SET);
-	fread(&header, sizeof(header), 1, fileWAD);
-
-	lumpcache = Z_MallocStatic(header.numlumps * sizeof(*lumpcache));
-	memset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
 }
 
 
@@ -194,27 +194,11 @@ static const filelump_t* PUREFUNC W_GetFileInfoForName(const char *name)
 }
 
 
-static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user);
-const void* PUREFUNC W_GetLumpByNum(int16_t num)
+void W_ReadLumpByName(const char *name, void *ptr)
 {
-	if (lumpcache[num])
-		Z_ChangeTagToStatic(lumpcache[num]);
-	else
-		lumpcache[num] = W_GetLumpByNumWithUser(num, &lumpcache[num]);
-
-	return lumpcache[num];
-}
-
-
-static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
-{
-	const filelump_t* lump = W_FindLumpByNum(num);
-
-	void* ptr = Z_MallocStaticWithUser(lump->size, user);
-
+	const filelump_t* lump = W_GetFileInfoForName(name);
 	fseek(fileWAD, lump->filepos, SEEK_SET);
 	fread(ptr, lump->size, 1, fileWAD);
-	return ptr;
 }
 
 
@@ -230,16 +214,24 @@ const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 }
 
 
-const void* PUREFUNC W_GetLumpByName(const char *name)
+static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
 {
-	int16_t num = W_GetNumForName(name);
-	return W_GetLumpByNum(num);
+	const filelump_t* lump = W_FindLumpByNum(num);
+
+	void* ptr = Z_MallocStaticWithUser(lump->size, user);
+
+	fseek(fileWAD, lump->filepos, SEEK_SET);
+	fread(ptr, lump->size, 1, fileWAD);
+	return ptr;
 }
 
 
-void W_ReadLumpByName(const char *name, void *ptr)
+const void* PUREFUNC W_GetLumpByNum(int16_t num)
 {
-	const filelump_t* lump = W_GetFileInfoForName(name);
-	fseek(fileWAD, lump->filepos, SEEK_SET);
-	fread(ptr, lump->size, 1, fileWAD);
+	if (lumpcache[num])
+		Z_ChangeTagToStatic(lumpcache[num]);
+	else
+		lumpcache[num] = W_GetLumpByNumWithUser(num, &lumpcache[num]);
+
+	return lumpcache[num];
 }
