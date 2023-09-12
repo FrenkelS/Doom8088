@@ -203,6 +203,7 @@ static const void* PUREFUNC W_GetLump(const filelump_t* lump)
 }
 
 
+static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user);
 const void* PUREFUNC W_GetLumpByNum(int16_t num)
 {
 	if (lumpcache[num])
@@ -214,7 +215,7 @@ const void* PUREFUNC W_GetLumpByNum(int16_t num)
 }
 
 
-static const void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
+static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
 {
 	const filelump_t* lump = W_FindLumpByNum(num);
 

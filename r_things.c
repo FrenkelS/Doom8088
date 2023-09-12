@@ -84,7 +84,7 @@ static void R_InstallSpriteLump(int16_t lump, uint8_t frame,
       {
           if (sprtemp[frame].lump[r]==-1)
           {
-              sprtemp[frame].lump[r] = lump - firstspritelump;
+              sprtemp[frame].lump[r] = lump;
 
               if(flipped)
                 sprtemp[frame].flipmask |= (1 << r);
@@ -99,7 +99,7 @@ static void R_InstallSpriteLump(int16_t lump, uint8_t frame,
 
   if (sprtemp[frame].lump[--rotation] == -1)
   {
-      sprtemp[frame].lump[rotation] = lump - firstspritelump;
+      sprtemp[frame].lump[rotation] = lump;
 
       if(flipped)
         sprtemp[frame].flipmask |= (1 << rotation);
@@ -248,10 +248,4 @@ void R_InitSpriteLumps(void)
 	int16_t lastspritelump = W_GetNumForName("S_END")   - 1;
 
 	numentries = lastspritelump - firstspritelump + 1;
-}
-
-
-const patch_t* R_GetSprite(int16_t sprite_num)
-{
-	return W_GetLumpByNum(sprite_num + firstspritelump);
 }

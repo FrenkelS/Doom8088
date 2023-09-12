@@ -873,7 +873,7 @@ typedef struct vissprite_s
   fixed_t texturemid;
   fixed_t iscale;
 
-  int16_t sprite_num;
+  int16_t lump_num;
   int16_t patch_topoffset;
 
   uint32_t mobjflags;
@@ -923,7 +923,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
     sprtopscreen = centeryfrac - FixedMul(dcvars.texturemid, spryscale);
 
 
-    const patch_t *patch = R_GetSprite(vis->sprite_num);
+    const patch_t *patch = W_GetLumpByNum(vis->lump_num);
 
     fixed_t xiscale = vis->xiscale;
 
@@ -1226,7 +1226,7 @@ static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
 
     flip = (boolean) SPR_FLIPPED(sprframe, 0);
 
-    const patch_t* patch = R_GetSprite(sprframe->lump[0]);
+    const patch_t* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
     fixed_t       tx;
     tx = psp->sx-160*FRACUNIT;
@@ -1275,7 +1275,7 @@ static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
     if (vis->x1 > x1)
         vis->startfrac += vis->xiscale*(vis->x1-x1);
 
-    vis->sprite_num      = sprframe->lump[0];
+    vis->lump_num        = sprframe->lump[0];
     vis->patch_topoffset = patch->topoffset;
     Z_ChangeTagToCache(patch);
 
@@ -1482,7 +1482,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     }
 
     const boolean flip = (boolean)SPR_FLIPPED(sprframe, rot);
-    const patch_t* patch = R_GetSprite(sprframe->lump[rot]);
+    const patch_t* patch = W_GetLumpByNum(sprframe->lump[rot]);
 
     /* calculate edges of the shape
      * cph 2003/08/1 - fraggle points out that this offset must be flipped
@@ -1536,7 +1536,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     vis->mobjflags       = thing->flags;
     vis->scale           = FixedDiv(projectiony, tz);
     vis->iscale          = tz >> 7;
-    vis->sprite_num      = sprframe->lump[rot];
+    vis->lump_num        = sprframe->lump[rot];
     vis->patch_topoffset = patch->topoffset;
     vis->gx              = fx;
     vis->gy              = fy;
