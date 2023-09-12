@@ -62,14 +62,6 @@
 
 typedef struct
 {
-  char identification[4]; // Should be "IWAD" or "PWAD".
-  int16_t  numlumps;
-  int16_t  filler;        // always zero
-  int32_t  infotableofs;
-} wadinfo_t;
-
-typedef struct
-{
   int32_t  filepos;
   int32_t  size;
   char name[8];
@@ -82,15 +74,23 @@ typedef struct
 
 static FILE* fileWAD;
 
-static wadinfo_t header;
+static int16_t numlumps;
 
-static filelump_t fileinfo;
+static filelump_t *fileinfo;
 
 static void **lumpcache;
 
 //
 // LUMP BASED ROUTINES.
 //
+
+typedef struct
+{
+  char identification[4]; // Should be "IWAD" or "PWAD".
+  int16_t  numlumps;
+  int16_t  filler;        // always zero
+  int32_t  infotableofs;
+} wadinfo_t;
 
 void W_Init(void)
 {
@@ -101,24 +101,35 @@ void W_Init(void)
 	if (fileWAD == NULL)
 		I_Error("Can't open DOOM1.WAD.");
 
+	wadinfo_t header;
 	fseek(fileWAD, 0, SEEK_SET);
 	fread(&header, sizeof(header), 1, fileWAD);
 
+	fileinfo = Z_MallocStatic(header.numlumps * sizeof(filelump_t));
+	fseek(fileWAD, header.infotableofs, SEEK_SET);
+	fread(fileinfo, sizeof(filelump_t), header.numlumps, fileWAD);
+
 	lumpcache = Z_MallocStatic(header.numlumps * sizeof(*lumpcache));
 	memset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
+
+	numlumps = header.numlumps;
 }
 
 
-static const filelump_t* PUREFUNC W_FindLumpByNum(int16_t num)
+const char* PUREFUNC W_GetNameForNum(int16_t num)
 {
-#ifdef RANGECHECK
-	if (!(0 <= num && num < header.numlumps))
-		I_Error("W_FindLumpByNum: %i >= numlumps", num);
-#endif
+	return fileinfo[num].name;
+}
 
-	fseek(fileWAD, header.infotableofs + num * sizeof(filelump_t), SEEK_SET);
-	fread(&fileinfo, sizeof(filelump_t), 1, fileWAD);
-	return &fileinfo;
+
+//
+// W_LumpLength
+// Returns the buffer size needed to load the given lump.
+//
+
+int32_t PUREFUNC W_LumpLength(int16_t num)
+{
+	return fileinfo[num].size;
 }
 
 
@@ -131,15 +142,12 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 	strncpy((char*)&nameint, name, 8);
 
 #if BACKWARDS
-	for (int16_t i = header.numlumps - 1; i >= 0; i--)
+	for (int16_t i = numlumps - 1; i >= 0; i--)
 #else
-	for (int16_t i = 0; i < header.numlumps; i++)
+	for (int16_t i = 0; i < numlumps; i++)
 #endif
 	{
-		fseek(fileWAD, header.infotableofs + i * sizeof(filelump_t), SEEK_SET);
-		fread(&fileinfo, sizeof(filelump_t), 1, fileWAD);
-
-		if (nameint == *(int64_t*)fileinfo.name)
+		if (nameint == *(int64_t*)(fileinfo[i].name))
 		{
 			return i;
 		}
@@ -150,42 +158,20 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 }
 
 
-const char* PUREFUNC W_GetNameForNum(int16_t num)
-{
-	const filelump_t* lump = W_FindLumpByNum(num);
-	return lump->name;
-}
-
-
-//
-// W_LumpLength
-// Returns the buffer size needed to load the given lump.
-//
-
-int32_t PUREFUNC W_LumpLength(int16_t num)
-{
-	const filelump_t* lump = W_FindLumpByNum(num);
-	return lump->size;
-}
-
-
 static const filelump_t* PUREFUNC W_GetFileInfoForName(const char *name)
 {
 	int64_t nameint;
 	strncpy((char*)&nameint, name, 8);
 
 #if BACKWARDS
-	for (int16_t i = header.numlumps - 1; i >= 0; i--)
+	for (int16_t i = numlumps - 1; i >= 0; i--)
 #else
-	for (int16_t i = 0; i < header.numlumps; i++)
+	for (int16_t i = 0; i < numlumps; i++)
 #endif
 	{
-		fseek(fileWAD, header.infotableofs + i * sizeof(filelump_t), SEEK_SET);
-		fread(&fileinfo, sizeof(filelump_t), 1, fileWAD);
-
-		if (nameint == *(int64_t*)fileinfo.name)
+		if (nameint == *(int64_t*)(fileinfo[i].name))
 		{
-			return &fileinfo;
+			return &fileinfo[i];
 		}
 	}
 
@@ -204,7 +190,7 @@ void W_ReadLumpByName(const char *name, void *ptr)
 
 const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 {
-	const filelump_t* lump = W_FindLumpByNum(num);
+	const filelump_t* lump = &fileinfo[num];
 
 	void* ptr = Z_MallocLevel(lump->size, NULL);
 
@@ -216,7 +202,7 @@ const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 
 static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
 {
-	const filelump_t* lump = W_FindLumpByNum(num);
+	const filelump_t* lump = &fileinfo[num];
 
 	void* ptr = Z_MallocStaticWithUser(lump->size, user);
 
