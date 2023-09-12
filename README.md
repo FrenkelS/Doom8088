@@ -6,11 +6,11 @@ It's mostly written in C code with very little assembly code.
 It has been ported to all kinds of systems.
 Usually these systems are 32-bit or more and have a flat memory model.
 
-Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286.
+Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286, and with VGA or MCGA graphics.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
 Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
-Watch what it looks like on a real 286 [here](https://www.twitch.tv/videos/1911540009?t=0h12m48s).
+Watch what an old version looked like on a real 286 [here](https://www.twitch.tv/videos/1911540009?t=0h12m48s).
 
 **What's special?:**
  - No textures
