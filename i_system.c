@@ -274,7 +274,7 @@ static void I_UploadNewPalette(int8_t pal)
 
 	const uint8_t* palette_lump = W_GetLumpByName(lumpName);
 	I_SetPalette_dos(&palette_lump[pal*256*3]);
-	Z_Free(palette_lump);
+	Z_ChangeTagToCache(palette_lump);
 }
 
 

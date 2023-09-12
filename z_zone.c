@@ -88,8 +88,10 @@ static segment_t   mainzone_rover_segment;
 
 static segment_t pointerToSegment(const memblock_t* ptr)
 {
+#if defined RANGECHECK
 	if ((((uint32_t) ptr) & (PARAGRAPH_SIZE - 1)) != 0)
 		I_Error("pointerToSegment: pointer is not aligned: 0x%lx", ptr);
+#endif
 
 	uint32_t seg = FP_SEG(ptr);
 	uint16_t off = FP_OFF(ptr);

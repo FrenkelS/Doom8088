@@ -83,7 +83,7 @@ void R_DrawSky(visplane_t *pl)
 
 			dcvars.source = (const byte*)column + 3;
 			R_DrawColumn(&dcvars);
-			Z_Free(patch);
+			Z_ChangeTagToCache(patch);
 		}
 	}
 #endif

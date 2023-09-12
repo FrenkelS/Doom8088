@@ -190,7 +190,7 @@ void V_DrawNumPatch(int32_t x, int32_t y, int16_t num)
 {
 	const patch_t* patch = W_GetLumpByNum(num);
 	V_DrawPatch(x, y, patch);
-	Z_Free(patch);
+	Z_ChangeTagToCache(patch);
 }
 
 
@@ -198,7 +198,7 @@ void V_DrawNamePatch(int32_t x, int32_t y, const char *name)
 {
 	const patch_t* patch = W_GetLumpByName(name);
 	V_DrawPatch(x, y, patch);
-	Z_Free(patch);
+	Z_ChangeTagToCache(patch);
 }
 
 
@@ -206,5 +206,5 @@ void V_DrawNumPatchNoScale(int32_t x, int32_t y, int16_t num)
 {
 	const patch_t* patch = W_GetLumpByNum(num);
 	V_DrawPatchNoScale(x, y, patch);
-	Z_Free(patch);
+	Z_ChangeTagToCache(patch);
 }

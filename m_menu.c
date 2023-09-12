@@ -332,9 +332,9 @@ static void M_DrawSaveLoad(const char* name)
 		M_WriteText(LoadDef.x, y - 7, _g->savegamestrings[i]);
 	}
 
-	Z_Free(lpatch);
-	Z_Free(mpatch);
-	Z_Free(rpatch);
+	Z_ChangeTagToCache(lpatch);
+	Z_ChangeTagToCache(mpatch);
+	Z_ChangeTagToCache(rpatch);
 }
 
 static void M_DrawLoad(void)
@@ -1149,7 +1149,7 @@ static int16_t M_StringWidth(const char* string)
 
 	// free the heads-up font
 	for (i = 0; i < HU_FONTSIZE; i++)
-		Z_Free(hu_font[i]);
+		Z_ChangeTagToCache(hu_font[i]);
 
 
 	return w;
@@ -1216,7 +1216,7 @@ static void M_WriteText (int16_t x, int16_t y, const char* string)
 
 	// free the heads-up font
 	for (i = 0; i < HU_FONTSIZE; i++)
-		Z_Free(hu_font[i]);
+		Z_ChangeTagToCache(hu_font[i]);
 }
 
 /////////////////////////////

@@ -46,10 +46,9 @@ int16_t     PUREFUNC W_GetNumForName( const char *name);
 const char* PUREFUNC W_GetNameForNum(       int16_t num);
 int32_t     PUREFUNC W_LumpLength(          int16_t num);
 const void* PUREFUNC W_GetLumpByNum(        int16_t num);
-const void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user);
 const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num);
-const void* PUREFUNC W_GetLumpByName( const char *name);
 void                 W_ReadLumpByName(const char *name, void *ptr);
 
+#define W_GetLumpByName(x) W_GetLumpByNum(W_GetNumForName(x))
 
 #endif

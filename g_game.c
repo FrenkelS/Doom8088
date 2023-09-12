@@ -1101,7 +1101,7 @@ void G_CheckDemoStatus (void)
                  resultfps / 1000, resultfps % 1000);
     }
 
-    Z_Free(_g->demobuffer);
+    Z_ChangeTagToCache(_g->demobuffer);
 
     if (_g->demoplayback)
     {

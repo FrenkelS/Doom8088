@@ -343,7 +343,7 @@ static void R_DoDrawPlane(visplane_t *pl)
                 R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], &dsvars);
             }
 
-            Z_Free(dsvars.source);
+            Z_ChangeTagToCache(dsvars.source);
 #endif
         }
     }

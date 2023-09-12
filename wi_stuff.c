@@ -157,7 +157,7 @@ int16_t V_NumPatchWidth(int16_t num)
 {
 	const patch_t* patch = W_GetLumpByNum(num);
 	int16_t width = patch->width;
-	Z_Free(patch);
+	Z_ChangeTagToCache(patch);
 	return width;
 }
 
@@ -165,7 +165,7 @@ static int16_t V_NamePatchWidth(const char *name)
 {
 	const patch_t* patch = W_GetLumpByName(name);
 	int16_t width = patch->width;
-	Z_Free(patch);
+	Z_ChangeTagToCache(patch);
 	return width;
 }
 
@@ -173,7 +173,7 @@ static int16_t V_NamePatchHeight(const char *name)
 {
 	const patch_t* patch = W_GetLumpByName(name);
 	int16_t height = patch->height;
-	Z_Free(patch);
+	Z_ChangeTagToCache(patch);
 	return height;
 }
 
@@ -279,7 +279,7 @@ static void WI_drawOnLnode(int8_t n, const char* const c[])
 		top = lnodes[n].y - patch->topoffset;
 		right = left + patch->width;
 		bottom = top + patch->height;
-		Z_Free(patch);
+		Z_ChangeTagToCache(patch);
 
 		if (0 <= left && right < 320 && 0 <= top && bottom < 200)
 		{

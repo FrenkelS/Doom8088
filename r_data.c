@@ -128,8 +128,8 @@ static void R_LoadTexture(int16_t texture_num)
     }
 
     pnames -= 4;
-    Z_Free(pnames);
-    Z_Free(maptex);
+    Z_ChangeTagToCache(pnames);
+    Z_ChangeTagToCache(maptex);
 
     for (uint8_t j = 0; j < texture->patchcount; j++)
     {
@@ -204,7 +204,7 @@ static int16_t R_GetTextureNumForName(const char* tex_name)
 
         if (!strncmp(tex_name_upper, mtexture->name, 8))
         {
-            Z_Free(maptex);
+            Z_ChangeTagToCache(maptex);
             return i;
         }
     }
@@ -250,7 +250,7 @@ static void R_InitTextures()
 {
 	const int32_t* mtex1 = W_GetLumpByName("TEXTURE1");
 	numtextures = *mtex1;
-	Z_Free(mtex1);
+	Z_ChangeTagToCache(mtex1);
 
 	textures = Z_MallocStatic(numtextures*sizeof*textures);
 	memset(textures, 0, numtextures*sizeof*textures);
