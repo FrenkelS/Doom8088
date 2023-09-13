@@ -109,9 +109,6 @@ static fixed_t scale_mtof = (fixed_t)INITSCALEMTOF;
 // used by FTOM to scale from frame-buffer-to-map coords (=1/scale_mtof)
 static fixed_t scale_ftom;
 
-static int32_t lastlevel   = -1;
-static int32_t lastepisode = -1;
-
 static boolean stopped = true;
 
 static fixed_t mtof_zoommul = FRACUNIT; // how far the window zooms each tic (map coords)
@@ -348,6 +345,9 @@ void AM_Stop (void)
 //
 static void AM_Start(void)
 {
+    static int32_t lastlevel   = -1;
+    static int32_t lastepisode = -1;
+
     if (!stopped)
         AM_Stop();
 
