@@ -101,7 +101,7 @@ static int16_t font_lump_offset;
 //
 void HU_Init(void)
 {
-	font_lump_offset = W_GetNumForName("STCFN033") - HU_FONTSTART;
+	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 }
 
 //

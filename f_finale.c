@@ -190,18 +190,7 @@ static void F_TextWrite (void)
 {
 	V_DrawBackground("FLOOR4_8");
 
-	// load the heads-up font
-	int8_t		i;
-	int8_t		j;
-	char	buffer[9];
-	const patch_t* hu_font[HU_FONTSIZE];
-
-	j = HU_FONTSTART;
-	for (i = 0; i < HU_FONTSIZE; i++)
-	{
-		sprintf(buffer, "STCFN%.3d", j++);
-		hu_font[i] = (const patch_t *) W_GetLumpByName(buffer);
-	}
+	int16_t font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 
 	// draw some of the text onto the screen
 	int16_t         cx = 10;
@@ -227,18 +216,14 @@ static void F_TextWrite (void)
 
 		c = toupper(c);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND) {
-			// CPhipps - patch drawing updated
-			i = c - HU_FONTSTART;
-			V_DrawPatchNoScale(cx, cy, hu_font[i]);
-			cx += hu_font[i]->width;
+			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			V_DrawPatchNoScale(cx, cy, patch);
+			cx += patch->width;
+			Z_ChangeTagToCache(patch);
 		} else {
 			cx += HU_FONT_SPACE_WIDTH;
 		}
 	}
-
-	// free the heads-up font
-	for (i = 0; i < HU_FONTSIZE; i++)
-		Z_ChangeTagToCache(hu_font[i]);
 }
 
 

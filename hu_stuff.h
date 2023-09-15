@@ -42,6 +42,8 @@
 #define HU_FONTSTART    '!'     /* the first font characters */
 #define HU_FONTEND      '_' /*jff 2/16/98 '_' the last font characters */
 
+#define HU_FONTSTART_LUMP "STCFN033"
+
 /* Calculate # of glyphs in font. */
 #define HU_FONTSIZE     (HU_FONTEND - HU_FONTSTART + 1)
 
