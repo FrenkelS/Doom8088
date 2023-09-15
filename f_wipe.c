@@ -57,8 +57,13 @@ static  int16_t* wipe_y_lookup;
 
 void wipe_StartScreen(void)
 {
-	frontbuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
-	I_CopyBackBufferToBuffer(frontbuffer);
+	uint32_t freeMemory = Z_GetLargestFreeBlockSize();
+	if (freeMemory >= SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t))
+	{
+		frontbuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
+		I_CopyBackBufferToBuffer(frontbuffer);
+	} else
+		frontbuffer = NULL;
 }
 
 
@@ -71,7 +76,7 @@ static boolean wipe_ScreenWipe(int32_t ticks)
     while (ticks--)
     {
         I_DrawBuffer(frontbuffer);
-        for (int32_t i = 0; i < SCREENWIDTH; i++)
+        for (int16_t i = 0; i < SCREENWIDTH; i++)
         {
             if (wipe_y_lookup[i] < 0)
             {
@@ -88,7 +93,7 @@ static boolean wipe_ScreenWipe(int32_t ticks)
                  *  the whole screen, so make the melt rate depend on SCREENHEIGHT
                  *  so it takes no longer in high res
                  */
-                int32_t dy = (wipe_y_lookup[i] < 16) ? wipe_y_lookup[i] + 1 : SCREENHEIGHT / 25;
+                int16_t dy = (wipe_y_lookup[i] < 16) ? wipe_y_lookup[i] + 1 : SCREENHEIGHT / 25;
                 // At most dy shall be so that the column is shifted by SCREENHEIGHT (i.e. just
                 // invisible)
                 if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
@@ -101,7 +106,7 @@ static boolean wipe_ScreenWipe(int32_t ticks)
                 // scroll down the column. Of course we need to copy from the bottom... up to
                 // SCREENHEIGHT - yLookup - dy
 
-                for (int32_t j = SCREENHEIGHT - wipe_y_lookup[i] - dy; j; j--)
+                for (int16_t j = SCREENHEIGHT - wipe_y_lookup[i] - dy; j; j--)
                 {
                     *d = *s;
                     d += -SCREENPITCH;
@@ -109,10 +114,10 @@ static boolean wipe_ScreenWipe(int32_t ticks)
                 }
 
                 // copy new screen. We need to copy only between y_lookup and + dy y_lookup
-                s = &backbuffer[i] +  wipe_y_lookup[i] * SCREENPITCH;
+                s = &backbuffer[i]  + wipe_y_lookup[i] * SCREENPITCH;
                 d = &frontbuffer[i] + wipe_y_lookup[i] * SCREENPITCH;
 
-                for (int32_t j = 0 ; j < dy; j++)
+                for (int16_t j = 0 ; j < dy; j++)
                 {
                     *d = *s;
                     d += SCREENPITCH;
@@ -157,6 +162,9 @@ static void wipe_initMelt()
 
 void D_Wipe(void)
 {
+    if (!frontbuffer)
+        return;
+
     wipe_initMelt();
 
     boolean done;

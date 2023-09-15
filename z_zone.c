@@ -249,7 +249,7 @@ void Z_Free (const void* ptr)
 }
 
 
-static uint32_t Z_GetLargestFreeBlockSize(void)
+uint32_t Z_GetLargestFreeBlockSize(void)
 {
 	uint32_t largestFreeBlockSize = 0;
 
