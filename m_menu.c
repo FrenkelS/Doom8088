@@ -1113,44 +1113,27 @@ static void M_DrawThermo(int32_t x,int32_t y,int32_t thermWidth,int32_t thermDot
 // String-drawing Routines
 //
 
+static int16_t font_lump_offset;
+
 //
 // Find string width from hu_font chars
 //
 
 static int16_t M_StringWidth(const char* string)
 {
-	// load the heads-up font
-	int8_t		i;
-	int8_t		j;
-	char	buffer[9];
-	const patch_t* hu_font[HU_FONTSIZE];
-
-	j = HU_FONTSTART;
-	for (i = 0; i < HU_FONTSIZE; i++)
-	{
-		sprintf(buffer, "STCFN%.3d", j++);
-		hu_font[i] = W_GetLumpByName(buffer);
-	}
-
-
 	int16_t	w = 0;
 
-	for (i = 0; i < strlen(string); i++)
+	for (int16_t i = 0; i < strlen(string); i++)
 	{
 		char c = toupper(string[i]);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
-			j = c - HU_FONTSTART;
-			w += hu_font[j]->width;
+			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			w += patch->width;
+			Z_ChangeTagToCache(patch);
 		} else
 			w += HU_FONT_SPACE_WIDTH;
 	}
-
-
-	// free the heads-up font
-	for (i = 0; i < HU_FONTSIZE; i++)
-		Z_ChangeTagToCache(hu_font[i]);
-
 
 	return w;
 }
@@ -1173,17 +1156,6 @@ static int16_t M_StringHeight(const char* string)
 //
 static void M_WriteText (int16_t x, int16_t y, const char* string)
 {
-	// load the heads-up font
-	int8_t		i;
-	const patch_t* hu_font[HU_FONTSIZE];
-
-	int16_t z = W_GetNumForName(HU_FONTSTART_LUMP);
-	for (i = 0; i < HU_FONTSIZE; i++)
-	{
-		hu_font[i] = W_GetLumpByNum(z++);
-	}
-
-
 	const char* ch = string;
 	int16_t cx = x;
 	int16_t cy = y;
@@ -1202,18 +1174,14 @@ static void M_WriteText (int16_t x, int16_t y, const char* string)
 		c = toupper(c);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
-			int16_t j = c - HU_FONTSTART;
-			V_DrawPatchNoScale(cx, cy, hu_font[j]);
-			cx += hu_font[j]->width;
+			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			V_DrawPatchNoScale(cx, cy, patch);
+			cx += patch->width;
+			Z_ChangeTagToCache(patch);
 		} else {
 			cx += HU_FONT_SPACE_WIDTH;
 		}
 	}
-
-
-	// free the heads-up font
-	for (i = 0; i < HU_FONTSIZE; i++)
-		Z_ChangeTagToCache(hu_font[i]);
 }
 
 /////////////////////////////
@@ -1234,6 +1202,8 @@ void M_Init(void)
 	_g->messageToPrint        = false;
 	_g->messageString         = NULL;
 	_g->messageLastMenuActive = _g->menuactive;
+
+	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 
 	G_UpdateSaveGameStrings();
 }
