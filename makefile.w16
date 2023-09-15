@@ -29,9 +29,9 @@
 #
 # --------------------------------------------------------------------------
 
-CCOPTS = -oaxes -oh -ol+ -zp1 -0 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -0 -j -zq -s -ml -wx -za99
 #CCOPTS = -oaxet -oh -ol+ -zp1 -0 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxes -oh -ol+ -zp1 -2 -j -zq -s -ml -wx -za99
+CCOPTS = -oaxes -oh -ol+ -zp1 -2 -j -zq -s -ml -wx -za99
 #CCOPTS = -oaxet -oh -ol+ -zp1 -2 -j -zq -s -ml -wx -za99
 #CCOPTS = -oaxes -oh -ol+ -zp1 -3 -j -zq -s -ml -wx -za99
 #CCOPTS = -oaxet -oh -ol+ -zp1 -3 -j -zq -s -ml -wx -za99
