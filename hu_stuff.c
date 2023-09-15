@@ -89,6 +89,9 @@ static const char *const mapnames[] =
 };
 
 
+static int16_t font_lump_offset;
+
+
 //
 // HU_Init()
 //
@@ -98,6 +101,7 @@ static const char *const mapnames[] =
 //
 void HU_Init(void)
 {
+	font_lump_offset = W_GetNumForName("STCFN033") - HU_FONTSTART;
 }
 
 //
@@ -238,25 +242,11 @@ void HU_Start(void)
 //
 static void HUlib_drawTextLine(hu_textline_t* l)
 {
-	// load the heads-up font
-	int8_t		i;
-	int8_t		j;
-	char	buffer[9];
-	const patch_t* hu_font[HU_FONTSIZE];
-
-	j = HU_FONTSTART;
-	for (i = 0; i < HU_FONTSIZE; i++)
-	{
-		sprintf(buffer, "STCFN%.3d", j++);
-		hu_font[i] = (const patch_t *) W_GetLumpByName(buffer);
-	}
-
-
 	int16_t y = l->y;           // killough 1/18/98 -- support multiple lines
 
 	// draw the new stuff
 	int16_t x = l->x;
-	for (i = 0; i < l->len; i++)
+	for (int16_t i = 0; i < l->len; i++)
 	{
 		char c = toupper(l->l[i]); //jff insure were not getting a cheap toupper conv.
 
@@ -266,13 +256,15 @@ static void HUlib_drawTextLine(hu_textline_t* l)
 			x=x-x%80+80;
 		else if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
-			int16_t j = c - HU_FONTSTART;
-			int16_t w = hu_font[j]->width;
+			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			int16_t w = patch->width;
 			if (x + w > 240)
+			{
+				Z_ChangeTagToCache(patch);
 				break;
-			// killough 1/18/98 -- support multiple lines:
-			// CPhipps - patch drawing updated
-			V_DrawPatchNoScale(x, y, hu_font[j]);
+			}
+			V_DrawPatchNoScale(x, y, patch);
+			Z_ChangeTagToCache(patch);
 			x += w;
 		}
 		else
@@ -282,11 +274,6 @@ static void HUlib_drawTextLine(hu_textline_t* l)
 				break;
 		}
 	}
-
-
-	// free the heads-up font
-	for (i = 0; i < HU_FONTSIZE; i++)
-		Z_ChangeTagToCache(hu_font[i]);
 }
 
 
