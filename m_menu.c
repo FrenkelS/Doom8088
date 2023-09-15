@@ -1129,7 +1129,7 @@ static int16_t M_StringWidth(const char* string)
 	for (i = 0; i < HU_FONTSIZE; i++)
 	{
 		sprintf(buffer, "STCFN%.3d", j++);
-		hu_font[i] = (const patch_t *) W_GetLumpByName(buffer);
+		hu_font[i] = W_GetLumpByName(buffer);
 	}
 
 
@@ -1175,15 +1175,12 @@ static void M_WriteText (int16_t x, int16_t y, const char* string)
 {
 	// load the heads-up font
 	int8_t		i;
-	int8_t		j;
-	char	buffer[9];
 	const patch_t* hu_font[HU_FONTSIZE];
 
-	j = HU_FONTSTART;
+	int16_t z = W_GetNumForName(HU_FONTSTART_LUMP);
 	for (i = 0; i < HU_FONTSIZE; i++)
 	{
-		sprintf(buffer, "STCFN%.3d", j++);
-		hu_font[i] = (const patch_t *) W_GetLumpByName(buffer);
+		hu_font[i] = W_GetLumpByNum(z++);
 	}
 
 
@@ -1205,9 +1202,9 @@ static void M_WriteText (int16_t x, int16_t y, const char* string)
 		c = toupper(c);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
-			int16_t i = c - HU_FONTSTART;
-			V_DrawPatchNoScale(cx, cy, hu_font[i]);
-			cx += hu_font[i]->width;
+			int16_t j = c - HU_FONTSTART;
+			V_DrawPatchNoScale(cx, cy, hu_font[j]);
+			cx += hu_font[j]->width;
 		} else {
 			cx += HU_FONT_SPACE_WIDTH;
 		}
