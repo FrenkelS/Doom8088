@@ -57,9 +57,7 @@
 // Now sensitive for scaling.
 
 // proff 08/18/98: Changed for high-res
-#define ST_HEIGHT 32
 #define ST_Y      (SCREENHEIGHT - ST_HEIGHT)
-#define ST_SCALED_HEIGHT ST_HEIGHT
 
 
 //
