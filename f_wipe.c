@@ -57,13 +57,9 @@ static  int16_t* wipe_y_lookup;
 
 void wipe_StartScreen(void)
 {
-	uint32_t freeMemory = Z_GetLargestFreeBlockSize();
-	if (freeMemory >= SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t))
-	{
-		frontbuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
+	frontbuffer = Z_TryMallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
+	if (frontbuffer)
 		I_CopyBackBufferToBuffer(frontbuffer);
-	} else
-		frontbuffer = NULL;
 }
 
 

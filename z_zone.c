@@ -37,7 +37,7 @@
 // Tags < 100 are not overwritten until freed.
 #define PU_STATIC		1	// static entire execution time
 #define PU_LEVEL		2	// static until level exited
-#define PU_LEVSPEC		3      // a special thinker in a level
+#define PU_LEVSPEC		3	// a special thinker in a level
 #define PU_CACHE		4
 
 #define PU_PURGELEVEL PU_CACHE
@@ -249,7 +249,7 @@ void Z_Free (const void* ptr)
 }
 
 
-uint32_t Z_GetLargestFreeBlockSize(void)
+static uint32_t Z_GetLargestFreeBlockSize(void)
 {
 	uint32_t largestFreeBlockSize = 0;
 
@@ -277,13 +277,14 @@ static uint32_t Z_GetTotalFreeMemory(void)
 
 
 //
-// Z_Malloc
+// Z_TryMalloc
 // You can pass a NULL user if the tag is < PU_PURGELEVEL.
+// Because Z_TryMalloc is static, we can control the input and we can make sure tag is always < PU_PURGELEVEL.
 //
 #define MINFRAGMENT		64
 
 
-static void* Z_Malloc(int32_t size, int32_t tag, void **user)
+static void* Z_TryMalloc(int32_t size, int8_t tag, void **user)
 {
     size = (size + (PARAGRAPH_SIZE - 1)) & ~(PARAGRAPH_SIZE - 1);
 
@@ -311,7 +312,7 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
         if (pointerToSegment(rover) == start_segment)
         {
             // scanned all the way around the list
-            I_Error ("Z_Malloc: failed to allocate %li B, max free block %li B, total free %li", size, Z_GetLargestFreeBlockSize(), Z_GetTotalFreeMemory());
+            return NULL;
         }
 
         if (rover->user)
@@ -361,21 +362,8 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
         base->size = size;
     }
 
-    if (user)
-    {
-        // mark as an in use block
-        base->user = user;
-    }
-    else
-    {
-        if (tag >= PU_PURGELEVEL)
-            I_Error ("Z_Malloc: an owner is required for purgable blocks");
-
-        // mark as in use, but unowned
-        base->user = UNOWNED;
-    }
-
-    base->tag = tag;
+    base->user = user ? user : UNOWNED;
+    base->tag  = tag;
 #if defined ZONEIDCHECK
     base->id  = ZONEID;
 #endif
@@ -389,6 +377,20 @@ static void* Z_Malloc(int32_t size, int32_t tag, void **user)
 #endif
 
     return segmentToPointer(pointerToSegment(base) + 1);
+}
+
+
+static void* Z_Malloc(int32_t size, int8_t tag, void **user) {
+	void* ptr = Z_TryMalloc(size, tag, user);
+	if (!ptr)
+		I_Error ("Z_Malloc: failed to allocate %li B, max free block %li B, total free %li", size, Z_GetLargestFreeBlockSize(), Z_GetTotalFreeMemory());
+	return ptr;
+}
+
+
+void* Z_TryMallocStatic(int32_t size)
+{
+	return Z_TryMalloc(size, PU_STATIC, NULL);
 }
 
 
