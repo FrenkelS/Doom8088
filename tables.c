@@ -333,7 +333,7 @@ fixed_t finesine(int16_t x)
 			case 1080: return -48304;
 			default: return -1 * (fixed_t)finesineTable_part_1[x];
 		}
-	} else if (x < 8192) {	// 6144 <= x < 8192
+	} else {				// 6144 <= x < 8192
 		x = 8191 - x;
 		switch (x) {
 			case   51: return  -2588;
@@ -352,8 +352,16 @@ fixed_t finesine(int16_t x)
 			case 1827: return -64601;
 			default: return -1 * (fixed_t)finesineTable_part_1[x];
 		}
-	} else {				// 8192 <= x < 10240
-		x -= 8192;
+	}
+}
+
+
+fixed_t finecosine(int16_t x)
+{
+	if (x < 6144) {	//    0 <= x < 6144
+		return finesine(x + (FINEANGLES / 4));
+	} else {		// 6144 <= x < 8192
+		x -= 6144;
 		switch (x) {
 			case   70: return  3542;
 			case  114: return  5747;

@@ -61,7 +61,7 @@ typedef uint32_t angle_t;
 
 
 fixed_t finesine(int16_t x);
-#define finecosine(x) finesine((x)+(FINEANGLES/4))
+fixed_t finecosine(int16_t x);
 
 angle_t xtoviewangle(int8_t x);
 
