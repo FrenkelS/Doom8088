@@ -339,17 +339,13 @@ fixed_t finesine(int16_t x)
 			case   51: return  -2588;
 			case  114: return  -5747;
 			case  244: return -12217;
-			case  273: return -13647;
 			case  455: return -22432;
 			case  771: return -36556;
 			case  795: return -37550;
 			case  863: return -40299;
-			case  883: return -41087;
 			case 1021: return -46251;
 			case 1051: return -47307;
-			case 1080: return -48305;
 			case 1469: return -59189;
-			case 1827: return -64601;
 			default: return -1 * (fixed_t)finesineTable_part_1[x];
 		}
 	}
