@@ -39,14 +39,13 @@
 #include "config.h"
 #include "doomtype.h"
 
-#include "m_recip.h"
 
 /*
  * Fixed point, 32bit as 16.16.
  */
 
 #define FRACBITS 16
-#define FRACUNIT (((int32_t)1)<<FRACBITS)
+#define FRACUNIT (1L<<FRACBITS)
 
 
 typedef int32_t fixed_t;
@@ -54,8 +53,6 @@ typedef int32_t fixed_t;
 /*
  * Absolute Value
  *
- * killough 5/10/98: In djgpp, use inlined assembly for performance
- * killough 9/05/98: better code seems to be gotten from using inlined C
  */
 
 inline static int32_t CONSTFUNC D_abs(fixed_t x)
@@ -65,27 +62,22 @@ inline static int32_t CONSTFUNC D_abs(fixed_t x)
   return (_t^_s)-_s;
 }
 
+
 /*
  * Fixed Point Multiplication
  */
 
-/* CPhipps - made __inline__ to inline, as specified in the gcc docs
- * Also made const */
-
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b);
+
 
 /*
  * Fixed Point Division
  */
-
-/* CPhipps - made __inline__ to inline, as specified in the gcc docs
- * Also made const */
 
 inline static fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 {
     return ((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b) ? ((a^b)>>31) ^ INT32_MAX :
                                                   (fixed_t)(((int64_t) a << FRACBITS) / b);
 }
-
 
 #endif

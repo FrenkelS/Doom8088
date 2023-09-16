@@ -261,33 +261,23 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 }
 
 
-static uint32_t reciprocal(uint32_t val)
-{
-#if 1
-	if (val == 0)
-		return 0;
-
-	return 4294967296 / val;
-#else
-	return reciprocalTable[val];
-#endif
-}
-
-
 //Approx Reciprocal of v
 inline static CONSTFUNC fixed_t FixedReciprocal(fixed_t v)
 {
+    if (v == 0)
+        return 0;
+
     uint32_t val = v < 0 ? -v : v;
 
-    uint32_t shift = 0;
+    uint8_t shift = 0;
 
-    while(val > (((int32_t)1) << FRACBITS))
+    while (val > (1L << FRACBITS))
     {
         val = (val >> 1u);
         shift++;
     }
 
-    fixed_t result = (reciprocal(val) >> shift);
+    fixed_t result = (0x100000000 / val) >> shift;
 
     return v < 0 ? -result : result;
 }

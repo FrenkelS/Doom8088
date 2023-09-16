@@ -53,7 +53,6 @@ GLOBOBJS = &
  m_cheat.obj &
  m_menu.obj &
  m_random.obj &
-# m_recip.obj &
  p_ceilng.obj &
  p_doors.obj &
  p_enemy.obj &

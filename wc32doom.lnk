@@ -29,7 +29,6 @@ file info.obj
 file m_cheat.obj
 file m_menu.obj
 file m_random.obj
-#file m_recip.obj
 file p_ceilng.obj
 file p_doors.obj
 file p_enemy.obj
