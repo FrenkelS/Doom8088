@@ -225,7 +225,7 @@ fixed_t dropoff_deltax, dropoff_deltay, floorz;
 //******************************************************************************
 
 /* killough 8/2/98: for more intelligent autoaiming */
-uint64_t aim_flags_mask;
+uint32_t aim_flags_mask;
 
 mobj_t    *tmthing;
 fixed_t   tmx;

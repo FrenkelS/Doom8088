@@ -592,8 +592,8 @@ void A_Punch(player_t *player, pspdef_t *psp)
 	angle += (t - P_Random())<<18;
 
 	/* killough 8/2/98: make autoaiming prefer enemies */
-	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE, MF_FRIEND), !_g->linetarget))
-		slope = P_AimLineAttack(player->mo, angle, MELEERANGE, 0);
+	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE, true), !_g->linetarget))
+		slope = P_AimLineAttack(player->mo, angle, MELEERANGE, false);
 
 	P_LineAttack(player->mo, angle, MELEERANGE, slope, damage);
 
@@ -622,8 +622,8 @@ void A_Saw(player_t *player, pspdef_t *psp)
 
 	/* Use meleerange + 1 so that the puff doesn't skip the flash
 	 * killough 8/2/98: make autoaiming prefer enemies */
-	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, MF_FRIEND), !_g->linetarget))
-		slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, 0);
+	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, true), !_g->linetarget))
+		slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, false);
 
 	P_LineAttack(player->mo, angle, MELEERANGE+1, slope, damage);
 
@@ -674,21 +674,22 @@ void A_FireMissile(player_t *player, pspdef_t *psp)
 //
 static void P_BulletSlope(mobj_t *mo)
 {
-  angle_t an = mo->angle;    // see which target is to be aimed at
+	angle_t an = mo->angle;    // see which target is to be aimed at
 
-  /* killough 8/2/98: make autoaiming prefer enemies */
-  uint32_t mask = MF_FRIEND;
+	/* killough 8/2/98: make autoaiming prefer enemies */
+	boolean friend = true;
 
-  do
-    {
-      _g->bulletslope = P_AimLineAttack(mo, an, 16*64*FRACUNIT, mask);
-      if (!_g->linetarget)
-  _g->bulletslope = P_AimLineAttack(mo, an += ((int32_t)1)<<26, 16*64*FRACUNIT, mask);
-      if (!_g->linetarget)
-  _g->bulletslope = P_AimLineAttack(mo, an -= ((int32_t)2)<<26, 16*64*FRACUNIT, mask);
-    }
-  while (mask && (mask=0, !_g->linetarget));  /* killough 8/2/98 */
+	do
+	{
+		_g->bulletslope = P_AimLineAttack(mo, an, 16 * 64 * FRACUNIT, friend);
+		if (!_g->linetarget)
+			_g->bulletslope = P_AimLineAttack(mo, an += 1L << 26, 16 * 64 * FRACUNIT, friend);
+		if (!_g->linetarget)
+			_g->bulletslope = P_AimLineAttack(mo, an -= 2L << 26, 16 * 64 * FRACUNIT, friend);
+	}
+	while (friend && (friend = false, !_g->linetarget));
 }
+
 
 //
 // P_GunShot

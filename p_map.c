@@ -1024,7 +1024,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 //
 // P_AimLineAttack
 //
-fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, uint64_t mask)
+fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, boolean friend)
   {
   fixed_t x2;
   fixed_t y2;
@@ -1038,14 +1038,14 @@ fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, uint64_t mask
 
   // can't shoot outside view angles
 
-  _g->topslope = 100*FRACUNIT/160;
-  _g->bottomslope = -100*FRACUNIT/160;
+  _g->topslope    =  100 * FRACUNIT / 160;
+  _g->bottomslope = -100 * FRACUNIT / 160;
 
   _g->attackrange = distance;
   _g->linetarget = NULL;
 
   /* killough 8/2/98: prevent friends from aiming at friends */
-  _g->aim_flags_mask = mask;
+  _g->aim_flags_mask = friend ? MF_FRIEND : 0;
 
   P_PathTraverse(t1->x,t1->y,x2,y2,PT_ADDLINES|PT_ADDTHINGS,PTR_AimTraverse);
 
