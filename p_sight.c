@@ -38,7 +38,6 @@
 #include "p_map.h"
 #include "p_maputl.h"
 #include "p_setup.h"
-#include "m_bbox.h"
 
 #include "globdata.h"
 

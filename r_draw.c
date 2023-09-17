@@ -49,7 +49,6 @@
 #include "w_wad.h"
 #include "r_main.h"
 #include "r_things.h"
-#include "m_bbox.h"
 #include "m_fixed.h"
 #include "v_video.h"
 #include "st_stuff.h"

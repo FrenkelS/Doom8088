@@ -56,7 +56,6 @@
 #include "p_inter.h"
 #include "s_sound.h"
 #include "sounds.h"
-#include "m_bbox.h"                                         // phares 3/20/98
 #include "i_system.h"
 
 #include "globdata.h"

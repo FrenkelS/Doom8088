@@ -112,6 +112,16 @@ typedef PACKEDATTR_PRE struct {
 } PACKEDATTR_POST mapthing_t;
 
 
+/* Bounding box coordinate storage. */
+enum
+{
+  BOXTOP,
+  BOXBOTTOM,
+  BOXLEFT,
+  BOXRIGHT
+};  /* bbox coordinates */
+
+
 //This is used at runtime so not packed.
 //compiler uses byte access on packed structs.
 

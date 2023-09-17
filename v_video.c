@@ -39,7 +39,6 @@
 
 #include "doomdef.h"
 #include "r_main.h"
-#include "m_bbox.h"
 #include "w_wad.h"   /* needed for color translation lump lookup */
 #include "v_video.h"
 

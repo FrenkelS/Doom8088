@@ -48,7 +48,6 @@
 #include "g_game.h"
 #include "p_enemy.h"
 #include "p_tick.h"
-#include "m_bbox.h"
 
 #include "globdata.h"
 

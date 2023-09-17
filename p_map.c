@@ -45,7 +45,6 @@
 #include "sounds.h"
 #include "p_inter.h"
 #include "m_random.h"
-#include "m_bbox.h"
 #include "i_system.h"
 
 #include "globdata.h"
