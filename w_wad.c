@@ -158,31 +158,10 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 }
 
 
-static const filelump_t* PUREFUNC W_GetFileInfoForName(const char *name)
-{
-	int64_t nameint;
-	strncpy((char*)&nameint, name, 8);
-
-#if BACKWARDS
-	for (int16_t i = numlumps - 1; i >= 0; i--)
-#else
-	for (int16_t i = 0; i < numlumps; i++)
-#endif
-	{
-		if (nameint == *(int64_t*)(fileinfo[i].name))
-		{
-			return &fileinfo[i];
-		}
-	}
-
-	I_Error("W_GetFileInfoForName: %.8s not found", name);
-	return NULL;
-}
-
-
 void W_ReadLumpByName(const char *name, void *ptr)
 {
-	const filelump_t* lump = W_GetFileInfoForName(name);
+	int16_t num = W_GetNumForName(name);
+	const filelump_t* lump = &fileinfo[num];
 	fseek(fileWAD, lump->filepos, SEEK_SET);
 	fread(ptr, lump->size, 1, fileWAD);
 }
