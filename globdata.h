@@ -224,9 +224,6 @@ fixed_t dropoff_deltax, dropoff_deltay, floorz;
 //p_map.c
 //******************************************************************************
 
-/* killough 8/2/98: for more intelligent autoaiming */
-uint32_t aim_flags_mask;
-
 mobj_t    *tmthing;
 fixed_t   tmx;
 fixed_t   tmy;
@@ -274,8 +271,6 @@ fixed_t   shootz;
 
 int32_t       la_damage;
 fixed_t   attackrange;
-
-fixed_t   aimslope;
 
 // slopes to top and bottom of target
 // killough 4/20/98: make static instead of using ones in p_sight.c

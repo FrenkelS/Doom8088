@@ -801,10 +801,11 @@ void P_SlideMove(mobj_t *mo)
   while (!P_TryMove(mo, mo->x+_g->tmxmove, mo->y+_g->tmymove));
 }
 
-//
-// P_LineAttack
-//
 
+// for more intelligent autoaiming
+static uint32_t aim_flags_mask;
+
+static fixed_t  aimslope;
 
 
 //
@@ -871,7 +872,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
     /* killough 7/19/98, 8/2/98:
    * friends don't aim at friends (except players), at least not first
    */
-    if (th->flags & _g->shootthing->flags & _g->aim_flags_mask && !P_MobjIsPlayer(th))
+    if (th->flags & _g->shootthing->flags & aim_flags_mask && !P_MobjIsPlayer(th))
         return true;
 
     // check angles to see if the thing can be aimed at
@@ -895,7 +896,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
     if (thingbottomslope < _g->bottomslope)
         thingbottomslope = _g->bottomslope;
 
-    _g->aimslope = (thingtopslope+thingbottomslope)/2;
+    aimslope = (thingtopslope + thingbottomslope) / 2;
     _g->linetarget = th;
 
     return false;   // don't go any farther
@@ -934,19 +935,19 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     // killough 11/98: simplify
 
     if ((LN_FRONTSECTOR(li)->floorheight==LN_BACKSECTOR(li)->floorheight ||
-         (slope = FixedDiv(_g->openbottom - _g->shootz , dist)) <= _g->aimslope) &&
+         (slope = FixedDiv(_g->openbottom - _g->shootz , dist)) <= aimslope) &&
         (LN_FRONTSECTOR(li)->ceilingheight==LN_BACKSECTOR(li)->ceilingheight ||
-         (slope = FixedDiv (_g->opentop - _g->shootz , dist)) >= _g->aimslope))
+         (slope = FixedDiv (_g->opentop - _g->shootz , dist)) >= aimslope))
       return true;      // shot continues
   }
 
     // hit line
     // position a bit closer
 
-    frac = in->frac - FixedDiv (4*FRACUNIT,_g->attackrange);
-    x = _g->trace.x + FixedMul (_g->trace.dx, frac);
-    y = _g->trace.y + FixedMul (_g->trace.dy, frac);
-    z = _g->shootz + FixedMul (_g->aimslope, FixedMul(frac, _g->attackrange));
+    frac = in->frac - FixedDiv(4 * FRACUNIT, _g->attackrange);
+    x = _g->trace.x + FixedMul(_g->trace.dx, frac);
+    y = _g->trace.y + FixedMul(_g->trace.dy, frac);
+    z = _g->shootz  + FixedMul(aimslope, FixedMul(frac, _g->attackrange));
 
     if (LN_FRONTSECTOR(li)->ceilingpic == _g->skyflatnum)
       {
@@ -989,12 +990,12 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   dist = FixedMul (_g->attackrange, in->frac);
   thingtopslope = FixedDiv (th->z+th->height - _g->shootz , dist);
 
-  if (thingtopslope < _g->aimslope)
+  if (thingtopslope < aimslope)
     return true;  // shot over the thing
 
   thingbottomslope = FixedDiv (th->z - _g->shootz, dist);
 
-  if (thingbottomslope > _g->aimslope)
+  if (thingbottomslope > aimslope)
     return true;  // shot under the thing
 
   // hit thing
@@ -1002,9 +1003,9 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   frac = in->frac - FixedDiv (10*FRACUNIT,_g->attackrange);
 
-  x = _g->trace.x + FixedMul (_g->trace.dx, frac);
-  y = _g->trace.y + FixedMul (_g->trace.dy, frac);
-  z = _g->shootz + FixedMul (_g->aimslope, FixedMul(frac, _g->attackrange));
+  x = _g->trace.x + FixedMul(_g->trace.dx, frac);
+  y = _g->trace.y + FixedMul(_g->trace.dy, frac);
+  z = _g->shootz  + FixedMul(aimslope, FixedMul(frac, _g->attackrange));
 
   // Spawn bullet puffs or blod spots,
   // depending on target type.
@@ -1042,15 +1043,15 @@ fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, boolean frien
   _g->bottomslope = -100 * FRACUNIT / 160;
 
   _g->attackrange = distance;
-  _g->linetarget = NULL;
+  _g->linetarget  = NULL;
 
-  /* killough 8/2/98: prevent friends from aiming at friends */
-  _g->aim_flags_mask = friend ? MF_FRIEND : 0;
+  // prevent friends from aiming at friends
+  aim_flags_mask = friend ? MF_FRIEND : 0;
 
   P_PathTraverse(t1->x,t1->y,x2,y2,PT_ADDLINES|PT_ADDTHINGS,PTR_AimTraverse);
 
   if (_g->linetarget)
-    return _g->aimslope;
+    return aimslope;
 
   return 0;
   }
@@ -1062,13 +1063,8 @@ fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, boolean frien
 // that will leave linetarget set.
 //
 
-void P_LineAttack
-(mobj_t* t1,
- angle_t angle,
- fixed_t distance,
- fixed_t slope,
- int32_t     damage)
-  {
+void P_LineAttack(mobj_t* t1, angle_t angle, fixed_t distance, fixed_t slope, int32_t damage)
+{
   fixed_t x2;
   fixed_t y2;
 
@@ -1079,10 +1075,10 @@ void P_LineAttack
   y2 = t1->y + (distance>>FRACBITS)*finesine(  angle);
   _g->shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
   _g->attackrange = distance;
-  _g->aimslope = slope;
+  aimslope = slope;
 
   P_PathTraverse(t1->x,t1->y,x2,y2,PT_ADDLINES|PT_ADDTHINGS,PTR_ShootTraverse);
-  }
+}
 
 
 //
