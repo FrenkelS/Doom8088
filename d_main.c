@@ -46,7 +46,7 @@
 
 #include "doomdef.h"
 #include "doomtype.h"
-#include "doomstat.h"
+#include "d_player.h"
 #include "d_net.h"
 #include "d_englsh.h"
 #include "sounds.h"

@@ -33,7 +33,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "p_spec.h"
 #include "p_tick.h"
 #include "s_sound.h"

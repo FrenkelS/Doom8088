@@ -35,7 +35,7 @@
  */
 
 #include <stdint.h>
-#include "doomstat.h"
+#include "d_player.h"
 #include "d_event.h"
 #include "v_video.h"
 #include "w_wad.h"

@@ -46,7 +46,7 @@
 #include "config.h"
 #endif
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "d_net.h"
 #include "f_finale.h"
 #include "doomtype.h"

@@ -53,7 +53,7 @@
 #include "s_sound.h"
 
 #include "doomdef.h"
-#include "doomstat.h"
+#include "d_player.h"
 #include "doomtype.h"
 
 #include "d_main.h"

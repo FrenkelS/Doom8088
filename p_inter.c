@@ -33,7 +33,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "d_englsh.h"
 #include "m_random.h"
 #include "am_map.h"

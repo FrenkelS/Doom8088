@@ -39,7 +39,7 @@
 #endif
 
 #include <stdint.h>
-#include "doomstat.h"
+#include "d_player.h"
 #include "r_defs.h"
 #include "st_stuff.h"
 #include "r_main.h"

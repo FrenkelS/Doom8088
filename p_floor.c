@@ -34,7 +34,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "r_main.h"
 #include "m_random.h"
 #include "p_inter.h"

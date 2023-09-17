@@ -35,7 +35,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include "doomstat.h" //jff 5/18/98
+#include "d_player.h"
 #include "doomdef.h"
 #include "m_random.h"
 #include "r_main.h"

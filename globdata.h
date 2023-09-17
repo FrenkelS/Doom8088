@@ -1,7 +1,7 @@
 #ifndef GLOBAL_DATA_H
 #define GLOBAL_DATA_H
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "doomdef.h"
 #include "m_fixed.h"
 #include "am_map.h"

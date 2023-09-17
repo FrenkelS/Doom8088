@@ -39,7 +39,7 @@
 #include "config.h"
 #endif
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "s_sound.h"
 #include "i_sound.h"
 #include "i_system.h"

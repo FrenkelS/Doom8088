@@ -50,7 +50,7 @@
 #endif
 
 #include "doomtype.h"
-#include "doomstat.h"
+#include "d_player.h"
 #include "d_net.h"
 #include "z_zone.h"
 

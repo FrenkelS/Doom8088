@@ -44,7 +44,7 @@
 
 #include <fcntl.h>
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "d_net.h"
 #include "doomtype.h"
 #include "i_system.h"

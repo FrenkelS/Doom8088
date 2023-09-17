@@ -39,10 +39,22 @@
 #include "d_event.h"
 
 
+// -------------------------
+// Status flags for refresh.
+//
+
+enum automapmode_e {
+  am_active  = 1,  // currently shown
+  am_overlay = 2,  // covers the screen, i.e. not overlay mode
+  am_rotate  = 4,  // rotates to the player facing direction
+  am_follow  = 8   // keep the player centred
+};
+
+
 // Used by ST StatusBar stuff.
 #define AM_MSGHEADER ((((int32_t)'a')<<24)+(((int32_t)'m')<<16))
 #define AM_MSGENTERED (AM_MSGHEADER | ('e'<<8))
-#define AM_MSGEXITED (AM_MSGHEADER | ('x'<<8))
+#define AM_MSGEXITED  (AM_MSGHEADER | ('x'<<8))
 
 // scale on entry
 #define INITSCALEMTOF (.2*FRACUNIT)

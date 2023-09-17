@@ -36,7 +36,7 @@
 // killough 5/3/98: remove unnecessary headers
 
 #include <stdint.h>
-#include "doomstat.h"
+#include "d_player.h"
 #include "r_defs.h"
 #include "hu_stuff.h"
 #include "st_stuff.h" /* jff 2/16/98 need loc of status bar */

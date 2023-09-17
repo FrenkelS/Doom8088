@@ -36,7 +36,7 @@
  *-----------------------------------------------------------------------------*/
 
 #include "doomdef.h"
-#include "doomstat.h"
+#include "d_player.h"
 #include "m_random.h"
 #include "i_system.h"
 #include "w_wad.h"

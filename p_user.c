@@ -35,7 +35,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "d_event.h"
 #include "r_main.h"
 #include "p_map.h"

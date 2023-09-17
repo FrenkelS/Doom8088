@@ -34,7 +34,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include "doomstat.h"
+#include "d_player.h"
 #include "w_wad.h"
 #include "r_main.h"
 #include "m_fixed.h"

@@ -50,7 +50,7 @@
 #include "i_system.h"
 #include "z_zone.h"
 #include "m_random.h"
-#include "doomstat.h"
+#include "d_player.h"
 #include "g_game.h"
 #include "doomtype.h"
 #include "i_sound.h"

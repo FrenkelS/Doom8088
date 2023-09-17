@@ -34,7 +34,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include "doomstat.h" //jff 6/19/98 for demo_compatibility
+#include "d_player.h"
 #include "r_main.h"
 #include "p_spec.h"
 #include "p_tick.h"

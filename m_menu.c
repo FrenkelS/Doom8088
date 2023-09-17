@@ -41,7 +41,7 @@
 #include <fcntl.h>
 
 #include "doomdef.h"
-#include "doomstat.h"
+#include "d_player.h"
 #include "d_englsh.h"
 #include "d_main.h"
 #include "v_video.h"
