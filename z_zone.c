@@ -22,6 +22,7 @@
 //
 //-----------------------------------------------------------------------------
 
+#include <dos.h>
 #include <malloc.h>
 #include <stdint.h>
 #include "compiler.h"
@@ -80,8 +81,6 @@ typedef struct
 typedef char assertMemblockSize[sizeof(memblock_t) <= PARAGRAPH_SIZE ? 1 : -1];
 
 
-static uint8_t    *mainzone;
-static uint8_t     mainzone_blocklist_buffer[32];
 static memblock_t *mainzone_blocklist;
 static segment_t   mainzone_rover_segment;
 
@@ -105,61 +104,190 @@ static memblock_t* segmentToPointer(segment_t seg)
 }
 
 
+#define	EMS_INT			0x67
+
+#define	EMS_STATUS		0x40
+#define	EMS_GETFRAME	0x41
+#define	EMS_GETPAGES	0x42
+#define	EMS_ALLOCPAGES	0x43
+#define	EMS_MAPPAGE		0x44
+#define	EMS_FREEPAGES	0x45
+#define	EMS_VERSION		0x46
+
+static uint16_t emsHandle;
+
+static segment_t Z_InitExpandedMemory(void)
+{
+#if defined _M_I86
+	void __far* emsInterruptVector = _dos_getvect(EMS_INT);
+	char __far* emsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
+	if (strncmp(emsDeviceName, "EMMXXXX0", 8))
+		return 0;
+
+	// EMS detected
+
+	union REGS regs;
+	regs.h.ah = EMS_STATUS;
+	int86(EMS_INT, &regs, &regs);
+	if (regs.h.ah)
+		return 0;
+
+	// EMS status is successful
+
+	regs.h.ah = EMS_VERSION;
+	int86(EMS_INT, &regs, &regs);
+	if (regs.h.ah || regs.h.al < 0x32)
+		return 0;
+
+	// EMS v3.2 or higher detected
+
+	regs.h.ah = EMS_GETFRAME;
+	int86(EMS_INT, &regs, &regs);
+	if (regs.h.ah)
+		return 0;
+
+	// EMS page frame address
+	segment_t emsSegment = regs.x.bx;
+
+	regs.h.ah = EMS_GETPAGES;
+	int86(EMS_INT, &regs, &regs);
+	if (regs.h.ah || regs.x.bx < 4)
+		return 0;
+
+	// There are at least 4 unallocated pages
+
+	regs.h.ah = EMS_ALLOCPAGES;
+	regs.x.bx = 4;
+	int86(EMS_INT, &regs, &regs);
+	if (regs.h.ah)
+		return 0;
+
+	// 4 logical pages are allocated
+
+	emsHandle = regs.x.dx;
+
+	for (int16_t pageNumber = 0; pageNumber < 4; pageNumber++)
+	{
+		regs.h.ah = EMS_MAPPAGE;
+		regs.h.al = pageNumber;	// physical page number
+		regs.x.bx = pageNumber;	//  logical page number
+		regs.x.dx = emsHandle;
+		int86(EMS_INT, &regs, &regs);
+		if (regs.h.ah)
+			return 0;
+	}
+	
+	// 64 kB of expanded memory is mapped
+
+	return emsSegment;
+#else
+	return 0;
+#endif
+}
+
+
+void Z_Shutdown(void)
+{
+	if (emsHandle)
+	{
+#if defined _M_I86
+		union REGS regs;
+		regs.h.ah = EMS_FREEPAGES;
+		regs.x.dx = emsHandle;
+		int86(EMS_INT, &regs, &regs);
+#endif
+	}
+}
+
+
 //
 // Z_Init
 //
 void Z_Init (void)
 {
-    memblock_t*	block;
+	uint32_t heapSize;
+	int32_t hallocNumb = 640 * 1024L / PARAGRAPH_SIZE;
+	static uint8_t *mainzone;
 
-    uint32_t heapSize;
-    int32_t hallocNumb = 640 * 1024L / PARAGRAPH_SIZE;
+	// Try to allocate memory.
+	do
+	{
+		mainzone = halloc(hallocNumb, PARAGRAPH_SIZE);
+		hallocNumb--;
+	} while (mainzone == NULL);
 
-    //Try to allocate memory.
-    do
-    {
-        mainzone = halloc(hallocNumb, PARAGRAPH_SIZE);
-        hallocNumb--;
+	hallocNumb++;
+	heapSize = hallocNumb * PARAGRAPH_SIZE;
 
-    } while (mainzone == NULL);
+	// align mainzone
+	uint32_t m = (uint32_t) mainzone;
+	if ((m & (PARAGRAPH_SIZE - 1)) != 0)
+	{
+		heapSize -= PARAGRAPH_SIZE;
+		while ((m & (PARAGRAPH_SIZE - 1)) != 0)
+			m = (uint32_t) ++mainzone;
+	}
 
-    hallocNumb++;
-    heapSize = hallocNumb * PARAGRAPH_SIZE;
+	printf("\t%ld bytes conventional memory\n", heapSize);
 
-    //align mainzone
-    uint32_t m = (uint32_t) mainzone;
-    if ((m & (PARAGRAPH_SIZE - 1)) != 0)
-    {
-        heapSize -= PARAGRAPH_SIZE;
-        while ((m & (PARAGRAPH_SIZE - 1)) != 0)
-            m = (uint32_t) ++mainzone;
-    }
+	// align blocklist
+	uint_fast8_t i = 0;
+	static uint8_t mainzone_blocklist_buffer[PARAGRAPH_SIZE * 2];
+	uint32_t b = (uint32_t) &mainzone_blocklist_buffer[i++];
+	while ((b & (PARAGRAPH_SIZE - 1)) != 0)
+		b = (uint32_t) &mainzone_blocklist_buffer[i++];
+	mainzone_blocklist = (memblock_t *)b;
 
-    printf("\t%ld bytes allocated for zone\n", heapSize);
+	// set the entire zone to one free block
+	memblock_t* block = (memblock_t *)mainzone;
+	mainzone_rover_segment = pointerToSegment(block);
 
-    //align blocklist
-    uint_fast8_t i = 0;
-    uint32_t b = (uint32_t) &mainzone_blocklist_buffer[i++];
-    while ((b & (PARAGRAPH_SIZE - 1)) != 0)
-        b = (uint32_t) &mainzone_blocklist_buffer[i++];
-    mainzone_blocklist = (memblock_t *)b;
+	mainzone_blocklist->tag  = PU_STATIC;
+	mainzone_blocklist->user = (void *)mainzone;
+	mainzone_blocklist->next = mainzone_rover_segment;
+	mainzone_blocklist->prev = mainzone_rover_segment;
 
-    // set the entire zone to one free block
-    block = (memblock_t *)mainzone;
-    mainzone_rover_segment = pointerToSegment(block);
+	block->size = heapSize;
+	block->tag  = 0;
+	block->user = NULL; // NULL indicates a free block.
+	block->prev = pointerToSegment(mainzone_blocklist);
+	block->next = block->prev;
+#if defined ZONEIDCHECK
+	block->id   = ZONEID;
+#endif
 
-    mainzone_blocklist->next = mainzone_rover_segment;
-    mainzone_blocklist->prev = mainzone_rover_segment;
+	segment_t ems_segment = Z_InitExpandedMemory();
+	if (ems_segment)
+	{
+		segment_t romblock_segment = mainzone_rover_segment + heapSize / PARAGRAPH_SIZE;
+		memblock_t* romblock = segmentToPointer(romblock_segment);
+		romblock->size = (uint32_t)(ems_segment - romblock_segment) * PARAGRAPH_SIZE;
+		romblock->tag  = PU_STATIC;
+		romblock->user = (void *)mainzone;
+		romblock->next = ems_segment;
+		romblock->prev = mainzone_rover_segment;
+#if defined ZONEIDCHECK
+		romblock->id   = ZONEID;
+#endif
 
-    mainzone_blocklist->user = (void *)mainzone;
-    mainzone_blocklist->tag  = PU_STATIC;
+		memblock_t* emsblock = segmentToPointer(ems_segment);
+		emsblock->size = 65536;
+		emsblock->tag  = 0;
+		emsblock->user = NULL; // NULL indicates a free block.
+		emsblock->next = block->next; // == pointerToSegment(mainzone_blocklist)
+		emsblock->prev = romblock_segment;
+#if defined ZONEIDCHECK
+		emsblock->id   = ZONEID;
+#endif
 
-    block->prev = block->next = pointerToSegment(mainzone_blocklist);
+		block->next = romblock_segment;
+		printf("\t 65536 bytes expanded memory\n");
+		heapSize += 65536;
+	}
+	else
+		printf("\t     0 bytes expanded memory\n");
 
-    // NULL indicates a free block.
-    block->user = NULL;
-
-    block->size = heapSize;
+	printf("\t%ld bytes total memory allocated for zone\n", heapSize);
 }
 
 
@@ -349,21 +477,21 @@ static void* Z_TryMalloc(int32_t size, int8_t tag, void **user)
 
         memblock_t* newblock = segmentToPointer(newblock_segment);
         newblock->size = newblock_size;
-        newblock->user = NULL; // NULL indicates free block.
         newblock->tag  = 0;
+        newblock->user = NULL; // NULL indicates free block.
+        newblock->next = base->next;
+        newblock->prev = base_segment;
 #if defined ZONEIDCHECK
         newblock->id   = ZONEID;
 #endif
-        newblock->prev = base_segment;
-        newblock->next = base->next;
 
         segmentToPointer(base->next)->prev = newblock_segment;
-        base->next = newblock_segment;
         base->size = size;
+        base->next = newblock_segment;
     }
 
-    base->user = user ? user : UNOWNED;
     base->tag  = tag;
+    base->user = user ? user : UNOWNED;
 #if defined ZONEIDCHECK
     base->id  = ZONEID;
 #endif

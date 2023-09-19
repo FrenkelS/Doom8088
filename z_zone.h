@@ -29,6 +29,7 @@
 #include <stddef.h>
 
 void  Z_Init(void);
+void  Z_Shutdown(void);
 void* Z_TryMallocStatic(int32_t size);
 void* Z_MallocStatic(int32_t size);
 void* Z_MallocStaticWithUser(int32_t size, void **user); 
