@@ -314,7 +314,7 @@ static CONSTFUNC int32_t SlopeDiv(uint32_t num, uint32_t den)
 // killough 5/2/98: reformatted
 //
 
-static PUREFUNC int32_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t *node)
+static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t *node)
 {
     fixed_t dx = (fixed_t)node->dx << FRACBITS;
     fixed_t dy = (fixed_t)node->dy << FRACBITS;
