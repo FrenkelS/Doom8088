@@ -81,7 +81,7 @@ typedef struct
 typedef char assertMemblockSize[sizeof(memblock_t) <= PARAGRAPH_SIZE ? 1 : -1];
 
 
-static memblock_t *mainzone_blocklist;
+static memblock_t *mainzone_sentinal;
 static segment_t   mainzone_rover_segment;
 
 
@@ -232,25 +232,25 @@ void Z_Init (void)
 
 	// align blocklist
 	uint_fast8_t i = 0;
-	static uint8_t mainzone_blocklist_buffer[PARAGRAPH_SIZE * 2];
-	uint32_t b = (uint32_t) &mainzone_blocklist_buffer[i++];
+	static uint8_t mainzone_sentinal_buffer[PARAGRAPH_SIZE * 2];
+	uint32_t b = (uint32_t) &mainzone_sentinal_buffer[i++];
 	while ((b & (PARAGRAPH_SIZE - 1)) != 0)
-		b = (uint32_t) &mainzone_blocklist_buffer[i++];
-	mainzone_blocklist = (memblock_t *)b;
+		b = (uint32_t) &mainzone_sentinal_buffer[i++];
+	mainzone_sentinal = (memblock_t *)b;
 
 	// set the entire zone to one free block
 	memblock_t* block = (memblock_t *)mainzone;
 	mainzone_rover_segment = pointerToSegment(block);
 
-	mainzone_blocklist->tag  = PU_STATIC;
-	mainzone_blocklist->user = (void *)mainzone;
-	mainzone_blocklist->next = mainzone_rover_segment;
-	mainzone_blocklist->prev = mainzone_rover_segment;
+	mainzone_sentinal->tag  = PU_STATIC;
+	mainzone_sentinal->user = (void *)mainzone;
+	mainzone_sentinal->next = mainzone_rover_segment;
+	mainzone_sentinal->prev = mainzone_rover_segment;
 
 	block->size = heapSize;
 	block->tag  = 0;
 	block->user = NULL; // NULL indicates a free block.
-	block->prev = pointerToSegment(mainzone_blocklist);
+	block->prev = pointerToSegment(mainzone_sentinal);
 	block->next = block->prev;
 #if defined ZONEIDCHECK
 	block->id   = ZONEID;
@@ -274,7 +274,7 @@ void Z_Init (void)
 		emsblock->size = 65536;
 		emsblock->tag  = 0;
 		emsblock->user = NULL; // NULL indicates a free block.
-		emsblock->next = block->next; // == pointerToSegment(mainzone_blocklist)
+		emsblock->next = block->next; // == pointerToSegment(mainzone_sentinal)
 		emsblock->prev = romblock_segment;
 #if defined ZONEIDCHECK
 		emsblock->id   = ZONEID;
@@ -381,9 +381,9 @@ static uint32_t Z_GetLargestFreeBlockSize(void)
 {
 	uint32_t largestFreeBlockSize = 0;
 
-	segment_t mainzone_blocklist_segment = pointerToSegment(mainzone_blocklist);
+	segment_t mainzone_sentinal_segment = pointerToSegment(mainzone_sentinal);
 
-	for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); pointerToSegment(block) != mainzone_blocklist_segment; block = segmentToPointer(block->next))
+	for (memblock_t* block = segmentToPointer(mainzone_sentinal->next); pointerToSegment(block) != mainzone_sentinal_segment; block = segmentToPointer(block->next))
 		if (!block->user && block->size > largestFreeBlockSize)
 			largestFreeBlockSize = block->size;
 
@@ -394,9 +394,9 @@ static uint32_t Z_GetTotalFreeMemory(void)
 {
 	uint32_t totalFreeMemory = 0;
 
-	segment_t mainzone_blocklist_segment = pointerToSegment(mainzone_blocklist);
+	segment_t mainzone_sentinal_segment = pointerToSegment(mainzone_sentinal);
 
-	for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); pointerToSegment(block) != mainzone_blocklist_segment; block = segmentToPointer(block->next))
+	for (memblock_t* block = segmentToPointer(mainzone_sentinal->next); pointerToSegment(block) != mainzone_sentinal_segment; block = segmentToPointer(block->next))
 		if (!block->user)
 			totalFreeMemory += block->size;
 
@@ -563,7 +563,9 @@ void Z_FreeTags(void)
 {
     memblock_t*	next;
 
-    for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); pointerToSegment(block) != pointerToSegment(mainzone_blocklist); block = next)
+    segment_t mainzone_sentinal_segment = pointerToSegment(mainzone_sentinal);
+
+    for (memblock_t* block = segmentToPointer(mainzone_sentinal->next); pointerToSegment(block) != mainzone_sentinal_segment; block = next)
     {
         // get link before freeing
         next = segmentToPointer(block->next);
@@ -582,11 +584,11 @@ void Z_FreeTags(void)
 //
 void Z_CheckHeap (void)
 {
-    segment_t mainzone_blocklist_segment = pointerToSegment(mainzone_blocklist);
+    segment_t mainzone_sentinal_segment = pointerToSegment(mainzone_sentinal);
 
-    for (memblock_t* block = segmentToPointer(mainzone_blocklist->next); ; block = segmentToPointer(block->next))
+    for (memblock_t* block = segmentToPointer(mainzone_sentinal->next); ; block = segmentToPointer(block->next))
     {
-        if (block->next == mainzone_blocklist_segment)
+        if (block->next == mainzone_sentinal_segment)
         {
             // all blocks have been hit
             break;
