@@ -49,7 +49,11 @@ typedef uint32_t segment_t;
 #define inp(port)			inportb(port)
 #define outp(port,data)		outportb(port,data)
 
+#define __far
 #define _interrupt
+
+#define _dos_getvect(x) NULL
+#define _fstrncmp(x,y,z) false
 
 #define replaceInterrupt(OldInt,NewInt,vector,handler)				\
 _go32_dpmi_get_protected_mode_interrupt_vector(vector, &OldInt);	\

@@ -118,10 +118,9 @@ static uint16_t emsHandle;
 
 static segment_t Z_InitExpandedMemory(void)
 {
-#if defined _M_I86
 	void __far* emsInterruptVector = _dos_getvect(EMS_INT);
 	char __far* emsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
-	if (strncmp(emsDeviceName, "EMMXXXX0", 8))
+	if (_fstrncmp(emsDeviceName, "EMMXXXX0", 8))
 		return 0;
 
 	// EMS detected
@@ -147,31 +146,31 @@ static segment_t Z_InitExpandedMemory(void)
 		return 0;
 
 	// EMS page frame address
-	segment_t emsSegment = regs.x.bx;
+	segment_t emsSegment = regs.w.bx;
 
 	regs.h.ah = EMS_GETPAGES;
 	int86(EMS_INT, &regs, &regs);
-	if (regs.h.ah || regs.x.bx < 4)
+	if (regs.h.ah || regs.w.bx < 4)
 		return 0;
 
 	// There are at least 4 unallocated pages
 
 	regs.h.ah = EMS_ALLOCPAGES;
-	regs.x.bx = 4;
+	regs.w.bx = 4;
 	int86(EMS_INT, &regs, &regs);
 	if (regs.h.ah)
 		return 0;
 
 	// 4 logical pages are allocated
 
-	emsHandle = regs.x.dx;
+	emsHandle = regs.w.dx;
 
 	for (int16_t pageNumber = 0; pageNumber < 4; pageNumber++)
 	{
 		regs.h.ah = EMS_MAPPAGE;
 		regs.h.al = pageNumber;	// physical page number
-		regs.x.bx = pageNumber;	//  logical page number
-		regs.x.dx = emsHandle;
+		regs.w.bx = pageNumber;	//  logical page number
+		regs.w.dx = emsHandle;
 		int86(EMS_INT, &regs, &regs);
 		if (regs.h.ah)
 			return 0;
@@ -180,9 +179,6 @@ static segment_t Z_InitExpandedMemory(void)
 	// 64 kB of expanded memory is mapped
 
 	return emsSegment;
-#else
-	return 0;
-#endif
 }
 
 
@@ -190,12 +186,10 @@ void Z_Shutdown(void)
 {
 	if (emsHandle)
 	{
-#if defined _M_I86
 		union REGS regs;
 		regs.h.ah = EMS_FREEPAGES;
-		regs.x.dx = emsHandle;
+		regs.w.dx = emsHandle;
 		int86(EMS_INT, &regs, &regs);
-#endif
 	}
 }
 
