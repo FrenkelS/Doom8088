@@ -306,8 +306,8 @@ void G_BuildTiccmd(void)
 
 static void G_DoLoadLevel (void)
 {
-    if (_g->wipegamestate == GS_LEVEL)
-        _g->wipegamestate = -1;             // force a wipe
+    if (wipegamestate == GS_LEVEL)
+        wipegamestate = -1;             // force a wipe
 
     _g->gamestate = GS_LEVEL;
 

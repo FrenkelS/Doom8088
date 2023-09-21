@@ -55,9 +55,6 @@ int32_t maketic;
 //d_main.c
 //******************************************************************************
 
-// wipegamestate can be set to -1 to force a wipe on the next draw
-gamestate_t    wipegamestate;
-
 int32_t  demosequence;         // killough 5/2/98: made static
 int32_t  pagetic;
 
@@ -602,6 +599,9 @@ boolean snl_pointeron;
 void InitGlobals();
 
 extern globals_t* _g;
+
+
+extern gamestate_t wipegamestate;
 
 
 extern int32_t showMessages;    // Show messages has default, 0 = off, 1 = on

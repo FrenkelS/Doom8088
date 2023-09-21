@@ -118,6 +118,8 @@ void D_PostEvent(event_t *ev)
 //  draw current display, possibly wiping it from the previous
 //
 
+gamestate_t wipegamestate = GS_DEMOSCREEN; // wipegamestate can be set to -1 to force a wipe on the next draw
+
 static void D_Display (void)
 {
     static gamestate_t oldgamestate = -1;
@@ -128,7 +130,7 @@ static void D_Display (void)
     I_StartDisplay();
 
     // save the current screen if about to wipe
-    boolean wipe = (_g->gamestate != _g->wipegamestate);
+    boolean wipe = (_g->gamestate != wipegamestate);
 
     if (wipe)
         wipe_StartScreen();
@@ -178,7 +180,7 @@ static void D_Display (void)
         HU_Drawer();
     }
 
-    oldgamestate = _g->wipegamestate = _g->gamestate;
+    oldgamestate = wipegamestate = _g->gamestate;
 
     // menus go directly to the screen
     M_Drawer();          // menu is drawn even on top of everything

@@ -134,7 +134,7 @@ static int32_t Get_TextSpeed(void)
                                // with enough time, it's automatic
             _g->finalecount = 0;
             _g->finalestage = true;
-            _g->wipegamestate = -1;         // force a wipe
+            wipegamestate = -1;         // force a wipe
         }
     }
 }
