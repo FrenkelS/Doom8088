@@ -443,13 +443,6 @@ boolean onground; // whether player is on ground or in air
 
 visplane_t *visplanes[MAXVISPLANES];   // killough
 visplane_t *freetail;                  // killough
-visplane_t **freehead;     // killough
-
-
-
-// Clip values are the solid pixel bounding the range.
-//  floorclip starts out SCREENHEIGHT
-//  ceilingclip starts out -1
 
 
 //******************************************************************************
@@ -615,6 +608,7 @@ extern globals_t* _g;
 
 
 extern uint16_t validcount;         // increment every time a check is made
+extern visplane_t **freehead;
 
 
 // These are not used, but should be (menu).

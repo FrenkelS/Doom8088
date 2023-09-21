@@ -364,8 +364,8 @@ void R_ClearPlanes(void)
 
 
     for (int8_t i = 0; i < MAXVISPLANES; i++)    // new code -- killough
-        for (*_g->freehead = _g->visplanes[i], _g->visplanes[i] = NULL; *_g->freehead; )
-            _g->freehead = &(*_g->freehead)->next;
+        for (*freehead = _g->visplanes[i], _g->visplanes[i] = NULL; *freehead; )
+            freehead = &(*freehead)->next;
 
     _g->lastopening = _g->openings;
 

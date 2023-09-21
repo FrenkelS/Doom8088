@@ -121,6 +121,7 @@ int main(int argc, const char * const * argv)
 	Z_Init();                  /* 1/18/98 killough: start up memory stuff first */
 
 	InitGlobals();
+	freehead = &_g->freetail;
 
 	D_DoomMain ();
 	return 0;

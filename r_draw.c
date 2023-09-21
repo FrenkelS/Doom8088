@@ -226,6 +226,7 @@ boolean highDetail = false;
 
 
 uint16_t validcount = 1;         // increment every time a check is made
+visplane_t **freehead;
 
 //*****************************************
 // Constants
@@ -1612,7 +1613,7 @@ static visplane_t *new_visplane(uint32_t hash)
     else
     {
         if (!(_g->freetail = _g->freetail->next))
-            _g->freehead = &_g->freetail;
+            freehead = &_g->freetail;
     }
 
     check->next = _g->visplanes[hash];
