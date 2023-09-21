@@ -81,10 +81,10 @@ static boolean P_CrossSubsector(int32_t num)
         divline_t divl;
 
         // allready checked other side?
-        if(_g->linedata[linenum].validcount == _g->validcount)
+        if(_g->linedata[linenum].validcount == validcount)
             continue;
 
-        _g->linedata[linenum].validcount = _g->validcount;
+        _g->linedata[linenum].validcount = validcount;
 
         if (line->bbox[BOXLEFT] > _g->los.bbox[BOXRIGHT ] ||
                 line->bbox[BOXRIGHT] < _g->los.bbox[BOXLEFT  ] ||
@@ -224,7 +224,7 @@ boolean P_CheckSight(mobj_t *t1, mobj_t *t2)
   // An unobstructed LOS is possible.
   // Now look from eyes of t1 to any part of t2.
 
-  _g->validcount++;
+  validcount++;
 
   _g->los.topslope = (_g->los.bottomslope = t2->z - (_g->los.sightzstart =
                                              t1->z + t1->height -

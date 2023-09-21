@@ -225,6 +225,7 @@ static const lighttable_t* current_colormap_ptr;
 boolean highDetail = false;
 
 
+uint16_t validcount = 1;         // increment every time a check is made
 
 //*****************************************
 // Constants
@@ -1582,11 +1583,11 @@ static void R_AddSprites(subsector_t* subsec, int32_t lightlevel)
   //  subsectors during BSP building.
   // Thus we check whether its already added.
 
-  if (sec->validcount == _g->validcount)
+  if (sec->validcount == validcount)
     return;
 
   // Well, now it will be done.
-  sec->validcount = _g->validcount;
+  sec->validcount = validcount;
 
   // Handle all things in sector.
 
@@ -2865,7 +2866,7 @@ static void R_SetupFrame (player_t *player)
     else
         fixedcolormap = 0;
 
-    _g->validcount++;
+    validcount++;
 
     highDetail = _g->highDetail;
 }

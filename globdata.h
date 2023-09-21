@@ -441,8 +441,6 @@ boolean onground; // whether player is on ground or in air
 //r_hotpatch_iwram.c
 //******************************************************************************
 
-uint16_t validcount;         // increment every time a check is made
-
 visplane_t *visplanes[MAXVISPLANES];   // killough
 visplane_t *freetail;                  // killough
 visplane_t **freehead;     // killough
@@ -614,6 +612,10 @@ boolean snl_pointeron;
 void InitGlobals();
 
 extern globals_t* _g;
+
+
+extern uint16_t validcount;         // increment every time a check is made
+
 
 // These are not used, but should be (menu).
 // Maximum volume of a sound effect.

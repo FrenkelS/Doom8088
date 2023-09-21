@@ -355,7 +355,7 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
 
     list++;     // skip 0 starting delimiter                      // phares
 
-    const int32_t vcount = _g->validcount;
+    const int32_t vcount = validcount;
 
     for ( ; *list != -1 ; list++)                                   // phares
     {
@@ -560,7 +560,7 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
   int32_t     mapxstep, mapystep;
   int32_t     count;
 
-  _g->validcount++;
+  validcount++;
   _g->intercept_p = _g->intercepts;
 
   if (!((x1-_g->bmaporgx)&(MAPBLOCKSIZE-1)))

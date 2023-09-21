@@ -31,8 +31,5 @@ void InitGlobals()
 //r_main.c
 //******************************************************************************
 
-    _g->validcount = 1;         // increment every time a check is made
-
-
     _g->freehead = &_g->freetail;     // killough
 }

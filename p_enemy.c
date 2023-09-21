@@ -90,10 +90,10 @@ static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
   int32_t i;
 
   // wake up all monsters in this sector
-  if (sec->validcount == _g->validcount && sec->soundtraversed <= soundblocks+1)
+  if (sec->validcount == validcount && sec->soundtraversed <= soundblocks+1)
     return;             // already flooded
 
-  sec->validcount = _g->validcount;
+  sec->validcount = validcount;
   sec->soundtraversed = soundblocks+1;
   P_SetTarget(&sec->soundtarget, soundtarget);
 
@@ -127,7 +127,7 @@ static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
 //
 void P_NoiseAlert(mobj_t *emitter)
 {
-  _g->validcount++;
+  validcount++;
   P_RecursiveSound(emitter->subsector->sector, 0, emitter);
 }
 
@@ -502,7 +502,7 @@ static fixed_t P_AvoidDropoff(mobj_t *actor)
 
   // check lines
 
-  _g->validcount++;
+  validcount++;
   for (bx=xl ; bx<=xh ; bx++)
     for (by=yl ; by<=yh ; by++)
       P_BlockLinesIterator(bx, by, PIT_AvoidDropoff);  // all contacted lines

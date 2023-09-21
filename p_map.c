@@ -133,7 +133,7 @@ boolean P_TeleportMove (mobj_t* thing,fixed_t x,fixed_t y, boolean boss)
   _g->tmfloorz = _g->tmdropoffz = newsubsec->sector->floorheight;
   _g->tmceilingz = newsubsec->sector->ceilingheight;
 
-  _g->validcount++;
+  validcount++;
   _g->numspechit = 0;
 
   // stomp on any things contacted
@@ -451,7 +451,7 @@ boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
 
   _g->tmfloorz = _g->tmdropoffz = newsubsec->sector->floorheight;
   _g->tmceilingz = newsubsec->sector->ceilingheight;
-  _g->validcount++;
+  validcount++;
   _g->numspechit = 0;
 
   if ( _g->tmthing->flags & MF_NOCLIP )
@@ -1466,7 +1466,7 @@ void P_CreateSecNodeList(mobj_t* thing)
   _g->tmbbox[BOXRIGHT]  = thing->x + _g->tmthing->radius;
   _g->tmbbox[BOXLEFT]   = thing->x - _g->tmthing->radius;
 
-  _g->validcount++; // used to make sure we only process a line once
+  validcount++; // used to make sure we only process a line once
 
   int32_t xl = (_g->tmbbox[BOXLEFT]   - _g->bmaporgx) >> MAPBLOCKSHIFT;
   int32_t xh = (_g->tmbbox[BOXRIGHT]  - _g->bmaporgx) >> MAPBLOCKSHIFT;
