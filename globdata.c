@@ -17,5 +17,4 @@ void InitGlobals()
 //******************************************************************************
 
     _g->wipegamestate = GS_DEMOSCREEN;
-    _g->oldgamestate  = -1;
 }

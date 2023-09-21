@@ -57,7 +57,6 @@ int32_t maketic;
 
 // wipegamestate can be set to -1 to force a wipe on the next draw
 gamestate_t    wipegamestate;
-gamestate_t oldgamestate;
 
 int32_t  demosequence;         // killough 5/2/98: made static
 int32_t  pagetic;

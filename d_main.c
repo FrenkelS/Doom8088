@@ -120,6 +120,8 @@ void D_PostEvent(event_t *ev)
 
 static void D_Display (void)
 {
+    static gamestate_t oldgamestate = -1;
+
     if (nodrawers)                    // for comparative timing / profiling
         return;
 
@@ -132,7 +134,7 @@ static void D_Display (void)
         wipe_StartScreen();
 
     if (_g->gamestate != GS_LEVEL) { // Not a level
-        switch (_g->oldgamestate)
+        switch (oldgamestate)
         {
             case -1:
             case GS_LEVEL:
@@ -176,7 +178,7 @@ static void D_Display (void)
         HU_Drawer();
     }
 
-    _g->oldgamestate = _g->wipegamestate = _g->gamestate;
+    oldgamestate = _g->wipegamestate = _g->gamestate;
 
     // menus go directly to the screen
     M_Drawer();          // menu is drawn even on top of everything
