@@ -49,14 +49,14 @@
 //
 
 // V_DrawNumPatch - Draws the patch from lump num
-void V_DrawNumPatch(int32_t x, int32_t y, int16_t lump);
-void V_DrawNumPatchNoScale(int32_t x, int32_t y, int16_t lump);
+void V_DrawNumPatch(int16_t x, int16_t y, int16_t lump);
+void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t lump);
 
-void V_DrawPatchNoScale(int32_t x, int32_t y, const patch_t* patch);
+void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch);
 
 
 // V_DrawNamePatch - Draws the patch from lump "name"
-void V_DrawNamePatch(int32_t x, int32_t y, const char *name);
+void V_DrawNamePatch(int16_t x, int16_t y, const char *name);
 
 
 //Cheap mul by 120. Not sure if faster.

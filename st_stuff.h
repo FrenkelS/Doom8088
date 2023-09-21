@@ -115,8 +115,8 @@ typedef struct
 typedef struct
 {
   // center-justified location of icons
-  int32_t     x;
-  int32_t     y;
+  int16_t     x;
+  int16_t     y;
 
   // last icon number
   int32_t     oldinum;

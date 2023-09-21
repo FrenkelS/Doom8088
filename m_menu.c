@@ -106,9 +106,8 @@ static void M_DrawSound(void);
 static void M_DrawLoad(void);
 static void M_DrawSave(void);
 
-static void M_DrawSaveLoadBorder(int32_t x,int32_t y);
 static void M_SetupNextMenu(const menu_t *menudef);
-static void M_DrawThermo(int32_t x,int32_t y,int32_t thermWidth,int32_t thermDot);
+static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot);
 static void M_WriteText(int16_t x, int16_t y, const char *string);
 static int16_t M_StringWidth(const char *string);
 static int16_t M_StringHeight(const char *string);
@@ -1074,10 +1073,10 @@ static void M_StartMessage (const char* string, void (*routine)(int32_t), boolea
 // proff/nicolas 09/20/98 -- changed for hi-res
 // CPhipps - patch drawing updated
 //
-static void M_DrawThermo(int32_t x,int32_t y,int32_t thermWidth,int32_t thermDot )
+static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot )
 {
-    int32_t          xx;
-    int32_t           i;
+    int16_t          xx;
+    int16_t           i;
     /*
    * Modification By Barry Mead to allow the Thermometer to have vastly
    * larger ranges. (the thermWidth parameter can now have a value as
@@ -1086,7 +1085,7 @@ static void M_DrawThermo(int32_t x,int32_t y,int32_t thermWidth,int32_t thermDot
    * be used to improve the dynamic range of music and sound affect
    * volume controls for example.
    */
-    int32_t horizScaler; //Used to allow more thermo range for mouse sensitivity.
+    int16_t horizScaler; //Used to allow more thermo range for mouse sensitivity.
     thermWidth = (thermWidth > 200) ? 200 : thermWidth; //Clamp to 200 max
     horizScaler = (thermWidth > 23) ? (200 / thermWidth) : 8; //Dynamic range
     xx = x;

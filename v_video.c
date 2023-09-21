@@ -50,7 +50,7 @@
  * so the st bar and menus don't look like garbage.
  */
 
-static void V_DrawPatch(int32_t x, int32_t y, const patch_t* patch)
+static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
 {
     y -= patch->topoffset;
     x -= patch->leftoffset;
@@ -137,7 +137,7 @@ static void V_DrawPatch(int32_t x, int32_t y, const patch_t* patch)
 }
 
 
-void V_DrawPatchNoScale(int32_t x, int32_t y, const patch_t* patch)
+void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch)
 {
     y -= patch->topoffset;
     x -= patch->leftoffset;
@@ -151,32 +151,18 @@ void V_DrawPatchNoScale(int32_t x, int32_t y, const patch_t* patch)
     {
         const column_t* column = (const column_t*)((const byte*)patch + patch->columnofs[col]);
 
-        uint32_t odd_addr = (uint32_t)desttop & 1;
-
-        byte* desttop_even = (byte*)((uint32_t)desttop & ~1);
-
         // step through the posts in a column
         while (column->topdelta != 0xff)
         {
             const byte* source = (const byte*)column + 3;
-            byte* dest = desttop_even + (ScreenYToOffset(column->topdelta) << 1);
+            byte* dest = desttop + (ScreenYToOffset(column->topdelta) << 1);
 
-            uint32_t count = column->length;
+            uint16_t count = column->length;
 
             while (count--)
             {
-                uint32_t color = *source++;
-                volatile uint16_t* dest16 = (volatile uint16_t*)dest;
-
-                uint32_t old = *dest16;
-
-                //The GBA must write in 16bits.
-                if (odd_addr)
-                    *dest16 = (old & 0xff) | (color << 8);
-                else
-                    *dest16 = ((color & 0xff) | (old & 0xff00));
-
-                dest += 240;
+                *dest = *source++;
+                dest += (SCREENWIDTH * 2);
             }
 
             column = (const column_t*)((const byte*)column + column->length + 4);
@@ -185,7 +171,7 @@ void V_DrawPatchNoScale(int32_t x, int32_t y, const patch_t* patch)
 }
 
 
-void V_DrawNumPatch(int32_t x, int32_t y, int16_t num)
+void V_DrawNumPatch(int16_t x, int16_t y, int16_t num)
 {
 	const patch_t* patch = W_GetLumpByNum(num);
 	V_DrawPatch(x, y, patch);
@@ -193,7 +179,7 @@ void V_DrawNumPatch(int32_t x, int32_t y, int16_t num)
 }
 
 
-void V_DrawNamePatch(int32_t x, int32_t y, const char *name)
+void V_DrawNamePatch(int16_t x, int16_t y, const char *name)
 {
 	const patch_t* patch = W_GetLumpByName(name);
 	V_DrawPatch(x, y, patch);
@@ -201,7 +187,7 @@ void V_DrawNamePatch(int32_t x, int32_t y, const char *name)
 }
 
 
-void V_DrawNumPatchNoScale(int32_t x, int32_t y, int16_t num)
+void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
 {
 	const patch_t* patch = W_GetLumpByNum(num);
 	V_DrawPatchNoScale(x, y, patch);
