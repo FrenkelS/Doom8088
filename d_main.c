@@ -418,7 +418,7 @@ static void D_DoomMainSetup(void)
     printf("P_Init: Init Playloop state.\n");
     P_Init();
 
-    S_Init(_g->snd_SfxVolume /* *8 */, _g->snd_MusicVolume /* *8*/ );
+    S_Init(snd_SfxVolume /* *8 */, snd_MusicVolume /* *8*/ );
 
     printf("HU_Init: Setting up heads up display.\n");
     HU_Init();

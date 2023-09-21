@@ -494,14 +494,6 @@ spritedef_t *sprites;
 // the set of channels available
 channel_t *channels;
 
-// These are not used, but should be (menu).
-// Maximum volume of a sound effect.
-// Internal default is max out of 0-15.
-int32_t snd_SfxVolume;
-
-// Maximum volume of music. Useless so far.
-int32_t snd_MusicVolume;
-
 // music currently being played
 int32_t mus_playing;
 
@@ -622,5 +614,13 @@ boolean snl_pointeron;
 void InitGlobals();
 
 extern globals_t* _g;
+
+// These are not used, but should be (menu).
+// Maximum volume of a sound effect.
+// Internal default is max out of 0-15.
+extern int32_t snd_SfxVolume;
+
+// Maximum volume of music. Useless so far.
+extern int32_t snd_MusicVolume;
 
 #endif // GLOBAL_DATA_H

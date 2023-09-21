@@ -836,8 +836,8 @@ void G_SaveSettings()
 
     settings.showMessages = _g->showMessages;
 
-    settings.musicVolume = _g->snd_MusicVolume;
-    settings.soundVolume = _g->snd_SfxVolume;
+    settings.musicVolume = snd_MusicVolume;
+    settings.soundVolume = snd_SfxVolume;
 	settings.highDetail = _g->highDetail;
 
     SaveSRAM((byte*)&settings, sizeof(settings), settings_sram_offset);
@@ -856,15 +856,15 @@ void G_LoadSettings()
 
         _g->showMessages = (settings.showMessages > 0) ? 1 : 0;
 
-        _g->snd_SfxVolume = (settings.soundVolume > 15) ? 15 : settings.soundVolume;
-        _g->snd_MusicVolume = (settings.musicVolume > 15) ? 15 : settings.musicVolume;
+        snd_SfxVolume   = (settings.soundVolume > 15) ? 15 : settings.soundVolume;
+        snd_MusicVolume = (settings.musicVolume > 15) ? 15 : settings.musicVolume;
 		_g->highDetail = (settings.highDetail > 0) ? 1 : 0;
 		highDetail = _g->highDetail;
 		
         I_SetPalette(0);
 
-        S_SetSfxVolume(_g->snd_SfxVolume);
-        S_SetMusicVolume(_g->snd_MusicVolume);
+        S_SetSfxVolume(snd_SfxVolume);
+        S_SetMusicVolume(snd_MusicVolume);
     }
 }
 

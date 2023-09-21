@@ -69,6 +69,14 @@
 #define S_STEREO_SWING		(96*0x10000)
 
 
+// These are not used, but should be (menu).
+// Maximum volume of a sound effect.
+// Internal default is max out of 0-15.
+int32_t snd_SfxVolume = 15;
+
+// Maximum volume of music. Useless so far.
+int32_t snd_MusicVolume = 15;
+
 
 // number of channels available
 static const uint32_t numChannels = 8;
@@ -81,7 +89,7 @@ static void S_StopChannel(int32_t cnum);
 
 static void S_StopMusic(void);
 
-static int32_t S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vol, int32_t *sep);
+static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vol, int32_t *sep);
 
 static int32_t S_getChannel(void *origin, const sfxinfo_t *sfxinfo, int32_t is_pickup);
 
@@ -181,8 +189,8 @@ static void S_StartSoundAtVolume(mobj_t *origin, int32_t sfx_id, int32_t volume)
         if (volume < 1)
             return;
 
-        if (volume > _g->snd_SfxVolume)
-            volume = _g->snd_SfxVolume;
+        if (volume > snd_SfxVolume)
+            volume = snd_SfxVolume;
     }
 
     // Check to see if it is audible, modify the params
@@ -222,7 +230,7 @@ static void S_StartSoundAtVolume(mobj_t *origin, int32_t sfx_id, int32_t volume)
 
 void S_StartSound(mobj_t *origin, int32_t sfx_id)
 {
-    S_StartSoundAtVolume(origin, sfx_id, _g->snd_SfxVolume);
+    S_StartSoundAtVolume(origin, sfx_id, snd_SfxVolume);
 }
 
 void S_StartSound2(degenmobj_t* origin, int32_t sfx_id)
@@ -251,7 +259,7 @@ void S_StartSound2(degenmobj_t* origin, int32_t sfx_id)
     fm.origin.x = origin->x;
     fm.origin.y = origin->y;
 
-    S_StartSoundAtVolume((mobj_t*) &fm, sfx_id, _g->snd_SfxVolume);
+    S_StartSoundAtVolume((mobj_t*) &fm, sfx_id, snd_SfxVolume);
 }
 
 void S_StopSound(void *origin)
@@ -306,7 +314,7 @@ void S_UpdateSounds(void)
             if (S_SoundIsPlaying(c->handle))
 			{
 				// initialize parameters
-                int32_t volume = _g->snd_SfxVolume;
+                int32_t volume = snd_SfxVolume;
 
 				if (strcmp("chgun", sfx->name) == 0)
 				{
@@ -319,9 +327,8 @@ void S_UpdateSounds(void)
 					}
 					else
 					{
-                        if (volume > _g->snd_SfxVolume)
-                            volume = _g->snd_SfxVolume;
-
+                        if (volume > snd_SfxVolume)
+                            volume = snd_SfxVolume;
 					}
 				}
 			}
@@ -336,10 +343,12 @@ void S_SetMusicVolume(int32_t volume)
     //jff 1/22/98 return if music is not enabled
     if (nomusicparm)
         return;
-    if (volume < 0 || volume > 15)
+
+    if (!(0 <= volume && volume <= 15))
         I_Error("S_SetMusicVolume: Attempt to set music volume at %ld", volume);
+
     I_SetMusicVolume(volume);
-    _g->snd_MusicVolume = volume;
+    snd_MusicVolume = volume;
 }
 
 
@@ -349,9 +358,11 @@ void S_SetSfxVolume(int32_t volume)
     //jff 1/22/98 return if sound is not enabled
     if (nosfxparm)
         return;
-    if (volume < 0 || volume > 127)
+
+    if (!(0 <= volume && volume <= 127))
         I_Error("S_SetSfxVolume: Attempt to set sfx volume at %ld", volume);
-    _g->snd_SfxVolume = volume;
+
+    snd_SfxVolume = volume;
 }
 
 
@@ -439,13 +450,13 @@ static void S_StopChannel(int32_t cnum)
 // Otherwise, modifies parameters and returns 1.
 //
 
-static int32_t S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vol, int32_t *sep)
+static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vol, int32_t *sep)
 {
 	fixed_t adx, ady,approx_dist;
 
 	//jff 1/22/98 return if sound is not enabled
 	if (nosfxparm)
-		return 0;
+		return false;
 
 	// e6y
 	// Fix crash when the program wants to S_AdjustSoundParams() for player
@@ -462,7 +473,7 @@ static int32_t S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vo
 	// http://competn.doom2.net/pub/compet-n/doom/coop/movies/e1cmnet3.zip
 	
 	if (!listener)
-		return 0;
+		return false;
 
 	// calculate the distance to sound origin
 	// and clip it if necessary
@@ -474,12 +485,12 @@ static int32_t S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vo
 
 	if (!approx_dist)  // killough 11/98: handle zero-distance as special case
 	{
-        *vol = _g->snd_SfxVolume;
+        *vol = snd_SfxVolume;
 		return *vol > 0;
 	}
 	
 	if (approx_dist > S_CLIPPING_DIST)
-		return 0;
+		return false;
 	
 
     // angle of source to listener
@@ -497,10 +508,10 @@ static int32_t S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vo
 
 	// volume calculation
 	if (approx_dist < S_CLOSE_DIST)
-        *vol = _g->snd_SfxVolume*8;
+        *vol = snd_SfxVolume*8;
 	else
 		// distance effect
-        *vol = (_g->snd_SfxVolume * ((S_CLIPPING_DIST-approx_dist)>>FRACBITS) * 8) / S_ATTENUATOR;
+        *vol = (snd_SfxVolume * ((S_CLIPPING_DIST-approx_dist)>>FRACBITS) * 8) / S_ATTENUATOR;
 	
 	return (*vol > 0);
 }
@@ -548,5 +559,3 @@ static int32_t S_getChannel(void *origin, const sfxinfo_t *sfxinfo, int32_t is_p
     c->is_pickup = is_pickup;         // killough 4/25/98
     return cnum;
 }
-
-
