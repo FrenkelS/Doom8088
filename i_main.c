@@ -74,32 +74,24 @@ static void I_Init(void)
 }
 
 
-static void SetTextPos(int32_t x, int32_t y)
+static void tprintf(void)
 {
 	union REGS regs;
-	regs.h.ah = 2;
-	regs.h.bh = 0;
-	regs.h.dh = y;
-	regs.h.dl = x;
-	int86(0x10, &regs, &regs);
-}
 
+	char* msg = "                          DOOM8088 System Startup                           ";
 
-static void tprintf(char *msg)
-{
-	union REGS regs;
-int x = 0;
-	for (uint8_t i = 0; i < strlen(msg); i++)
+	for (int_fast8_t i = 0; i < strlen(msg); )
 	{
 		regs.h.ah = 9;
 		regs.h.al = msg[i];
-		regs.h.ch = 0;
-		regs.h.cl = 1;
-		regs.h.bl = (7 << 4) | 4;
-		regs.h.bh = 0;
+		regs.w.cx = 1;
+		regs.w.bx = (7 << 4) | 4;
 		int86(0x10, &regs, &regs);
 
-		SetTextPos(++x, 0);
+		regs.h.ah = 2;
+		regs.h.bh = 0;
+		regs.w.dx = ++i;
+		int86(0x10, &regs, &regs);
 	}
 
 	printf("\n");
@@ -116,7 +108,7 @@ int main(int argc, const char * const * argv)
 	/* cphipps - call to video specific startup code */
 	I_InitScreen();
 
-	tprintf("                          DOOM8088 System Startup                           ");
+	tprintf();
 
 	//Call this before Z_Init as maxmod uses malloc.
 	I_Init();
