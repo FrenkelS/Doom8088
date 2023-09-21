@@ -59,6 +59,10 @@
 
 #include "globdata.h"
 
+
+int32_t showMessages;
+
+
 static void (*messageRoutine)(int32_t response);
 
 // we are going to be entering a savegame string
@@ -509,7 +513,7 @@ static void M_DrawOptions(void)
   // proff/nicolas 09/20/98 -- changed for hi-res
   V_DrawNamePatch(108, 15, "M_OPTTTL");
 
-  V_DrawNamePatch(OptionsDef.x + 120, OptionsDef.y+LINEHEIGHT*messages, msgNames[_g->showMessages]);
+  V_DrawNamePatch(OptionsDef.x + 120, OptionsDef.y+LINEHEIGHT*messages, msgNames[showMessages]);
 
   V_DrawNamePatch(OptionsDef.x + 146, OptionsDef.y+LINEHEIGHT*alwaysrun, msgNames[_g->alwaysRun]);
 
@@ -654,12 +658,9 @@ static void M_ChangeMessages(int32_t choice)
 {
   UNUSED(choice);
 
-  _g->showMessages = 1 - _g->showMessages;
+  showMessages = 1 - showMessages;
 
-  if (!_g->showMessages)
-    _g->player.message = MSGOFF; // Ty 03/27/98 - externalized
-  else
-    _g->player.message = MSGON ; // Ty 03/27/98 - externalized
+  _g->player.message = showMessages ? MSGON : MSGOFF;
 
   _g->message_dontfuckwithme = true;
 

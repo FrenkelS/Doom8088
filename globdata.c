@@ -18,11 +18,4 @@ void InitGlobals()
 
     _g->wipegamestate = GS_DEMOSCREEN;
     _g->oldgamestate  = -1;
-
-
-//******************************************************************************
-//m_menu.c
-//******************************************************************************
-
-    _g->showMessages = 0;    // Show messages has default, 0 = off, 1 = on
 }

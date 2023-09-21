@@ -170,8 +170,6 @@ uint32_t cheat_buffer;
 //
 // defaulted values
 //
-int32_t showMessages;    // Show messages has default, 0 = off, 1 = on
-
 int32_t alwaysRun;
 
 int32_t highDetail;
@@ -605,6 +603,9 @@ boolean snl_pointeron;
 void InitGlobals();
 
 extern globals_t* _g;
+
+
+extern int32_t showMessages;    // Show messages has default, 0 = off, 1 = on
 
 
 extern uint16_t validcount;         // increment every time a check is made

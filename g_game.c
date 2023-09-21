@@ -834,7 +834,7 @@ void G_SaveSettings()
     settings.gamma = _g->gamma;
     settings.alwaysRun = _g->alwaysRun;
 
-    settings.showMessages = _g->showMessages;
+    settings.showMessages = showMessages;
 
     settings.musicVolume = snd_MusicVolume;
     settings.soundVolume = snd_SfxVolume;
@@ -854,7 +854,7 @@ void G_LoadSettings()
         _g->gamma = (settings.gamma > 5) ? 5 : settings.gamma;
         _g->alwaysRun = (settings.alwaysRun > 0) ? 1 : 0;
 
-        _g->showMessages = (settings.showMessages > 0) ? 1 : 0;
+        showMessages = (settings.showMessages > 0) ? 1 : 0;
 
         snd_SfxVolume   = (settings.soundVolume > 15) ? 15 : settings.soundVolume;
         snd_MusicVolume = (settings.musicVolume > 15) ? 15 : settings.musicVolume;

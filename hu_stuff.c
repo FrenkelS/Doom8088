@@ -428,7 +428,7 @@ void HU_Ticker(void)
 
     // if messages on, or "Messages Off" is being displayed
     // this allows the notification of turning messages off to be seen
-    if (_g->showMessages || _g->message_dontfuckwithme)
+    if (showMessages || _g->message_dontfuckwithme)
     {
         // display message if necessary
         if (plr->message)
