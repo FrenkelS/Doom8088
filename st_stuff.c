@@ -193,6 +193,10 @@
 #define RADIATIONPAL            13
 
 
+// used to use appopriately pained face
+static int32_t      st_oldhealth = -1;
+
+
 //
 // STATUS BAR CODE
 //
@@ -297,7 +301,7 @@ static void ST_updateFaceWidget(void)
 			// haleyjd 10/12/03: classic DOOM problem of missing OUCH face
 			// was due to inversion of this test:
 			// if(plyr->health - st_oldhealth > ST_MUCHPAIN)
-            if(_g->st_oldhealth - _g->player.health > ST_MUCHPAIN)
+            if(st_oldhealth - _g->player.health > ST_MUCHPAIN)
 			{
 				_g->st_facecount = ST_TURNCOUNT;
 				_g->st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
@@ -352,7 +356,7 @@ static void ST_updateFaceWidget(void)
             // haleyjd 10/12/03: classic DOOM problem of missing OUCH face
             // was due to inversion of this test:
             // if(plyr->health - st_oldhealth > ST_MUCHPAIN)
-            if(_g->st_oldhealth - _g->player.health > ST_MUCHPAIN)
+            if(st_oldhealth - _g->player.health > ST_MUCHPAIN)
             {
                 priority = 7;
                 _g->st_facecount = ST_TURNCOUNT;
@@ -450,7 +454,7 @@ void ST_Ticker(void)
 {
   _g->st_randomnumber = M_Random();
   ST_updateWidgets();
-  _g->st_oldhealth = _g->player.health;
+  st_oldhealth = _g->player.health;
 }
 
 
@@ -761,7 +765,7 @@ static void ST_initData(void)
     _g->st_faceindex = 0;
     _g->st_palette = -1;
 
-    _g->st_oldhealth = -1;
+    st_oldhealth = -1;
 
     for (i=0;i<NUMWEAPONS;i++)
         _g->oldweaponsowned[i] = _g->player.weaponowned[i];

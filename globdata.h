@@ -553,9 +553,6 @@ st_number_t w_maxammo[4];
 // armor widget
 st_number_t  st_armor;
 
-// used to use appopriately pained face
-int32_t      st_oldhealth;
-
 // used for evil grin
 boolean  oldweaponsowned[NUMWEAPONS];
 
