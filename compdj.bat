@@ -16,7 +16,6 @@ set CFLAGS=-march=i386
 @set GLOBOBJS=%GLOBOBJS% f_finale.c
 @set GLOBOBJS=%GLOBOBJS% f_wipe.c
 @set GLOBOBJS=%GLOBOBJS% g_game.c
-@set GLOBOBJS=%GLOBOBJS% globdata.c
 @set GLOBOBJS=%GLOBOBJS% hu_stuff.c
 @set GLOBOBJS=%GLOBOBJS% i_audio.c
 @set GLOBOBJS=%GLOBOBJS% i_main.c

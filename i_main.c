@@ -63,6 +63,10 @@
 #include <string.h>
 
 
+static globals_t globals;
+globals_t* _g = &globals;
+
+
 static void I_Init(void)
 {
 	if (!(nomusicparm && nosfxparm))
@@ -120,7 +124,8 @@ int main(int argc, const char * const * argv)
 	printf("Z_Init: Init zone memory allocation daemon.\n");
 	Z_Init();                  /* 1/18/98 killough: start up memory stuff first */
 
-	InitGlobals();
+	//InitGlobals
+	memset(_g, 0, sizeof(globals_t));
 	freehead = &_g->freetail;
 
 	D_DoomMain ();

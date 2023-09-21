@@ -596,7 +596,6 @@ boolean snl_pointeron;
 
 } globals_t;
 
-void InitGlobals();
 
 extern globals_t* _g;
 

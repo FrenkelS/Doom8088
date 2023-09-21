@@ -44,7 +44,6 @@ GLOBOBJS = &
  f_finale.obj &
  f_wipe.obj &
  g_game.obj &
- globdata.obj &
  hu_stuff.obj &
  i_audio.obj &
  i_main.obj &
