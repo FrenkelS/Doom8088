@@ -42,6 +42,11 @@
 
 #include "globdata.h"
 
+
+// the list of ceilings moving currently, including crushers
+static ceilinglist_t *activeceilings;
+
+
 static void P_RemoveActiveCeiling(ceiling_t* ceiling);
 
 /////////////////////////////////////////////////////////////////
@@ -373,7 +378,7 @@ boolean P_ActivateInStasisCeiling(const line_t *line)
   ceilinglist_t *cl;
   boolean rtn=false;
 
-  for (cl=_g->activeceilings; cl; cl=cl->next)
+  for (cl=activeceilings; cl; cl=cl->next)
   {
     ceiling_t *ceiling = cl->ceiling;
     if (ceiling->tag == line->tag && ceiling->direction == 0)
@@ -400,7 +405,7 @@ boolean EV_CeilingCrushStop(const line_t* line)
   boolean rtn=false;
 
   ceilinglist_t *cl;
-  for (cl=_g->activeceilings; cl; cl=cl->next)
+  for (cl=activeceilings; cl; cl=cl->next)
   {
     ceiling_t *ceiling = cl->ceiling;
     if (ceiling->direction != 0 && ceiling->tag == line->tag)
@@ -424,9 +429,9 @@ boolean EV_CeilingCrushStop(const line_t* line)
 //
 void P_AddActiveCeiling(ceiling_t* ceiling)
 {
-    ceilinglist_t *old_head = _g->activeceilings;
+    ceilinglist_t *old_head = activeceilings;
 
-    ceilinglist_t *list = _g->activeceilings = Z_MallocLevel(sizeof *list, (void **)&_g->activeceilings);
+    ceilinglist_t *list = activeceilings = Z_MallocLevel(sizeof *list, (void **)&activeceilings);
     list->ceiling = ceiling;
     ceiling->list = list;
 
@@ -466,10 +471,10 @@ static void P_RemoveActiveCeiling(ceiling_t* ceiling)
 //
 void P_RemoveAllActiveCeilings(void)
 {
-  while (_g->activeceilings)
+  while (activeceilings)
   {
-    ceilinglist_t *next = _g->activeceilings->next;
-    Z_Free(_g->activeceilings);
-    _g->activeceilings = next;
+    ceilinglist_t *next = activeceilings->next;
+    Z_Free(activeceilings);
+    activeceilings = next;
   }
 }
