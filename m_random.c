@@ -72,21 +72,22 @@ static const uint8_t rndtable[256] = {
 };
 
 
+static uint8_t	rndindex;
+static uint8_t	prndindex;
+
 
 // Which one is deterministic?
-int32_t P_Random (void)
+int16_t P_Random (void)
 {
-    _g->prndindex = (_g->prndindex+1)&0xff;
-    return rndtable[_g->prndindex];
+    return rndtable[++prndindex];
 }
 
-int32_t M_Random (void)
+int16_t M_Random (void)
 {
-    _g->rndindex = (_g->rndindex+1)&0xff;
-    return rndtable[_g->rndindex];
+    return rndtable[++rndindex];
 }
 
 void M_ClearRandom (void)
 {
-    _g->rndindex = _g->prndindex = 0;
+    rndindex = prndindex = 0;
 }
