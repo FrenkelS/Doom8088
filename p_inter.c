@@ -545,7 +545,7 @@ static void P_KillMobj(mobj_t *source, mobj_t *target)
       _g->player.playerstate = PST_DEAD;
       P_DropWeapon (&_g->player);
 
-      if (_g->automapmode & am_active)
+      if (automapmode & am_active)
         AM_Stop();    // don't die in auto map; switch view prior to dying
     }
 

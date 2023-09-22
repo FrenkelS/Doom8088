@@ -68,7 +68,7 @@ void F_StartFinale (void)
 {
     _g->gameaction = ga_nothing;
     _g->gamestate = GS_FINALE;
-    _g->automapmode &= ~am_active;
+    automapmode &= ~am_active;
 
     // killough 3/28/98: clear accelerative text flags
     _g->acceleratestage = _g->midstage = false;

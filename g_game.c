@@ -360,7 +360,7 @@ boolean G_Responder (event_t* ev)
         // Don't suck up keys, which may be cheats
         if(_g->gamestate == GS_DEMOSCREEN)
         {
-            if(!(_g->automapmode & am_active))
+            if(!(automapmode & am_active))
             {
                 if(ev->type == ev_keydown)
                 {
@@ -606,7 +606,7 @@ static void G_DoCompleted (void)
     if (_g->playeringame)
         G_PlayerFinishLevel();        // take away cards and stuff
 
-    if (_g->automapmode & am_active)
+    if (automapmode & am_active)
         AM_Stop();
 
     if (_g->gamemap == 9) // kilough 2/7/98
@@ -650,7 +650,7 @@ static void G_DoCompleted (void)
     _g->wminfo.totaltimes = (_g->totalleveltimes += (_g->leveltime - _g->leveltime%35));
 
     _g->gamestate = GS_INTERMISSION;
-    _g->automapmode &= ~am_active;
+    automapmode &= ~am_active;
 
     // lmpwatch.pl engine-side demo testing support
     // print "FINISHED: <mapname>" when the player exits the current map
@@ -920,7 +920,7 @@ static void G_InitNew(skill_t skill, int32_t map)
     _g->player.playerstate = PST_REBORN;
 
     _g->usergame = true;                // will be set false if a demo
-    _g->automapmode &= ~am_active;
+    automapmode &= ~am_active;
     _g->gamemap = map;
     _g->gameskill = skill;
 

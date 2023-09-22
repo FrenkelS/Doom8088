@@ -55,6 +55,9 @@
 #include "globdata.h"
 
 
+enum automapmode_e automapmode; // Mode that the automap is in
+
+
 static const uint8_t mapcolor_back = 247;    // map background
 static const uint8_t mapcolor_wall = 23;    // normal 1s wall color
 static const uint8_t mapcolor_fchg = 55;    // line at floor height change color
@@ -245,7 +248,7 @@ static void AM_changeWindowLoc(void)
 {
     if (m_paninc.x || m_paninc.y)
     {
-        _g->automapmode &= ~am_follow;
+        automapmode &= ~am_follow;
         f_oldloc.x = INT32_MAX;
     }
 
@@ -280,7 +283,7 @@ static void AM_initVariables(void)
 {
     static const event_t st_notify = { ev_keyup, AM_MSGENTERED, 0, 0 };
 
-    _g->automapmode |= am_active;
+    automapmode |= am_active;
 
     f_oldloc.x = INT32_MAX;
 
@@ -328,7 +331,7 @@ void AM_Stop (void)
 {
     static const event_t st_notify = { 0, ev_keyup, AM_MSGEXITED, 0 };
 
-    _g->automapmode  = 0;
+    automapmode  = 0;
     ST_Responder(&st_notify);
     stopped = true;
 }
@@ -404,7 +407,7 @@ boolean AM_Responder
 
     rc = false;
 
-    if (!(_g->automapmode & am_active))
+    if (!(automapmode & am_active))
     {
         if (ev->type == ev_keydown && ev->data1 == key_map)         // phares
         {
@@ -418,38 +421,38 @@ boolean AM_Responder
         ch = ev->data1;                                             // phares
 
         if (ch == key_map_right)                                    //    |
-            if (!(_g->automapmode & am_follow))                           //    V
+            if (!(automapmode & am_follow))                           //    V
                 m_paninc.x = FTOM(F_PANINC);
             else
                 rc = false;
         else if (ch == key_map_left)
-            if (!(_g->automapmode & am_follow))
+            if (!(automapmode & am_follow))
                 m_paninc.x = -FTOM(F_PANINC);
             else
                 rc = false;
         else if (ch == key_map_up)
-            if (!(_g->automapmode & am_follow))
+            if (!(automapmode & am_follow))
                 m_paninc.y = FTOM(F_PANINC);
             else
                 rc = false;
         else if (ch == key_map_down)
-            if (!(_g->automapmode & am_follow))
+            if (!(automapmode & am_follow))
                 m_paninc.y = -FTOM(F_PANINC);
             else
                 rc = false;
         else if (ch == key_map)
         {
-            if(_g->automapmode & am_overlay)
+            if(automapmode & am_overlay)
                 AM_Stop ();
             else
-                _g->automapmode |= (am_overlay | am_rotate | am_follow);
+                automapmode |= (am_overlay | am_rotate | am_follow);
         }
         else if (ch == key_map_follow && _g->gamekeydown[key_use])
         {
-            _g->automapmode ^= am_follow;     // CPhipps - put all automap mode stuff into one enum
+            automapmode ^= am_follow;     // CPhipps - put all automap mode stuff into one enum
             f_oldloc.x = INT32_MAX;
             // Ty 03/27/98 - externalized
-            _g->player.message = (_g->automapmode & am_follow) ? AMSTR_FOLLOWON : AMSTR_FOLLOWOFF;
+            _g->player.message = (automapmode & am_follow) ? AMSTR_FOLLOWON : AMSTR_FOLLOWOFF;
         }                                                         //    |
         else if (ch == key_map_zoomout)
         {
@@ -472,22 +475,22 @@ boolean AM_Responder
         ch = ev->data1;
         if (ch == key_map_right)
         {
-            if (!(_g->automapmode & am_follow))
+            if (!(automapmode & am_follow))
                 m_paninc.x = 0;
         }
         else if (ch == key_map_left)
         {
-            if (!(_g->automapmode & am_follow))
+            if (!(automapmode & am_follow))
                 m_paninc.x = 0;
         }
         else if (ch == key_map_up)
         {
-            if (!(_g->automapmode & am_follow))
+            if (!(automapmode & am_follow))
                 m_paninc.y = 0;
         }
         else if (ch == key_map_down)
         {
-            if (!(_g->automapmode & am_follow))
+            if (!(automapmode & am_follow))
                 m_paninc.y = 0;
         }
         else if ((ch == key_map_zoomout) || (ch == key_map_zoomin))
@@ -579,10 +582,10 @@ static void AM_doFollowPlayer(void)
 //
 void AM_Ticker (void)
 {
-    if (!(_g->automapmode & am_active))
+    if (!(automapmode & am_active))
         return;
 
-    if (_g->automapmode & am_follow)
+    if (automapmode & am_follow)
         AM_doFollowPlayer();
 
     // Change the zoom if necessary
@@ -921,7 +924,7 @@ static void AM_drawWalls(void)
 
         const uint32_t line_special =  LN_SPECIAL(&_g->lines[i]);
 
-        if (_g->automapmode & am_rotate)
+        if (automapmode & am_rotate)
         {
             AM_rotate(&l.a.x, &l.a.y, ANG90-_g->player.mo->angle, _g->player.mo->x, _g->player.mo->y);
             AM_rotate(&l.b.x, &l.b.y, ANG90-_g->player.mo->angle, _g->player.mo->x, _g->player.mo->y);
@@ -1046,7 +1049,7 @@ static void AM_drawLineCharacter(angle_t angle, fixed_t x, fixed_t y)
     int32_t   i;
     mline_t l;
 
-    if (_g->automapmode & am_rotate) angle -= _g->player.mo->angle - ANG90; // cph
+    if (automapmode & am_rotate) angle -= _g->player.mo->angle - ANG90; // cph
 
     for (i=0;i<NUMPLYRLINES;i++)
     {
@@ -1111,9 +1114,9 @@ static void V_FillRect(void)
 void AM_Drawer (void)
 {
     // CPhipps - all automap modes put into one enum
-    if (!(_g->automapmode & am_active)) return;
+    if (!(automapmode & am_active)) return;
 
-    if (!(_g->automapmode & am_overlay)) // cph - If not overlay mode, clear background for the automap
+    if (!(automapmode & am_overlay)) // cph - If not overlay mode, clear background for the automap
         V_FillRect(); //jff 1/5/98 background default color
 
     AM_drawWalls();

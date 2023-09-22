@@ -38,13 +38,6 @@ typedef struct globals_t
 #define GLOBAL_DEFS_H
 
 //******************************************************************************
-//am_map.c
-//******************************************************************************
-
-enum automapmode_e automapmode; // Mode that the automap is in
-
-
-//******************************************************************************
 //d_client.c
 //******************************************************************************
 
@@ -598,6 +591,9 @@ boolean snl_pointeron;
 
 
 extern globals_t* _g;
+
+
+extern enum automapmode_e automapmode;
 
 
 extern gamestate_t wipegamestate;

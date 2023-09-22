@@ -305,7 +305,7 @@ static void HUlib_drawSText(hu_stext_t* s)
 void HU_Drawer(void)
 {
     // draw the automap widgets if automap is displayed
-    if (_g->automapmode & am_active)
+    if (automapmode & am_active)
     {
         // map title
         HUlib_drawTextLine(&_g->w_title);

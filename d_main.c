@@ -166,13 +166,13 @@ static void D_Display (void)
         HU_Erase();
 
         // Work out if the player view is visible, and if there is a border
-        boolean viewactive = (!(_g->automapmode & am_active) || (_g->automapmode & am_overlay));
+        boolean viewactive = (!(automapmode & am_active) || (automapmode & am_overlay));
 
         // Now do the drawing
         if (viewactive)
             R_RenderPlayerView (&_g->player);
 
-        if (_g->automapmode & am_active)
+        if (automapmode & am_active)
             AM_Drawer();
 
         ST_Drawer();
