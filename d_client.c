@@ -63,6 +63,9 @@
 #include "globdata.h"
 
 
+int32_t maketic;
+
+
 void D_InitNetGame (void)
 {
     _g->playeringame = true;
@@ -77,11 +80,11 @@ void D_BuildNewTiccmds(void)
     while (newtics--)
     {
         I_StartTic();
-        if (_g->maketic - _g->gametic > 3)
+        if (maketic - _g->gametic > 3)
             break;
 
         G_BuildTiccmd();
-        _g->maketic++;
+        maketic++;
     }
 }
 
@@ -96,7 +99,7 @@ void TryRunTics (void)
 
         D_BuildNewTiccmds();
 
-        runtics = (_g->maketic) - _g->gametic;
+        runtics = maketic - _g->gametic;
         if (runtics <= 0)
         {
             if (I_GetTime() - entertime > 10)

@@ -225,7 +225,7 @@ static void D_DoomLoop(void)
             G_Ticker ();
 
             _g->gametic++;
-            _g->maketic++;
+            maketic++;
         }
         else
             TryRunTics (); // will run at least one tic
