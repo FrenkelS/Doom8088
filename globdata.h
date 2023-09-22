@@ -589,9 +589,6 @@ extern globals_t* _g;
 extern enum automapmode_e automapmode;
 
 
-extern int32_t maketic;
-
-
 extern gamestate_t wipegamestate;
 
 

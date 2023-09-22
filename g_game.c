@@ -47,7 +47,6 @@
 #endif
 
 #include "d_player.h"
-#include "d_net.h"
 #include "f_finale.h"
 #include "doomtype.h"
 #include "m_menu.h"

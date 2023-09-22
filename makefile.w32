@@ -27,7 +27,6 @@ CCOPTS = -omaxtnrih -ol+ -oe=32 -zp1 -3r -j -zq -zc -wx -za99
 
 GLOBOBJS = &
  am_map.obj &
- d_client.obj &
  d_items.obj &
  d_main.obj &
  f_finale.obj &

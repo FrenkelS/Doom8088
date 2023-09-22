@@ -10,7 +10,6 @@ set CFLAGS=-march=i386
 
 @set GLOBOBJS=
 @set GLOBOBJS=%GLOBOBJS% am_map.c
-@set GLOBOBJS=%GLOBOBJS% d_client.c
 @set GLOBOBJS=%GLOBOBJS% d_items.c
 @set GLOBOBJS=%GLOBOBJS% d_main.c
 @set GLOBOBJS=%GLOBOBJS% f_finale.c

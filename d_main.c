@@ -47,7 +47,6 @@
 #include "doomdef.h"
 #include "doomtype.h"
 #include "d_player.h"
-#include "d_net.h"
 #include "d_englsh.h"
 #include "sounds.h"
 #include "z_zone.h"
@@ -85,6 +84,8 @@ const boolean nomusicparm = true;
 const boolean nodrawers = false;
 
 
+static int32_t maketic;
+
 /*
  * D_PostEvent - Event handling
  *
@@ -110,6 +111,24 @@ void D_PostEvent(event_t *ev)
              ) ||
             G_Responder(ev);
 
+}
+
+
+static void D_BuildNewTiccmds(void)
+{
+    static int32_t lastmadetic = 0;
+    int32_t newtics = I_GetTime() - lastmadetic;
+    lastmadetic += newtics;
+
+    while (newtics--)
+    {
+        I_StartTic();
+        if (maketic - _g->gametic > 3)
+            break;
+
+        G_BuildTiccmd();
+        maketic++;
+    }
 }
 
 
@@ -194,6 +213,45 @@ static void D_Display (void)
         // wipe update
         D_Wipe();
 }
+
+
+//? how many ticks to run?
+static void TryRunTics (void)
+{
+    int32_t runtics;
+    int32_t entertime = I_GetTime();
+
+    // Wait for tics to run
+    while (1)
+    {
+
+        D_BuildNewTiccmds();
+
+        runtics = maketic - _g->gametic;
+        if (runtics <= 0)
+        {
+            if (I_GetTime() - entertime > 10)
+            {
+                M_Ticker();
+                return;
+            }
+        }
+        else
+            break;
+    }
+
+    while (runtics-- > 0)
+    {
+
+        if (_g->advancedemo)
+            D_DoAdvanceDemo ();
+
+        M_Ticker ();
+        G_Ticker ();
+        _g->gametic++;
+    }
+}
+
 
 //
 //  D_DoomLoop()
@@ -392,6 +450,12 @@ static int16_t M_CheckParm(char *check)
 			return i;
 
 	return 0;
+}
+
+
+static void D_InitNetGame (void)
+{
+    _g->playeringame = true;
 }
 
 
