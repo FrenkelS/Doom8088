@@ -42,6 +42,18 @@
 #include "globdata.h"
 
 
+typedef struct {
+  fixed_t sightzstart, t2x, t2y;   // eye z of looker
+  divline_t strace;                // from t1 to t2
+  fixed_t topslope, bottomslope;   // slopes to top and bottom of target
+  fixed_t bbox[4];
+  fixed_t maxz,minz;               // cph - z optimisations for 2sided lines
+} los_t;
+
+
+static los_t los;
+
+
 //
 // P_DivlineSide
 // Returns side 0 (front), 1 (back), or 2 (on).
@@ -86,10 +98,10 @@ static boolean P_CrossSubsector(int32_t num)
 
         _g->linedata[linenum].validcount = validcount;
 
-        if (line->bbox[BOXLEFT] > _g->los.bbox[BOXRIGHT ] ||
-                line->bbox[BOXRIGHT] < _g->los.bbox[BOXLEFT  ] ||
-                line->bbox[BOXBOTTOM] > _g->los.bbox[BOXTOP   ] ||
-                line->bbox[BOXTOP]    < _g->los.bbox[BOXBOTTOM])
+        if (line->bbox[BOXLEFT]  > los.bbox[BOXRIGHT ] ||
+           line->bbox[BOXRIGHT]  < los.bbox[BOXLEFT  ] ||
+           line->bbox[BOXBOTTOM] > los.bbox[BOXTOP   ] ||
+           line->bbox[BOXTOP]    < los.bbox[BOXBOTTOM])
             continue;
 
         // cph - do what we can before forced to check intersection
@@ -110,7 +122,7 @@ static boolean P_CrossSubsector(int32_t num)
                         front->floorheight : back->floorheight ;
 
             // cph - reject if does not intrude in the z-space of the possible LOS
-            if ((opentop >= _g->los.maxz) && (openbottom <= _g->los.minz))
+            if ((opentop >= los.maxz) && (openbottom <= los.minz))
                 continue;
         }
 
@@ -120,43 +132,43 @@ static boolean P_CrossSubsector(int32_t num)
         v1 = &line->v1;
         v2 = &line->v2;
 
-        if (P_DivlineSide(v1->x, v1->y, &_g->los.strace) == P_DivlineSide(v2->x, v2->y, &_g->los.strace))
+        if (P_DivlineSide(v1->x, v1->y, &los.strace) == P_DivlineSide(v2->x, v2->y, &los.strace))
             continue;
 
         divl.dx = v2->x - (divl.x = v1->x);
         divl.dy = v2->y - (divl.y = v1->y);
 
         // line isn't crossed?
-        if (P_DivlineSide(_g->los.strace.x, _g->los.strace.y, &divl) == P_DivlineSide(_g->los.t2x, _g->los.t2y, &divl))
+        if (P_DivlineSide(los.strace.x, los.strace.y, &divl) == P_DivlineSide(los.t2x, los.t2y, &divl))
             continue;
 
 
         // cph - if bottom >= top or top < minz or bottom > maxz then it must be
         // solid wrt this LOS
         if (!(line->flags & ML_TWOSIDED) || (openbottom >= opentop) ||
-                (opentop < _g->los.minz) || (openbottom > _g->los.maxz))
+                (opentop < los.minz) || (openbottom > los.maxz))
             return false;
 
         // crosses a two sided line
         /* cph 2006/07/15 - oops, we missed this in 2.4.0 & .1;
        *  use P_InterceptVector2 for those compat levels only. */
-        fixed_t frac = P_InterceptVector2(&_g->los.strace, &divl);
+        fixed_t frac = P_InterceptVector2(&los.strace, &divl);
 
         if (front->floorheight != back->floorheight)
         {
-            fixed_t slope = FixedDiv(openbottom - _g->los.sightzstart , frac);
-            if (slope > _g->los.bottomslope)
-                _g->los.bottomslope = slope;
+            fixed_t slope = FixedDiv(openbottom - los.sightzstart , frac);
+            if (slope > los.bottomslope)
+                los.bottomslope = slope;
         }
 
         if (front->ceilingheight != back->ceilingheight)
         {
-            fixed_t slope = FixedDiv(opentop - _g->los.sightzstart , frac);
-            if (slope < _g->los.topslope)
-                _g->los.topslope = slope;
+            fixed_t slope = FixedDiv(opentop - los.sightzstart , frac);
+            if (slope < los.topslope)
+                los.topslope = slope;
         }
 
-        if (_g->los.topslope <= _g->los.bottomslope)
+        if (los.topslope <= los.bottomslope)
             return false;               // stop
 
     }
@@ -178,8 +190,8 @@ static boolean P_CrossBSPNode(int32_t bspnum)
         dl.dy = ((fixed_t)bsp->dy << FRACBITS);
 
         int32_t side,side2;
-        side = P_DivlineSide(_g->los.strace.x,_g->los.strace.y,&dl)&1;
-        side2= P_DivlineSide(_g->los.t2x, _g->los.t2y, &dl);
+        side = P_DivlineSide(los.strace.x,los.strace.y,&dl)&1;
+        side2= P_DivlineSide(los.t2x, los.t2y, &dl);
 
         if (side == side2)
             bspnum = bsp->children[side]; // doesn't touch the other side
@@ -226,24 +238,24 @@ boolean P_CheckSight(mobj_t *t1, mobj_t *t2)
 
   validcount++;
 
-  _g->los.topslope = (_g->los.bottomslope = t2->z - (_g->los.sightzstart =
+  los.topslope = (los.bottomslope = t2->z - (los.sightzstart =
                                              t1->z + t1->height -
                                              (t1->height>>2))) + t2->height;
-  _g->los.strace.dx = (_g->los.t2x = t2->x) - (_g->los.strace.x = t1->x);
-  _g->los.strace.dy = (_g->los.t2y = t2->y) - (_g->los.strace.y = t1->y);
+  los.strace.dx = (los.t2x = t2->x) - (los.strace.x = t1->x);
+  los.strace.dy = (los.t2y = t2->y) - (los.strace.y = t1->y);
 
   if (t1->x > t2->x)
-    _g->los.bbox[BOXRIGHT] = t1->x, _g->los.bbox[BOXLEFT] = t2->x;
+    los.bbox[BOXRIGHT] = t1->x, los.bbox[BOXLEFT] = t2->x;
   else
-    _g->los.bbox[BOXRIGHT] = t2->x, _g->los.bbox[BOXLEFT] = t1->x;
+    los.bbox[BOXRIGHT] = t2->x, los.bbox[BOXLEFT] = t1->x;
 
   if (t1->y > t2->y)
-    _g->los.bbox[BOXTOP] = t1->y, _g->los.bbox[BOXBOTTOM] = t2->y;
+    los.bbox[BOXTOP] = t1->y, los.bbox[BOXBOTTOM] = t2->y;
   else
-    _g->los.bbox[BOXTOP] = t2->y, _g->los.bbox[BOXBOTTOM] = t1->y;
+    los.bbox[BOXTOP] = t2->y, los.bbox[BOXBOTTOM] = t1->y;
 
 
-    _g->los.maxz = INT32_MAX; _g->los.minz = INT32_MIN;
+    los.maxz = INT32_MAX; los.minz = INT32_MIN;
 
   // the head node is the last node output
   return P_CrossBSPNode(numnodes-1);
