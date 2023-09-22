@@ -88,10 +88,11 @@ boolean C_Responder (event_t *ev)
 
         //We can test a cheat sequence with a simple int comparison.
 
-        uint32_t cb = _g->cheat_buffer << 4;
+        static uint32_t cheat_buffer = 0;
+        uint32_t cb = cheat_buffer << 4;
         cb |= ev->data1 & 0xf;
 
-        _g->cheat_buffer = cb;
+        cheat_buffer = cb;
 
         if(CheckCheats(cb))
             return true; //eat last cheat key.
