@@ -371,17 +371,6 @@ int16_t openings[MAXOPENINGS];
 int16_t* lastopening;
 
 
-
-//******************************************************************************
-//r_sky.c
-//******************************************************************************
-
-//
-// sky mapping
-//
-int16_t skyflatnum;
-
-
 //******************************************************************************
 //r_things.c
 //******************************************************************************
@@ -530,6 +519,12 @@ extern int32_t showMessages;    // Show messages has default, 0 = off, 1 = on
 
 extern uint16_t validcount;         // increment every time a check is made
 extern visplane_t **freehead;
+
+
+//
+// sky mapping
+//
+extern int16_t skyflatnum;
 
 
 // These are not used, but should be (menu).

@@ -283,7 +283,7 @@ static void R_DoDrawPlane(visplane_t *pl)
 {
     if (pl->minx <= pl->maxx)
     {
-        if (pl->picnum == _g->skyflatnum)
+        if (pl->picnum == skyflatnum)
         {
             // sky flat
             R_DrawSky(pl);

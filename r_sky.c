@@ -33,6 +33,7 @@
 #define FLAT_SKY
 
 
+int16_t skyflatnum;
 static int16_t skytexture;
 
 
@@ -99,5 +100,5 @@ void R_InitSky(void)
 	//  a flat. The data is in the WAD only because
 	//  we look for an actual index, instead of simply
 	//  setting one.
-	_g->skyflatnum = R_FlatNumForName("F_SKY1");
+	skyflatnum = R_FlatNumForName("F_SKY1");
 }

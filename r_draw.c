@@ -1634,7 +1634,7 @@ static visplane_t *R_FindPlane(fixed_t height, int16_t picnum, int32_t lightleve
     visplane_t *check;
     uint32_t hash;                      // killough
 
-    if (picnum == _g->skyflatnum)
+    if (picnum == skyflatnum)
         height = lightlevel = 0;         // killough 7/19/98: most skies map together
 
     // New visplane algorithm uses hash table -- killough
@@ -2251,7 +2251,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         worldlow = backsector->floorheight - viewz;
 
         // hack to allow height changes in outdoor areas
-        if (frontsector->ceilingpic == _g->skyflatnum && backsector->ceilingpic == _g->skyflatnum)
+        if (frontsector->ceilingpic == skyflatnum && backsector->ceilingpic == skyflatnum)
             worldtop = worldhigh;
 
         markfloor = worldlow != worldbottom
@@ -2311,7 +2311,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     if (frontsector->floorheight >= viewz)       // above view plane
         markfloor = false;
     if (frontsector->ceilingheight <= viewz &&
-            frontsector->ceilingpic != _g->skyflatnum)   // below view plane
+            frontsector->ceilingpic != skyflatnum)   // below view plane
         markceiling = false;
 
     // calculate incremental stepping values for texture edges
@@ -2446,8 +2446,8 @@ static void R_RecalcLineFlags(void)
                     side->bottomtexture)
 
                 // properly render skies (consider door "open" if both ceilings are sky):
-                && (backsector->ceilingpic !=_g->skyflatnum ||
-                    frontsector->ceilingpic!=_g->skyflatnum)
+                && (backsector->ceilingpic != skyflatnum ||
+                    frontsector->ceilingpic!= skyflatnum)
                 )
             )
         linedata->r_flags = (RF_CLOSED | (linedata->r_flags & ML_MAPPED));
@@ -2633,7 +2633,7 @@ static void R_Subsector(int32_t num)
     }
 
 
-    if(frontsector->ceilingheight > viewz || (frontsector->ceilingpic == _g->skyflatnum))
+    if(frontsector->ceilingheight > viewz || (frontsector->ceilingpic == skyflatnum))
     {
         ceilingplane = R_FindPlane(frontsector->ceilingheight,     // killough 3/8/98
                                        frontsector->ceilingpic,
