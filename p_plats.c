@@ -43,6 +43,10 @@
 
 #include "globdata.h"
 
+
+static platlist_t *activeplats;
+
+
 static void P_RemoveActivePlat(plat_t* plat);
 
 //
@@ -342,7 +346,7 @@ boolean EV_DoPlat
 void P_ActivateInStasis(int32_t tag)
 {
   platlist_t *pl;
-  for (pl=_g->activeplats; pl; pl=pl->next)   // search the active plats
+  for (pl=activeplats; pl; pl=pl->next)   // search the active plats
   {
     plat_t *plat = pl->plat;              // for one in stasis with right tag
     if (plat->tag == tag && plat->status == in_stasis)
@@ -366,7 +370,7 @@ void P_ActivateInStasis(int32_t tag)
 void EV_StopPlat(const line_t* line)
 {
   platlist_t *pl;
-  for (pl=_g->activeplats; pl; pl=pl->next)  // search the active plats
+  for (pl=activeplats; pl; pl=pl->next)  // search the active plats
   {
     plat_t *plat = pl->plat;             // for one with the tag not in stasis
     if (plat->status != in_stasis && plat->tag == line->tag)
@@ -388,9 +392,9 @@ void EV_StopPlat(const line_t* line)
 //
 void P_AddActivePlat(plat_t* plat)
 {
-    platlist_t* old_head = _g->activeplats;
+    platlist_t* old_head = activeplats;
 
-    platlist_t *list = _g->activeplats = Z_MallocLevel(sizeof *list, (void **)&_g->activeplats);
+    platlist_t *list = activeplats = Z_MallocLevel(sizeof *list, (void **)&activeplats);
     list->plat = plat;
     plat->list = list;
     if ((list->next = old_head))
@@ -429,10 +433,10 @@ static void P_RemoveActivePlat(plat_t* plat)
 //
 void P_RemoveAllActivePlats(void)
 {
-  while (_g->activeplats)
+  while (activeplats)
   {
-    platlist_t *next = _g->activeplats->next;
-    Z_Free(_g->activeplats);
-    _g->activeplats = next;
+    platlist_t *next = activeplats->next;
+    Z_Free(activeplats);
+    activeplats = next;
   }
 }
