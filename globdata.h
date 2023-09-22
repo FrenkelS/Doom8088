@@ -349,12 +349,6 @@ int32_t leveltime; // tics in game play for par
 // a special class of thinkers, to allow more efficient searches.
 thinker_t thinkerclasscap;
 
-//******************************************************************************
-//p_user.c
-//******************************************************************************
-
-boolean onground; // whether player is on ground or in air
-
 
 //******************************************************************************
 //r_hotpatch_iwram.c

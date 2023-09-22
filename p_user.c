@@ -44,6 +44,10 @@
 
 #include "globdata.h"
 
+
+static boolean onground; // whether player is on ground or in air
+
+
 // Index of the special effects (INVUL inverse) map.
 
 #define INVERSECOLORMAP 32
@@ -117,7 +121,7 @@ void P_CalcHeight (player_t* player)
   if (player->bob > MAXBOB)
     player->bob = MAXBOB;
 
-  if (!_g->onground || player->cheats & CF_NOMOMENTUM)
+  if (!onground || player->cheats & CF_NOMOMENTUM)
     {
     player->viewz = player->mo->z + VIEWHEIGHT;
 
@@ -182,7 +186,7 @@ static void P_MovePlayer (player_t* player)
   mobj_t *mo = player->mo;
 
   mo->angle += ((int32_t)cmd->angleturn) << 16;
-  _g->onground = mo->z <= mo->floorz;
+  onground = mo->z <= mo->floorz;
 
   // killough 10/98:
   //
@@ -194,7 +198,7 @@ static void P_MovePlayer (player_t* player)
   //e6y
   if ((cmd->forwardmove | cmd->sidemove)) // killough 10/98
     {
-      if (_g->onground) // killough 8/9/98
+      if (onground) // killough 8/9/98
       {
         int32_t movefactor = ORIG_FRICTION_FACTOR;
 
@@ -239,7 +243,7 @@ static void P_DeathThink (player_t* player)
     player->viewheight = 6*FRACUNIT;
 
   player->deltaviewheight = 0;
-  _g->onground = (player->mo->z <= player->mo->floorz);
+  onground = (player->mo->z <= player->mo->floorz);
   P_CalcHeight (player);
 
   if (player->attacker && player->attacker != player->mo)
