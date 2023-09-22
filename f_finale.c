@@ -47,6 +47,14 @@
 #include "globdata.h"
 
 
+// Stage of animation:
+//  false = text, true = art screen
+static boolean finalestage; // cph -
+static int32_t finalecount; // made static
+
+static boolean midstage;                 // whether we're in "mid-stage"
+
+
 // defines for the end mission display text                     // phares
 
 #define TEXTSPEED    300   // original value                    // phares
@@ -71,7 +79,7 @@ void F_StartFinale (void)
     automapmode &= ~am_active;
 
     // killough 3/28/98: clear accelerative text flags
-    _g->acceleratestage = _g->midstage = false;
+    _g->acceleratestage = midstage = false;
 
     // Okay - IWAD dependend stuff.
     // This has been changed severly, and
@@ -79,8 +87,8 @@ void F_StartFinale (void)
 
     S_ChangeMusic(mus_victor, true);
 
-    _g->finalestage = false;
-    _g->finalecount = 0;
+    finalestage = false;
+    finalecount = 0;
 }
 
 
@@ -96,7 +104,7 @@ boolean F_Responder (event_t *event)
 
 static int32_t Get_TextSpeed(void)
 {
-    return _g->midstage ? NEWTEXTSPEED : (_g->midstage=_g->acceleratestage) ?
+    return midstage ? NEWTEXTSPEED : (midstage=_g->acceleratestage) ?
                               _g->acceleratestage=false, NEWTEXTSPEED : TEXTSPEED;
     }
 
@@ -120,20 +128,20 @@ static int32_t Get_TextSpeed(void)
     WI_checkForAccelerate();  // killough 3/28/98: check for acceleration
 
     // advance animation
-    _g->finalecount++;
+    finalecount++;
 
-    if (!_g->finalestage)
+    if (!finalestage)
     {
         int32_t speed = Get_TextSpeed();
         /* killough 2/28/98: changed to allow acceleration */
-        if (_g->finalecount > strlen(E1TEXT)*speed/100 +
-                (_g->midstage ? NEWTEXTWAIT : TEXTWAIT) ||
-                (_g->midstage && _g->acceleratestage))
+        if (finalecount > strlen(E1TEXT)*speed/100 +
+                (midstage ? NEWTEXTWAIT : TEXTWAIT) ||
+                (midstage && _g->acceleratestage))
         {
        // Doom 1 end
                                // with enough time, it's automatic
-            _g->finalecount = 0;
-            _g->finalestage = true;
+            finalecount = 0;
+            finalestage = true;
             wipegamestate = -1;         // force a wipe
         }
     }
@@ -196,7 +204,7 @@ static void F_TextWrite (void)
 	int16_t         cx = 10;
 	int16_t         cy = 10;
 	const char* ch = E1TEXT; // CPhipps - const
-	int32_t         count = (_g->finalecount - 10)*100/Get_TextSpeed(); // phares
+	int32_t         count = (finalecount - 10)*100/Get_TextSpeed(); // phares
 
 	if (count < 0)
 		count = 0;
@@ -232,7 +240,7 @@ static void F_TextWrite (void)
 //
 void F_Drawer (void)
 {
-    if (!_g->finalestage)
+    if (!finalestage)
         F_TextWrite ();
     else
         W_ReadLumpByName("HELP2", _g->screen);
