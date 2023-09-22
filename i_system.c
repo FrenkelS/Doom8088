@@ -364,28 +364,29 @@ void I_Error (const char *error, ...)
 int32_t I_GetTime(void)
 {
     int32_t thistimereply;
-
+    static int32_t lasttimereply = 0;
+    static int32_t basetime = 0;
     clock_t now = clock();
 
     thistimereply = (now * TICRATE) / CLOCKS_PER_SEC;
 
-    if (thistimereply < _g->lasttimereply)
+    if (thistimereply < lasttimereply)
     {
-        _g->basetime -= 0xffff;
+        basetime -= 0xffff;
     }
 
-    _g->lasttimereply = thistimereply;
+    lasttimereply = thistimereply;
 
 
     /* Fix for time problem */
-    if (!_g->basetime)
+    if (!basetime)
     {
-        _g->basetime = thistimereply;
+        basetime = thistimereply;
         thistimereply = 0;
     }
     else
     {
-        thistimereply -= _g->basetime;
+        thistimereply -= basetime;
     }
 
     return thistimereply;
