@@ -1210,7 +1210,7 @@ static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
     fixed_t       topoffset;
 
     // decide which patch to use
-    sprdef = &_g->sprites[psp->state->sprite];
+    sprdef = &sprites[psp->state->sprite];
 
     sprframe = &sprdef->spriteframes[psp->state->frame & FF_FRAMEMASK];
 
@@ -1459,7 +1459,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
         return;
 
     // decide which patch to use for sprite relative to player
-    const spritedef_t*   sprdef   = &_g->sprites[thing->sprite];
+    const spritedef_t*   sprdef   = &sprites[thing->sprite];
     const spriteframe_t* sprframe = &sprdef->spriteframes[thing->frame & FF_FRAMEMASK];
 
     uint32_t rot = 0;

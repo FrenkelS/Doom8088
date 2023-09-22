@@ -372,15 +372,6 @@ int16_t* lastopening;
 
 
 //******************************************************************************
-//r_things.c
-//******************************************************************************
-
-// variables used to look up and range check thing_t sprites patches
-
-spritedef_t *sprites;
-
-
-//******************************************************************************
 //s_sound.c
 //******************************************************************************
 
@@ -525,6 +516,10 @@ extern visplane_t **freehead;
 // sky mapping
 //
 extern int16_t skyflatnum;
+
+
+// variables used to look up and range check thing_t sprites patches
+extern spritedef_t *sprites;
 
 
 // These are not used, but should be (menu).

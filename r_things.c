@@ -43,6 +43,10 @@
 #include "globdata.h"
 
 
+// variables used to look up and range check thing_t sprites patches
+spritedef_t *sprites;
+
+
 static int8_t maxframe;
 
 #define MAX_SPRITE_FRAMES 29
@@ -144,9 +148,9 @@ void R_InitSprites(void)
   if (!numentries || !*sprnames)
     return;
 
-  _g->sprites = Z_MallocStatic(NUMSPRITES *sizeof(*_g->sprites));
+  sprites = Z_MallocStatic(NUMSPRITES *sizeof(*sprites));
 
-  memset(_g->sprites, 0, NUMSPRITES *sizeof(*_g->sprites));
+  memset(sprites, 0, NUMSPRITES *sizeof(*sprites));
 
   // Create hash table based on just the first four letters of each sprite
   // killough 1/31/98
@@ -203,7 +207,7 @@ void R_InitSprites(void)
           while ((j = hash[j].next) >= 0);
 
           // check the frames that were found for completeness
-          if ((_g->sprites[i].numframes = ++maxframe))  // killough 1/31/98
+          if ((sprites[i].numframes = ++maxframe))  // killough 1/31/98
             {
               int8_t frame;
               for (frame = 0; frame < maxframe; frame++)
@@ -232,8 +236,8 @@ void R_InitSprites(void)
                     }
                   }
               // allocate space for the frames present and copy sprtemp to it
-              _g->sprites[i].spriteframes = Z_MallocStatic(maxframe * sizeof(spriteframe_t));
-              memcpy(_g->sprites[i].spriteframes, sprtemp, maxframe*sizeof(spriteframe_t));
+              sprites[i].spriteframes = Z_MallocStatic(maxframe * sizeof(spriteframe_t));
+              memcpy(sprites[i].spriteframes, sprtemp, maxframe*sizeof(spriteframe_t));
             }
         }
     }
