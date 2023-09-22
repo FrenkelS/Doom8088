@@ -667,6 +667,9 @@ void A_FireMissile(player_t *player, pspdef_t *psp)
 }
 
 
+static fixed_t bulletslope;
+
+
 //
 // P_BulletSlope
 // Sets a slope so a near miss is at aproximately
@@ -681,11 +684,11 @@ static void P_BulletSlope(mobj_t *mo)
 
 	do
 	{
-		_g->bulletslope = P_AimLineAttack(mo, an, 16 * 64 * FRACUNIT, friend);
+		bulletslope = P_AimLineAttack(mo, an, 16 * 64 * FRACUNIT, friend);
 		if (!_g->linetarget)
-			_g->bulletslope = P_AimLineAttack(mo, an += 1L << 26, 16 * 64 * FRACUNIT, friend);
+			bulletslope = P_AimLineAttack(mo, an += 1L << 26, 16 * 64 * FRACUNIT, friend);
 		if (!_g->linetarget)
-			_g->bulletslope = P_AimLineAttack(mo, an -= 2L << 26, 16 * 64 * FRACUNIT, friend);
+			bulletslope = P_AimLineAttack(mo, an -= 2L << 26, 16 * 64 * FRACUNIT, friend);
 	}
 	while (friend && (friend = false, !_g->linetarget));
 }
@@ -706,7 +709,7 @@ static void P_GunShot(mobj_t *mo, boolean accurate)
       angle += (t - P_Random())<<18;
     }
 
-  P_LineAttack(mo, angle, MISSILERANGE, _g->bulletslope, damage);
+  P_LineAttack(mo, angle, MISSILERANGE, bulletslope, damage);
 }
 
 //
