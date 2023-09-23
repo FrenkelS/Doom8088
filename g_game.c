@@ -74,10 +74,10 @@
 #include "globdata.h"
 
 
-static const byte *demobuffer;   /* cph - only used for playback */
+static const byte __far* demobuffer;   /* cph - only used for playback */
 static int32_t demolength; // check for overrun (missing DEMOMARKER)
 
-static const byte *demo_p;
+static const byte __far* demo_p;
 
 gameaction_t    _g_gameaction;
 gamestate_t     _g_gamestate;
@@ -1014,7 +1014,7 @@ void G_DeferedPlayDemo (const char* name)
 
 
 //e6y: Check for overrun
-static void CheckForOverrun(const byte *start_p, const byte *current_p, size_t size)
+static void CheckForOverrun(const byte __far* start_p, const byte __far* current_p, size_t size)
 {
     size_t pos = current_p - start_p;
     if (pos + size > demolength)
@@ -1023,7 +1023,7 @@ static void CheckForOverrun(const byte *start_p, const byte *current_p, size_t s
     }
 }
 
-static const byte* G_ReadDemoHeader(const byte *demo_p)
+static const byte __far* G_ReadDemoHeader(const byte __far* demo_p)
 {
     skill_t skill;
     int32_t map;
@@ -1031,7 +1031,7 @@ static const byte* G_ReadDemoHeader(const byte *demo_p)
     // e6y
     // The local variable should be used instead of demobuffer,
     // because demobuffer can be uninitialized
-    const byte *header_p = demo_p;
+    const byte __far* header_p = demo_p;
 
     _g_basetic = _g_gametic;  // killough 9/29/98
 
