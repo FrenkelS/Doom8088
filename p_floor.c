@@ -562,7 +562,7 @@ boolean EV_DoFloor
   boolean           rtn;
   int32_t           i;
   sector_t*     sec;
-  floormove_t*  floor;
+  floormove_t __far*  floor;
 
   secnum = -1;
   rtn = false;
@@ -865,7 +865,7 @@ boolean EV_BuildStairs
 
     // don't start a stair if the first step's floor is already moving
    if (!P_SectorActive(floor_special,sec)) { //jff 2/22/98
-    floormove_t*  floor;
+    floormove_t __far*  floor;
     int32_t           texture, height;
     fixed_t       stairsize;
     fixed_t       speed;
@@ -980,7 +980,7 @@ boolean EV_DoDonut(const line_t*  line)
   int32_t       secnum;
   boolean       rtn;
   int32_t       i;
-  floormove_t* floor;
+  floormove_t __far* floor;
 
   secnum = -1;
   rtn = false;
@@ -1061,7 +1061,7 @@ boolean EV_DoElevator
   int32_t                   secnum;
   boolean                   rtn;
   sector_t*             sec;
-  elevator_t*           elevator;
+  elevator_t __far*           elevator;
 
   secnum = -1;
   rtn = false;
