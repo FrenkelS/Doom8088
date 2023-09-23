@@ -393,7 +393,7 @@ typedef struct
 
 typedef struct visplane
 {
-  struct visplane *next;        // Next visplane in hash chain -- killough
+  struct visplane __far* next;        // Next visplane in hash chain -- killough
   int16_t picnum, lightlevel;
   int16_t minx, maxx;
   fixed_t height;

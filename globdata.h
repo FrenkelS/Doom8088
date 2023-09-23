@@ -239,7 +239,7 @@ extern thinker_t _g_thinkerclasscap;
 //r_hotpatch_iwram.c
 //******************************************************************************
 
-extern visplane_t *_g_visplanes[MAXVISPLANES];
+extern visplane_t __far* _g_visplanes[MAXVISPLANES];
 extern visplane_t *_g_freetail;
 
 

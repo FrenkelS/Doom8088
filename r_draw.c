@@ -61,7 +61,7 @@
 #define FLAT_WALL
 
 
-visplane_t *_g_visplanes[MAXVISPLANES];
+visplane_t __far* _g_visplanes[MAXVISPLANES];
 visplane_t *_g_freetail;
 
 
@@ -923,7 +923,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
     sprtopscreen = centeryfrac - FixedMul(dcvars.texturemid, spryscale);
 
 
-    const patch_t *patch = W_GetLumpByNum(vis->lump_num);
+    const patch_t __far* patch = W_GetLumpByNum(vis->lump_num);
 
     fixed_t xiscale = vis->xiscale;
 
@@ -1075,7 +1075,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int32_t x1, int32_t x2)
             int16_t patch_num;
             int16_t x_c;
             R_GetColumn(texture, xc, &patch_num, &x_c);
-            const patch_t* patch = W_GetLumpByNum(patch_num);
+            const patch_t __far* patch = W_GetLumpByNum(patch_num);
             const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
 
             R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
@@ -1226,7 +1226,7 @@ static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
 
     flip = (boolean) SPR_FLIPPED(sprframe, 0);
 
-    const patch_t* patch = W_GetLumpByNum(sprframe->lump[0]);
+    const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
     fixed_t       tx;
     tx = psp->sx-160*FRACUNIT;
@@ -1482,7 +1482,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
     }
 
     const boolean flip = (boolean)SPR_FLIPPED(sprframe, rot);
-    const patch_t* patch = W_GetLumpByNum(sprframe->lump[rot]);
+    const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[rot]);
 
     /* calculate edges of the shape
      * cph 2003/08/1 - fraggle points out that this offset must be flipped
@@ -1613,9 +1613,9 @@ static void R_AddSprites(subsector_t* subsec, int32_t lightlevel)
 
 // New function, by Lee Killough
 
-static visplane_t *new_visplane(uint32_t hash)
+static visplane_t __far* new_visplane(uint32_t hash)
 {
-    visplane_t *check = _g_freetail;
+    visplane_t __far* check = _g_freetail;
 
     if (!check)
         check = Z_CallocLevel(sizeof(visplane_t));
@@ -1676,10 +1676,10 @@ static visplane_t *R_FindPlane(fixed_t height, int16_t picnum, int32_t lightleve
  *
  * cph 2003/04/18 - create duplicate of existing visplane and set initial range
  */
-static visplane_t *R_DupPlane(const visplane_t *pl, int32_t start, int32_t stop)
+static visplane_t __far* R_DupPlane(const visplane_t *pl, int32_t start, int32_t stop)
 {
     uint32_t hash = visplane_hash(pl->picnum, pl->lightlevel, pl->height);
-    visplane_t *new_pl = new_visplane(hash);
+    visplane_t __far* new_pl = new_visplane(hash);
 
     new_pl->height = pl->height;
     new_pl->picnum = pl->picnum;
