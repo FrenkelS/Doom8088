@@ -68,7 +68,7 @@ boolean EV_DoGenFloor
   boolean                   rtn;
   boolean               manual;
   sector_t*             sec;
-  floormove_t*          floor;
+  floormove_t __far*          floor;
   uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenFloorBase;
 
   // parse the bit fields in the line's special type
@@ -271,7 +271,7 @@ boolean EV_DoGenCeiling
   boolean               manual;
   fixed_t               targheight;
   sector_t*             sec;
-  ceiling_t*            ceiling;
+  ceiling_t __far*            ceiling;
   uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenCeilingBase;
 
   // parse the bit fields in the line's special type
@@ -471,7 +471,7 @@ manual_ceiling:
 boolean EV_DoGenLift
 ( const line_t*       line )
 {
-  plat_t*         plat;
+  plat_t __far*         plat;
   int32_t             secnum;
   boolean             rtn;
   boolean         manual;
@@ -633,7 +633,7 @@ boolean EV_DoGenStairs
   sector_t*             sec;
   sector_t*             tsec;
 
-  floormove_t*  floor;
+  floormove_t __far*  floor;
 
   fixed_t               stairsize;
   fixed_t               speed;
@@ -808,7 +808,7 @@ boolean EV_DoGenCrusher
   boolean                   rtn;
   boolean               manual;
   sector_t*             sec;
-  ceiling_t*            ceiling;
+  ceiling_t __far*            ceiling;
   uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenCrusherBase;
 
   // parse the bit fields in the line's special type
@@ -904,7 +904,7 @@ boolean EV_DoGenLockedDoor
   int32_t   secnum;
   boolean   rtn;
   sector_t* sec;
-  vldoor_t* door;
+  vldoor_t __far* door;
   boolean manual;
   uint32_t  value = (uint32_t)LN_SPECIAL(line) - GenLockedBase;
 
@@ -1012,7 +1012,7 @@ boolean EV_DoGenDoor
   boolean   rtn;
   sector_t* sec;
   boolean   manual;
-  vldoor_t* door;
+  vldoor_t __far* door;
   uint32_t  value = (uint32_t)LN_SPECIAL(line) - GenDoorBase;
 
   // parse the bit fields in the line's special type
