@@ -45,6 +45,10 @@
 #include "globdata.h"
 
 
+// The screen is [SCREENWIDTH*SCREENHEIGHT];
+uint16_t *_g_screen;
+
+
 /*
  * This function draws at GBA resolution (ie. not pixel doubled)
  * so the st bar and menus don't look like garbage.
@@ -62,7 +66,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
     const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / 200;
     const int32_t   DYI = (((int32_t)200)<<FRACBITS) / SCREENHEIGHT;
 
-    byte* byte_topleft = (byte*)_g->screen;
+    byte* byte_topleft = (byte*)_g_screen;
     const int32_t byte_pitch = (SCREENPITCH * 2);
 
     const int32_t left = ( x * DX ) >> FRACBITS;
@@ -142,7 +146,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch)
     y -= patch->topoffset;
     x -= patch->leftoffset;
 
-    byte* desttop = (byte*)_g->screen;
+    byte* desttop = (byte*)_g_screen;
     desttop += (ScreenYToOffset(y) << 1) + x;
 
     int16_t width = patch->width;

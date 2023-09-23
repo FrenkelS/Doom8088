@@ -49,6 +49,16 @@
 
 #include "globdata.h"
 
+
+// widgets
+static hu_textline_t  w_title;
+static hu_stext_t     w_message;
+
+static boolean    message_on;
+boolean    _g_message_dontfuckwithme;
+static boolean    headsupactive;
+
+
 // global heads up display controls
 
 //
@@ -56,7 +66,7 @@
 //
 // Ty 03/28/98 -
 // These shortcuts modifed to reflect char ** of mapnames[]
-#define HU_TITLE  (mapnames[_g->gamemap-1])
+#define HU_TITLE  (mapnames[_g_gamemap-1])
 #define HU_TITLEX 0
 //jff 2/16/98 change 167 to ST_Y-1
 // CPhipps - changed to ST_TY
@@ -113,7 +123,7 @@ void HU_Init(void)
 //
 static void HU_Stop(void)
 {
-    _g->headsupactive = false;
+    headsupactive = false;
 }
 
 
@@ -204,31 +214,31 @@ void HU_Start(void)
 {
     const char* s; /* cph - const */
 
-    if (_g->headsupactive)                    // stop before starting
+    if (headsupactive)                    // stop before starting
         HU_Stop();
 
 
-    _g->message_on = false;
-    _g->message_dontfuckwithme = false;
+    message_on = false;
+    _g_message_dontfuckwithme = false;
 
     // create the message widget
     // messages to player in upper-left of screen
-    HUlib_initSText(&_g->w_message, &_g->message_on);
+    HUlib_initSText(&w_message, &message_on);
 
     //jff 2/16/98 added some HUD widgets
     // create the map title widget - map title display in lower left of automap
-    HUlib_initTextLine(&_g->w_title, HU_TITLEX, HU_TITLEY);
+    HUlib_initTextLine(&w_title, HU_TITLEX, HU_TITLEY);
 
     // initialize the automap's level title widget
-    if (_g->gamestate == GS_LEVEL) /* cph - stop SEGV here when not in level */
+    if (_g_gamestate == GS_LEVEL) /* cph - stop SEGV here when not in level */
         s = HU_TITLE;
     else s = "";
     while (*s)
-        HUlib_addCharToTextLine(&_g->w_title, *(s++));
+        HUlib_addCharToTextLine(&w_title, *(s++));
 
 
     // now allow the heads-up display to run
-    _g->headsupactive = true;
+    headsupactive = true;
 }
 
 
@@ -308,7 +318,7 @@ void HU_Drawer(void)
     if (automapmode & am_active)
     {
         // map title
-        HUlib_drawTextLine(&_g->w_title);
+        HUlib_drawTextLine(&w_title);
     }
 
     //jff 3/4/98 display last to give priority
@@ -316,7 +326,7 @@ void HU_Drawer(void)
     // needed when screen not fullsize
 
 
-    HUlib_drawSText(&_g->w_message);
+    HUlib_drawSText(&w_message);
 }
 
 
@@ -365,10 +375,10 @@ static void HUlib_eraseSText(hu_stext_t* s)
 void HU_Erase(void)
 {
     // erase the message display or the message review display
-    HUlib_eraseSText(&_g->w_message);
+    HUlib_eraseSText(&w_message);
 
     // erase the automap title
-    HUlib_eraseTextLine(&_g->w_title);
+    HUlib_eraseTextLine(&w_title);
 }
 
 
@@ -417,34 +427,36 @@ static void HUlib_addMessageToSText(hu_stext_t* s, const char* msg)
 
 void HU_Ticker(void)
 {
-    player_t* plr = &_g->player;        // killough 3/7/98
+    static int16_t        message_counter = 0;
+
+    player_t* plr = &_g_player;        // killough 3/7/98
 
     // tick down message counter if message is up
-    if (_g->message_counter && !--_g->message_counter)
+    if (message_counter && !--message_counter)
     {
-        _g->message_on = false;
+        message_on = false;
     }
 
 
     // if messages on, or "Messages Off" is being displayed
     // this allows the notification of turning messages off to be seen
-    if (showMessages || _g->message_dontfuckwithme)
+    if (showMessages || _g_message_dontfuckwithme)
     {
         // display message if necessary
         if (plr->message)
         {
             //post the message to the message widget
-            HUlib_addMessageToSText(&_g->w_message, plr->message);
+            HUlib_addMessageToSText(&w_message, plr->message);
 
             // clear the message to avoid posting multiple times
             plr->message = 0;
             // note a message is displayed
-            _g->message_on = true;
+            message_on = true;
             // start the message persistence counter
-            _g->message_counter = HU_MSGTIMEOUT;
+            message_counter = HU_MSGTIMEOUT;
 
             // clear the flag that "Messages Off" is being posted
-            _g->message_dontfuckwithme = 0;
+            _g_message_dontfuckwithme = 0;
         }
     }
 }

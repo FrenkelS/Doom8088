@@ -224,7 +224,7 @@ void I_InitGraphics(void)
 
 void I_StartDisplay(void)
 {
-	_g->screen = &backBuffer[0];
+	_g_screen = &backBuffer[0];
 }
 
 
@@ -267,10 +267,10 @@ static void I_UploadNewPalette(int8_t pal)
 
 	char lumpName[9] = "PLAYPAL0";
 
-	if(_g->gamma == 0)
+	if(_g_gamma == 0)
 		lumpName[7] = 0;
 	else
-		lumpName[7] = '0' + _g->gamma;
+		lumpName[7] = '0' + _g_gamma;
 
 	const uint8_t* palette_lump = W_GetLumpByName(lumpName);
 	I_SetPalette_dos(&palette_lump[pal*256*3]);

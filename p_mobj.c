@@ -83,7 +83,7 @@ boolean P_SetMobjState(mobj_t* mobj, statenum_t state)
         // Call action functions when the state is set
         if(st->action)
         {
-            if(!(_g->player.cheats & CF_ENEMY_ROCKETS))
+            if(!(_g_player.cheats & CF_ENEMY_ROCKETS))
             {
                 st->action(mobj);
             }
@@ -205,9 +205,9 @@ static void P_XYMovement (mobj_t* mo)
                 {
                     // explode a missile
 
-                    if (_g->ceilingline)
+                    if (_g_ceilingline)
                     {
-                        const sector_t* ceilingBackSector = LN_BACKSECTOR(_g->ceilingline);
+                        const sector_t* ceilingBackSector = LN_BACKSECTOR(_g_ceilingline);
 
                         if(ceilingBackSector && ceilingBackSector->ceilingpic == skyflatnum)
                         {
@@ -565,7 +565,7 @@ void P_MobjThinker (mobj_t* mobj)
         if (! (mobj->flags & MF_COUNTKILL) )
             return;
 
-        if (!_g->respawnmonsters)
+        if (!_g_respawnmonsters)
             return;
 
         mobj->movecount++;
@@ -573,7 +573,7 @@ void P_MobjThinker (mobj_t* mobj)
         if (mobj->movecount < 12*35)
             return;
 
-        if (_g->leveltime & 31)
+        if (_g_leveltime & 31)
             return;
 
         if (P_Random () > 4)
@@ -628,11 +628,11 @@ static mobj_t* P_NewMobj()
 {
     mobj_t* mobj = NULL;
 
-    for(int32_t i = _g->thingPoolSize-1; i >= 0; i--)
+    for(int32_t i = _g_thingPoolSize-1; i >= 0; i--)
     {
-        if(_g->thingPool[i].type == MT_NOTHING)
+        if(_g_thingPool[i].type == MT_NOTHING)
         {
-            mobj = &_g->thingPool[i];
+            mobj = &_g_thingPool[i];
             memset (mobj, 0, sizeof (*mobj));
 
             mobj->flags = MF_POOLED;
@@ -669,7 +669,7 @@ mobj_t* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
 
     mobj->health = info->spawnhealth;
 
-    if (_g->gameskill != sk_nightmare)
+    if (_g_gameskill != sk_nightmare)
         mobj->reactiontime = info->reactiontime;
 
     P_Random(); // only to call random for compatibiltiy
@@ -700,7 +700,7 @@ mobj_t* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
     mobj->target = mobj->tracer = mobj->lastenemy = NULL;
     P_AddThinker (&mobj->thinker);
     if (!((mobj->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
-        _g->totallive++;
+        _g_totallive++;
     return mobj;
 }
 
@@ -729,7 +729,7 @@ void P_RemoveMobj (mobj_t* mobj)
   // CPhipps - only leave dead references in old demos; I hope lxdoom_1 level
   // demos are rare and don't rely on this. I hope.
 
-  if (!_g->demoplayback)
+  if (!_g_demoplayback)
   {
     P_SetTarget(&mobj->target,    NULL);
     P_SetTarget(&mobj->tracer,    NULL);
@@ -786,10 +786,10 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 
   // not playing?
 
-  if (!_g->playeringame)
+  if (!_g_playeringame)
     return;
 
-  p = &_g->player;
+  p = &_g_player;
 
   if (p->playerstate == PST_REBORN)
     G_PlayerReborn ();
@@ -882,9 +882,9 @@ void P_SpawnMapThing (const mapthing_t* mthing)
     //Only care about start spot for player 1.
     if(mthing->type == 1)
     {
-        _g->playerstarts[0] = *mthing;
-        _g->playerstarts[0].options = 1;
-        P_SpawnPlayer (&_g->playerstarts[0]);
+        _g_playerstarts[0] = *mthing;
+        _g_playerstarts[0].options = 1;
+        P_SpawnPlayer (&_g_playerstarts[0]);
         return;
     }
 
@@ -895,9 +895,9 @@ void P_SpawnMapThing (const mapthing_t* mthing)
         return;
 
     // killough 11/98: simplify
-    if (_g->gameskill == sk_baby || _g->gameskill == sk_easy ?
+    if (_g_gameskill == sk_baby || _g_gameskill == sk_easy ?
             !(options & MTF_EASY) :
-            _g->gameskill == sk_hard || _g->gameskill == sk_nightmare ?
+            _g_gameskill == sk_hard || _g_gameskill == sk_nightmare ?
             !(options & MTF_HARD) : !(options & MTF_NORMAL))
         return;
 
@@ -934,10 +934,10 @@ void P_SpawnMapThing (const mapthing_t* mthing)
 
     /* killough 7/20/98: exclude friends */
     if (!((mobj->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
-        _g->totalkills++;
+        _g_totalkills++;
 
     if (mobj->flags & MF_COUNTITEM)
-        _g->totalitems++;
+        _g_totalitems++;
 
     mobj->angle = ANG45 * (mthing->angle/45);
     if (options & MTF_AMBUSH)
@@ -968,7 +968,7 @@ void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
 
   // don't make punches spark on the wall
 
-  if (_g->attackrange == MELEERANGE)
+  if (_g_attackrange == MELEERANGE)
     P_SetMobjState (th, S_PUFF3);
   }
 
@@ -1090,14 +1090,14 @@ void P_SpawnPlayerMissile(mobj_t* source,mobjtype_t type)
 		do
 		{
 			slope = P_AimLineAttack(source, an, 16 * 64 * FRACUNIT, friend);
-			if (!_g->linetarget)
+			if (!_g_linetarget)
 				slope = P_AimLineAttack(source, an += 1L << 26, 16 * 64 * FRACUNIT, friend);
-			if (!_g->linetarget)
+			if (!_g_linetarget)
 				slope = P_AimLineAttack(source, an -= 2l << 26, 16 * 64 * FRACUNIT, friend);
-			if (!_g->linetarget)
+			if (!_g_linetarget)
 				an = source->angle, slope = 0;
 		}
-		while (friend && (friend = false, !_g->linetarget));
+		while (friend && (friend = false, !_g_linetarget));
 	}
 
 	x = source->x;
@@ -1121,9 +1121,9 @@ void P_SpawnPlayerMissile(mobj_t* source,mobjtype_t type)
 
 struct player_s* P_MobjIsPlayer(const mobj_t* mobj)
 {
-    if(mobj == _g->player.mo)
+    if(mobj == _g_player.mo)
     {
-        return &_g->player;
+        return &_g_player;
     }
 
     return NULL;

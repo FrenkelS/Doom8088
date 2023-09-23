@@ -105,7 +105,7 @@ side_t* getSide
   int32_t           line,
   int32_t           side )
 {
-  return &_g->sides[ (_g->sectors[currentSector].lines[line])->sidenum[side] ];
+  return &_g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ];
 }
 
 
@@ -123,7 +123,7 @@ static sector_t* getSector
   int32_t           line,
   int32_t           side )
 {
-  return _g->sides[ (_g->sectors[currentSector].lines[line])->sidenum[side] ].sector;
+  return _g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ].sector;
 }
 
 
@@ -143,7 +143,7 @@ boolean twoSided
   //jff 1/26/98 return what is actually needed, whether the line
   //has two sidedefs, rather than whether the 2S flag is set
 
-  return (_g->sectors[sector].lines[line])->sidenum[1] != NO_INDEX;
+  return (_g_sectors[sector].lines[line])->sidenum[1] != NO_INDEX;
 }
 
 
@@ -424,7 +424,7 @@ fixed_t P_FindShortestTextureAround(int32_t secnum)
   int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
   side_t*     side;
   int32_t i;
-  sector_t *sec = &_g->sectors[secnum];
+  sector_t *sec = &_g_sectors[secnum];
 
   for (i = 0; i < sec->linecount; i++)
   {
@@ -457,7 +457,7 @@ fixed_t P_FindShortestUpperAround(int32_t secnum)
   int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
   side_t*     side;
   int32_t i;
-  sector_t *sec = &_g->sectors[secnum];
+  sector_t *sec = &_g_sectors[secnum];
 
   for (i = 0; i < sec->linecount; i++)
   {
@@ -497,7 +497,7 @@ sector_t *P_FindModelFloorSector(fixed_t floordestheight,int32_t secnum)
   sector_t *sec=NULL;
   int32_t linecount;
 
-  sec = &_g->sectors[secnum]; //jff 3/2/98 woops! better do this
+  sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
   //jff 5/23/98 don't disturb sec->linecount while searching
   // but allow early exit in old demos
   linecount = sec->linecount;
@@ -505,7 +505,7 @@ sector_t *P_FindModelFloorSector(fixed_t floordestheight,int32_t secnum)
   {
     if ( twoSided(secnum, i) )
     {
-      if (getSide(secnum,i,0)->sector-_g->sectors == secnum)
+      if (getSide(secnum,i,0)->sector-_g_sectors == secnum)
           sec = getSector(secnum,i,1);
       else
           sec = getSector(secnum,i,0);
@@ -539,7 +539,7 @@ sector_t *P_FindModelCeilingSector(fixed_t ceildestheight,int32_t secnum)
   sector_t *sec=NULL;
   int32_t linecount;
 
-  sec = &_g->sectors[secnum]; //jff 3/2/98 woops! better do this
+  sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
   //jff 5/23/98 don't disturb sec->linecount while searching
   // but allow early exit in old demos
   linecount = sec->linecount;
@@ -547,7 +547,7 @@ sector_t *P_FindModelCeilingSector(fixed_t ceildestheight,int32_t secnum)
   {
     if ( twoSided(secnum, i) )
     {
-      if (getSide(secnum,i,0)->sector-_g->sectors == secnum)
+      if (getSide(secnum,i,0)->sector-_g_sectors == secnum)
           sec = getSector(secnum,i,1);
       else
           sec = getSector(secnum,i,0);
@@ -566,9 +566,9 @@ int32_t P_FindSectorFromLineTag(const line_t* line, int32_t start)
 {
     int32_t	i;
 
-    for (i=start+1; i<_g->numsectors; i++)
+    for (i=start+1; i<_g_numsectors; i++)
     {
-        if (_g->sectors[i].tag == line->tag)
+        if (_g_sectors[i].tag == line->tag)
             return i;
     }
 
@@ -583,9 +583,9 @@ int32_t P_FindLineFromLineTag(const line_t *line, int32_t start)
 
     int32_t	i;
 
-    for (i=start+1; i<_g->numlines; i++)
+    for (i=start+1; i<_g_numlines; i++)
     {
-        if (_g->lines[i].tag == line->tag)
+        if (_g_lines[i].tag == line->tag)
             return i;
     }
 
@@ -1986,14 +1986,14 @@ void P_PlayerInSpecialSector (player_t* player)
       case 5:
         // 5/10 unit damage per 31 ticks
         if (!player->powers[pw_ironfeet])
-          if (!(_g->leveltime&0x1f))
+          if (!(_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 10);
         break;
 
       case 7:
         // 2/5 unit damage per 31 ticks
         if (!player->powers[pw_ironfeet])
-          if (!(_g->leveltime&0x1f))
+          if (!(_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 5);
         break;
 
@@ -2004,7 +2004,7 @@ void P_PlayerInSpecialSector (player_t* player)
         if (!player->powers[pw_ironfeet]
             || (P_Random()<5) ) // even with suit, take damage
         {
-          if (!(_g->leveltime&0x1f))
+          if (!(_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 20);
         }
         break;
@@ -2016,9 +2016,9 @@ void P_PlayerInSpecialSector (player_t* player)
         break;
 
       case 11:
-        _g->player.cheats &= ~CF_GODMODE;
+        _g_player.cheats &= ~CF_GODMODE;
 
-        if (!(_g->leveltime&0x1f))
+        if (!(_g_leveltime&0x1f))
           P_DamageMobj (player->mo, NULL, NULL, 20);
 
         if (player->health <= 10)
@@ -2038,19 +2038,19 @@ void P_PlayerInSpecialSector (player_t* player)
         break;
       case 1: // 2/5 damage per 31 ticks
         if (!player->powers[pw_ironfeet])
-          if (!(_g->leveltime&0x1f))
+          if (!(_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 5);
         break;
       case 2: // 5/10 damage per 31 ticks
         if (!player->powers[pw_ironfeet])
-          if (!(_g->leveltime&0x1f))
+          if (!(_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 10);
         break;
       case 3: // 10/20 damage per 31 ticks
         if (!player->powers[pw_ironfeet]
             || (P_Random()<5))  // take damage even with suit
         {
-          if (!(_g->leveltime&0x1f))
+          if (!(_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 20);
         }
         break;
@@ -2086,7 +2086,7 @@ void P_PlayerInSpecialSector (player_t* player)
 
 static void P_UpdateAnimatedTexture(void)
 {
-	uint32_t t = _g->leveltime >> 3;
+	uint32_t t = _g_leveltime >> 3;
 
 	int16_t pic = animated_texture_basepic + (t % 3);
 
@@ -2103,32 +2103,32 @@ void P_UpdateSpecials (void)
     // Check buttons (retriggerable switches) and change texture on timeout
     for (int8_t i = 0; i < MAXBUTTONS; i++)
     {
-        if (_g->buttonlist[i].btimer)
+        if (_g_buttonlist[i].btimer)
         {
-            _g->buttonlist[i].btimer--;
+            _g_buttonlist[i].btimer--;
 
-            if (!_g->buttonlist[i].btimer)
+            if (!_g_buttonlist[i].btimer)
             {
-                switch(_g->buttonlist[i].where)
+                switch(_g_buttonlist[i].where)
                 {
                     case top:
-                        _g->sides[_g->buttonlist[i].line->sidenum[0]].toptexture =
-                                _g->buttonlist[i].btexture;
+                        _g_sides[_g_buttonlist[i].line->sidenum[0]].toptexture =
+                                _g_buttonlist[i].btexture;
                         break;
 
                     case middle:
-                        _g->sides[_g->buttonlist[i].line->sidenum[0]].midtexture =
-                                _g->buttonlist[i].btexture;
+                        _g_sides[_g_buttonlist[i].line->sidenum[0]].midtexture =
+                                _g_buttonlist[i].btexture;
                         break;
 
                     case bottom:
-                        _g->sides[_g->buttonlist[i].line->sidenum[0]].bottomtexture =
-                                _g->buttonlist[i].btexture;
+                        _g_sides[_g_buttonlist[i].line->sidenum[0]].bottomtexture =
+                                _g_buttonlist[i].btexture;
                         break;
                 }
 
-                S_StartSound2(_g->buttonlist[i].soundorg, sfx_swtchn);
-                memset(&_g->buttonlist[i],0,sizeof(button_t));
+                S_StartSound2(_g_buttonlist[i].soundorg, sfx_swtchn);
+                memset(&_g_buttonlist[i],0,sizeof(button_t));
             }
         }
     }
@@ -2156,14 +2156,14 @@ void P_SpawnSpecials (void)
   int32_t         i;
 
   //  Init special sectors.
-  sector = _g->sectors;
-  for (i=0 ; i<_g->numsectors ; i++, sector++)
+  sector = _g_sectors;
+  for (i=0 ; i<_g_numsectors ; i++, sector++)
   {
     if (!sector->special)
       continue;
 
     if (sector->special&SECRET_MASK) //jff 3/15/98 count extended
-      _g->totalsecret++;                 // secret sectors too
+      _g_totalsecret++;                 // secret sectors too
 
     switch (sector->special&31)
     {
@@ -2195,7 +2195,7 @@ void P_SpawnSpecials (void)
       case 9:
         // secret sector
         if (sector->special<32) //jff 3/14/98 bits don't count unless not
-          _g->totalsecret++;        // a generalized sector type
+          _g_totalsecret++;        // a generalized sector type
         break;
 
       case 10:
@@ -2230,7 +2230,7 @@ void P_SpawnSpecials (void)
   P_RemoveAllActivePlats();     // killough
 
   for (i = 0;i < MAXBUTTONS;i++)
-    memset(&_g->buttonlist[i],0,sizeof(button_t));
+    memset(&_g_buttonlist[i],0,sizeof(button_t));
 
   // P_InitTagLists() must be called before P_FindSectorFromLineTag()
   // or P_FindLineFromLineTag() can be called.
@@ -2261,7 +2261,7 @@ void P_SpawnSpecials (void)
 
 static void T_Scroll(scroll_t *s)
 {
-    side_t *side  =_g->sides + s->affectee;
+    side_t *side  =_g_sides + s->affectee;
     side->textureoffset++;
 }
 
@@ -2295,16 +2295,16 @@ static void Add_Scroller(int32_t affectee)
 static void P_SpawnScrollers(void)
 {
     int32_t i;
-    const line_t *l = _g->lines;
+    const line_t *l = _g_lines;
 
-    for (i=0;i<_g->numlines;i++,l++)
+    for (i=0;i<_g_numlines;i++,l++)
     {
         int32_t special = LN_SPECIAL(l);
 
         switch (special)
         {
         case 48:                  // scroll first side
-            Add_Scroller(_g->lines[i].sidenum[0]);
+            Add_Scroller(_g_lines[i].sidenum[0]);
             break;
 
         }

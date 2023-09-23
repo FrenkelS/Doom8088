@@ -51,6 +51,10 @@
 
 #include "globdata.h"
 
+
+static fixed_t dropoff_deltax, dropoff_deltay, floorz;
+
+
 static const int32_t distfriend = 128;
 
 typedef enum {
@@ -107,10 +111,10 @@ static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
 
       P_LineOpening(check);
 
-      if (_g->openrange <= 0)
+      if (_g_openrange <= 0)
         continue;       // closed door
 
-      other=_g->sides[check->sidenum[_g->sides[check->sidenum[0]].sector==sec]].sector;
+      other=_g_sides[check->sidenum[_g_sides[check->sidenum[0]].sector==sec]].sector;
 
       if (!(check->flags & ML_SOUNDBLOCK))
         P_RecursiveSound(other, soundblocks, soundtarget);
@@ -160,8 +164,8 @@ static boolean P_HitFriend(mobj_t *actor)
              actor->target->x, actor->target->y),
          P_AproxDistance(actor->x-actor->target->x,
              actor->y-actor->target->y), false),
-     _g->linetarget) && _g->linetarget != actor->target &&
-    !((_g->linetarget->flags ^ actor->flags) & MF_FRIEND);
+     _g_linetarget) && _g_linetarget != actor->target &&
+    !((_g_linetarget->flags ^ actor->flags) & MF_FRIEND);
 }
 
 //
@@ -298,9 +302,9 @@ static boolean P_Move(mobj_t *actor)
     {      // open any specials
       int32_t good;
 
-      if (actor->flags & MF_FLOAT && _g->floatok)
+      if (actor->flags & MF_FLOAT && _g_floatok)
         {
-          if (actor->z < _g->tmfloorz)          // must adjust height
+          if (actor->z < _g_tmfloorz)          // must adjust height
             actor->z += FLOATSPEED;
           else
             actor->z -= FLOATSPEED;
@@ -310,7 +314,7 @@ static boolean P_Move(mobj_t *actor)
     return true;
         }
 
-      if (!_g->numspechit)
+      if (!_g_numspechit)
         return false;
 
       actor->movedir = DI_NODIR;
@@ -332,9 +336,9 @@ static boolean P_Move(mobj_t *actor)
        * back out when they shouldn't, and creates secondary stickiness).
        */
 
-      for (good = false; _g->numspechit--; )
-        if (P_UseSpecialLine(actor, _g->spechit[_g->numspechit], 0))
-    good |= _g->spechit[_g->numspechit] == _g->blockline ? 1 : 2;
+      for (good = false; _g_numspechit--; )
+        if (P_UseSpecialLine(actor, _g_spechit[_g_numspechit], 0))
+    good |= _g_spechit[_g_numspechit] == _g_blockline ? 1 : 2;
 
       /* cph - compatibility maze here
        * Boom v2.01 and orig. Doom return "good"
@@ -348,7 +352,7 @@ static boolean P_Move(mobj_t *actor)
 
   /* killough 11/98: fall more slowly, under gravity, if felldown==true */
   if (!(actor->flags & MF_FLOAT) &&
-      (!_g->felldown))
+      (!_g_felldown))
     actor->z = actor->floorz;
 
   return true;
@@ -455,11 +459,11 @@ static void P_DoNewChaseDir(mobj_t *actor, fixed_t deltax, fixed_t deltay)
 static boolean PIT_AvoidDropoff(const line_t *line)
 {
   if (LN_BACKSECTOR(line)                          && // Ignore one-sided linedefs
-      _g->tmbbox[BOXRIGHT]  > line->bbox[BOXLEFT]   &&
-      _g->tmbbox[BOXLEFT]   < line->bbox[BOXRIGHT]  &&
-      _g->tmbbox[BOXTOP]    > line->bbox[BOXBOTTOM] && // Linedef must be contacted
-      _g->tmbbox[BOXBOTTOM] < line->bbox[BOXTOP]    &&
-      P_BoxOnLineSide(_g->tmbbox, line) == -1)
+      _g_tmbbox[BOXRIGHT]  > line->bbox[BOXLEFT]   &&
+      _g_tmbbox[BOXLEFT]   < line->bbox[BOXRIGHT]  &&
+      _g_tmbbox[BOXTOP]    > line->bbox[BOXBOTTOM] && // Linedef must be contacted
+      _g_tmbbox[BOXBOTTOM] < line->bbox[BOXTOP]    &&
+      P_BoxOnLineSide(_g_tmbbox, line) == -1)
     {
       fixed_t front = LN_FRONTSECTOR(line)->floorheight;
       fixed_t back  = LN_BACKSECTOR(line)->floorheight;
@@ -468,18 +472,18 @@ static boolean PIT_AvoidDropoff(const line_t *line)
       // The monster must contact one of the two floors,
       // and the other must be a tall dropoff (more than 24).
 
-      if (back == _g->floorz && front < _g->floorz - FRACUNIT*24)
+      if (back == floorz && front < floorz - FRACUNIT*24)
   angle = R_PointToAngle2(0,0,line->dx,line->dy);   // front side dropoff
       else
-  if (front == _g->floorz && back < _g->floorz - FRACUNIT*24)
+  if (front == floorz && back < floorz - FRACUNIT*24)
     angle = R_PointToAngle2(line->dx,line->dy,0,0); // back side dropoff
   else
     return true;
 
       // Move away from dropoff at a standard speed.
       // Multiple contacted linedefs are cumulative (e.g. hanging over corner)
-      _g->dropoff_deltax -= finesine(  angle >> ANGLETOFINESHIFT)*32;
-      _g->dropoff_deltay += finecosine(angle >> ANGLETOFINESHIFT)*32;
+      dropoff_deltax -= finesine(  angle >> ANGLETOFINESHIFT)*32;
+      dropoff_deltay += finecosine(angle >> ANGLETOFINESHIFT)*32;
     }
   return true;
 }
@@ -490,15 +494,15 @@ static boolean PIT_AvoidDropoff(const line_t *line)
 
 static fixed_t P_AvoidDropoff(mobj_t *actor)
 {
-  int32_t yh=((_g->tmbbox[BOXTOP]   = actor->y+actor->radius)-_g->bmaporgy)>>MAPBLOCKSHIFT;
-  int32_t yl=((_g->tmbbox[BOXBOTTOM]= actor->y-actor->radius)-_g->bmaporgy)>>MAPBLOCKSHIFT;
-  int32_t xh=((_g->tmbbox[BOXRIGHT] = actor->x+actor->radius)-_g->bmaporgx)>>MAPBLOCKSHIFT;
-  int32_t xl=((_g->tmbbox[BOXLEFT]  = actor->x-actor->radius)-_g->bmaporgx)>>MAPBLOCKSHIFT;
+  int32_t yh=((_g_tmbbox[BOXTOP]   = actor->y+actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
+  int32_t yl=((_g_tmbbox[BOXBOTTOM]= actor->y-actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
+  int32_t xh=((_g_tmbbox[BOXRIGHT] = actor->x+actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
+  int32_t xl=((_g_tmbbox[BOXLEFT]  = actor->x-actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
   int32_t bx, by;
 
-  _g->floorz = actor->z;            // remember floor height
+  floorz = actor->z;            // remember floor height
 
-  _g->dropoff_deltax = _g->dropoff_deltay = 0;
+  dropoff_deltax = dropoff_deltay = 0;
 
   // check lines
 
@@ -507,7 +511,7 @@ static fixed_t P_AvoidDropoff(mobj_t *actor)
     for (by=yl ; by<=yh ; by++)
       P_BlockLinesIterator(bx, by, PIT_AvoidDropoff);  // all contacted lines
 
-  return _g->dropoff_deltax | _g->dropoff_deltay;   // Non-zero if movement prescribed
+  return dropoff_deltax | dropoff_deltay;   // Non-zero if movement prescribed
 }
 
 
@@ -533,7 +537,7 @@ static void P_NewChaseDir(mobj_t *actor)
             !(actor->flags & (MF_DROPOFF|MF_FLOAT)) &&
             P_AvoidDropoff(actor)) /* Move away from dropoff */
     {
-        P_DoNewChaseDir(actor, _g->dropoff_deltax, _g->dropoff_deltay);
+        P_DoNewChaseDir(actor, dropoff_deltax, dropoff_deltay);
 
         // If moving away from dropoff, set movecount to 1 so that
         // small steps are taken to get monster away from dropoff.
@@ -588,9 +592,9 @@ static boolean P_LookForPlayers(mobj_t *actor, boolean allaround)
 {
     player_t *player;
 
-    if(_g->playeringame)
+    if(_g_playeringame)
     {
-        player = &_g->player;
+        player = &_g_player;
 
         if (player->health <= 0)
             return false;               // dead
@@ -737,7 +741,7 @@ void A_Chase(mobj_t *actor)
     if (actor->flags & MF_JUSTATTACKED)
     {
         actor->flags &= ~MF_JUSTATTACKED;
-        if (_g->gameskill != sk_nightmare)
+        if (_g_gameskill != sk_nightmare)
             P_NewChaseDir(actor);
         return;
     }
@@ -759,7 +763,7 @@ void A_Chase(mobj_t *actor)
     // check for missile attack
     if (mobjinfo[actor->type].missilestate)
     {
-        if (!(_g->gameskill < sk_nightmare && actor->movecount))
+        if (!(_g_gameskill < sk_nightmare && actor->movecount))
         {
             if (P_CheckMissileRange(actor))
             {
@@ -1000,18 +1004,18 @@ void A_BossDeath(mobj_t *mo)
     thinker_t *th;
     line_t    junk;
 
-    if (_g->gamemap != 8)
+    if (_g_gamemap != 8)
         return;
 
     if (mo->type != MT_BRUISER)
         return;
 
-    if (!(_g->playeringame && _g->player.health > 0))
+    if (!(_g_playeringame && _g_player.health > 0))
         return;     // no one left alive, so do not end game
 
     // scan the remaining thinkers to see
     // if all bosses are dead
-    for (th = _g->thinkerclasscap.next; th != &_g->thinkerclasscap; th = th->next)
+    for (th = _g_thinkerclasscap.next; th != &_g_thinkerclasscap; th = th->next)
         if (th->function == P_MobjThinker)
         {
             mobj_t *mo2 = (mobj_t *) th;

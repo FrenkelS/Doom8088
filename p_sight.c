@@ -80,23 +80,23 @@ static int32_t P_DivlineSide(fixed_t x, fixed_t y, const divline_t *node)
 
 static boolean P_CrossSubsector(int32_t num)
 {
-    const seg_t *seg = _g->segs + _g->subsectors[num].firstline;
+    const seg_t *seg = _g_segs + _g_subsectors[num].firstline;
     int32_t count;
     fixed_t opentop = 0, openbottom = 0;
     const sector_t *front = NULL, *back = NULL;
 
-    for (count = _g->subsectors[num].numlines; --count >= 0; seg++)
+    for (count = _g_subsectors[num].numlines; --count >= 0; seg++)
     { // check lines
         int32_t linenum = seg->linenum;
 
-        const line_t *line = &_g->lines[linenum];
+        const line_t *line = &_g_lines[linenum];
         divline_t divl;
 
         // allready checked other side?
-        if(_g->linedata[linenum].validcount == validcount)
+        if(_g_linedata[linenum].validcount == validcount)
             continue;
 
-        _g->linedata[linenum].validcount = validcount;
+        _g_linedata[linenum].validcount = validcount;
 
         if (line->bbox[BOXLEFT]  > los.bbox[BOXRIGHT ] ||
            line->bbox[BOXRIGHT]  < los.bbox[BOXLEFT  ] ||
@@ -217,14 +217,14 @@ boolean P_CheckSight(mobj_t *t1, mobj_t *t2)
 {
   const sector_t *s1 = t1->subsector->sector;
   const sector_t *s2 = t2->subsector->sector;
-  int32_t pnum = (s1-_g->sectors)*_g->numsectors + (s2-_g->sectors);
+  int32_t pnum = (s1-_g_sectors)*_g_numsectors + (s2-_g_sectors);
 
   // First check for trivial rejection.
   // Determine subsector entries in REJECT table.
   //
   // Check in REJECT table.
 
-  if (_g->rejectmatrix[pnum>>3] & (1 << (pnum&7)))   // can't possibly be connected
+  if (_g_rejectmatrix[pnum>>3] & (1 << (pnum&7)))   // can't possibly be connected
     return false;
 
   /* killough 11/98: shortcut for melee situations

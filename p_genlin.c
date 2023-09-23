@@ -89,7 +89,7 @@ boolean EV_DoGenFloor
   {
     if (!(sec = LN_BACKSECTOR(line)))
       return rtn;
-    secnum = sec-_g->sectors;
+    secnum = sec-_g_sectors;
     manual = true;
     goto manual_floor;
   }
@@ -98,7 +98,7 @@ boolean EV_DoGenFloor
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
 manual_floor:
     // Do not start another function if floor already moving
@@ -292,7 +292,7 @@ boolean EV_DoGenCeiling
   {
     if (!(sec = LN_BACKSECTOR(line)))
       return rtn;
-    secnum = sec-_g->sectors;
+    secnum = sec-_g_sectors;
     manual = true;
     goto manual_ceiling;
   }
@@ -301,7 +301,7 @@ boolean EV_DoGenCeiling
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
 manual_ceiling:
     // Do not start another function if ceiling already moving
@@ -499,7 +499,7 @@ boolean EV_DoGenLift
   {
     if (!(sec = LN_BACKSECTOR(line)))
       return rtn;
-    secnum = sec-_g->sectors;
+    secnum = sec-_g_sectors;
     manual = true;
     goto manual_lift;
   }
@@ -507,7 +507,7 @@ boolean EV_DoGenLift
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
 manual_lift:
     // Do not start another function if floor already moving
@@ -656,7 +656,7 @@ boolean EV_DoGenStairs
   {
     if (!(sec = LN_BACKSECTOR(line)))
       return rtn;
-    secnum = sec-_g->sectors;
+    secnum = sec-_g_sectors;
     manual = true;
     goto manual_stair;
   }
@@ -665,7 +665,7 @@ boolean EV_DoGenStairs
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
 manual_stair:
     //Do not start another function if floor already moving
@@ -746,13 +746,13 @@ manual_stair:
           continue;
 
         tsec = LN_FRONTSECTOR((sec->lines[i]));
-        newsecnum = tsec-_g->sectors;
+        newsecnum = tsec-_g_sectors;
 
         if (secnum != newsecnum)
           continue;
 
         tsec = LN_BACKSECTOR((sec->lines[i]));
-        newsecnum = tsec - _g->sectors;
+        newsecnum = tsec - _g_sectors;
 
         if (!Igno && tsec->floorpic != texture)
           continue;
@@ -827,7 +827,7 @@ boolean EV_DoGenCrusher
   {
     if (!(sec = LN_BACKSECTOR(line)))
       return rtn;
-    secnum = sec-_g->sectors;
+    secnum = sec-_g_sectors;
     manual = true;
     goto manual_crusher;
   }
@@ -836,7 +836,7 @@ boolean EV_DoGenCrusher
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
 manual_crusher:
     // Do not start another function if ceiling already moving
@@ -922,7 +922,7 @@ boolean EV_DoGenLockedDoor
   {
     if (!(sec = LN_BACKSECTOR(line)))
       return rtn;
-    secnum = sec-_g->sectors;
+    secnum = sec-_g_sectors;
     manual = true;
     goto manual_locked;
   }
@@ -933,7 +933,7 @@ boolean EV_DoGenLockedDoor
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 manual_locked:
     // Do not start another function if ceiling already moving
     if (P_SectorActive(ceiling_special,sec)) //jff 2/22/98
@@ -1030,7 +1030,7 @@ boolean EV_DoGenDoor
   {
     if (!(sec = LN_BACKSECTOR(line)))
       return rtn;
-    secnum = sec-_g->sectors;
+    secnum = sec-_g_sectors;
     manual = true;
     goto manual_door;
   }
@@ -1042,7 +1042,7 @@ boolean EV_DoGenDoor
   // if not manual do all sectors tagged the same as the line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 manual_door:
     // Do not start another function if ceiling already moving
     if (P_SectorActive(ceiling_special,sec)) //jff 2/22/98

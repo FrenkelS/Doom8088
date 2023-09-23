@@ -45,6 +45,11 @@
 #include "globdata.h"
 
 
+int16_t _g_switchlist[MAXSWITCHES * 2];
+int32_t   _g_numswitches;
+
+button_t  _g_buttonlist[MAXBUTTONS];
+
 
 static const switchlist_t alphSwitchList[] =
 {
@@ -89,15 +94,15 @@ void P_InitSwitchList(void)
     {
         if (!alphSwitchList[i].episode)
         {
-            _g->numswitches = index/2;
-            _g->switchlist[index] = -1;
+            _g_numswitches = index/2;
+            _g_switchlist[index] = -1;
             break;
         }
 
         if (alphSwitchList[i].episode <= episode)
         {
-            _g->switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name1);
-            _g->switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name2);
+            _g_switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name1);
+            _g_switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name2);
         }
     }
 }
@@ -121,19 +126,19 @@ static void P_StartButton
 
   // See if button is already pressed
   for (i = 0;i < MAXBUTTONS;i++)
-    if (_g->buttonlist[i].btimer && _g->buttonlist[i].line == line)
+    if (_g_buttonlist[i].btimer && _g_buttonlist[i].line == line)
       return;
 
   for (i = 0;i < MAXBUTTONS;i++)
-    if (!_g->buttonlist[i].btimer)    // use first unused element of list
+    if (!_g_buttonlist[i].btimer)    // use first unused element of list
     {
-      _g->buttonlist[i].line = line;
-      _g->buttonlist[i].where = w;
-      _g->buttonlist[i].btexture = texture;
-      _g->buttonlist[i].btimer = time;
+      _g_buttonlist[i].line = line;
+      _g_buttonlist[i].where = w;
+      _g_buttonlist[i].btexture = texture;
+      _g_buttonlist[i].btimer = time;
       /* use sound origin of line itself - no need to compatibility-wrap
        * as the popout code gets it wrong whatever its value */
-      _g->buttonlist[i].soundorg = &LN_FRONTSECTOR(line)->soundorg;
+      _g_buttonlist[i].soundorg = &LN_FRONTSECTOR(line)->soundorg;
       return;
     }
 
@@ -157,9 +162,9 @@ void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
     int16_t   *texture, ttop, tmid, tbot;
     bwhere_e position;
 
-    ttop = _g->sides[line->sidenum[0]].toptexture;
-    tmid = _g->sides[line->sidenum[0]].midtexture;
-    tbot = _g->sides[line->sidenum[0]].bottomtexture;
+    ttop = _g_sides[line->sidenum[0]].toptexture;
+    tmid = _g_sides[line->sidenum[0]].midtexture;
+    tbot = _g_sides[line->sidenum[0]].bottomtexture;
 
     sound = sfx_swtchn;
 
@@ -171,21 +176,21 @@ void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
     texture = NULL;
     position = 0;
 
-    for (i = 0; i < _g->numswitches*2; i++)
+    for (i = 0; i < _g_numswitches*2; i++)
     {
-        if (_g->switchlist[i] == ttop)
+        if (_g_switchlist[i] == ttop)
         {
             texture = &ttop;
             position = top;
             break;
         }
-        else if (_g->switchlist[i] == tmid)
+        else if (_g_switchlist[i] == tmid)
         {
             texture = &tmid;
             position = middle;
             break;
         }
-        else if (_g->switchlist[i] == tbot)
+        else if (_g_switchlist[i] == tbot)
         {
             texture = &tbot;
             position = bottom;
@@ -196,27 +201,27 @@ void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
     if (texture == NULL)
         return; /* no switch texture was found to change */
 
-    *texture = _g->switchlist[i^1];
+    *texture = _g_switchlist[i^1];
 
     switch(position)
     {
         case top:
-            _g->sides[line->sidenum[0]].toptexture = *texture;
+            _g_sides[line->sidenum[0]].toptexture = *texture;
             break;
 
         case middle:
-            _g->sides[line->sidenum[0]].midtexture = *texture;
+            _g_sides[line->sidenum[0]].midtexture = *texture;
             break;
 
         case bottom:
-            _g->sides[line->sidenum[0]].bottomtexture = *texture;
+            _g_sides[line->sidenum[0]].bottomtexture = *texture;
             break;
     }
 
     S_StartSound2(&LN_FRONTSECTOR(line)->soundorg, sound);
 
     if (useAgain)
-        P_StartButton(line, position, _g->switchlist[i], BUTTONTIME);
+        P_StartButton(line, position, _g_switchlist[i], BUTTONTIME);
 }
 
 

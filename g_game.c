@@ -74,6 +74,46 @@
 #include "globdata.h"
 
 
+static const byte *demobuffer;   /* cph - only used for playback */
+static int32_t demolength; // check for overrun (missing DEMOMARKER)
+
+static const byte *demo_p;
+
+gameaction_t    _g_gameaction;
+gamestate_t     _g_gamestate;
+skill_t         _g_gameskill;
+
+int32_t             _g_gamemap;
+
+player_t        _g_player;
+
+static int32_t             starttime;     // for comparative timing purposes
+
+int32_t             _g_gametic;
+int32_t             _g_basetic;       /* killough 9/29/98: for demo sync */
+int32_t             _g_totalkills, _g_totallive, _g_totalitems, _g_totalsecret;    // for intermission
+wbstartstruct_t _g_wminfo;               // parms for world map / intermission
+static int32_t             totalleveltimes;      // CPhipps - total time for all completed levels
+
+
+boolean _g_gamekeydown[NUMKEYS];
+
+static skill_t d_skill;
+
+static byte  savegameslot;         // Slot to load if gameaction == ga_loadgame
+
+
+static boolean secretexit;
+
+boolean         _g_respawnmonsters;
+
+boolean         _g_usergame;      // ok to save / end game
+boolean         _g_timingdemo;    // if true, exit with report on completion
+boolean         _g_playeringame;
+boolean         _g_demoplayback;
+boolean         _g_singledemo;           // quit after playing a demo from cmdline
+
+
 //
 // controls (have defaults)
 //
@@ -171,6 +211,8 @@ static ticcmd_t netcmd;
 
 void G_BuildTiccmd(void)
 {
+    static int16_t     turnheld = 0;       // for accelerative turning
+
     int32_t speed;
     int32_t tspeed;
     int32_t forward;
@@ -180,44 +222,44 @@ void G_BuildTiccmd(void)
     memset(&netcmd,0,sizeof(ticcmd_t));
 
     //Use button negates the always run setting.
-    speed = (_g->gamekeydown[key_use] ^ _g->alwaysRun);
+    speed = (_g_gamekeydown[key_use] ^ _g_alwaysRun);
 
     forward = side = 0;
 
     // use two stage accelerative turning
     // on the keyboard and joystick
-    if (_g->gamekeydown[key_right] || _g->gamekeydown[key_left])
-        _g->turnheld ++;
+    if (_g_gamekeydown[key_right] || _g_gamekeydown[key_left])
+        turnheld++;
     else
-        _g->turnheld = 0;
+        turnheld = 0;
 
-    if (_g->turnheld < SLOWTURNTICS)
+    if (turnheld < SLOWTURNTICS)
         tspeed = 2;             // slow turn
     else
         tspeed = speed;
 
     // let movement keys cancel each other out
 
-    if (_g->gamekeydown[key_right])
+    if (_g_gamekeydown[key_right])
         netcmd.angleturn -= angleturn[tspeed];
-    if (_g->gamekeydown[key_left])
+    if (_g_gamekeydown[key_left])
         netcmd.angleturn += angleturn[tspeed];
 
-    if (_g->gamekeydown[key_up])
+    if (_g_gamekeydown[key_up])
         forward += forwardmove[speed];
-    if (_g->gamekeydown[key_down])
+    if (_g_gamekeydown[key_down])
         forward -= forwardmove[speed];
 
-    if (_g->gamekeydown[key_straferight])
+    if (_g_gamekeydown[key_straferight])
         side += sidemove[speed];
 
-    if (_g->gamekeydown[key_strafeleft])
+    if (_g_gamekeydown[key_strafeleft])
         side -= sidemove[speed];
 
-    if (_g->gamekeydown[key_fire])
+    if (_g_gamekeydown[key_fire])
         netcmd.buttons |= BT_ATTACK;
 
-    if (_g->gamekeydown[key_use])
+    if (_g_gamekeydown[key_use])
     {
         netcmd.buttons |= BT_USE;
     }
@@ -233,19 +275,19 @@ void G_BuildTiccmd(void)
     //
     // killough 3/26/98, 4/2/98: fix autoswitch when no weapons are left
 
-    if(_g->gamekeydown[key_use] && _g->gamekeydown[key_straferight])
+    if(_g_gamekeydown[key_use] && _g_gamekeydown[key_straferight])
     {
-        newweapon = P_WeaponCycleUp(&_g->player);
+        newweapon = P_WeaponCycleUp(&_g_player);
         side -= sidemove[speed]; //Hack cancel strafe.
     }
 
-    else if(_g->gamekeydown[key_use] && _g->gamekeydown[key_strafeleft])
+    else if(_g_gamekeydown[key_use] && _g_gamekeydown[key_strafeleft])
     {
-        newweapon = P_WeaponCycleDown(&_g->player);
+        newweapon = P_WeaponCycleDown(&_g_player);
         side += sidemove[speed]; //Hack cancel strafe.
     }
-    else if ((_g->player.attackdown && !P_CheckAmmo(&_g->player)))
-        newweapon = P_SwitchWeapon(&_g->player);           // phares
+    else if ((_g_player.attackdown && !P_CheckAmmo(&_g_player)))
+        newweapon = P_SwitchWeapon(&_g_player);           // phares
     else
     {
         newweapon = wp_nochange;
@@ -262,7 +304,7 @@ void G_BuildTiccmd(void)
         // Switch to shotgun or SSG based on preferences.
 
         {
-            const player_t *player = &_g->player;
+            const player_t *player = &_g_player;
 
             // only select chainsaw from '1' if it's owned, it's
             // not already in use, and the player prefers it or
@@ -308,11 +350,11 @@ static void G_DoLoadLevel (void)
     if (wipegamestate == GS_LEVEL)
         wipegamestate = -1;             // force a wipe
 
-    _g->gamestate = GS_LEVEL;
+    _g_gamestate = GS_LEVEL;
 
 
-    if (_g->playeringame && _g->player.playerstate == PST_DEAD)
-        _g->player.playerstate = PST_REBORN;
+    if (_g_playeringame && _g_player.playerstate == PST_DEAD)
+        _g_player.playerstate = PST_REBORN;
 
 
     // initialize the msecnode_t freelist.                     phares 3/25/98
@@ -323,13 +365,13 @@ static void G_DoLoadLevel (void)
     P_SetSecnodeFirstpoolToNull();
 
 
-    P_SetupLevel (_g->gamemap);
+    P_SetupLevel (_g_gamemap);
 
-    _g->gameaction = ga_nothing;
+    _g_gameaction = ga_nothing;
     Z_CheckHeap ();
 
     // clear cmd building stuff
-    memset (_g->gamekeydown, 0, sizeof(_g->gamekeydown));
+    memset (_g_gamekeydown, 0, sizeof(_g_gamekeydown));
 
     // killough 5/13/98: in case netdemo has consoleplayer other than green
     ST_Start();
@@ -351,13 +393,13 @@ boolean G_Responder (event_t* ev)
     // killough 9/29/98: make any key pop up menu regardless of
     // which kind of demo, and allow other events during playback
 
-    if (_g->gameaction == ga_nothing && (_g->demoplayback || _g->gamestate == GS_DEMOSCREEN))
+    if (_g_gameaction == ga_nothing && (_g_demoplayback || _g_gamestate == GS_DEMOSCREEN))
     {
         // killough 10/98:
         // Don't pop up menu, if paused in middle
         // of demo playback, or if automap active.
         // Don't suck up keys, which may be cheats
-        if(_g->gamestate == GS_DEMOSCREEN)
+        if(_g_gamestate == GS_DEMOSCREEN)
         {
             if(!(automapmode & am_active))
             {
@@ -372,7 +414,7 @@ boolean G_Responder (event_t* ev)
         return false;
     }
 
-    if (_g->gamestate == GS_FINALE && F_Responder(ev))
+    if (_g_gamestate == GS_FINALE && F_Responder(ev))
         return true;  // finale ate the event
 
     switch (ev->type)
@@ -380,12 +422,12 @@ boolean G_Responder (event_t* ev)
         case ev_keydown:
 
             if (ev->data1 <NUMKEYS)
-                _g->gamekeydown[ev->data1] = true;
+                _g_gamekeydown[ev->data1] = true;
             return true;    // eat key down events
 
         case ev_keyup:
             if (ev->data1 <NUMKEYS)
-                _g->gamekeydown[ev->data1] = false;
+                _g_gamekeydown[ev->data1] = false;
             return false;   // always let key up events filter down
 
         default:
@@ -401,20 +443,22 @@ boolean G_Responder (event_t* ev)
 
 void G_Ticker (void)
 {
+    static gamestate_t prevgamestate = 0;
+
     P_MapStart();
 
-    if(_g->playeringame && _g->player.playerstate == PST_REBORN)
+    if(_g_playeringame && _g_player.playerstate == PST_REBORN)
         G_DoReborn ();
 
     P_MapEnd();
 
     // do things to change the game state
-    while (_g->gameaction != ga_nothing)
+    while (_g_gameaction != ga_nothing)
     {
-        switch (_g->gameaction)
+        switch (_g_gameaction)
         {
         case ga_loadlevel:
-            _g->player.playerstate = PST_REBORN;
+            _g_player.playerstate = PST_REBORN;
             G_DoLoadLevel ();
             break;
         case ga_newgame:
@@ -443,23 +487,23 @@ void G_Ticker (void)
         }
     }
 
-    if (!_g->demoplayback && _g->menuactive)
-        _g->basetic++;  // For revenant tracers and RNG -- we must maintain sync
+    if (!_g_demoplayback && _g_menuactive)
+        _g_basetic++;  // For revenant tracers and RNG -- we must maintain sync
     else
     {
-        if (_g->playeringame)
+        if (_g_playeringame)
         {
-            memcpy(&_g->player.cmd, &netcmd, sizeof(ticcmd_t));
+            memcpy(&_g_player.cmd, &netcmd, sizeof(ticcmd_t));
 
-            if (_g->demoplayback)
+            if (_g_demoplayback)
                 G_ReadDemoTiccmd ();
         }
     }
 
     // cph - if the gamestate changed, we may need to clean up the old gamestate
-    if (_g->gamestate != _g->prevgamestate)
+    if (_g_gamestate != prevgamestate)
     {
-        switch (_g->prevgamestate)
+        switch (prevgamestate)
         {
         case GS_LEVEL:
             // This causes crashes at level end - Neil Stevens
@@ -475,11 +519,11 @@ void G_Ticker (void)
         default:
             break;
         }
-        _g->prevgamestate = _g->gamestate;
+        prevgamestate = _g_gamestate;
     }
 
     // do main actions
-    switch (_g->gamestate)
+    switch (_g_gamestate)
     {
     case GS_LEVEL:
         P_Ticker ();
@@ -514,7 +558,7 @@ void G_Ticker (void)
 
 static void G_PlayerFinishLevel(void)
 {
-    player_t *p = &_g->player;
+    player_t *p = &_g_player;
     memset(p->powers, 0, sizeof p->powers);
     memset(p->cards, 0, sizeof p->cards);
     p->mo = NULL;           // cph - this is allocated PU_LEVEL so it's gone
@@ -538,19 +582,19 @@ void G_PlayerReborn (void)
     int32_t itemcount;
     int32_t secretcount;
 
-    killcount = _g->player.killcount;
-    itemcount = _g->player.itemcount;
-    secretcount = _g->player.secretcount;
+    killcount = _g_player.killcount;
+    itemcount = _g_player.itemcount;
+    secretcount = _g_player.secretcount;
 
-    p = &_g->player;
+    p = &_g_player;
 
     int32_t cheats = p->cheats;
     memset (p, 0, sizeof(*p));
     p->cheats = cheats;
 
-    _g->player.killcount = killcount;
-    _g->player.itemcount = itemcount;
-    _g->player.secretcount = secretcount;
+    _g_player.killcount = killcount;
+    _g_player.itemcount = itemcount;
+    _g_player.secretcount = secretcount;
 
     p->usedown = p->attackdown = true;  // don't do anything immediately
     p->playerstate = PST_LIVE;
@@ -570,7 +614,7 @@ void G_PlayerReborn (void)
 
 void G_DoReborn (void)
 {
-    _g->gameaction = ga_loadlevel;      // reload the level from scratch
+    _g_gameaction = ga_loadlevel;      // reload the level from scratch
 }
 
 // DOOM Par Times
@@ -581,8 +625,8 @@ static const int32_t pars[10] = {
 
 void G_ExitLevel (void)
 {
-    _g->secretexit = false;
-    _g->gameaction = ga_completed;
+    secretexit = false;
+    _g_gameaction = ga_completed;
 }
 
 // Here's for the german edition.
@@ -590,8 +634,8 @@ void G_ExitLevel (void)
 
 void G_SecretExitLevel (void)
 {
-    _g->secretexit = true;
-    _g->gameaction = ga_completed;
+    secretexit = true;
+    _g_gameaction = ga_completed;
 }
 
 //
@@ -600,65 +644,65 @@ void G_SecretExitLevel (void)
 
 static void G_DoCompleted (void)
 {
-    _g->gameaction = ga_nothing;
+    _g_gameaction = ga_nothing;
 
-    if (_g->playeringame)
+    if (_g_playeringame)
         G_PlayerFinishLevel();        // take away cards and stuff
 
     if (automapmode & am_active)
         AM_Stop();
 
-    if (_g->gamemap == 9) // kilough 2/7/98
-        _g->player.didsecret = true;
+    if (_g_gamemap == 9) // kilough 2/7/98
+        _g_player.didsecret = true;
 
-    _g->wminfo.didsecret = _g->player.didsecret;
-    _g->wminfo.last = _g->gamemap -1;
+    _g_wminfo.didsecret = _g_player.didsecret;
+    _g_wminfo.last = _g_gamemap -1;
 
     // wminfo.next is 0 biased, unlike gamemap
-    if (_g->secretexit)
-        _g->wminfo.next = 8;  // go to secret level
+    if (secretexit)
+        _g_wminfo.next = 8;  // go to secret level
     else
-        if (_g->gamemap == 9)
+        if (_g_gamemap == 9)
         {
             // returning from secret level
-            _g->wminfo.next = 3;
+            _g_wminfo.next = 3;
         }
         else
-           _g->wminfo.next = _g->gamemap;          // go to next level
+           _g_wminfo.next = _g_gamemap;          // go to next level
 
-    _g->wminfo.maxkills = _g->totalkills;
-    _g->wminfo.maxitems = _g->totalitems;
-    _g->wminfo.maxsecret = _g->totalsecret;
+    _g_wminfo.maxkills = _g_totalkills;
+    _g_wminfo.maxitems = _g_totalitems;
+    _g_wminfo.maxsecret = _g_totalsecret;
 
-    _g->wminfo.partime = TICRATE*pars[_g->gamemap];
+    _g_wminfo.partime = TICRATE*pars[_g_gamemap];
 
-    _g->wminfo.pnum = 0;
+    _g_wminfo.pnum = 0;
 
 
-    _g->wminfo.plyr[0].in = _g->playeringame;
-    _g->wminfo.plyr[0].skills = _g->player.killcount;
-    _g->wminfo.plyr[0].sitems = _g->player.itemcount;
-    _g->wminfo.plyr[0].ssecret = _g->player.secretcount;
-    _g->wminfo.plyr[0].stime = _g->leveltime;
+    _g_wminfo.plyr[0].in = _g_playeringame;
+    _g_wminfo.plyr[0].skills = _g_player.killcount;
+    _g_wminfo.plyr[0].sitems = _g_player.itemcount;
+    _g_wminfo.plyr[0].ssecret = _g_player.secretcount;
+    _g_wminfo.plyr[0].stime = _g_leveltime;
 
     /* cph - modified so that only whole seconds are added to the totalleveltimes
    *  value; so our total is compatible with the "naive" total of just adding
    *  the times in seconds shown for each level. Also means our total time
    *  will agree with Compet-n.
    */
-    _g->wminfo.totaltimes = (_g->totalleveltimes += (_g->leveltime - _g->leveltime%35));
+    _g_wminfo.totaltimes = (totalleveltimes += (_g_leveltime - _g_leveltime%35));
 
-    _g->gamestate = GS_INTERMISSION;
+    _g_gamestate = GS_INTERMISSION;
     automapmode &= ~am_active;
 
     // lmpwatch.pl engine-side demo testing support
     // print "FINISHED: <mapname>" when the player exits the current map
-    if (nodrawers && (_g->demoplayback || _g->timingdemo))
+    if (nodrawers && (_g_demoplayback || _g_timingdemo))
     {
-        printf("FINISHED: E1M%ld\n", _g->gamemap);
+        printf("FINISHED: E1M%ld\n", _g_gamemap);
     }
 
-    WI_Start (&_g->wminfo);
+    WI_Start (&_g_wminfo);
 }
 
 //
@@ -667,21 +711,21 @@ static void G_DoCompleted (void)
 
 void G_WorldDone (void)
 {
-    _g->gameaction = ga_worlddone;
+    _g_gameaction = ga_worlddone;
 
-    if (_g->secretexit)
-        _g->player.didsecret = true;
+    if (secretexit)
+        _g_player.didsecret = true;
 
-    if (_g->gamemap == 8)
-        _g->gameaction = ga_victory; // cph - after ExM8 summary screen, show victory stuff
+    if (_g_gamemap == 8)
+        _g_gameaction = ga_victory; // cph - after ExM8 summary screen, show victory stuff
 }
 
 static void G_DoWorldDone (void)
 {
-    _g->gamestate = GS_LEVEL;
-    _g->gamemap = _g->wminfo.next+1;
+    _g_gamestate = GS_LEVEL;
+    _g_gamemap = _g_wminfo.next+1;
     G_DoLoadLevel();
-    _g->gameaction = ga_nothing;
+    _g_gameaction = ga_nothing;
 }
 
 // killough 2/28/98: A ridiculously large number
@@ -718,13 +762,13 @@ void G_UpdateSaveGameStrings()
     {
         if(saveslots[i].save_present != 1)
         {
-            strcpy(_g->savegamestrings[i], "EMPTY");
+            strcpy(_g_savegamestrings[i], "EMPTY");
         }
         else
         {
-            strcpy(_g->savegamestrings[i], "E1My");
+            strcpy(_g_savegamestrings[i], "E1My");
 
-            _g->savegamestrings[i][3] = '0' + saveslots[i].gamemap;
+            _g_savegamestrings[i][3] = '0' + saveslots[i].gamemap;
         }
     }
 
@@ -733,9 +777,9 @@ void G_UpdateSaveGameStrings()
 
 // killough 3/16/98: add slot info
 void G_LoadGame(int32_t slot)
-{  
-    _g->savegameslot = slot;
-    _g->demoplayback = false;
+{
+    savegameslot = slot;
+    _g_demoplayback = false;
 
     G_DoLoadGame();
 }
@@ -751,24 +795,24 @@ static void G_DoLoadGame(void)
 
     gba_save_data_t* saveslots = (gba_save_data_t*)loadbuffer;
 
-    gba_save_data_t* savedata = &saveslots[_g->savegameslot];
+    gba_save_data_t* savedata = &saveslots[savegameslot];
 
     if(savedata->save_present != 1)
         return;
 
-    _g->gameskill = savedata->gameskill;
-    _g->gamemap = savedata->gamemap;
+    _g_gameskill = savedata->gameskill;
+    _g_gamemap = savedata->gamemap;
 	
-    G_InitNew (_g->gameskill, _g->gamemap);
+    G_InitNew (_g_gameskill, _g_gamemap);
 
-    _g->totalleveltimes = savedata->totalleveltimes;
-    memcpy(_g->player.weaponowned, savedata->weaponowned, sizeof(savedata->weaponowned));
-    memcpy(_g->player.ammo, savedata->ammo, sizeof(savedata->ammo));
-    memcpy(_g->player.maxammo, savedata->maxammo, sizeof(savedata->maxammo));
+    totalleveltimes = savedata->totalleveltimes;
+    memcpy(_g_player.weaponowned, savedata->weaponowned, sizeof(savedata->weaponowned));
+    memcpy(_g_player.ammo, savedata->ammo, sizeof(savedata->ammo));
+    memcpy(_g_player.maxammo, savedata->maxammo, sizeof(savedata->maxammo));
 	
     //If stored maxammo is more than no backpack ammo, player had a backpack.
-    if(_g->player.maxammo[am_clip] > maxammo[am_clip])
-		_g->player.backpack = true;
+    if(_g_player.maxammo[am_clip] > maxammo[am_clip])
+		_g_player.backpack = true;
 
     Z_Free(loadbuffer);
 }
@@ -780,7 +824,7 @@ static void G_DoLoadGame(void)
 
 void G_SaveGame(int32_t slot)
 {
-    _g->savegameslot = slot;
+    savegameslot = slot;
     G_DoSaveGame();
 }
 
@@ -803,23 +847,23 @@ static void G_DoSaveGame(void)
 
     gba_save_data_t* saveslots = (gba_save_data_t*)savebuffer;
 
-    gba_save_data_t* savedata = &saveslots[_g->savegameslot];
+    gba_save_data_t* savedata = &saveslots[savegameslot];
 
     savedata->save_present = 1;
 
-    savedata->gameskill = _g->gameskill;
-    savedata->gamemap = _g->gamemap;
-    savedata->totalleveltimes = _g->totalleveltimes;
+    savedata->gameskill = _g_gameskill;
+    savedata->gamemap = _g_gamemap;
+    savedata->totalleveltimes = totalleveltimes;
 
-    memcpy(savedata->weaponowned, _g->player.weaponowned, sizeof(savedata->weaponowned));
-    memcpy(savedata->ammo, _g->player.ammo, sizeof(savedata->ammo));
-    memcpy(savedata->maxammo, _g->player.maxammo, sizeof(savedata->maxammo));
+    memcpy(savedata->weaponowned, _g_player.weaponowned, sizeof(savedata->weaponowned));
+    memcpy(savedata->ammo, _g_player.ammo, sizeof(savedata->ammo));
+    memcpy(savedata->maxammo, _g_player.maxammo, sizeof(savedata->maxammo));
 
     SaveSRAM(savebuffer, savebuffersize, 0);
 
     Z_Free(savebuffer);
 
-    _g->player.message = GGSAVED;
+    _g_player.message = GGSAVED;
 
     G_UpdateSaveGameStrings();
 }
@@ -830,14 +874,14 @@ void G_SaveSettings()
 
     settings.cookie = settings_cookie;
 
-    settings.gamma = _g->gamma;
-    settings.alwaysRun = _g->alwaysRun;
+    settings.gamma = _g_gamma;
+    settings.alwaysRun = _g_alwaysRun;
 
     settings.showMessages = showMessages;
 
     settings.musicVolume = snd_MusicVolume;
     settings.soundVolume = snd_SfxVolume;
-	settings.highDetail = _g->highDetail;
+	settings.highDetail = _g_highDetail;
 
     SaveSRAM((byte*)&settings, sizeof(settings), settings_sram_offset);
 }
@@ -850,15 +894,15 @@ void G_LoadSettings()
 
     if(settings.cookie == settings_cookie)
     {
-        _g->gamma = (settings.gamma > 5) ? 5 : settings.gamma;
-        _g->alwaysRun = (settings.alwaysRun > 0) ? 1 : 0;
+        _g_gamma = (settings.gamma > 5) ? 5 : settings.gamma;
+        _g_alwaysRun = (settings.alwaysRun > 0) ? 1 : 0;
 
         showMessages = (settings.showMessages > 0) ? 1 : 0;
 
         snd_SfxVolume   = (settings.soundVolume > 15) ? 15 : settings.soundVolume;
         snd_MusicVolume = (settings.musicVolume > 15) ? 15 : settings.musicVolume;
-		_g->highDetail = (settings.highDetail > 0) ? 1 : 0;
-		highDetail = _g->highDetail;
+		_g_highDetail = (settings.highDetail > 0) ? 1 : 0;
+		highDetail = _g_highDetail;
 		
         I_SetPalette(0);
 
@@ -869,8 +913,8 @@ void G_LoadSettings()
 
 void G_DeferedInitNew(skill_t skill)
 {
-    _g->d_skill = skill;
-    _g->gameaction = ga_newgame;
+    d_skill = skill;
+    _g_gameaction = ga_newgame;
 }
 
 // killough 3/1/98: function to reload all the default parameter
@@ -882,15 +926,15 @@ void G_ReloadDefaults(void)
     // (allows functions above to load different values for demos
     // and savegames without messing up defaults).
 
-    _g->demoplayback = false;
-    _g->singledemo = false;            // killough 9/29/98: don't stop after 1 demo
+    _g_demoplayback = false;
+    _g_singledemo = false;            // killough 9/29/98: don't stop after 1 demo
 }
 
 static void G_DoNewGame (void)
 {
     G_ReloadDefaults();            // killough 3/1/98
-    G_InitNew (_g->d_skill, 1);
-    _g->gameaction = ga_nothing;
+    G_InitNew (d_skill, 1);
+    _g_gameaction = ga_nothing;
 
     //jff 4/26/98 wake up the status bar in case were coming out of a DM demo
     ST_Start();
@@ -914,16 +958,16 @@ static void G_InitNew(skill_t skill, int32_t map)
 
     M_ClearRandom();
 
-    _g->respawnmonsters = skill == sk_nightmare;
+    _g_respawnmonsters = skill == sk_nightmare;
 
-    _g->player.playerstate = PST_REBORN;
+    _g_player.playerstate = PST_REBORN;
 
-    _g->usergame = true;                // will be set false if a demo
+    _g_usergame = true;                // will be set false if a demo
     automapmode &= ~am_active;
-    _g->gamemap = map;
-    _g->gameskill = skill;
+    _g_gamemap = map;
+    _g_gameskill = skill;
 
-    _g->totalleveltimes = 0; // cph
+    totalleveltimes = 0;
 
     G_DoLoadLevel ();
 }
@@ -938,20 +982,20 @@ static void G_ReadDemoTiccmd (void)
 {
     uint8_t at; // e6y: tasdoom stuff
 
-    if (*_g->demo_p == DEMOMARKER)
+    if (*demo_p == DEMOMARKER)
         G_CheckDemoStatus();      // end of demo data stream
-    else if (_g->demoplayback && _g->demo_p + 4 > _g->demobuffer + _g->demolength)
+    else if (_g_demoplayback && demo_p + 4 > demobuffer + demolength)
     {
         printf("G_ReadDemoTiccmd: missing DEMOMARKER\n");
         G_CheckDemoStatus();
     }
     else
     {
-        ticcmd_t* cmd = &_g->player.cmd;
-        cmd->forwardmove = ((int8_t)*_g->demo_p++);
-        cmd->sidemove = ((int8_t)*_g->demo_p++);
-        cmd->angleturn = ((uint8_t)(at = *_g->demo_p++))<<8;
-        cmd->buttons = (uint8_t)*_g->demo_p++;
+        ticcmd_t* cmd = &_g_player.cmd;
+        cmd->forwardmove = ((int8_t)*demo_p++);
+        cmd->sidemove = ((int8_t)*demo_p++);
+        cmd->angleturn = ((uint8_t)(at = *demo_p++))<<8;
+        cmd->buttons = (uint8_t)*demo_p++;
     }
 }
 
@@ -965,21 +1009,21 @@ static const char *defdemoname;
 void G_DeferedPlayDemo (const char* name)
 {
     defdemoname = name;
-    _g->gameaction = ga_playdemo;
+    _g_gameaction = ga_playdemo;
 }
 
 
 //e6y: Check for overrun
-static void CheckForOverrun(const byte *start_p, const byte *current_p, size_t maxsize, size_t size)
+static void CheckForOverrun(const byte *start_p, const byte *current_p, size_t size)
 {
     size_t pos = current_p - start_p;
-    if (pos + size > maxsize)
+    if (pos + size > demolength)
     {
         I_Error("CheckForOverrun: wrong demo header\n");
     }
 }
 
-static const byte* G_ReadDemoHeader(const byte *demo_p, size_t size)
+static const byte* G_ReadDemoHeader(const byte *demo_p)
 {
     skill_t skill;
     int32_t map;
@@ -989,14 +1033,14 @@ static const byte* G_ReadDemoHeader(const byte *demo_p, size_t size)
     // because demobuffer can be uninitialized
     const byte *header_p = demo_p;
 
-    _g->basetic = _g->gametic;  // killough 9/29/98
+    _g_basetic = _g_gametic;  // killough 9/29/98
 
     // killough 2/22/98, 2/28/98: autodetect old demos and act accordingly.
     // Old demos turn on demo_compatibility => compatibility; new demos load
     // compatibility flag, and other flags as well, as a part of the demo.
 
     //e6y: check for overrun
-    CheckForOverrun(header_p, demo_p, size, 1);
+    CheckForOverrun(header_p, demo_p, 1);
 
     demo_p++;
 
@@ -1006,7 +1050,7 @@ static const byte* G_ReadDemoHeader(const byte *demo_p, size_t size)
     // respawnparm, nomonsters flags to G_LoadOptions()/G_SaveOptions())
 
     //e6y: check for overrun
-    CheckForOverrun(header_p, demo_p, size, 8);
+    CheckForOverrun(header_p, demo_p, 8);
 
     skill = *demo_p++;
     demo_p++;
@@ -1018,17 +1062,17 @@ static const byte* G_ReadDemoHeader(const byte *demo_p, size_t size)
     demo_p++;
 
     //e6y: check for overrun
-    CheckForOverrun(header_p, demo_p, size, MAXPLAYERS);
+    CheckForOverrun(header_p, demo_p, MAXPLAYERS);
 
-    _g->playeringame = *demo_p++;
+    _g_playeringame = *demo_p++;
     demo_p += MIN_MAXPLAYERS - MAXPLAYERS;
 
 
-    if (_g->gameaction != ga_loadgame) { /* killough 12/98: support -loadgame */
+    if (_g_gameaction != ga_loadgame) { /* killough 12/98: support -loadgame */
         G_InitNew(skill, map);
     }
 
-    _g->player.cheats = 0;
+    _g_player.cheats = 0;
 
     return demo_p;
 }
@@ -1071,17 +1115,17 @@ static void G_DoPlayDemo(void)
 
     /* cph - store lump number for unlocking later */
     int16_t demolumpnum = W_GetNumForName(basename);
-    _g->demobuffer = W_GetLumpByNum(demolumpnum);
-    _g->demolength = W_LumpLength(demolumpnum);
+    demobuffer = W_GetLumpByNum(demolumpnum);
+    demolength = W_LumpLength(demolumpnum);
 
-    _g->demo_p = G_ReadDemoHeader(_g->demobuffer, _g->demolength);
+    demo_p = G_ReadDemoHeader(demobuffer);
 
-    _g->gameaction = ga_nothing;
-    _g->usergame = false;
+    _g_gameaction = ga_nothing;
+    _g_usergame = false;
 
-    _g->demoplayback = true;
+    _g_demoplayback = true;
 
-    _g->starttime = I_GetTime();
+    starttime = I_GetTime();
 }
 
 /* G_CheckDemoStatus
@@ -1090,22 +1134,22 @@ static void G_DoPlayDemo(void)
  */
 void G_CheckDemoStatus (void)
 {
-    if (_g->timingdemo)
+    if (_g_timingdemo)
     {
         int32_t endtime = I_GetTime();
         // killough -- added fps information and made it work for longer demos:
-        uint32_t realtics = endtime-_g->starttime;
-        uint32_t resultfps = TICRATE * 1000L * _g->gametic / realtics;
+        uint32_t realtics = endtime - starttime;
+        uint32_t resultfps = TICRATE * 1000L * _g_gametic / realtics;
         I_Error ("Timed %lu gametics in %lu realtics = %lu.%.3lu frames per second",
-                 (uint32_t) _g->gametic,realtics,
+                 (uint32_t) _g_gametic,realtics,
                  resultfps / 1000, resultfps % 1000);
     }
 
-    Z_ChangeTagToCache(_g->demobuffer);
+    Z_ChangeTagToCache(demobuffer);
 
-    if (_g->demoplayback)
+    if (_g_demoplayback)
     {
-        if (_g->singledemo)
+        if (_g_singledemo)
             exit(0);  // killough
 
         G_ReloadDefaults();    // killough 3/1/98

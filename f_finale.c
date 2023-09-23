@@ -74,12 +74,12 @@ void WI_checkForAccelerate(void);    // killough 3/28/98: used to
 //
 void F_StartFinale (void)
 {
-    _g->gameaction = ga_nothing;
-    _g->gamestate = GS_FINALE;
+    _g_gameaction = ga_nothing;
+    _g_gamestate = GS_FINALE;
     automapmode &= ~am_active;
 
     // killough 3/28/98: clear accelerative text flags
-    _g->acceleratestage = midstage = false;
+    _g_acceleratestage = midstage = false;
 
     // Okay - IWAD dependend stuff.
     // This has been changed severly, and
@@ -104,8 +104,8 @@ boolean F_Responder (event_t *event)
 
 static int32_t Get_TextSpeed(void)
 {
-    return midstage ? NEWTEXTSPEED : (midstage=_g->acceleratestage) ?
-                              _g->acceleratestage=false, NEWTEXTSPEED : TEXTSPEED;
+    return midstage ? NEWTEXTSPEED : (midstage=_g_acceleratestage) ?
+                              _g_acceleratestage=false, NEWTEXTSPEED : TEXTSPEED;
     }
 
 
@@ -136,7 +136,7 @@ static int32_t Get_TextSpeed(void)
         /* killough 2/28/98: changed to allow acceleration */
         if (finalecount > strlen(E1TEXT)*speed/100 +
                 (midstage ? NEWTEXTWAIT : TEXTWAIT) ||
-                (midstage && _g->acceleratestage))
+                (midstage && _g_acceleratestage))
         {
        // Doom 1 end
                                // with enough time, it's automatic
@@ -158,7 +158,7 @@ static void V_DrawBackground(const char* flatname)
 {
     /* erase the entire screen to a tiled background */
     const byte* src = W_GetLumpByName(flatname);
-    uint16_t *dest = _g->screen;
+    uint16_t *dest = _g_screen;
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
     {
@@ -243,5 +243,5 @@ void F_Drawer (void)
     if (!finalestage)
         F_TextWrite ();
     else
-        W_ReadLumpByName("HELP2", _g->screen);
+        W_ReadLumpByName("HELP2", _g_screen);
 }

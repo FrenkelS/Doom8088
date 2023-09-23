@@ -89,7 +89,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
             );
 
       // if not a silent crusher, make moving sound
-      if (!(_g->leveltime&7))
+      if (!(_g_leveltime&7))
       {
         switch(ceiling->type)
         {
@@ -153,7 +153,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
             );
 
       // if not silent crusher type make moving sound
-      if (!(_g->leveltime&7))
+      if (!(_g_leveltime&7))
       {
         switch(ceiling->type)
         {
@@ -279,7 +279,7 @@ boolean EV_DoCeiling
   // affects all sectors with the same tag as the linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
     // if ceiling already moving, don't start a second function on it
     if (P_SectorActive(ceiling_special,sec))  //jff 2/22/98

@@ -60,6 +60,32 @@
 #include "globdata.h"
 
 
+//
+// defaulted values
+//
+int32_t _g_alwaysRun;
+
+int32_t _g_highDetail;
+
+static boolean messageToPrint;  // true = message to be printed
+
+static const char* messageString; // ...and here is the message string!
+
+static boolean messageLastMenuActive;
+
+
+static const menu_t* currentMenu; // current menudef
+
+static int16_t itemOn;           // menu item skull is on (for Big Font menus)
+static int16_t skullAnimCounter; // skull animation counter
+static int16_t whichSkull;       // which skull to draw (he blinks)
+
+boolean _g_menuactive;    // The menus are up
+static boolean messageNeedsInput; // timed message = no input from user
+
+char _g_savegamestrings[8][8];
+
+
 int32_t showMessages;
 
 
@@ -232,7 +258,7 @@ static void M_NewGame(int32_t choice)
 	UNUSED(choice);
 
 	M_SetupNextMenu(&NewDef);
-	_g->itemOn = 2; //Set hurt me plenty as default difficulty
+	itemOn = 2; //Set hurt me plenty as default difficulty
 }
 
 // CPhipps - static
@@ -249,7 +275,7 @@ static void M_ChooseSkill(int32_t choice)
     if (choice == nightmare)
     {   // Ty 03/27/98 - externalized
         M_StartMessage(NIGHTMARE,M_VerifyNightmare,true);
-		_g->itemOn = 0;
+		itemOn = 0;
     }
     else
     {
@@ -332,7 +358,7 @@ static void M_DrawSaveLoad(const char* name)
 		}
 		V_DrawPatchNoScale(x, y, rpatch);
 
-		M_WriteText(LoadDef.x, y - 7, _g->savegamestrings[i]);
+		M_WriteText(LoadDef.x, y - 7, _g_savegamestrings[i]);
 	}
 
 	Z_ChangeTagToCache(lpatch);
@@ -434,9 +460,7 @@ static void M_DoSave(int32_t slot)
 //
 static void M_SaveSelect(int32_t choice)
 {
-    _g->saveSlot = choice;
-
-    M_DoSave(_g->saveSlot);
+    M_DoSave(choice);
 }
 
 //
@@ -447,13 +471,13 @@ static void M_SaveGame (int32_t choice)
 	UNUSED(choice);
 
 	// killough 10/6/98: allow savegames during single-player demo playback
-	if (!_g->usergame && (!_g->demoplayback))
+	if (!_g_usergame && (!_g_demoplayback))
 	{
 		M_StartMessage(SAVEDEAD,NULL,false); // Ty 03/27/98 - externalized
 		return;
 	}
 
-	if (_g->gamestate != GS_LEVEL)
+	if (_g_gamestate != GS_LEVEL)
 		return;
 
 	M_SetupNextMenu(&SaveDef);
@@ -515,11 +539,11 @@ static void M_DrawOptions(void)
 
   V_DrawNamePatch(OptionsDef.x + 120, OptionsDef.y+LINEHEIGHT*messages, msgNames[showMessages]);
 
-  V_DrawNamePatch(OptionsDef.x + 146, OptionsDef.y+LINEHEIGHT*alwaysrun, msgNames[_g->alwaysRun]);
+  V_DrawNamePatch(OptionsDef.x + 146, OptionsDef.y+LINEHEIGHT*alwaysrun, msgNames[_g_alwaysRun]);
 
-  V_DrawNamePatch(OptionsDef.x + 176, OptionsDef.y+LINEHEIGHT*detail, detailNames[_g->highDetail]);
+  V_DrawNamePatch(OptionsDef.x + 176, OptionsDef.y+LINEHEIGHT*detail, detailNames[_g_highDetail]);
 
-  M_DrawThermo(OptionsDef.x + 158, OptionsDef.y+LINEHEIGHT*gamma+2,6,_g->gamma);
+  M_DrawThermo(OptionsDef.x + 158, OptionsDef.y+LINEHEIGHT*gamma+2,6,_g_gamma);
 }
 
 static void M_Options(int32_t choice)
@@ -635,7 +659,7 @@ static void M_EndGameResponse(int32_t ch)
     return;
 
   // killough 5/26/98: make endgame quit if recording or playing back demo
-  if (_g->singledemo)
+  if (_g_singledemo)
     G_CheckDemoStatus();
 
   M_ClearMenus ();
@@ -660,9 +684,9 @@ static void M_ChangeMessages(int32_t choice)
 
   showMessages = 1 - showMessages;
 
-  _g->player.message = showMessages ? MSGON : MSGOFF;
+  _g_player.message = showMessages ? MSGON : MSGOFF;
 
-  _g->message_dontfuckwithme = true;
+  _g_message_dontfuckwithme = true;
 
   G_SaveSettings();
 }
@@ -672,12 +696,12 @@ static void M_ChangeAlwaysRun(int32_t choice)
 {
     UNUSED(choice);
 
-    _g->alwaysRun = 1 - _g->alwaysRun;
+    _g_alwaysRun = 1 - _g_alwaysRun;
 
-    if (!_g->alwaysRun)
-      _g->player.message = RUNOFF; // Ty 03/27/98 - externalized
+    if (!_g_alwaysRun)
+      _g_player.message = RUNOFF; // Ty 03/27/98 - externalized
     else
-      _g->player.message = RUNON ; // Ty 03/27/98 - externalized
+      _g_player.message = RUNON ; // Ty 03/27/98 - externalized
 
     G_SaveSettings();
 }
@@ -686,12 +710,12 @@ static void M_ChangeDetail(int32_t choice)
 {
     UNUSED(choice);
 
-    _g->highDetail = 1 - _g->highDetail;
+    _g_highDetail = 1 - _g_highDetail;
 
-    if (!_g->highDetail)
-      _g->player.message = LOWDETAIL; // Ty 03/27/98 - externalized
+    if (!_g_highDetail)
+      _g_player.message = LOWDETAIL; // Ty 03/27/98 - externalized
     else
-      _g->player.message = HIGHDETAIL ; // Ty 03/27/98 - externalized
+      _g_player.message = HIGHDETAIL ; // Ty 03/27/98 - externalized
 
     G_SaveSettings();
 }
@@ -701,12 +725,12 @@ static void M_ChangeGamma(int32_t choice)
 	switch(choice)
     {
 		case 0:
-		  if (_g->gamma)
-			_g->gamma--;
+		  if (_g_gamma)
+			_g_gamma--;
 		  break;
 		case 1:
-		  if (_g->gamma < 5)
-			_g->gamma++;
+		  if (_g_gamma < 5)
+			_g_gamma++;
 		  break;
     }
 	I_SetPalette(0);
@@ -775,25 +799,25 @@ boolean M_Responder (event_t* ev)
 
     // Take care of any messages that need input
 
-    if (_g->messageToPrint)
+    if (messageToPrint)
     {
-        if (_g->messageNeedsInput == true &&
+        if (messageNeedsInput == true &&
                 !(ch == ' ' || ch == 'n' || ch == 'y' || ch == key_escape || ch == key_fire || ch == key_enter)) // phares
             return false;
 
-        _g->menuactive     = _g->messageLastMenuActive;
-        _g->messageToPrint = false;
+        _g_menuactive     = messageLastMenuActive;
+        messageToPrint = false;
         if (messageRoutine)
             messageRoutine(ch);
 
-        _g->menuactive = false;
+        _g_menuactive = false;
         S_StartSound(NULL,sfx_swtchx);
         return true;
     }
 
     // Pop-up Main menu?
 
-    if (!_g->menuactive)
+    if (!_g_menuactive)
     {
         if (ch == key_escape)                                     // phares
         {
@@ -811,13 +835,13 @@ boolean M_Responder (event_t* ev)
     {
         do
         {
-            if (_g->itemOn+1 > _g->currentMenu->numitems-1)
-                _g->itemOn = 0;
+            if (itemOn+1 > currentMenu->numitems-1)
+                itemOn = 0;
             else
-                _g->itemOn++;
+                itemOn++;
             S_StartSound(NULL,sfx_pstop);
         }
-        while(_g->currentMenu->menuitems[_g->itemOn].status==-1);
+        while(currentMenu->menuitems[itemOn].status==-1);
         return true;
     }
 
@@ -825,51 +849,51 @@ boolean M_Responder (event_t* ev)
     {
         do
         {
-            if (!_g->itemOn)
-                _g->itemOn = _g->currentMenu->numitems-1;
+            if (!itemOn)
+                itemOn = currentMenu->numitems-1;
             else
-                _g->itemOn--;
+                itemOn--;
             S_StartSound(NULL,sfx_pstop);
         }
-        while(_g->currentMenu->menuitems[_g->itemOn].status==-1);
+        while(currentMenu->menuitems[itemOn].status==-1);
         return true;
     }
 
     if (ch == key_menu_left)                             // phares 3/7/98
     {
-        if (_g->currentMenu->menuitems[_g->itemOn].routine &&
-                _g->currentMenu->menuitems[_g->itemOn].status == 2)
+        if (currentMenu->menuitems[itemOn].routine &&
+                currentMenu->menuitems[itemOn].status == 2)
         {
             S_StartSound(NULL,sfx_stnmov);
-            _g->currentMenu->menuitems[_g->itemOn].routine(0);
+            currentMenu->menuitems[itemOn].routine(0);
         }
         return true;
     }
 
     if (ch == key_menu_right)                            // phares 3/7/98
     {
-        if (_g->currentMenu->menuitems[_g->itemOn].routine &&
-                _g->currentMenu->menuitems[_g->itemOn].status == 2)
+        if (currentMenu->menuitems[itemOn].routine &&
+                currentMenu->menuitems[itemOn].status == 2)
         {
             S_StartSound(NULL,sfx_stnmov);
-            _g->currentMenu->menuitems[_g->itemOn].routine(1);
+            currentMenu->menuitems[itemOn].routine(1);
         }
         return true;
     }
 
     if (ch == key_menu_enter)                            // phares 3/7/98
     {
-        if (_g->currentMenu->menuitems[_g->itemOn].routine &&
-                _g->currentMenu->menuitems[_g->itemOn].status)
+        if (currentMenu->menuitems[itemOn].routine &&
+                currentMenu->menuitems[itemOn].status)
         {
-            if (_g->currentMenu->menuitems[_g->itemOn].status == 2)
+            if (currentMenu->menuitems[itemOn].status == 2)
             {
-                _g->currentMenu->menuitems[_g->itemOn].routine(1);   // right arrow
+                currentMenu->menuitems[itemOn].routine(1);   // right arrow
                 S_StartSound(NULL,sfx_stnmov);
             }
             else
             {
-                _g->currentMenu->menuitems[_g->itemOn].routine(_g->itemOn);
+                currentMenu->menuitems[itemOn].routine(itemOn);
                 S_StartSound(NULL,sfx_pistol);
             }
         }
@@ -889,14 +913,14 @@ boolean M_Responder (event_t* ev)
 	if (ch == key_fire)                           // phares 3/7/98
     {
 		//If the prevMenu == NULL (Such as main menu screen), then just get out of the menu altogether
-		if(_g->currentMenu->prevMenu == NULL)
+		if(currentMenu->prevMenu == NULL)
 		{
 			M_ClearMenus();
 		}else //Otherwise, change to the parent menu and match the row used to get there.
 		{
-			int16_t previtemOn = _g->currentMenu->previtemOn; //Temporarily store this so after menu change, we store the last row it was on.
-			M_SetupNextMenu(_g->currentMenu->prevMenu);					
-			_g->itemOn = previtemOn;
+			int16_t previtemOn = currentMenu->previtemOn; //Temporarily store this so after menu change, we store the last row it was on.
+			M_SetupNextMenu(currentMenu->prevMenu);					
+			itemOn = previtemOn;
 		}
         S_StartSound(NULL,sfx_swtchx);
         return true;		
@@ -922,7 +946,7 @@ void M_StartControlPanel (void)
 {
   // intro might call this repeatedly
 
-  if (_g->menuactive)
+  if (_g_menuactive)
     return;
 
   //jff 3/24/98 make default skill menu choice follow -skill or defaultskill
@@ -932,8 +956,8 @@ void M_StartControlPanel (void)
   // Fix to make "always floating" with menu selections, and to always follow
   // defaultskill, instead of -skill.
 
-  _g->menuactive = true;
-  _g->currentMenu = &MainDef;         // JDC
+  _g_menuactive = true;
+  currentMenu = &MainDef;         // JDC
 }
 
 
@@ -965,13 +989,13 @@ void M_Drawer (void)
 {
     // Horiz. & Vertically center string and print it.
     // killough 9/29/98: simplified code, removed 40-character width limit
-    if (_g->messageToPrint)
+    if (messageToPrint)
     {
         /* cph - strdup string to writable memory */
-        char *ms = Z_Strdup(_g->messageString);
+        char *ms = Z_Strdup(messageString);
         char *p = ms;
 
-        int16_t y = 80 - M_StringHeight(_g->messageString)/2;
+        int16_t y = 80 - M_StringHeight(messageString)/2;
         while (*p)
         {
             char *string = p, c;
@@ -986,30 +1010,30 @@ void M_Drawer (void)
         Z_Free(ms);
     }
     else
-        if (_g->menuactive)
+        if (_g_menuactive)
         {
             int32_t x,y,max,i;
 
-            if (_g->currentMenu->routine)
-                _g->currentMenu->routine();     // call Draw routine
+            if (currentMenu->routine)
+                currentMenu->routine();     // call Draw routine
 
             // DRAW MENU
 
-            x = _g->currentMenu->x;
-            y = _g->currentMenu->y;
-            max = _g->currentMenu->numitems;
+            x = currentMenu->x;
+            y = currentMenu->y;
+            max = currentMenu->numitems;
 
             for (i=0;i<max;i++)
             {
-                if (_g->currentMenu->menuitems[i].name[0])
-                    V_DrawNamePatch(x,y,_g->currentMenu->menuitems[i].name);
+                if (currentMenu->menuitems[i].name[0])
+                    V_DrawNamePatch(x,y,currentMenu->menuitems[i].name);
                 y += LINEHEIGHT;
             }
 
             // DRAW SKULL
 
             // CPhipps - patch drawing updated
-            V_DrawNamePatch(x + SKULLXOFF, _g->currentMenu->y - 5 + _g->itemOn*LINEHEIGHT, skullName[_g->whichSkull]);
+            V_DrawNamePatch(x + SKULLXOFF, currentMenu->y - 5 + itemOn*LINEHEIGHT, skullName[whichSkull]);
         }
 }
 
@@ -1020,8 +1044,8 @@ void M_Drawer (void)
 
 static void M_ClearMenus (void)
 {
-  _g->menuactive = false;
-  _g->itemOn = 0;
+  _g_menuactive = false;
+  itemOn = 0;
 }
 
 //
@@ -1029,8 +1053,8 @@ static void M_ClearMenus (void)
 //
 static void M_SetupNextMenu(const menu_t *menudef)
 {
-  _g->currentMenu = menudef;
-  _g->itemOn = 0;
+  currentMenu = menudef;
+  itemOn = 0;
 }
 
 /////////////////////////////
@@ -1039,10 +1063,10 @@ static void M_SetupNextMenu(const menu_t *menudef)
 //
 void M_Ticker (void)
 {
-  if (--_g->skullAnimCounter <= 0)
+  if (--skullAnimCounter <= 0)
     {
-      _g->whichSkull ^= 1;
-      _g->skullAnimCounter = 8;
+      whichSkull ^= 1;
+      skullAnimCounter = 8;
     }
 }
 
@@ -1053,12 +1077,12 @@ void M_Ticker (void)
 
 static void M_StartMessage (const char* string, void (*routine)(int32_t), boolean input)
 {
-	_g->messageLastMenuActive = _g->menuactive;
-	_g->messageToPrint        = true;
-	_g->messageString         = string;
-	messageRoutine            = routine;
-	_g->messageNeedsInput     = input;
-	_g->menuactive            = true;
+	messageLastMenuActive = _g_menuactive;
+	messageToPrint        = true;
+	messageString         = string;
+	messageRoutine        = routine;
+	messageNeedsInput     = input;
+	_g_menuactive         = true;
 }
 
 
@@ -1194,14 +1218,14 @@ static void M_WriteText (int16_t x, int16_t y, const char* string)
 //
 void M_Init(void)
 {
-	M_InitDefaults();                // killough 11/98
-	_g->currentMenu           = &MainDef;
-	_g->menuactive            = false;
-	_g->whichSkull            = 0;
-	_g->skullAnimCounter      = 10;
-	_g->messageToPrint        = false;
-	_g->messageString         = NULL;
-	_g->messageLastMenuActive = _g->menuactive;
+	M_InitDefaults();
+	currentMenu           = &MainDef;
+	_g_menuactive         = false;
+	whichSkull            = 0;
+	skullAnimCounter      = 10;
+	messageToPrint        = false;
+	messageString         = NULL;
+	messageLastMenuActive = _g_menuactive;
 
 	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 

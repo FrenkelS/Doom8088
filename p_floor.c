@@ -70,9 +70,9 @@ static boolean P_ThingHeightClip (mobj_t* thing)
    * killough 11/98: Answer: see below (upset balance if hanging off ledge)
    */
 
-  thing->floorz = _g->tmfloorz;
-  thing->ceilingz = _g->tmceilingz;
-  thing->dropoffz = _g->tmdropoffz;    /* killough 11/98: remember dropoffs */
+  thing->floorz = _g_tmfloorz;
+  thing->ceilingz = _g_tmceilingz;
+  thing->dropoffz = _g_tmdropoffz;    /* killough 11/98: remember dropoffs */
 
   if (onfloor)
     {
@@ -147,9 +147,9 @@ static void PIT_ChangeSector (mobj_t* thing)
     return;
     }
 
-  _g->nofit = true;
+  _g_nofit = true;
 
-  if (_g->crushchange && !(_g->leveltime&3)) {
+  if (_g_crushchange && !(_g_leveltime&3)) {
     int32_t t;
     P_DamageMobj(thing,NULL,NULL,10);
 
@@ -178,8 +178,8 @@ static boolean P_CheckSector(sector_t* sector,boolean crunch)
   {
   msecnode_t *n;
 
-  _g->nofit = false;
-  _g->crushchange = crunch;
+  _g_nofit = false;
+  _g_crushchange = crunch;
 
   // killough 4/4/98: scan list front-to-back until empty or exhausted,
   // restarting from beginning after each thing is processed. Avoids
@@ -205,7 +205,7 @@ static boolean P_CheckSector(sector_t* sector,boolean crunch)
         }
   while (n);  // repeat from scratch until all things left are marked valid
 
-  return _g->nofit;
+  return _g_nofit;
   }
 
 
@@ -406,7 +406,7 @@ void T_MoveFloor(floormove_t* floor)
     floor->direction
   );
 
-  if (!(_g->leveltime&7))     // make the floormove sound
+  if (!(_g_leveltime&7))     // make the floormove sound
     S_StartSound2(&floor->sector->soundorg, sfx_stnmov);
 
   if (res == pastdest)    // if destination height is reached
@@ -526,7 +526,7 @@ static void T_MoveElevator(elevator_t* elevator)
   }
 
   // make floor move sound
-  if (!(_g->leveltime&7))
+  if (!(_g_leveltime&7))
     S_StartSound2(&elevator->sector->soundorg, sfx_stnmov);
 
   if (res == pastdest)            // if destination height acheived
@@ -569,7 +569,7 @@ boolean EV_DoFloor
   // move all floors with the same tag as the linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
     // Don't start a second thinker on the same floor
     if (P_SectorActive(floor_special,sec)) //jff 2/23/98
@@ -743,7 +743,7 @@ boolean EV_DoFloor
         floor->oldspecial = sec->oldspecial;
 
         //jff 5/23/98 use model subroutine to unify fixes and handling
-        sec = P_FindModelFloorSector(floor->floordestheight,sec-_g->sectors);
+        sec = P_FindModelFloorSector(floor->floordestheight,sec-_g_sectors);
         if (sec)
         {
           floor->texture = sec->floorpic;
@@ -784,7 +784,7 @@ boolean EV_DoChange
   // change all sectors with the same tag as the linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
     rtn = true;
 
@@ -861,7 +861,7 @@ boolean EV_BuildStairs
   while ((ssec = P_FindSectorFromLineTagWithLowerBound(line,ssec,minssec)) >= 0)
   {
    int32_t           secnum = ssec;
-   sector_t*     sec = &_g->sectors[secnum];
+   sector_t*     sec = &_g_sectors[secnum];
 
     // don't start a stair if the first step's floor is already moving
    if (!P_SectorActive(floor_special,sec)) { //jff 2/22/98
@@ -918,14 +918,14 @@ boolean EV_BuildStairs
         if ( !((sec->lines[i])->flags & ML_TWOSIDED) )
           continue;
 
-        newsecnum = tsec-_g->sectors;
+        newsecnum = tsec-_g_sectors;
 
         if (secnum != newsecnum)
           continue;
 
         tsec = LN_BACKSECTOR((sec->lines[i]));
         if (!tsec) continue;     //jff 5/7/98 if no backside, continue
-        newsecnum = tsec - _g->sectors;
+        newsecnum = tsec - _g_sectors;
 
         // if sector's floor is different texture, look for another
         if (tsec->floorpic != texture)
@@ -987,7 +987,7 @@ boolean EV_DoDonut(const line_t*  line)
   // do function on all sectors with same tag as linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    s1 = &_g->sectors[secnum];                // s1 is pillar's sector
+    s1 = &_g_sectors[secnum];                // s1 is pillar's sector
 
     // do not start the donut if the pillar is already moving
     if (P_SectorActive(floor_special,s1)) //jff 2/22/98
@@ -1068,7 +1068,7 @@ boolean EV_DoElevator
   // act on all sectors with the same tag as the triggering linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
     // If either floor or ceiling is already activated, skip it
     if (sec->floordata || sec->ceilingdata) //jff 2/22/98

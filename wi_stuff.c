@@ -45,6 +45,39 @@
 
 #include "globdata.h"
 
+
+// used to accelerate or skip a stage
+boolean   _g_acceleratestage;
+
+ // specifies current state
+stateenum_t  _g_state;
+
+// contains information passed into intermission
+wbstartstruct_t* _g_wbs;
+
+wbplayerstruct_t* _g_plrs;  // wbs->plyr[]
+
+// used for general timing
+int32_t    _g_cnt;
+
+// used for timing of background animation
+int32_t    _g_bcnt;
+
+int32_t    _g_cnt_time;
+int32_t    _g_cnt_total_time;
+int32_t    _g_cnt_par;
+int32_t    _g_cnt_pause;
+
+
+int32_t  _g_sp_state;
+
+int32_t _g_cnt_kills;
+int32_t _g_cnt_items;
+int32_t _g_cnt_secret;
+
+boolean _g_snl_pointeron;
+
+
 //
 // Data needed to add patches to full screen intermission pics.
 // Patches are statistics messages, and animations.
@@ -199,7 +232,7 @@ static void WI_levelNameLump(int32_t map, char* buf)
 static void WI_slamBackground(void)
 {
   // background
-  W_ReadLumpByName("WIMAP0", _g->screen);
+  W_ReadLumpByName("WIMAP0", _g_screen);
 }
 
 
@@ -216,7 +249,7 @@ static void WI_drawLF(void)
 
   // draw <LevelName>
   /* cph - get the graphic lump name and use it */
-  WI_levelNameLump(_g->wbs->last, lname);
+  WI_levelNameLump(_g_wbs->last, lname);
   // CPhipps - patch drawing updated
   V_DrawNamePatch((320 - V_NamePatchWidth(lname))/2, y, lname);
 
@@ -240,7 +273,7 @@ static void WI_drawEL(void)
   char lname[9];
 
   /* cph - get the graphic lump name */
-  WI_levelNameLump(_g->wbs->next, lname);
+  WI_levelNameLump(_g_wbs->next, lname);
 
   // draw "Entering"
   // CPhipps - patch drawing updated
@@ -434,9 +467,9 @@ static void WI_drawTime(int32_t x, int32_t y, int32_t t)
 void WI_End(void)
 {
 	//Clean up coop game stats
-	_g->cnt_kills  = -1;
-	_g->cnt_secret = -1;
-	_g->cnt_items  = -1;
+	_g_cnt_kills  = -1;
+	_g_cnt_secret = -1;
+	_g_cnt_items  = -1;
 }
 
 
@@ -448,9 +481,9 @@ void WI_End(void)
 //
 static void WI_initNoState(void)
 {
-  _g->state = NoState;
-  _g->acceleratestage = false;
-  _g->cnt = 10;
+  _g_state = NoState;
+  _g_acceleratestage = false;
+  _g_cnt = 10;
 }
 
 
@@ -487,7 +520,7 @@ static void WI_drawTimeStats(int32_t cnt_time, int32_t cnt_total_time, int32_t c
 //
 static void WI_updateNoState(void)
 {
-  if (!--_g->cnt)
+  if (!--_g_cnt)
     G_WorldDone();
 }
 
@@ -499,13 +532,13 @@ static void WI_updateNoState(void)
 //
 static void WI_initShowNextLoc(void)
 {
-  if (_g->gamemap == 8) {
+  if (_g_gamemap == 8) {
     G_WorldDone();
     return;
   }
 
-  _g->state = ShowNextLoc;
-  _g->acceleratestage = false;
+  _g_state = ShowNextLoc;
+  _g_acceleratestage = false;
   
   // e6y: That was pretty easy - only a HEX editor and luck
   // There is no more desync on ddt-tas.zip\e4tux231.lmp
@@ -515,7 +548,7 @@ static void WI_initShowNextLoc(void)
   // .text:0003119E                 mov     ds:acceleratestage, 0
   // .text:000311A8                 mov     ds:cnt, 3Ch
   // nowhere no hide
-    _g->cnt = SHOWNEXTLOCDELAY * TICRATE;
+    _g_cnt = SHOWNEXTLOCDELAY * TICRATE;
 }
 
 
@@ -527,10 +560,10 @@ static void WI_initShowNextLoc(void)
 //
 static void WI_updateShowNextLoc(void)
 {
-  if (!--_g->cnt || _g->acceleratestage)
+  if (!--_g_cnt || _g_acceleratestage)
     WI_initNoState();
   else
-    _g->snl_pointeron = (_g->cnt & 31) < 20;
+    _g_snl_pointeron = (_g_cnt & 31) < 20;
 }
 
 
@@ -547,19 +580,19 @@ static void WI_drawShowNextLoc(void)
 
     WI_slamBackground();
 
-    last = (_g->wbs->last == 8) ? _g->wbs->next - 1 : _g->wbs->last;
+    last = (_g_wbs->last == 8) ? _g_wbs->next - 1 : _g_wbs->last;
 
     // draw a splat on taken cities.
     for (i=0 ; i<=last ; i++)
         WI_drawOnLnode(i, &splat);
 
     // splat the secret level?
-    if (_g->wbs->didsecret)
+    if (_g_wbs->didsecret)
         WI_drawOnLnode(8, &splat);
 
     // draw flashing ptr
-    if (_g->snl_pointeron)
-        WI_drawOnLnode(_g->wbs->next, yah);
+    if (_g_snl_pointeron)
+        WI_drawOnLnode(_g_wbs->next, yah);
 
     // draws which level you are entering..
     WI_drawEL();
@@ -573,7 +606,7 @@ static void WI_drawShowNextLoc(void)
 //
 static void WI_drawNoState(void)
 {
-  _g->snl_pointeron = true;
+  _g_snl_pointeron = true;
   WI_drawShowNextLoc();
 }
 
@@ -590,16 +623,16 @@ static void WI_drawNoState(void)
 
 static void WI_initStats(void)
 {
-  _g->state = StatCount;
-  _g->acceleratestage = false;
-  _g->sp_state = 1;
+  _g_state = StatCount;
+  _g_acceleratestage = false;
+  _g_sp_state = 1;
 
-  _g->cnt_kills = -1;
-  _g->cnt_secret = -1;
-  _g->cnt_items = -1;
+  _g_cnt_kills = -1;
+  _g_cnt_secret = -1;
+  _g_cnt_items = -1;
 
-  _g->cnt_time = _g->cnt_par = _g->cnt_total_time = -1;
-  _g->cnt_pause = TICRATE;
+  _g_cnt_time = _g_cnt_par = _g_cnt_total_time = -1;
+  _g_cnt_pause = TICRATE;
 }
 
 // ====================================================================
@@ -610,110 +643,110 @@ static void WI_initStats(void)
 //
 static void WI_updateStats(void)
 {
-  if (_g->acceleratestage && _g->sp_state != 10)
+  if (_g_acceleratestage && _g_sp_state != 10)
   {
-    _g->acceleratestage = false;
-    _g->cnt_kills = (_g->plrs[0].skills * 100) / _g->wbs->maxkills;
-    _g->cnt_items = (_g->plrs[0].sitems * 100) / _g->wbs->maxitems;
+    _g_acceleratestage = false;
+    _g_cnt_kills = (_g_plrs[0].skills * 100) / _g_wbs->maxkills;
+    _g_cnt_items = (_g_plrs[0].sitems * 100) / _g_wbs->maxitems;
 
     // killough 2/22/98: Make secrets = 100% if maxsecret = 0:
-    _g->cnt_secret = (_g->wbs->maxsecret ?
-      (_g->plrs[0].ssecret * 100) / _g->wbs->maxsecret : 100);
+    _g_cnt_secret = (_g_wbs->maxsecret ?
+      (_g_plrs[0].ssecret * 100) / _g_wbs->maxsecret : 100);
 
-    _g->cnt_total_time = _g->wbs->totaltimes / TICRATE;
-    _g->cnt_time = _g->plrs[0].stime / TICRATE;
-    _g->cnt_par = _g->wbs->partime / TICRATE;
+    _g_cnt_total_time = _g_wbs->totaltimes / TICRATE;
+    _g_cnt_time = _g_plrs[0].stime / TICRATE;
+    _g_cnt_par = _g_wbs->partime / TICRATE;
     S_StartSound(0, sfx_barexp);
-    _g->sp_state = 10;
+    _g_sp_state = 10;
   }
 
-  if (_g->sp_state == 2)
+  if (_g_sp_state == 2)
   {
-    _g->cnt_kills += 2;
+    _g_cnt_kills += 2;
 
-    if (!(_g->bcnt&3))
+    if (!(_g_bcnt&3))
       S_StartSound(0, sfx_pistol);
 
-    if (_g->cnt_kills >= (_g->plrs[0].skills * 100) / _g->wbs->maxkills)
+    if (_g_cnt_kills >= (_g_plrs[0].skills * 100) / _g_wbs->maxkills)
     {
-      _g->cnt_kills = (_g->plrs[0].skills * 100) / _g->wbs->maxkills;
+      _g_cnt_kills = (_g_plrs[0].skills * 100) / _g_wbs->maxkills;
       S_StartSound(0, sfx_barexp);
-      _g->sp_state++;
+      _g_sp_state++;
     }
   }
-  else if (_g->sp_state == 4)
+  else if (_g_sp_state == 4)
   {
-    _g->cnt_items += 2;
+    _g_cnt_items += 2;
 
-    if (!(_g->bcnt&3))
+    if (!(_g_bcnt&3))
       S_StartSound(0, sfx_pistol);
 
-    if (_g->cnt_items >= (_g->plrs[0].sitems * 100) / _g->wbs->maxitems)
+    if (_g_cnt_items >= (_g_plrs[0].sitems * 100) / _g_wbs->maxitems)
     {
-      _g->cnt_items = (_g->plrs[0].sitems * 100) / _g->wbs->maxitems;
+      _g_cnt_items = (_g_plrs[0].sitems * 100) / _g_wbs->maxitems;
       S_StartSound(0, sfx_barexp);
-      _g->sp_state++;
+      _g_sp_state++;
     }
   }
-  else if (_g->sp_state == 6)
+  else if (_g_sp_state == 6)
   {
-    _g->cnt_secret += 2;
+    _g_cnt_secret += 2;
 
-    if (!(_g->bcnt&3))
+    if (!(_g_bcnt&3))
       S_StartSound(0, sfx_pistol);
 
     // killough 2/22/98: Make secrets = 100% if maxsecret = 0:
-    if (_g->cnt_secret >= (_g->wbs->maxsecret ? (_g->plrs[0].ssecret * 100) / _g->wbs->maxsecret : 100))
+    if (_g_cnt_secret >= (_g_wbs->maxsecret ? (_g_plrs[0].ssecret * 100) / _g_wbs->maxsecret : 100))
     {
-      _g->cnt_secret = (_g->wbs->maxsecret ?
-        (_g->plrs[0].ssecret * 100) / _g->wbs->maxsecret : 100);
+      _g_cnt_secret = (_g_wbs->maxsecret ?
+        (_g_plrs[0].ssecret * 100) / _g_wbs->maxsecret : 100);
       S_StartSound(0, sfx_barexp);
-      _g->sp_state++;
+      _g_sp_state++;
     }
   }
-  else if (_g->sp_state == 8)
+  else if (_g_sp_state == 8)
   {
-    if (!(_g->bcnt&3))
+    if (!(_g_bcnt&3))
       S_StartSound(0, sfx_pistol);
 
-    _g->cnt_time += 3;
+    _g_cnt_time += 3;
 
-    if (_g->cnt_time >= _g->plrs[0].stime / TICRATE)
-      _g->cnt_time = _g->plrs[0].stime / TICRATE;
+    if (_g_cnt_time >= _g_plrs[0].stime / TICRATE)
+      _g_cnt_time = _g_plrs[0].stime / TICRATE;
 
-    _g->cnt_total_time += 3;
+    _g_cnt_total_time += 3;
 
-    if (_g->cnt_total_time >= _g->wbs->totaltimes / TICRATE)
-      _g->cnt_total_time = _g->wbs->totaltimes / TICRATE;
+    if (_g_cnt_total_time >= _g_wbs->totaltimes / TICRATE)
+      _g_cnt_total_time = _g_wbs->totaltimes / TICRATE;
 
-    _g->cnt_par += 3;
+    _g_cnt_par += 3;
 
-    if (_g->cnt_par >= _g->wbs->partime / TICRATE)
+    if (_g_cnt_par >= _g_wbs->partime / TICRATE)
     {
-      _g->cnt_par = _g->wbs->partime / TICRATE;
+      _g_cnt_par = _g_wbs->partime / TICRATE;
 
-      if ((_g->cnt_time >= _g->plrs[0].stime / TICRATE) && (_g->cnt_total_time >= _g->wbs->totaltimes / TICRATE))
+      if ((_g_cnt_time >= _g_plrs[0].stime / TICRATE) && (_g_cnt_total_time >= _g_wbs->totaltimes / TICRATE))
       {
         S_StartSound(0, sfx_barexp);
-        _g->sp_state++;
+        _g_sp_state++;
       }
     }
   }
-  else if (_g->sp_state == 10)
+  else if (_g_sp_state == 10)
   {
-    if (_g->acceleratestage)
+    if (_g_acceleratestage)
     {
       S_StartSound(0, sfx_sgcock);
 
       WI_initShowNextLoc();
     }
   }
-  else if (_g->sp_state & 1)
+  else if (_g_sp_state & 1)
   {
-    if (!--_g->cnt_pause)
+    if (!--_g_cnt_pause)
     {
-      _g->sp_state++;
-      _g->cnt_pause = TICRATE;
+      _g_sp_state++;
+      _g_cnt_pause = TICRATE;
     }
   }
 }
@@ -738,18 +771,18 @@ static void WI_drawStats(void)
 	WI_drawLF();
 
 	V_DrawNamePatch(SP_STATSX, SP_STATSY, kills);
-	if (_g->cnt_kills)
-		WI_drawPercent(320 - SP_STATSX, SP_STATSY, _g->cnt_kills);
+	if (_g_cnt_kills)
+		WI_drawPercent(320 - SP_STATSX, SP_STATSY, _g_cnt_kills);
 
 	V_DrawNamePatch(SP_STATSX, SP_STATSY + lineHeight, items);
-	if (_g->cnt_items)
-		WI_drawPercent(320 - SP_STATSX, SP_STATSY + lineHeight, _g->cnt_items);
+	if (_g_cnt_items)
+		WI_drawPercent(320 - SP_STATSX, SP_STATSY + lineHeight, _g_cnt_items);
 
 	V_DrawNamePatch(SP_STATSX, SP_STATSY + 2 * lineHeight, sp_secret);
-	if (_g->cnt_secret)
-		WI_drawPercent(320 - SP_STATSX, SP_STATSY + 2 * lineHeight, _g->cnt_secret);
+	if (_g_cnt_secret)
+		WI_drawPercent(320 - SP_STATSX, SP_STATSY + 2 * lineHeight, _g_cnt_secret);
 
-	WI_drawTimeStats(_g->cnt_time, _g->cnt_total_time, _g->cnt_par);
+	WI_drawTimeStats(_g_cnt_time, _g_cnt_total_time, _g_cnt_par);
 }
 
 // ====================================================================
@@ -762,14 +795,14 @@ static void WI_drawStats(void)
 //
 void WI_checkForAccelerate(void)
 {
-  player_t  *player = &_g->player;
+  player_t  *player = &_g_player;
 
-    if (_g->playeringame)
+    if (_g_playeringame)
     {
       if (player->cmd.buttons & BT_ATTACK)
       {
         if (!player->attackdown)
-          _g->acceleratestage = true;
+          _g_acceleratestage = true;
         player->attackdown = true;
       }
       else
@@ -778,7 +811,7 @@ void WI_checkForAccelerate(void)
       if (player->cmd.buttons & BT_USE)
       {
         if (!player->usedown)
-          _g->acceleratestage = true;
+          _g_acceleratestage = true;
         player->usedown = true;
       }
       else
@@ -796,9 +829,9 @@ void WI_checkForAccelerate(void)
 void WI_Ticker(void)
 {
   // counter for general background animation
-  _g->bcnt++;
+  _g_bcnt++;
 
-  if (_g->bcnt == 1)
+  if (_g_bcnt == 1)
   {
     // intermission music
     S_ChangeMusic(mus_inter, true);
@@ -806,7 +839,7 @@ void WI_Ticker(void)
 
   WI_checkForAccelerate();
 
-  switch (_g->state)
+  switch (_g_state)
   {
     case StatCount:
          WI_updateStats();
@@ -832,7 +865,7 @@ void WI_Ticker(void)
 //
 void WI_Drawer (void)
 {
-  switch (_g->state)
+  switch (_g_state)
   {
     case StatCount:
            WI_drawStats();
@@ -859,17 +892,17 @@ void WI_Drawer (void)
 static void WI_initVariables(wbstartstruct_t* wbstartstruct)
 {
 
-  _g->wbs = wbstartstruct;
+  _g_wbs = wbstartstruct;
 
-  _g->acceleratestage = false;
-  _g->cnt = _g->bcnt = 0;
-  _g->plrs = _g->wbs->plyr;
+  _g_acceleratestage = false;
+  _g_cnt = _g_bcnt = 0;
+  _g_plrs = _g_wbs->plyr;
 
-  if (!_g->wbs->maxkills)
-    _g->wbs->maxkills = 1;  // probably only useful in MAP30
+  if (!_g_wbs->maxkills)
+    _g_wbs->maxkills = 1;  // probably only useful in MAP30
 
-  if (!_g->wbs->maxitems)
-    _g->wbs->maxitems = 1;
+  if (!_g_wbs->maxitems)
+    _g_wbs->maxitems = 1;
 }
 
 // ====================================================================

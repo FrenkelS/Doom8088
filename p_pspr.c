@@ -449,7 +449,7 @@ void A_WeaponReady(player_t *player, pspdef_t *psp)
 
   // bob the weapon based on movement speed
   {
-    int32_t angle = (128*_g->leveltime) & FINEMASK;
+    int32_t angle = (128*_g_leveltime) & FINEMASK;
     psp->sx = FRACUNIT  + FixedMul(player->bob, finecosine(angle));
     angle &= FINEANGLES/2-1;
     psp->sy = WEAPONTOP + FixedMul(player->bob, finesine(  angle));
@@ -592,18 +592,18 @@ void A_Punch(player_t *player, pspdef_t *psp)
 	angle += (t - P_Random())<<18;
 
 	/* killough 8/2/98: make autoaiming prefer enemies */
-	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE, true), !_g->linetarget))
+	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE, true), !_g_linetarget))
 		slope = P_AimLineAttack(player->mo, angle, MELEERANGE, false);
 
 	P_LineAttack(player->mo, angle, MELEERANGE, slope, damage);
 
-	if (!_g->linetarget)
+	if (!_g_linetarget)
 		return;
 
 	S_StartSound(player->mo, sfx_punch);
 
 	// turn to face target
-	player->mo->angle = R_PointToAngle2(player->mo->x, player->mo->y, _g->linetarget->x, _g->linetarget->y);
+	player->mo->angle = R_PointToAngle2(player->mo->x, player->mo->y, _g_linetarget->x, _g_linetarget->y);
 }
 
 //
@@ -622,12 +622,12 @@ void A_Saw(player_t *player, pspdef_t *psp)
 
 	/* Use meleerange + 1 so that the puff doesn't skip the flash
 	 * killough 8/2/98: make autoaiming prefer enemies */
-	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, true), !_g->linetarget))
+	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, true), !_g_linetarget))
 		slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, false);
 
 	P_LineAttack(player->mo, angle, MELEERANGE+1, slope, damage);
 
-	if (!_g->linetarget)
+	if (!_g_linetarget)
 	{
 		S_StartSound(player->mo, sfx_sawful);
 		return;
@@ -636,7 +636,7 @@ void A_Saw(player_t *player, pspdef_t *psp)
 	S_StartSound(player->mo, sfx_sawhit);
 
 	// turn to face target
-	angle = R_PointToAngle2(player->mo->x, player->mo->y, _g->linetarget->x, _g->linetarget->y);
+	angle = R_PointToAngle2(player->mo->x, player->mo->y, _g_linetarget->x, _g_linetarget->y);
 
 	if (angle - player->mo->angle > ANG180) {
 		if (angle - player->mo->angle < -ANG90/20)
@@ -685,12 +685,12 @@ static void P_BulletSlope(mobj_t *mo)
 	do
 	{
 		bulletslope = P_AimLineAttack(mo, an, 16 * 64 * FRACUNIT, friend);
-		if (!_g->linetarget)
+		if (!_g_linetarget)
 			bulletslope = P_AimLineAttack(mo, an += 1L << 26, 16 * 64 * FRACUNIT, friend);
-		if (!_g->linetarget)
+		if (!_g_linetarget)
 			bulletslope = P_AimLineAttack(mo, an -= 2L << 26, 16 * 64 * FRACUNIT, friend);
 	}
-	while (friend && (friend = false, !_g->linetarget));
+	while (friend && (friend = false, !_g_linetarget));
 }
 
 

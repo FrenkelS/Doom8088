@@ -31,6 +31,7 @@
 
 #define FLAT_SPAN
 
+
 static int16_t firstflat;
 
 
@@ -50,7 +51,7 @@ static int16_t firstflat;
 #if defined FLAT_SPAN
 static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, uint16_t color)
 {
-	uint16_t* dest = _g->screen + ScreenYToOffset(y) + x1;
+	uint16_t* dest = _g_screen + ScreenYToOffset(y) + x1;
 
 	uint32_t count = x2 - x1;
 	uint32_t l = count >> 4;
@@ -147,7 +148,7 @@ static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, const draw_span_var
     const byte *source = dsvars->source;
     const byte *colormap = dsvars->colormap;
 
-    uint16_t* dest = _g->screen + ScreenYToOffset(y) + x1;
+    uint16_t* dest = _g_screen + ScreenYToOffset(y) + x1;
 
     const uint32_t step = dsvars->step;
     uint32_t position = dsvars->position;
@@ -336,7 +337,7 @@ void R_DrawPlanes (void)
 {
     for (int8_t i = 0; i < MAXVISPLANES; i++)
     {
-        visplane_t *pl = _g->visplanes[i];
+        visplane_t *pl = _g_visplanes[i];
 
         while(pl)
         {
@@ -364,10 +365,10 @@ void R_ClearPlanes(void)
 
 
     for (int8_t i = 0; i < MAXVISPLANES; i++)    // new code -- killough
-        for (*freehead = _g->visplanes[i], _g->visplanes[i] = NULL; *freehead; )
+        for (*freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *freehead; )
             freehead = &(*freehead)->next;
 
-    _g->lastopening = _g->openings;
+    _g_lastopening = _g_openings;
 
 #if !defined FLAT_SPAN
     static const fixed_t iprojection = 1092; //( (1 << FRACUNIT) / (SCREENWIDTH / 2))
@@ -430,7 +431,7 @@ void P_InitAnimatedFlat(void)
 
 void P_UpdateAnimatedFlat(void)
 {
-	uint32_t t = _g->leveltime >> 3;
+	uint32_t t = _g_leveltime >> 3;
 
 	int16_t pic = animated_flat_basepic + (t % 3);
 

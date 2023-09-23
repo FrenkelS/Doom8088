@@ -42,6 +42,13 @@
 #include "globdata.h"
 
 
+int32_t _g_leveltime; // tics in game play for par
+
+// killough 8/29/98: we maintain several separate threads, each containing
+// a special class of thinkers, to allow more efficient searches.
+thinker_t _g_thinkerclasscap;
+
+
 //
 // THINKERS
 // All thinkers should be allocated by Z_Malloc
@@ -58,7 +65,7 @@
 
 void P_InitThinkers(void)
 {
-  _g->thinkerclasscap.prev = _g->thinkerclasscap.next  = &_g->thinkerclasscap;
+  _g_thinkerclasscap.prev = _g_thinkerclasscap.next  = &_g_thinkerclasscap;
 }
 
 //
@@ -68,10 +75,10 @@ void P_InitThinkers(void)
 
 void P_AddThinker(thinker_t* thinker)
 {
-  _g->thinkerclasscap.prev->next = thinker;
-  thinker->next = &_g->thinkerclasscap;
-  thinker->prev = _g->thinkerclasscap.prev;
-  _g->thinkerclasscap.prev = thinker;
+  _g_thinkerclasscap.prev->next = thinker;
+  thinker->next = &_g_thinkerclasscap;
+  thinker->prev = _g_thinkerclasscap.prev;
+  _g_thinkerclasscap.prev = thinker;
 }
 
 //
@@ -152,7 +159,7 @@ void P_RemoveThing(mobj_t *thing)
  */
 thinker_t* P_NextThinker(thinker_t* th)
 {
-  thinker_t* top = &_g->thinkerclasscap;
+  thinker_t* top = &_g_thinkerclasscap;
   if (!th) th = top;
   th = th->next;
   return th == top ? NULL : th;
@@ -201,8 +208,8 @@ void P_SetTarget(mobj_t **mop, mobj_t *targ)
 
 static void P_RunThinkers (void)
 {
-    thinker_t* th = _g->thinkerclasscap.next;
-    thinker_t* th_end = &_g->thinkerclasscap;
+    thinker_t* th = _g_thinkerclasscap.next;
+    thinker_t* th_end = &_g_thinkerclasscap;
 
     while(th != th_end)
     {
@@ -226,19 +233,19 @@ void P_Ticker (void)
    * All of this complicated mess is used to preserve demo sync.
    */
 
-  if (_g->menuactive && !_g->demoplayback && _g->player.viewz != 1)
+  if (_g_menuactive && !_g_demoplayback && _g_player.viewz != 1)
     return;
 
   P_MapStart();
                // not if this is an intermission screen
-  if(_g->gamestate==GS_LEVEL)
-    if (_g->playeringame)
-      P_PlayerThink(&_g->player);
+  if(_g_gamestate==GS_LEVEL)
+    if (_g_playeringame)
+      P_PlayerThink(&_g_player);
 
   P_RunThinkers();
   P_UpdateSpecials();
   P_RespawnSpecials();
   P_MapEnd();
-  _g->leveltime++;                       // for par times
+  _g_leveltime++;                       // for par times
 }
 

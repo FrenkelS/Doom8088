@@ -214,17 +214,17 @@ static void AM_findMinMaxBoundaries(void)
     min_x = min_y =  INT32_MAX;
     max_x = max_y = -INT32_MAX;
 
-    for (i=0;i<_g->numvertexes;i++)
+    for (i=0;i<_g_numvertexes;i++)
     {
-        if (_g->vertexes[i].x < min_x)
-            min_x = _g->vertexes[i].x;
-        else if (_g->vertexes[i].x > max_x)
-            max_x = _g->vertexes[i].x;
+        if (_g_vertexes[i].x < min_x)
+            min_x = _g_vertexes[i].x;
+        else if (_g_vertexes[i].x > max_x)
+            max_x = _g_vertexes[i].x;
 
-        if (_g->vertexes[i].y < min_y)
-            min_y = _g->vertexes[i].y;
-        else if (_g->vertexes[i].y > max_y)
-            max_y = _g->vertexes[i].y;
+        if (_g_vertexes[i].y < min_y)
+            min_y = _g_vertexes[i].y;
+        else if (_g_vertexes[i].y > max_y)
+            max_y = _g_vertexes[i].y;
     }
 
     max_w = (max_x >>= FRACTOMAPBITS) - (min_x >>= FRACTOMAPBITS);//e6y
@@ -293,8 +293,8 @@ static void AM_initVariables(void)
     m_h = FTOM(f_h);
 
 
-    m_x = (_g->player.mo->x >> FRACTOMAPBITS) - m_w/2;//e6y
-    m_y = (_g->player.mo->y >> FRACTOMAPBITS) - m_h/2;//e6y
+    m_x = (_g_player.mo->x >> FRACTOMAPBITS) - m_w/2;//e6y
+    m_y = (_g_player.mo->y >> FRACTOMAPBITS) - m_h/2;//e6y
     AM_changeWindowLoc();
 
     // inform the status bar of the change
@@ -355,10 +355,10 @@ static void AM_Start(void)
         AM_Stop();
 
     stopped = false;
-    if (lastlevel != _g->gamemap || lastepisode != 1)
+    if (lastlevel != _g_gamemap || lastepisode != 1)
     {
         AM_LevelInit();
-        lastlevel = _g->gamemap;
+        lastlevel = _g_gamemap;
         lastepisode = 1;
     }
     AM_initVariables();
@@ -447,12 +447,12 @@ boolean AM_Responder
             else
                 automapmode |= (am_overlay | am_rotate | am_follow);
         }
-        else if (ch == key_map_follow && _g->gamekeydown[key_use])
+        else if (ch == key_map_follow && _g_gamekeydown[key_use])
         {
             automapmode ^= am_follow;     // CPhipps - put all automap mode stuff into one enum
             f_oldloc.x = INT32_MAX;
             // Ty 03/27/98 - externalized
-            _g->player.message = (automapmode & am_follow) ? AMSTR_FOLLOWON : AMSTR_FOLLOWOFF;
+            _g_player.message = (automapmode & am_follow) ? AMSTR_FOLLOWON : AMSTR_FOLLOWOFF;
         }                                                         //    |
         else if (ch == key_map_zoomout)
         {
@@ -562,14 +562,14 @@ static void AM_changeWindowScale(void)
 //
 static void AM_doFollowPlayer(void)
 {
-    if (f_oldloc.x != _g->player.mo->x || f_oldloc.y != _g->player.mo->y)
+    if (f_oldloc.x != _g_player.mo->x || f_oldloc.y != _g_player.mo->y)
     {
-        m_x = FTOM(MTOF(_g->player.mo->x >> FRACTOMAPBITS)) - m_w/2;//e6y
-        m_y = FTOM(MTOF(_g->player.mo->y >> FRACTOMAPBITS)) - m_h/2;//e6y
+        m_x = FTOM(MTOF(_g_player.mo->x >> FRACTOMAPBITS)) - m_w/2;//e6y
+        m_y = FTOM(MTOF(_g_player.mo->y >> FRACTOMAPBITS)) - m_h/2;//e6y
         m_x2 = m_x + m_w;
         m_y2 = m_y + m_h;
-        f_oldloc.x = _g->player.mo->x;
-        f_oldloc.y = _g->player.mo->y;
+        f_oldloc.x = _g_player.mo->x;
+        f_oldloc.y = _g_player.mo->y;
     }
 }
 
@@ -737,7 +737,7 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
 
 static void V_PlotPixel(int32_t x, int32_t y, uint8_t color)
 {
-    byte* fb = (byte*)_g->screen;
+    byte* fb = (byte*)_g_screen;
 
     byte* dest = &fb[(ScreenYToOffset(y) << 1) + x];
 
@@ -911,34 +911,34 @@ static void AM_drawWalls(void)
     mline_t l;
 
     // draw the unclipped visible portions of all lines
-    for (i=0;i<_g->numlines;i++)
+    for (i=0;i<_g_numlines;i++)
     {
-        l.a.x = _g->lines[i].v1.x >> FRACTOMAPBITS;//e6y
-        l.a.y = _g->lines[i].v1.y >> FRACTOMAPBITS;//e6y
-        l.b.x = _g->lines[i].v2.x >> FRACTOMAPBITS;//e6y
-        l.b.y = _g->lines[i].v2.y >> FRACTOMAPBITS;//e6y
+        l.a.x = _g_lines[i].v1.x >> FRACTOMAPBITS;//e6y
+        l.a.y = _g_lines[i].v1.y >> FRACTOMAPBITS;//e6y
+        l.b.x = _g_lines[i].v2.x >> FRACTOMAPBITS;//e6y
+        l.b.y = _g_lines[i].v2.y >> FRACTOMAPBITS;//e6y
 
 
-        const sector_t* backsector = LN_BACKSECTOR(&_g->lines[i]);
-        const sector_t* frontsector = LN_FRONTSECTOR(&_g->lines[i]);
+        const sector_t* backsector = LN_BACKSECTOR(&_g_lines[i]);
+        const sector_t* frontsector = LN_FRONTSECTOR(&_g_lines[i]);
 
-        const uint32_t line_special =  LN_SPECIAL(&_g->lines[i]);
+        const uint32_t line_special =  LN_SPECIAL(&_g_lines[i]);
 
         if (automapmode & am_rotate)
         {
-            AM_rotate(&l.a.x, &l.a.y, ANG90-_g->player.mo->angle, _g->player.mo->x, _g->player.mo->y);
-            AM_rotate(&l.b.x, &l.b.y, ANG90-_g->player.mo->angle, _g->player.mo->x, _g->player.mo->y);
+            AM_rotate(&l.a.x, &l.a.y, ANG90-_g_player.mo->angle, _g_player.mo->x, _g_player.mo->y);
+            AM_rotate(&l.b.x, &l.b.y, ANG90-_g_player.mo->angle, _g_player.mo->x, _g_player.mo->y);
         }
 
         // if line has been seen or IDDT has been used
-        if (_g->linedata[i].r_flags & ML_MAPPED)
+        if (_g_linedata[i].r_flags & ML_MAPPED)
         {
-            if (_g->lines[i].flags & ML_DONTDRAW)
+            if (_g_lines[i].flags & ML_DONTDRAW)
                 continue;
             {
                 /* cph - show keyed doors and lines */
                 int32_t amd;
-                if (!(_g->lines[i].flags & ML_SECRET) && (amd = AM_DoorColor(line_special)) != -1)
+                if (!(_g_lines[i].flags & ML_SECRET) && (amd = AM_DoorColor(line_special)) != -1)
                 {
                     {
                         switch (amd) /* closed keyed door */
@@ -977,21 +977,21 @@ static void AM_drawWalls(void)
                 // jff 1/10/98 add color change for all teleporter types
                 if
                         (
-                         mapcolor_tele && !(_g->lines[i].flags & ML_SECRET) &&
+                         mapcolor_tele && !(_g_lines[i].flags & ML_SECRET) &&
                          (line_special == 39 || line_special == 97 ||
                           line_special == 125 || line_special == 126)
                          )
                 { // teleporters
                     AM_drawMline(&l, mapcolor_tele);
                 }
-                else if (_g->lines[i].flags & ML_SECRET)    // secret door
+                else if (_g_lines[i].flags & ML_SECRET)    // secret door
                 {
                     AM_drawMline(&l, mapcolor_wall);      // wall color
                 }
                 else if
                         (
                          mapcolor_clsd &&
-                         !(_g->lines[i].flags & ML_SECRET) &&    // non-secret closed door
+                         !(_g_lines[i].flags & ML_SECRET) &&    // non-secret closed door
                          ((backsector->floorheight==backsector->ceilingheight) ||
                           (frontsector->floorheight==frontsector->ceilingheight))
                          )
@@ -1014,9 +1014,9 @@ static void AM_drawWalls(void)
                 }
             }
         } // now draw the lines only visible because the player has computermap
-        else if (_g->player.powers[pw_allmap]) // computermap visible lines
+        else if (_g_player.powers[pw_allmap]) // computermap visible lines
         {
-            if (!(_g->lines[i].flags & ML_DONTDRAW)) // invisible flag lines do not show
+            if (!(_g_lines[i].flags & ML_DONTDRAW)) // invisible flag lines do not show
             {
                 if
                         (
@@ -1049,7 +1049,7 @@ static void AM_drawLineCharacter(angle_t angle, fixed_t x, fixed_t y)
     int32_t   i;
     mline_t l;
 
-    if (automapmode & am_rotate) angle -= _g->player.mo->angle - ANG90; // cph
+    if (automapmode & am_rotate) angle -= _g_player.mo->angle - ANG90; // cph
 
     for (i=0;i<NUMPLYRLINES;i++)
     {
@@ -1084,7 +1084,7 @@ static void AM_drawLineCharacter(angle_t angle, fixed_t x, fixed_t y)
 //
 static void AM_drawPlayers(void)
 {    
-    AM_drawLineCharacter(_g->player.mo->angle, _g->player.mo->x >> FRACTOMAPBITS, _g->player.mo->y >> FRACTOMAPBITS);
+    AM_drawLineCharacter(_g_player.mo->angle, _g_player.mo->x >> FRACTOMAPBITS, _g_player.mo->y >> FRACTOMAPBITS);
 }
 
 
@@ -1094,7 +1094,7 @@ static void AM_drawPlayers(void)
 // CPhipps - New function to fill a rectangle with a given colour
 static void V_FillRect(void)
 {
-    byte* dest = (byte*)_g->screen;
+    byte* dest = (byte*)_g_screen;
     int32_t height = f_h;
     while (height--)
     {
