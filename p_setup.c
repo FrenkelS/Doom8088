@@ -60,7 +60,7 @@
 //
 
 int32_t      _g_numvertexes;
-const vertex_t *_g_vertexes;
+const vertex_t __far* _g_vertexes;
 
 const seg_t    *_g_segs;
 
@@ -319,7 +319,7 @@ static boolean P_IsDoomnumAllowed(int16_t doomnum)
 static void P_LoadThings (int16_t lump)
 {
     int32_t  i, numthings = W_LumpLength (lump) / sizeof(mapthing_t);
-    const mapthing_t *data = W_GetLumpByNumAutoFree (lump);
+    const mapthing_t __far* data = W_GetLumpByNumAutoFree (lump);
 
     if ((!data) || (!numthings))
         I_Error("P_LoadThings: no things in level");
@@ -400,7 +400,7 @@ static void P_LoadSideDefs (int16_t lump)
 
 static void P_LoadSideDefs2(int16_t lump)
 {
-    const byte *data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
+    const byte __far* data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
 
     for (int32_t i = 0; i < numsides; i++)
     {

@@ -133,7 +133,7 @@ static void R_LoadTexture(int16_t texture_num)
 
     for (uint8_t j = 0; j < texture->patchcount; j++)
     {
-        const texpatch_t* patch = &texture->patches[j];
+        const texpatch_t __far* patch = &texture->patches[j];
 
         //Check for patch overlaps.
         int16_t l1 = patch->originx;
@@ -144,7 +144,7 @@ static void R_LoadTexture(int16_t texture_num)
             if (k == j)
                 continue;
 
-            const texpatch_t* p2 = &texture->patches[k];
+            const texpatch_t __far* p2 = &texture->patches[k];
 
             //Check for patch overlaps.
             int16_t l2 = p2->originx;
@@ -170,7 +170,7 @@ static void R_LoadTexture(int16_t texture_num)
 
 static int16_t numtextures;
 
-const texture_t* R_GetTexture(int16_t texture)
+const texture_t __far* R_GetTexture(int16_t texture)
 {
 #ifdef RANGECHECK
     if (texture >= numtextures)
@@ -193,8 +193,8 @@ static int16_t R_GetTextureNumForName(const char* tex_name)
 
     strupr(tex_name_upper);
 
-    const int32_t *maptex = W_GetLumpByName("TEXTURE1");
-    const int32_t *directory = maptex+1;
+    const int32_t __far* maptex = W_GetLumpByName("TEXTURE1");
+    const int32_t __far* directory = maptex+1;
 
     for (int16_t i = 0; i < numtextures; i++)
     {
@@ -248,7 +248,7 @@ int16_t PUREFUNC R_CheckTextureNumForName (const char *tex_name)
 
 static void R_InitTextures()
 {
-	const int32_t* mtex1 = W_GetLumpByName("TEXTURE1");
+	const int32_t __far* mtex1 = W_GetLumpByName("TEXTURE1");
 	numtextures = *mtex1;
 	Z_ChangeTagToCache(mtex1);
 

@@ -159,7 +159,7 @@ extern divline_t _g_trace;
 //
 
 extern int32_t      _g_numvertexes;
-extern const vertex_t *_g_vertexes;
+extern const vertex_t __far* _g_vertexes;
 
 extern const seg_t    *_g_segs;
 

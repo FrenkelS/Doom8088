@@ -90,7 +90,7 @@ int16_t R_FlatNumForName (const char* name);   // killough -- const added
 
 int16_t R_CheckTextureNumForName (const char *name);
 
-const texture_t* R_GetTexture(int16_t texture);
+const texture_t __far* R_GetTexture(int16_t texture);
 
 
 #endif

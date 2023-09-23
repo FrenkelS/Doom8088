@@ -208,9 +208,9 @@ static int32_t      rw_lightlevel;
 
 static int16_t      *maskedtexturecol; // dropoff overflow
 
-fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
+fixed_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
 
-int16_t       *texturetranslation;
+int16_t       __far* texturetranslation;
 
 fixed_t  viewcos, viewsin;
 
@@ -968,7 +968,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 }
 
 
-void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c)
+void R_GetColumn(const texture_t __far* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c)
 {
     const uint8_t patchcount = texture->patchcount;
     const uint16_t widthmask = texture->widthmask;
@@ -981,7 +981,7 @@ void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num
 
         do
         {
-            const texpatch_t* patch = &texture->patches[i];
+            const texpatch_t __far* patch = &texture->patches[i];
 
             const int16_t x1 = patch->originx;
 
@@ -1057,7 +1057,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int32_t x1, int32_t x2)
 
     dcvars.texturemid += (((int32_t)_g_sides[curline->sidenum].rowoffset) << FRACBITS);
 
-    const texture_t* texture = R_GetTexture(texnum);
+    const texture_t __far* texture = R_GetTexture(texnum);
 
     dcvars.colormap = R_LoadColorMap(rw_lightlevel);
 
@@ -1845,7 +1845,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
         {
             const texpatch_t* patch = &tex->patches[i];
 
-            const patch_t* realpatch = W_GetLumpByNum(patch->patch_num);
+            const patch_t __far* realpatch = W_GetLumpByNum(patch->patch_num);
 
             const int16_t x1 = patch->originx;
 
@@ -1882,7 +1882,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_colu
         int16_t patch_num;
         int16_t x_c;
         R_GetColumn(tex, texcolumn, &patch_num, &x_c);
-        const patch_t* patch = W_GetLumpByNum(patch_num);
+        const patch_t __far* patch = W_GetLumpByNum(patch_num);
         const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
 
         dcvars->source = (const byte*)column + 3;
