@@ -314,7 +314,7 @@ typedef struct mobj_s
 
 
 void    P_RespawnSpecials(void);
-mobj_t  *P_SpawnMobj(fixed_t x, fixed_t y, fixed_t z, mobjtype_t type);
+mobj_t __far* P_SpawnMobj(fixed_t x, fixed_t y, fixed_t z, mobjtype_t type);
 void    P_RemoveMobj(mobj_t *th);
 boolean P_SetMobjState(mobj_t *mobj, statenum_t state);
 
@@ -326,7 +326,7 @@ mobj_t  *P_SpawnMissile(mobj_t *source, mobj_t *dest, mobjtype_t type);
 void    P_SpawnPlayerMissile(mobj_t *source, mobjtype_t type);
 void    P_SpawnMapThing (const mapthing_t*  mthing);
 
-struct player_s* P_MobjIsPlayer(const mobj_t* mobj);
+struct player_s* P_MobjIsPlayer(const mobj_t __far* mobj);
 
 #endif
 

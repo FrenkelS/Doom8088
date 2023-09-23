@@ -600,7 +600,7 @@ static void P_KillMobj(mobj_t *source, mobj_t *target)
 // and other environmental stuff.
 //
 
-void P_DamageMobj(mobj_t *target, mobj_t __far* inflictor, mobj_t *source, int32_t damage)
+void P_DamageMobj(mobj_t *target, mobj_t __far* inflictor, mobj_t __far* source, int32_t damage)
 {
   player_t *player;
   boolean justhit = false;          /* killough 11/98 */

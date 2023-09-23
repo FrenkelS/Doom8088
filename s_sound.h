@@ -62,7 +62,7 @@ void S_Start(void);
 // Start sound for thing at <origin>
 //  using <sound_id> from sounds.h
 //
-void S_StartSound(mobj_t *origin, int32_t sfx_id);
+void S_StartSound(mobj_t __far* origin, int32_t sfx_id);
 
 void S_StartSound2(degenmobj_t* origin, int32_t sfx_id);
 
@@ -84,17 +84,6 @@ void S_ChangeMusic(int32_t music_id, int32_t looping);
 void S_UpdateSounds(void);
 void S_SetMusicVolume(int32_t volume);
 void S_SetSfxVolume(int32_t volume);
-
-
-typedef struct
-{
-  const sfxinfo_t *sfxinfo;  // sound information (if null, channel avail.)
-  int32_t tickend;
-  void *origin;        // origin of sound
-  int16_t handle;          // handle of the sound being played
-  int16_t is_pickup;       // killough 4/25/98: whether sound is a player's weapon
-} channel_t;
-
 
 
 #endif

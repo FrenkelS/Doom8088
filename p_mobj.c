@@ -448,7 +448,7 @@ static void P_NightmareRespawn(mobj_t* mobj)
     fixed_t      y;
     fixed_t      z;
     subsector_t* ss;
-    mobj_t*      mo;
+    mobj_t __far*      mo;
 
     /* haleyjd: stupid nightmare respawning bug fix
    *
@@ -606,7 +606,7 @@ static void P_MobjBrainlessThinker(mobj_t* mobj)
 
 
 
-static think_t P_ThinkerFunctionForType(mobjtype_t type, mobj_t* mobj)
+static think_t P_ThinkerFunctionForType(mobjtype_t type, mobj_t __far* mobj)
 {
     //Full thinking ability.
     if(type < MT_MISC0)
@@ -649,7 +649,7 @@ static mobj_t __far* P_NewMobj()
     return mobj;
 }
 
-mobj_t* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
+mobj_t __far* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
 {
     const state_t*    st;
     const mobjinfo_t* info;
@@ -1119,7 +1119,7 @@ void P_SpawnPlayerMissile(mobj_t* source,mobjtype_t type)
 }
 
 
-struct player_s* P_MobjIsPlayer(const mobj_t* mobj)
+struct player_s* P_MobjIsPlayer(const mobj_t __far* mobj)
 {
     if(mobj == _g_player.mo)
     {

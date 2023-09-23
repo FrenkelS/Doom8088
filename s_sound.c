@@ -51,6 +51,16 @@
 #include "globdata.h"
 
 
+typedef struct
+{
+  const sfxinfo_t *sfxinfo;  // sound information (if null, channel avail.)
+  int32_t tickend;
+  void __far* origin;        // origin of sound
+  int16_t handle;          // handle of the sound being played
+  int16_t is_pickup;       // killough 4/25/98: whether sound is a player's weapon
+} channel_t;
+
+
 // the set of channels available
 static channel_t *channels;
 
@@ -97,9 +107,9 @@ static void S_StopChannel(int32_t cnum);
 
 static void S_StopMusic(void);
 
-static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vol, int32_t *sep);
+static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t __far* source, int32_t *vol, int32_t *sep);
 
-static int32_t S_getChannel(void *origin, const sfxinfo_t *sfxinfo, int32_t is_pickup);
+static int32_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup);
 
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
@@ -163,7 +173,7 @@ void S_Start(void)
     S_ChangeMusic(mnum, true);
 }
 
-static void S_StartSoundAtVolume(mobj_t *origin, int32_t sfx_id, int32_t volume)
+static void S_StartSoundAtVolume(mobj_t __far* origin, int32_t sfx_id, int32_t volume)
 {
     int32_t cnum, is_pickup;
     const sfxinfo_t *sfx;
@@ -230,7 +240,7 @@ static void S_StartSoundAtVolume(mobj_t *origin, int32_t sfx_id, int32_t volume)
 
 }
 
-void S_StartSound(mobj_t *origin, int32_t sfx_id)
+void S_StartSound(mobj_t __far* origin, int32_t sfx_id)
 {
     S_StartSoundAtVolume(origin, sfx_id, snd_SfxVolume);
 }
@@ -449,7 +459,7 @@ static void S_StopChannel(int32_t cnum)
 // Otherwise, modifies parameters and returns 1.
 //
 
-static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vol, int32_t *sep)
+static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t __far* source, int32_t *vol, int32_t *sep)
 {
 	fixed_t adx, ady,approx_dist;
 
@@ -521,7 +531,7 @@ static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t *source, int32_t *vo
 //
 // killough 4/25/98: made static, added is_pickup argument
 
-static int32_t S_getChannel(void *origin, const sfxinfo_t *sfxinfo, int32_t is_pickup)
+static int32_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup)
 {
     // channel number to use
     int32_t cnum;
