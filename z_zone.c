@@ -66,7 +66,7 @@ typedef struct
 {
     uint32_t  size:24;		// including the header and possibly tiny fragments
     uint32_t  tag:4;		// purgelevel
-    void __far**    user;	// NULL if a free block
+    void __far*__far*    user;	// NULL if a free block
     segment_t next;
     segment_t prev;
 #if defined ZONEIDCHECK
@@ -405,7 +405,7 @@ static uint32_t Z_GetTotalFreeMemory(void)
 #define MINFRAGMENT		64
 
 
-static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far** user)
+static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
 {
     size = (size + (PARAGRAPH_SIZE - 1)) & ~(PARAGRAPH_SIZE - 1);
 
@@ -504,7 +504,7 @@ static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far** user)
 }
 
 
-static void __far* Z_Malloc(int32_t size, int8_t tag, void __far** user) {
+static void __far* Z_Malloc(int32_t size, int8_t tag, void __far*__far* user) {
 	void __far* ptr = Z_TryMalloc(size, tag, user);
 	if (!ptr)
 		I_Error ("Z_Malloc: failed to allocate %li B, max free block %li B, total free %li", size, Z_GetLargestFreeBlockSize(), Z_GetTotalFreeMemory());
@@ -524,13 +524,13 @@ void __far* Z_MallocStatic(int32_t size)
 }
 
 
-void __far* Z_MallocStaticWithUser(int32_t size, void __far** user)
+void __far* Z_MallocStaticWithUser(int32_t size, void __far*__far* user)
 {
 	return Z_Malloc(size, PU_STATIC, user);
 }
 
 
-void __far* Z_MallocLevel(int32_t size, void __far** user)
+void __far* Z_MallocLevel(int32_t size, void __far*__far* user)
 {
 	return Z_Malloc(size, PU_LEVEL, user);
 }

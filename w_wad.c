@@ -75,9 +75,9 @@ static FILE* fileWAD;
 
 static int16_t numlumps;
 
-static filelump_t *fileinfo;
+static filelump_t __far* fileinfo;
 
-static void __far** lumpcache;
+static void __far*__far* lumpcache;
 
 //
 // LUMP BASED ROUTINES.
@@ -120,13 +120,13 @@ void W_Init(void)
 	_ffread(fileinfo, sizeof(filelump_t) * header.numlumps, fileWAD);
 
 	lumpcache = Z_MallocStatic(header.numlumps * sizeof(*lumpcache));
-	memset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
+	_fmemset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
 
 	numlumps = header.numlumps;
 }
 
 
-const char* PUREFUNC W_GetNameForNum(int16_t num)
+const char __far* PUREFUNC W_GetNameForNum(int16_t num)
 {
 	return fileinfo[num].name;
 }
@@ -171,17 +171,17 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 void W_ReadLumpByName(const char *name, void __far* ptr)
 {
 	int16_t num = W_GetNumForName(name);
-	const filelump_t* lump = &fileinfo[num];
+	const filelump_t __far* lump = &fileinfo[num];
 	fseek(fileWAD, lump->filepos, SEEK_SET);
 	_ffread(ptr, lump->size, fileWAD);
 }
 
 
-const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
+const void __far* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 {
-	const filelump_t* lump = &fileinfo[num];
+	const filelump_t __far* lump = &fileinfo[num];
 
-	void* ptr = Z_MallocLevel(lump->size, NULL);
+	void __far* ptr = Z_MallocLevel(lump->size, NULL);
 
 	fseek(fileWAD, lump->filepos, SEEK_SET);
 	_ffread(ptr, lump->size, fileWAD);
@@ -189,9 +189,9 @@ const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 }
 
 
-static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void __far** user)
+static void __far* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void __far*__far* user)
 {
-	const filelump_t* lump = &fileinfo[num];
+	const filelump_t __far* lump = &fileinfo[num];
 
 	void __far* ptr = Z_MallocStaticWithUser(lump->size, user);
 
@@ -201,7 +201,7 @@ static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void __far** user)
 }
 
 
-const void* PUREFUNC W_GetLumpByNum(int16_t num)
+const void __far* PUREFUNC W_GetLumpByNum(int16_t num)
 {
 	if (lumpcache[num])
 		Z_ChangeTagToStatic(lumpcache[num]);
