@@ -39,7 +39,7 @@ static int16_t skytexture;
 
 #define ANGLETOSKYSHIFT         22
 
-void R_DrawSky(visplane_t *pl)
+void R_DrawSky(visplane_t __far* pl)
 {
 	draw_column_vars_t dcvars;
 

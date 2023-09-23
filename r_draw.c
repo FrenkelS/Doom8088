@@ -62,7 +62,7 @@
 
 
 visplane_t __far* _g_visplanes[MAXVISPLANES];
-visplane_t *_g_freetail;
+visplane_t __far* _g_freetail;
 
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
@@ -235,7 +235,7 @@ boolean highDetail = false;
 
 
 uint16_t validcount = 1;         // increment every time a check is made
-visplane_t **freehead;
+visplane_t __far**freehead;
 
 //*****************************************
 // Constants
@@ -1639,9 +1639,9 @@ static visplane_t __far* new_visplane(uint32_t hash)
   ((uint32_t)((picnum)*3+(lightlevel)+(height)*7) & (MAXVISPLANES-1))
 
 
-static visplane_t *R_FindPlane(fixed_t height, int16_t picnum, int32_t lightlevel)
+static visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int32_t lightlevel)
 {
-    visplane_t *check;
+    visplane_t __far* check;
     uint32_t hash;                      // killough
 
     if (picnum == skyflatnum)
@@ -1664,7 +1664,7 @@ static visplane_t *R_FindPlane(fixed_t height, int16_t picnum, int32_t lightleve
     check->minx = SCREENWIDTH; // Was SCREENWIDTH -- killough 11/98
     check->maxx = -1;
 
-    memset(check->top, UINT32_MAX, sizeof(check->top));
+    _fmemset(check->top, UINT32_MAX, sizeof(check->top));
 
     check->modified = false;
 
@@ -1687,7 +1687,7 @@ static visplane_t __far* R_DupPlane(const visplane_t *pl, int32_t start, int32_t
     new_pl->minx = start;
     new_pl->maxx = stop;
 
-    memset(new_pl->top, UINT32_MAX, sizeof(new_pl->top));
+    _fmemset(new_pl->top, UINT32_MAX, sizeof(new_pl->top));
 
     new_pl->modified = false;
 
@@ -1698,7 +1698,7 @@ static visplane_t __far* R_DupPlane(const visplane_t *pl, int32_t start, int32_t
 //
 // R_CheckPlane
 //
-static visplane_t *R_CheckPlane(visplane_t *pl, int32_t start, int32_t stop)
+static visplane_t __far* R_CheckPlane(visplane_t __far* pl, int32_t start, int32_t stop)
 {
     int32_t intrl, intrh, unionl, unionh, x;
 

@@ -280,7 +280,7 @@ static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32
 #endif
 
 
-static void R_DoDrawPlane(visplane_t *pl)
+static void R_DoDrawPlane(visplane_t __far* pl)
 {
     if (pl->minx <= pl->maxx)
     {
@@ -337,7 +337,7 @@ void R_DrawPlanes (void)
 {
     for (int8_t i = 0; i < MAXVISPLANES; i++)
     {
-        visplane_t *pl = _g_visplanes[i];
+        visplane_t __far* pl = _g_visplanes[i];
 
         while(pl)
         {
