@@ -138,8 +138,8 @@ static void M_DrawSave(void);
 
 static void M_SetupNextMenu(const menu_t *menudef);
 static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot);
-static void M_WriteText(int16_t x, int16_t y, const char *string);
-static int16_t M_StringWidth(const char *string);
+static void M_WriteText(int16_t x, int16_t y, const char __far* string);
+static int16_t M_StringWidth(const char __far* string);
 static int16_t M_StringHeight(const char *string);
 static void M_StartMessage(const char *string,void (*routine)(int32_t),boolean input);
 static void M_ClearMenus (void);
@@ -961,17 +961,17 @@ void M_StartControlPanel (void)
 }
 
 
-static char* Z_Strdup(const char* s)
+static char __far* Z_Strdup(const char* s)
 {
     const uint32_t len = strlen(s);
 
     if(!len)
         return NULL;
 
-    char* ptr = Z_MallocStatic(len+1);
+    char __far* ptr = Z_MallocStatic(len+1);
 
     if(ptr)
-        strcpy(ptr, s);
+        _fstrcpy(ptr, s);
 
     return ptr;
 }
@@ -992,13 +992,14 @@ void M_Drawer (void)
     if (messageToPrint)
     {
         /* cph - strdup string to writable memory */
-        char *ms = Z_Strdup(messageString);
-        char *p = ms;
+        char __far* ms = Z_Strdup(messageString);
+        char __far* p = ms;
 
         int16_t y = 80 - M_StringHeight(messageString)/2;
         while (*p)
         {
-            char *string = p, c;
+            char __far* string = p;
+            char c;
             while ((c = *p) && *p != '\n')
                 p++;
             *p = 0;
@@ -1143,11 +1144,11 @@ static int16_t font_lump_offset;
 // Find string width from hu_font chars
 //
 
-static int16_t M_StringWidth(const char* string)
+static int16_t M_StringWidth(const char __far* string)
 {
 	int16_t	w = 0;
 
-	for (int16_t i = 0; i < strlen(string); i++)
+	for (int16_t i = 0; i < _fstrlen(string); i++)
 	{
 		char c = toupper(string[i]);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
@@ -1178,9 +1179,9 @@ static int16_t M_StringHeight(const char* string)
 //
 //    Write a string using the hu_font
 //
-static void M_WriteText (int16_t x, int16_t y, const char* string)
+static void M_WriteText (int16_t x, int16_t y, const char __far* string)
 {
-	const char* ch = string;
+	const char __far* ch = string;
 	int16_t cx = x;
 	int16_t cy = y;
 
