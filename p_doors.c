@@ -353,7 +353,7 @@ boolean EV_DoDoor
   // open all doors with the same tag as the activating line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
     // if the ceiling already moving, don't start the door action
     if (P_SectorActive(ceiling_special,sec)) //jff 2/22/98
         continue;
@@ -491,7 +491,7 @@ void EV_VerticalDoor
   }
 
   // get the sector on the second side of activating linedef
-  sec = _g->sides[line->sidenum[1]].sector;
+  sec = _g_sides[line->sidenum[1]].sector;
 
   /* if door already has a thinker, use it
    * cph 2001/04/05 -

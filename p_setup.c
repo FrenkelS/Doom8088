@@ -54,6 +54,72 @@
 #include "globdata.h"
 
 
+//
+// MAP related Lookup tables.
+// Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
+//
+
+int32_t      _g_numvertexes;
+const vertex_t *_g_vertexes;
+
+const seg_t    *_g_segs;
+
+int32_t      _g_numsectors;
+sector_t *_g_sectors;
+
+
+static int32_t      numsubsectors;
+subsector_t *_g_subsectors;
+
+
+
+int32_t      _g_numlines;
+const line_t   *_g_lines;
+linedata_t* _g_linedata;
+
+
+static int32_t      numsides;
+side_t   *_g_sides;
+
+// BLOCKMAP
+// Created from axis aligned bounding box
+// of the map, a rectangular array of
+// blocks of size ...
+// Used to speed up collision detection
+// by spatial subdivision in 2D.
+//
+// Blockmap size.
+
+int16_t       _g_bmapwidth, _g_bmapheight;  // size in mapblocks
+
+// killough 3/1/98: remove blockmap limit internally:
+const int16_t      *_g_blockmap;
+
+// offsets in blockmap are from here
+const int16_t      *_g_blockmaplump;
+
+fixed_t   _g_bmaporgx, _g_bmaporgy;     // origin of block map
+
+mobj_t    **_g_blocklinks;           // for thing chains
+
+//
+// REJECT
+// For fast sight rejection.
+// Speeds up enemy AI by skipping detailed
+//  LineOf Sight calculation.
+// Without the special effect, this could
+// be used as a PVS lookup as well.
+//
+
+const byte *_g_rejectmatrix;
+
+// Maintain single and multi player starting spots.
+mapthing_t _g_playerstarts[MAXPLAYERS];
+
+mobj_t*      _g_thingPool;
+uint32_t _g_thingPoolSize;
+
+
 // Lump order in a map WAD: each map needs a couple of lumps
 // to provide a complete scene geometry description.
 enum {
@@ -80,10 +146,10 @@ static void P_LoadVertexes (int16_t lump)
 {
   // Determine number of lumps:
   //  total lump length / vertex record length.
-  _g->numvertexes = W_LumpLength(lump) / sizeof(vertex_t);
+  _g_numvertexes = W_LumpLength(lump) / sizeof(vertex_t);
 
   // Allocate zone memory for buffer.
-  _g->vertexes = W_GetLumpByNumAutoFree(lump);
+  _g_vertexes = W_GetLumpByNumAutoFree(lump);
 
 }
 
@@ -95,7 +161,7 @@ static void P_LoadVertexes (int16_t lump)
 static void P_LoadSegs (int16_t lump)
 {
     int32_t numsegs = W_LumpLength(lump) / sizeof(seg_t);
-    _g->segs = (const seg_t *)W_GetLumpByNumAutoFree(lump);
+    _g_segs = (const seg_t *)W_GetLumpByNumAutoFree(lump);
 
     if (!numsegs)
       I_Error("P_LoadSegs: no segs in level");
@@ -118,17 +184,17 @@ static void P_LoadSubsectors (int16_t lump)
   const mapsubsector_t *data;
   int32_t  i;
 
-  _g->numsubsectors = W_LumpLength (lump) / sizeof(mapsubsector_t);
-  _g->subsectors = Z_CallocLevel(_g->numsubsectors * sizeof(subsector_t));
+  numsubsectors = W_LumpLength (lump) / sizeof(mapsubsector_t);
+  _g_subsectors = Z_CallocLevel(numsubsectors * sizeof(subsector_t));
   data = (const mapsubsector_t *)W_GetLumpByNumAutoFree(lump);
 
-  if ((!data) || (!_g->numsubsectors))
+  if ((!data) || (!numsubsectors))
     I_Error("P_LoadSubsectors: no subsectors in level");
 
-  for (i=0; i<_g->numsubsectors; i++)
+  for (i=0; i<numsubsectors; i++)
   {
-    _g->subsectors[i].numlines  = (uint16_t)SHORT(data[i].numsegs );
-    _g->subsectors[i].firstline = (uint16_t)SHORT(data[i].firstseg);
+    _g_subsectors[i].numlines  = (uint16_t)SHORT(data[i].numsegs );
+    _g_subsectors[i].firstline = (uint16_t)SHORT(data[i].firstseg);
   }
 }
 
@@ -153,13 +219,13 @@ static void P_LoadSectors (int16_t lump)
   const byte *data; // cph - const*
   int32_t  i;
 
-  _g->numsectors = W_LumpLength (lump) / sizeof(mapsector_t);
-  _g->sectors = Z_CallocLevel(_g->numsectors * sizeof(sector_t));
+  _g_numsectors = W_LumpLength (lump) / sizeof(mapsector_t);
+  _g_sectors = Z_CallocLevel(_g_numsectors * sizeof(sector_t));
   data = W_GetLumpByNumAutoFree (lump); // cph - wad lump handling updated
 
-  for (i=0; i<_g->numsectors; i++)
+  for (i=0; i<_g_numsectors; i++)
     {
-      sector_t *ss = _g->sectors + i;
+      sector_t *ss = _g_sectors + i;
       const mapsector_t *ms = (const mapsector_t *) data + i;
 
       ss->floorheight = ((int32_t)SHORT(ms->floorheight))<<FRACBITS;
@@ -191,7 +257,7 @@ static void P_LoadNodes (int16_t lump)
   if ((!nodes) || (!numnodes))
   {
     // allow trivial maps
-    if (_g->numsubsectors == 1)
+    if (numsubsectors == 1)
       printf("P_LoadNodes: trivial map (no nodes, one subsector)\n");
     else
       I_Error("P_LoadNodes: no nodes in level");
@@ -258,12 +324,12 @@ static void P_LoadThings (int16_t lump)
     if ((!data) || (!numthings))
         I_Error("P_LoadThings: no things in level");
 
-    _g->thingPool = Z_CallocLevel(numthings * sizeof(mobj_t));
-    _g->thingPoolSize = numthings;
+    _g_thingPool = Z_CallocLevel(numthings * sizeof(mobj_t));
+    _g_thingPoolSize = numthings;
 
     for(int32_t i = 0; i < numthings; i++)
     {
-        _g->thingPool[i].type = MT_NOTHING;
+        _g_thingPool[i].type = MT_NOTHING;
     }
 
     for (i=0; i<numthings; i++)
@@ -293,14 +359,14 @@ static void P_LoadLineDefs (int16_t lump)
 {
     int32_t  i;
 
-    _g->numlines = W_LumpLength (lump) / sizeof(line_t);
-    _g->lines = W_GetLumpByNumAutoFree (lump);
+    _g_numlines = W_LumpLength (lump) / sizeof(line_t);
+    _g_lines = W_GetLumpByNumAutoFree (lump);
 
-    _g->linedata = Z_CallocLevel(_g->numlines * sizeof(linedata_t));
+    _g_linedata = Z_CallocLevel(_g_numlines * sizeof(linedata_t));
 
-    for (i=0; i<_g->numlines; i++)
+    for (i=0; i<_g_numlines; i++)
     {
-        _g->linedata[i].special = _g->lines[i].const_special;
+        _g_linedata[i].special = _g_lines[i].const_special;
     }
 }
 
@@ -324,8 +390,8 @@ typedef PACKEDATTR_PRE struct {
 
 static void P_LoadSideDefs (int16_t lump)
 {
-  _g->numsides = W_LumpLength(lump) / sizeof(mapsidedef_t);
-  _g->sides = Z_CallocLevel(_g->numsides * sizeof(side_t));
+  numsides = W_LumpLength(lump) / sizeof(mapsidedef_t);
+  _g_sides = Z_CallocLevel(numsides * sizeof(side_t));
 }
 
 // killough 4/4/98: delay using texture names until
@@ -336,10 +402,10 @@ static void P_LoadSideDefs2(int16_t lump)
 {
     const byte *data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
 
-    for (int32_t i = 0; i < _g->numsides; i++)
+    for (int32_t i = 0; i < numsides; i++)
     {
         register const mapsidedef_t *msd = (const mapsidedef_t *) data + i;
-        register side_t *sd = _g->sides + i;
+        register side_t *sd = _g_sides + i;
         register sector_t *sec;
 
         sd->textureoffset = msd->textureoffset;
@@ -347,12 +413,12 @@ static void P_LoadSideDefs2(int16_t lump)
 
         /* cph 2006/09/30 - catch out-of-range sector numbers; use sector 0 instead */
         uint16_t sector_num = SHORT(msd->sector);
-        if (sector_num >= _g->numsectors)
+        if (sector_num >= _g_numsectors)
         {
             printf("P_LoadSideDefs2: sidedef %li has out-of-range sector num %u\n", i, sector_num);
             sector_num = 0;
         }
-        sd->sector = sec = &_g->sectors[sector_num];
+        sd->sector = sec = &_g_sectors[sector_num];
 
         sd->midtexture    = msd->midtexture;
         sd->toptexture    = msd->toptexture;
@@ -394,18 +460,18 @@ typedef struct linelist_t        // type used to list lines in each block
 
 static void P_LoadBlockMap (int16_t lump)
 {
-    _g->blockmaplump = W_GetLumpByNumAutoFree(lump);
+    _g_blockmaplump = W_GetLumpByNumAutoFree(lump);
 
-    _g->bmaporgx = ((int32_t)_g->blockmaplump[0])<<FRACBITS;
-    _g->bmaporgy = ((int32_t)_g->blockmaplump[1])<<FRACBITS;
-    _g->bmapwidth  = _g->blockmaplump[2];
-    _g->bmapheight = _g->blockmaplump[3];
+    _g_bmaporgx = ((int32_t)_g_blockmaplump[0])<<FRACBITS;
+    _g_bmaporgy = ((int32_t)_g_blockmaplump[1])<<FRACBITS;
+    _g_bmapwidth  = _g_blockmaplump[2];
+    _g_bmapheight = _g_blockmaplump[3];
 
 
     // clear out mobj chains - CPhipps - use calloc
-    _g->blocklinks = Z_CallocLevel(_g->bmapwidth * _g->bmapheight * sizeof(*_g->blocklinks));
+    _g_blocklinks = Z_CallocLevel(_g_bmapwidth * _g_bmapheight * sizeof(*_g_blocklinks));
 
-    _g->blockmap = _g->blockmaplump+4;
+    _g_blockmap = _g_blockmaplump+4;
 }
 
 //
@@ -414,7 +480,7 @@ static void P_LoadBlockMap (int16_t lump)
 
 static void P_LoadReject(int16_t lump)
 {
-  _g->rejectmatrix = W_GetLumpByNumAutoFree(lump);
+  _g_rejectmatrix = W_GetLumpByNumAutoFree(lump);
 }
 
 //
@@ -456,28 +522,28 @@ static void P_GroupLines (void)
 {
     register const line_t *li;
     register sector_t *sector;
-    int32_t i,j, total = _g->numlines;
+    int32_t i,j, total = _g_numlines;
 
     // figgi
-    for (i=0 ; i<_g->numsubsectors ; i++)
+    for (i=0 ; i<numsubsectors ; i++)
     {
-        const seg_t *seg = &_g->segs[_g->subsectors[i].firstline];
-        _g->subsectors[i].sector = NULL;
-        for(j=0; j<_g->subsectors[i].numlines; j++)
+        const seg_t *seg = &_g_segs[_g_subsectors[i].firstline];
+        _g_subsectors[i].sector = NULL;
+        for(j=0; j<_g_subsectors[i].numlines; j++)
         {
             if(seg->sidenum != NO_INDEX)
             {
-                _g->subsectors[i].sector = _g->sides[seg->sidenum].sector;
+                _g_subsectors[i].sector = _g_sides[seg->sidenum].sector;
                 break;
             }
             seg++;
         }
-        if(_g->subsectors[i].sector == NULL)
+        if(_g_subsectors[i].sector == NULL)
             I_Error("P_GroupLines: Subsector a part of no sector!\n");
     }
 
     // count number of lines in each sector
-    for (i=0,li=_g->lines; i<_g->numlines; i++, li++)
+    for (i=0,li=_g_lines; i<_g_numlines; i++, li++)
     {
         LN_FRONTSECTOR(li)->linecount++;
         if (LN_BACKSECTOR(li) && LN_BACKSECTOR(li) != LN_FRONTSECTOR(li))
@@ -490,7 +556,7 @@ static void P_GroupLines (void)
     {  // allocate line tables for each sector
         const line_t **linebuffer = Z_MallocLevel(total*sizeof(line_t *), NULL);
 
-        for (i=0, sector = _g->sectors; i<_g->numsectors; i++, sector++)
+        for (i=0, sector = _g_sectors; i<_g_numsectors; i++, sector++)
         {
             sector->lines = linebuffer;
             linebuffer += sector->linecount;
@@ -499,14 +565,14 @@ static void P_GroupLines (void)
     }
 
     // Enter those lines
-    for (i=0,li=_g->lines; i<_g->numlines; i++, li++)
+    for (i=0,li=_g_lines; i<_g_numlines; i++, li++)
     {
         P_AddLineToSector(li, LN_FRONTSECTOR(li));
         if (LN_BACKSECTOR(li) && LN_BACKSECTOR(li) != LN_FRONTSECTOR(li))
             P_AddLineToSector(li, LN_BACKSECTOR(li));
     }
 
-    for (i=0, sector = _g->sectors; i<_g->numsectors; i++, sector++)
+    for (i=0, sector = _g_sectors; i<_g_numsectors; i++, sector++)
     {
         fixed_t bbox[4];
         M_ClearBox(bbox);
@@ -527,9 +593,9 @@ static void P_GroupLines (void)
 //end. This function resets the visplane arrays.
 static void R_ResetPlanes()
 {
-    memset(_g->visplanes, 0, sizeof(_g->visplanes));
-    _g->freetail = NULL;
-    freehead = &_g->freetail;
+    memset(_g_visplanes, 0, sizeof(_g_visplanes));
+    _g_freetail = NULL;
+    freehead = &_g_freetail;
 }
 
 
@@ -551,14 +617,14 @@ void P_SetupLevel(int32_t map)
     char  lumpname[9];
     int16_t   lumpnum;
 
-    _g->totallive = _g->totalkills = _g->totalitems = _g->totalsecret = 0;
-    _g->wminfo.partime = 180;
+    _g_totallive = _g_totalkills = _g_totalitems = _g_totalsecret = 0;
+    _g_wminfo.partime = 180;
 
     for (i=0; i<MAXPLAYERS; i++)
-        _g->player.killcount = _g->player.secretcount = _g->player.itemcount = 0;
+        _g_player.killcount = _g_player.secretcount = _g_player.itemcount = 0;
 
     // Initial height of PointOfView will be set by player think.
-    _g->player.viewz = 1;
+    _g_player.viewz = 1;
 
     // Make sure all sounds are stopped before Z_FreeTags.
     S_Start();
@@ -567,8 +633,8 @@ void P_SetupLevel(int32_t map)
 
     P_InitThinkers();
 
-    _g->leveltime = 0;
-    _g->totallive = 0;
+    _g_leveltime = 0;
+    _g_totallive = 0;
 
     // find map name
     sprintf(lumpname, "E1M%d", map);   // killough 1/24/98: simplify
@@ -592,16 +658,16 @@ void P_SetupLevel(int32_t map)
     // a much simpler fix is in g_game.c -- killough 10/98
 
     /* cph - reset all multiplayer starts */
-    memset(_g->playerstarts,0,sizeof(_g->playerstarts));
+    memset(_g_playerstarts,0,sizeof(_g_playerstarts));
 
     for (i = 0; i < MAXPLAYERS; i++)
-        _g->player.mo = NULL;
+        _g_player.mo = NULL;
 
     P_MapStart();
 
     P_LoadThings(lumpnum + ML_THINGS);
 
-    if (_g->playeringame && !_g->player.mo)
+    if (_g_playeringame && !_g_player.mo)
         I_Error("P_SetupLevel: missing player %d start\n", i+1);
 
     // set up world state

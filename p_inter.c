@@ -109,7 +109,7 @@ static boolean P_GiveAmmo(player_t *player, ammotype_t ammo, int32_t num)
     num = clipammo[ammo]/2;
 
   // give double ammo in trainer mode, you'll need in nightmare
-  if (_g->gameskill == sk_baby || _g->gameskill == sk_nightmare)
+  if (_g_gameskill == sk_baby || _g_gameskill == sk_nightmare)
     num <<= 1;
 
   oldammo = player->ammo[ammo];
@@ -502,7 +502,7 @@ void P_TouchSpecialThing(mobj_t *special, mobj_t *toucher)
   /* cph 20028/10 - for old-school DM addicts, allow old behavior
    * where only consoleplayer's pickup sounds are heard */
   // displayplayer, not consoleplayer, for viewing multiplayer demos
-  if (player == &_g->player)
+  if (player == &_g_player)
     S_StartSound (player->mo, sound | PICKUP_SOUND);   // killough 4/25/98
 }
 
@@ -522,7 +522,7 @@ static void P_KillMobj(mobj_t *source, mobj_t *target)
 
 
   if (!((target->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
-    _g->totallive--;
+    _g_totallive--;
 
   if (source && P_MobjIsPlayer(source))
     {
@@ -535,15 +535,15 @@ static void P_KillMobj(mobj_t *source, mobj_t *target)
 
       // count all monster deaths,
       // even those caused by other monsters
-      _g->player.killcount++;
+      _g_player.killcount++;
 
   }
 
   if (P_MobjIsPlayer(target))
     {
       target->flags &= ~MF_SOLID;
-      _g->player.playerstate = PST_DEAD;
-      P_DropWeapon (&_g->player);
+      _g_player.playerstate = PST_DEAD;
+      P_DropWeapon (&_g_player);
 
       if (automapmode & am_active)
         AM_Stop();    // don't die in auto map; switch view prior to dying
@@ -563,7 +563,7 @@ static void P_KillMobj(mobj_t *source, mobj_t *target)
   // This determines the kind of object spawned
   // during the death frame of a thing.
 
-  if( (_g->player.cheats & CF_ENEMY_ROCKETS) && (target->type >= MT_POSSESSED) && (target->type <= MT_BRUISERSHOT) )
+  if( (_g_player.cheats & CF_ENEMY_ROCKETS) && (target->type >= MT_POSSESSED) && (target->type <= MT_BRUISERSHOT) )
   {
     item = MT_MISC27; //Everyone drops a rocket launcher.
   }
@@ -616,7 +616,7 @@ void P_DamageMobj(mobj_t *target,mobj_t *inflictor, mobj_t *source, int32_t dama
     target->momx = target->momy = target->momz = 0;
 
   player = P_MobjIsPlayer(target);
-  if (player && _g->gameskill == sk_baby)
+  if (player && _g_gameskill == sk_baby)
     damage >>= 1;   // take half damage in trainer mode
 
   // Some close combat weapons should not

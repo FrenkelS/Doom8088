@@ -189,13 +189,13 @@ typedef struct line_s
 
 } line_t;
 
-#define LN_FRONTSECTOR(l) (_g->sides[(l)->sidenum[0]].sector)
-#define LN_BACKSECTOR(l) ((l)->sidenum[1] != NO_INDEX ? _g->sides[(l)->sidenum[1]].sector : NULL)
+#define LN_FRONTSECTOR(l) (_g_sides[(l)->sidenum[0]].sector)
+#define LN_BACKSECTOR(l) ((l)->sidenum[1] != NO_INDEX ? _g_sides[(l)->sidenum[1]].sector : NULL)
 
-#define LN_SPECIAL(l) (_g->linedata[(l)->lineno].special)
-#define LN_VCOUNT(l) (_g->linedata[(l)->lineno].validcount)
-#define LN_RVCOUNT(l) (_g->linedata[(l)->lineno].r_validcount)
-#define LN_RFLAGS(l) (_g->linedata[(l)->lineno].r_flags)
+#define LN_SPECIAL(l) (_g_linedata[(l)->lineno].special)
+#define LN_VCOUNT(l) (_g_linedata[(l)->lineno].validcount)
+#define LN_RVCOUNT(l) (_g_linedata[(l)->lineno].r_validcount)
+#define LN_RFLAGS(l) (_g_linedata[(l)->lineno].r_flags)
 
 
 // phares 3/14/98
@@ -265,8 +265,8 @@ typedef struct
     uint16_t backsectornum;
 } seg_t;
 
-#define SG_FRONTSECTOR(s) ((s)->frontsectornum != NO_INDEX ? &_g->sectors[(s)->frontsectornum] : NULL)
-#define SG_BACKSECTOR(s) ((s)->backsectornum != NO_INDEX ? &_g->sectors[(s)->backsectornum] : NULL)
+#define SG_FRONTSECTOR(s) ((s)->frontsectornum != NO_INDEX ? &_g_sectors[(s)->frontsectornum] : NULL)
+#define SG_BACKSECTOR(s) ((s)->backsectornum != NO_INDEX ? &_g_sectors[(s)->backsectornum] : NULL)
 
 //
 // A SubSector.

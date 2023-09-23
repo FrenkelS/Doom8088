@@ -103,36 +103,36 @@ boolean C_Responder (event_t *ev)
 
 static void cheat_god()
 {
-    _g->player.cheats ^= CF_GODMODE;
+    _g_player.cheats ^= CF_GODMODE;
 
-    if(_g->player.cheats & CF_GODMODE)
+    if(_g_player.cheats & CF_GODMODE)
     {
-        _g->player.health = god_health;
+        _g_player.health = god_health;
 
-        _g->player.message = STSTR_DQDON;
+        _g_player.message = STSTR_DQDON;
     }
     else
     {
-        _g->player.message = STSTR_DQDOFF;
+        _g_player.message = STSTR_DQDOFF;
 
     }
 }
 
 static void cheat_choppers()
 {
-    _g->player.weaponowned[wp_chainsaw] = true;
-    _g->player.pendingweapon = wp_chainsaw;
+    _g_player.weaponowned[wp_chainsaw] = true;
+    _g_player.pendingweapon = wp_chainsaw;
 
-    P_GivePower(&_g->player, pw_invulnerability);
+    P_GivePower(&_g_player, pw_invulnerability);
 
-    _g->player.message = STSTR_CHOPPERS;
+    _g_player.message = STSTR_CHOPPERS;
 }
 
 static void cheat_idkfa()
 {
     int32_t i;
 
-    player_t* plyr = &_g->player;
+    player_t* plyr = &_g_player;
 
     if (!plyr->backpack)
     {
@@ -163,7 +163,7 @@ static void cheat_idkfa()
 static void cheat_ammo()
 {
     int32_t i;
-    player_t* plyr = &_g->player;
+    player_t* plyr = &_g_player;
 
     if (!plyr->backpack)
     {
@@ -190,42 +190,42 @@ static void cheat_ammo()
 
 static void cheat_noclip()
 {
-    _g->player.cheats ^= CF_NOCLIP;
+    _g_player.cheats ^= CF_NOCLIP;
 
-    if(_g->player.cheats & CF_NOCLIP)
+    if(_g_player.cheats & CF_NOCLIP)
     {
-        _g->player.message = STSTR_NCON;
+        _g_player.message = STSTR_NCON;
     }
     else
     {
-        _g->player.message = STSTR_NCOFF;
+        _g_player.message = STSTR_NCOFF;
 
     }
 }
 
 static void cheat_invincibility()
 {
-    P_GivePower(&_g->player, pw_invulnerability);
+    P_GivePower(&_g_player, pw_invulnerability);
 }
 
 static void cheat_beserk()
 {
-    P_GivePower(&_g->player, pw_strength);
+    P_GivePower(&_g_player, pw_strength);
 }
 
 static void cheat_invisibility()
 {
-    P_GivePower(&_g->player, pw_invisibility);
+    P_GivePower(&_g_player, pw_invisibility);
 }
 
 static void cheat_map()
 {
-    P_GivePower(&_g->player, pw_allmap);
+    P_GivePower(&_g_player, pw_allmap);
 }
 
 static void cheat_goggles()
 {
-    P_GivePower(&_g->player, pw_infrared);
+    P_GivePower(&_g_player, pw_infrared);
 }
 
 static void cheat_exit()
@@ -235,33 +235,33 @@ static void cheat_exit()
 
 static void cheat_rockets()
 {
-    _g->player.cheats ^= CF_ENEMY_ROCKETS;
+    _g_player.cheats ^= CF_ENEMY_ROCKETS;
 
-    if(_g->player.cheats & CF_ENEMY_ROCKETS)
+    if(_g_player.cheats & CF_ENEMY_ROCKETS)
     {
-        _g->player.health = god_health;
+        _g_player.health = god_health;
 
-        _g->player.weaponowned[wp_missile] = true;
-        _g->player.ammo[am_misl] = _g->player.maxammo[am_misl];
+        _g_player.weaponowned[wp_missile] = true;
+        _g_player.ammo[am_misl] = _g_player.maxammo[am_misl];
 
-        _g->player.pendingweapon = wp_missile;
+        _g_player.pendingweapon = wp_missile;
 
-        _g->player.message = STSTR_ROCKETON;
+        _g_player.message = STSTR_ROCKETON;
     }
     else
     {
-        _g->player.message = STSTR_ROCKETOFF;
+        _g_player.message = STSTR_ROCKETOFF;
     }
 }
 
 static void cheat_fps()
 {
-    _g->fps_show = !_g->fps_show;
-	if(_g->fps_show)
+    _g_fps_show = !_g_fps_show;
+	if(_g_fps_show)
 	{
-		_g->player.message = STSTR_FPSON;
+		_g_player.message = STSTR_FPSON;
 	}else
 	{
-		_g->player.message = STSTR_FPSOFF;
+		_g_player.message = STSTR_FPSOFF;
 	}
 }

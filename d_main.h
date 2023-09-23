@@ -52,7 +52,7 @@ void D_PostEvent(event_t* ev);
 
 // Demo stuff
 void D_AdvanceDemo(void);
-void D_DoAdvanceDemo (void);
+
 
 //
 // BASE LEVEL

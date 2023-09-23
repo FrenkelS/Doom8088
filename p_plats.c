@@ -74,7 +74,7 @@ void T_PlatRaise(plat_t* plat)
       if (plat->type == raiseAndChange
           || plat->type == raiseToNearestAndChange)
       {
-        if (!(_g->leveltime&7))
+        if (!(_g_leveltime&7))
           S_StartSound2(&plat->sector->soundorg, sfx_stnmov);
       }
 
@@ -215,7 +215,7 @@ boolean EV_DoPlat
   // act on all sectors tagged the same as the activating linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
 
     // don't start a second floor function if already moving
     if (P_SectorActive(floor_special,sec)) //jff 2/23/98 multiple thinkers
@@ -242,7 +242,7 @@ boolean EV_DoPlat
     {
       case raiseToNearestAndChange:
         plat->speed = PLATSPEED/2;
-        sec->floorpic = _g->sides[line->sidenum[0]].sector->floorpic;
+        sec->floorpic = _g_sides[line->sidenum[0]].sector->floorpic;
         plat->high = P_FindNextHighestFloor(sec,sec->floorheight);
         plat->wait = 0;
         plat->status = up;
@@ -255,7 +255,7 @@ boolean EV_DoPlat
 
       case raiseAndChange:
         plat->speed = PLATSPEED/2;
-        sec->floorpic = _g->sides[line->sidenum[0]].sector->floorpic;
+        sec->floorpic = _g_sides[line->sidenum[0]].sector->floorpic;
         plat->high = sec->floorheight + amount*FRACUNIT;
         plat->wait = 0;
         plat->status = up;

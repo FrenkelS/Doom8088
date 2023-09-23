@@ -55,7 +55,7 @@ static mobj_t* P_TeleportDestination(const line_t* line)
       if (th->function == P_MobjThinker) {
         register mobj_t* m = (mobj_t*)th;
         if (m->type == MT_TELEPORTMAN  &&
-            m->subsector->sector-_g->sectors == i)
+            m->subsector->sector-_g_sectors == i)
             return m;
       }
   }
@@ -222,7 +222,7 @@ boolean EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t *thing,
     return false;
 
   for (i = -1; (i = P_FindLineFromLineTag(line, i)) >= 0;)
-    if ((l=_g->lines+i) != line && LN_BACKSECTOR(l))
+    if ((l=_g_lines+i) != line && LN_BACKSECTOR(l))
       {
         // Get the thing's position along the source linedef
         fixed_t pos = D_abs(line->dx) > D_abs(line->dy) ?
@@ -300,7 +300,7 @@ boolean EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t *thing,
         // Adjust z position to be same height above ground as before.
         // Ground level at the exit is measured as the higher of the
         // two floor heights at the exit linedef.
-        thing->z = z + _g->sides[l->sidenum[stepdown]].sector->floorheight;
+        thing->z = z + _g_sides[l->sidenum[stepdown]].sector->floorheight;
 
         // Rotate thing's orientation according to difference in linedef angles
         thing->angle += angle;

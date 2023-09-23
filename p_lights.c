@@ -313,7 +313,7 @@ void EV_StartLightStrobing(const line_t* line)
   // start lights strobing in all sectors tagged same as line
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
   {
-    sec = &_g->sectors[secnum];
+    sec = &_g_sectors[secnum];
     // if already doing a lighting function, don't start a second
     if (P_SectorActive(lighting_special,sec)) //jff 2/22/98
       continue;
@@ -338,7 +338,7 @@ void EV_TurnTagLightsOff(const line_t* line)
   // killough 10/98: replaced inefficient search with fast search
   for (j = -1; (j = P_FindSectorFromLineTag(line,j)) >= 0;)
     {
-      sector_t *sector = _g->sectors + j, *tsec;
+      sector_t *sector = _g_sectors + j, *tsec;
       int32_t i, min = sector->lightlevel;
       // find min neighbor light level
       for (i = 0;i < sector->linecount; i++)
@@ -366,7 +366,7 @@ void EV_LightTurnOn(const line_t *line, int32_t bright)
   // killough 10/98: replace inefficient search with fast search
   for (i = -1; (i = P_FindSectorFromLineTag(line,i)) >= 0;)
     {
-      sector_t *temp, *sector = _g->sectors+i;
+      sector_t *temp, *sector = _g_sectors+i;
       int32_t j, tbright = bright; //jff 5/17/98 search for maximum PER sector
 
       // bright = 0 means to search for highest light level surrounding sector
@@ -405,7 +405,7 @@ void EV_LightTurnOnPartway(const line_t *line, fixed_t level)
   // search all sectors for ones with same tag as activating line
   for (i = -1; (i = P_FindSectorFromLineTag(line,i)) >= 0;)
     {
-      sector_t *temp, *sector = _g->sectors+i;
+      sector_t *temp, *sector = _g_sectors+i;
       int32_t j, bright = 0, min = sector->lightlevel;
 
       for (j = 0; j < sector->linecount; j++)

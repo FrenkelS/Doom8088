@@ -32,91 +32,49 @@
 #include "wi_stuff.h"
 
 
-typedef struct globals_t
-{
-#ifndef GLOBAL_DEFS_H
-#define GLOBAL_DEFS_H
+extern boolean _g_fps_show;
 
-//******************************************************************************
-//d_main.c
-//******************************************************************************
-
-int32_t  demosequence;         // killough 5/2/98: made static
-int32_t  pagetic;
-
-boolean singletics; // debug flag to cancel adaptiveness
-boolean advancedemo;
-boolean fps_show;
-
-uint32_t gamma;
+extern uint32_t _g_gamma;
 
 //fps counter stuff
-
-uint32_t fps_timebefore;
-uint32_t fps_frames;
-uint16_t fps_framerate;
+extern uint16_t _g_fps_framerate;
 
 
 //******************************************************************************
 //g_game.c
 //******************************************************************************
 
-const byte *demobuffer;   /* cph - only used for playback */
-int32_t demolength; // check for overrun (missing DEMOMARKER)
+extern gameaction_t    _g_gameaction;
+extern gamestate_t     _g_gamestate;
+extern skill_t         _g_gameskill;
 
-const byte *demo_p;
+extern int32_t             _g_gamemap;
 
-gameaction_t    gameaction;
-gamestate_t     gamestate;
-skill_t         gameskill;
+extern player_t        _g_player;
 
-int32_t             gamemap;
-
-player_t        player;
-
-int32_t             starttime;     // for comparative timing purposes
-
-int32_t             gametic;
-int32_t             basetic;       /* killough 9/29/98: for demo sync */
-int32_t             totalkills, totallive, totalitems, totalsecret;    // for intermission
-wbstartstruct_t wminfo;               // parms for world map / intermission
-int32_t             totalleveltimes;      // CPhipps - total time for all completed levels
+extern int32_t             _g_gametic;
+extern int32_t             _g_basetic;       /* killough 9/29/98: for demo sync */
+extern int32_t             _g_totalkills, _g_totallive, _g_totalitems, _g_totalsecret;    // for intermission
+extern wbstartstruct_t _g_wminfo;               // parms for world map / intermission
 
 
-// CPhipps - made lots of key/button state vars static
-boolean gamekeydown[NUMKEYS];
-int32_t     turnheld;       // for accelerative turning
-
-gamestate_t prevgamestate;
-
-skill_t d_skill;
-
-byte  savegameslot;         // Slot to load if gameaction == ga_loadgame
+extern boolean _g_gamekeydown[NUMKEYS];
 
 
-boolean secretexit;
+extern boolean         _g_respawnmonsters;
 
-boolean         respawnmonsters;
-
-boolean         usergame;      // ok to save / end game
-boolean         timingdemo;    // if true, exit with report on completion
-boolean         playeringame;
-boolean         demoplayback;
-boolean         singledemo;           // quit after playing a demo from cmdline
+extern boolean         _g_usergame;      // ok to save / end game
+extern boolean         _g_timingdemo;    // if true, exit with report on completion
+extern boolean         _g_playeringame;
+extern boolean         _g_demoplayback;
+extern boolean         _g_singledemo;           // quit after playing a demo from cmdline
 
 
 //******************************************************************************
 //hu_stuff.c
 //******************************************************************************
 
-// widgets
-hu_textline_t  w_title;
-hu_stext_t     w_message;
-int16_t        message_counter;
-
-boolean    message_on;
-boolean    message_dontfuckwithme;
-boolean    headsupactive;
+extern boolean    _g_message_dontfuckwithme;
 
 
 //******************************************************************************
@@ -126,136 +84,68 @@ boolean    headsupactive;
 //
 // defaulted values
 //
-int32_t alwaysRun;
+extern int32_t _g_alwaysRun;
 
-int32_t highDetail;
+extern int32_t _g_highDetail;
 
-boolean messageToPrint;  // true = message to be printed
+extern boolean _g_menuactive;    // The menus are up
 
-// CPhipps - static const
-const char* messageString; // ...and here is the message string!
-
-boolean messageLastMenuActive;
-
-int32_t saveSlot;        // which slot to save in
-// old save description before edit
-
-const menu_t* currentMenu; // current menudef
-
-int16_t itemOn;           // menu item skull is on (for Big Font menus)
-int16_t skullAnimCounter; // skull animation counter
-int16_t whichSkull;       // which skull to draw (he blinks)
-
-boolean menuactive;    // The menus are up
-boolean messageNeedsInput; // timed message = no input from user
-
-char savegamestrings[8][8];
-
-
-//******************************************************************************
-//p_enemy.c
-//******************************************************************************
-
-fixed_t dropoff_deltax, dropoff_deltay, floorz;
+extern char _g_savegamestrings[8][8];
 
 
 //******************************************************************************
 //p_map.c
 //******************************************************************************
 
-mobj_t    *tmthing;
-fixed_t   tmx;
-fixed_t   tmy;
-
-
 // The tm* items are used to hold information globally, usually for
 // line or object intersection checking
 
-fixed_t   tmbbox[4];  // bounding box for line intersection checks
-fixed_t   tmfloorz;   // floor you'd hit if free to fall
-fixed_t   tmceilingz; // ceiling of sector you're in
-fixed_t   tmdropoffz; // dropoff on other side of line you're crossing
+extern fixed_t   _g_tmbbox[4];  // bounding box for line intersection checks
+extern fixed_t   _g_tmfloorz;   // floor you'd hit if free to fall
+extern fixed_t   _g_tmceilingz; // ceiling of sector you're in
+extern fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 
 // keep track of the line that lowers the ceiling,
 // so missiles don't explode against sky hack walls
 
-const line_t    *ceilingline;
-const line_t        *blockline;    /* killough 8/11/98: blocking linedef */
-const line_t        *floorline;    /* killough 8/1/98: Highest touched floor */
-int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
+extern const line_t    *_g_ceilingline;
+extern const line_t        *_g_blockline;    /* killough 8/11/98: blocking linedef */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-const line_t *spechit[4];                // new code -- killough
+extern const line_t *_g_spechit[4];
 
-int32_t numspechit;
+extern int32_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
-msecnode_t* sector_list;                             // phares 3/16/98
+extern msecnode_t* _g_sector_list;
 
-/* killough 8/2/98: make variables static */
-fixed_t   bestslidefrac;
-const line_t*   bestslideline;
-mobj_t*   slidemo;
-fixed_t   tmxmove;
-fixed_t   tmymove;
+extern mobj_t*   _g_linetarget; // who got hit (or NULL)
 
-mobj_t*   linetarget; // who got hit (or NULL)
-mobj_t*   shootthing;
-
-// Height if not aiming up or down
-fixed_t   shootz;
-
-int32_t       la_damage;
-fixed_t   attackrange;
-
-// slopes to top and bottom of target
-// killough 4/20/98: make static instead of using ones in p_sight.c
-
-fixed_t  topslope;
-fixed_t  bottomslope;
-
-mobj_t *bombsource, *bombspot;
-int32_t bombdamage;
-
-mobj_t*   usething;
+extern fixed_t   _g_attackrange;
 
 // If "floatok" true, move would be ok
 // if within "tmfloorz - tmceilingz".
-boolean   floatok;
+extern boolean   _g_floatok;
 
 /* killough 11/98: if "felldown" true, object was pushed down ledge */
-boolean   felldown;
+extern boolean   _g_felldown;
 
-boolean crushchange, nofit;
-
-boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
-
+extern boolean _g_crushchange, _g_nofit;
 
 
 //******************************************************************************
 //p_maputl.c
 //******************************************************************************
 
-fixed_t opentop;
-fixed_t openbottom;
-fixed_t openrange;
-fixed_t lowfloor;
+extern fixed_t _g_opentop;
+extern fixed_t _g_openbottom;
+extern fixed_t _g_openrange;
+extern fixed_t _g_lowfloor;
 
-// moved front and back outside P-LineOpening and changed    // phares 3/7/98
-// them to these so we can pick up the new friction value
-// in PIT_CheckLine()
-sector_t *openfrontsector; // made global                    // phares
-sector_t *openbacksector;  // made global
-
-divline_t trace;
-
-
-// 1/11/98 killough: Intercept limit removed
-intercept_t intercepts[MAXINTERCEPTS];
-intercept_t* intercept_p;
+extern divline_t _g_trace;
 
 
 //******************************************************************************
@@ -268,27 +158,25 @@ intercept_t* intercept_p;
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
 //
 
-int32_t      numvertexes;
-const vertex_t *vertexes;
+extern int32_t      _g_numvertexes;
+extern const vertex_t *_g_vertexes;
 
-const seg_t    *segs;
+extern const seg_t    *_g_segs;
 
-int32_t      numsectors;
-sector_t *sectors;
-
-
-int32_t      numsubsectors;
-subsector_t *subsectors;
+extern int32_t      _g_numsectors;
+extern sector_t *_g_sectors;
 
 
-
-int32_t      numlines;
-const line_t   *lines;
-linedata_t* linedata;
+extern subsector_t *_g_subsectors;
 
 
-int32_t      numsides;
-side_t   *sides;
+
+extern int32_t      _g_numlines;
+extern const line_t   *_g_lines;
+extern linedata_t* _g_linedata;
+
+
+extern side_t   *_g_sides;
 
 // BLOCKMAP
 // Created from axis aligned bounding box
@@ -299,17 +187,17 @@ side_t   *sides;
 //
 // Blockmap size.
 
-int16_t       bmapwidth, bmapheight;  // size in mapblocks
+extern int16_t       _g_bmapwidth, _g_bmapheight;  // size in mapblocks
 
 // killough 3/1/98: remove blockmap limit internally:
-const int16_t      *blockmap;              // was short -- killough
+extern const int16_t      *_g_blockmap;
 
 // offsets in blockmap are from here
-const int16_t      *blockmaplump;          // was short -- killough
+extern const int16_t      *_g_blockmaplump;
 
-fixed_t   bmaporgx, bmaporgy;     // origin of block map
+extern fixed_t   _g_bmaporgx, _g_bmaporgy;     // origin of block map
 
-mobj_t    **blocklinks;           // for thing chains
+extern mobj_t    **_g_blocklinks;           // for thing chains
 
 //
 // REJECT
@@ -320,131 +208,47 @@ mobj_t    **blocklinks;           // for thing chains
 // be used as a PVS lookup as well.
 //
 
-const byte *rejectmatrix; // cph - const*
+extern const byte *_g_rejectmatrix;
 
 // Maintain single and multi player starting spots.
-mapthing_t playerstarts[MAXPLAYERS];
+extern mapthing_t _g_playerstarts[MAXPLAYERS];
 
-mobj_t*      thingPool;
-uint32_t thingPoolSize;
+extern mobj_t*      _g_thingPool;
+extern uint32_t _g_thingPoolSize;
 
 
 //******************************************************************************
 //p_switch.c
 //******************************************************************************
 
-int16_t switchlist[MAXSWITCHES * 2];
-int32_t   numswitches;                           // killough
-
-button_t  buttonlist[MAXBUTTONS];
+extern button_t  _g_buttonlist[MAXBUTTONS];
 
 
 //******************************************************************************
 //p_tick.c
 //******************************************************************************
 
-int32_t leveltime; // tics in game play for par
+extern int32_t _g_leveltime; // tics in game play for par
 
 // killough 8/29/98: we maintain several separate threads, each containing
 // a special class of thinkers, to allow more efficient searches.
-thinker_t thinkerclasscap;
+extern thinker_t _g_thinkerclasscap;
 
 
 //******************************************************************************
 //r_hotpatch_iwram.c
 //******************************************************************************
 
-visplane_t *visplanes[MAXVISPLANES];   // killough
-visplane_t *freetail;                  // killough
+extern visplane_t *_g_visplanes[MAXVISPLANES];
+extern visplane_t *_g_freetail;
 
 
 //******************************************************************************
 //r_segs.c
 //******************************************************************************
 
-//
-// regular wall
-//
-drawseg_t drawsegs[MAXDRAWSEGS];
-
-int16_t openings[MAXOPENINGS];
-int16_t* lastopening;
-
-
-//******************************************************************************
-//s_sound.c
-//******************************************************************************
-
-// the set of channels available
-channel_t *channels;
-
-// music currently being played
-int32_t mus_playing;
-
-// whether songs are mus_paused
-boolean mus_paused;
-
-//******************************************************************************
-//st_stuff.c
-//******************************************************************************
-
-uint32_t st_needrefresh;
-
-// 0-9, tall numbers
-int16_t tallnum[10];
-
-// 0-9, short, yellow (,different!) numbers
-int16_t shortnum[10];
-
-int16_t keys[NUMCARDS];
-
-// face status patches
-int16_t faces[ST_NUMFACES];
-
-
-// weapon ownership patches
-int16_t arms[6][2];
-
-// ready-weapon widget
-st_number_t w_ready;
-
-// health widget
-st_number_t st_health;
-
-// weapon ownership widgets
-st_multicon_t w_arms[6];
-
-// face status widget
-st_multicon_t w_faces;
-
-// keycard widgets
-st_multicon_t w_keyboxes[3];
-
-// ammo widgets
-st_number_t w_ammo[4];
-
-// max ammo widgets
-st_number_t w_maxammo[4];
-
-// armor widget
-st_number_t  st_armor;
-
-// used for evil grin
-boolean  oldweaponsowned[NUMWEAPONS];
-
- // count until face changes
-int32_t      st_facecount;
-
-// current face index, used by w_faces
-int32_t      st_faceindex;
-
-// holds key-type for each key box on bar
-int32_t      keyboxes[3];
-
-// a random number per tick
-int32_t      st_randomnumber;
-
-int8_t st_palette;
+extern int16_t _g_openings[MAXOPENINGS];
+extern int16_t* _g_lastopening;
 
 
 //******************************************************************************
@@ -452,51 +256,17 @@ int8_t st_palette;
 //******************************************************************************
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-uint16_t *screen;
+extern uint16_t *_g_screen;
 
 //******************************************************************************
 //wi_stuff.c
 //******************************************************************************
 
 // used to accelerate or skip a stage
-boolean   acceleratestage;           // killough 3/28/98: made global
-
- // specifies current state
-stateenum_t  state;
-
-// contains information passed into intermission
-wbstartstruct_t* wbs;
-
-wbplayerstruct_t* plrs;  // wbs->plyr[]
+extern boolean   _g_acceleratestage;
 
 // used for general timing
-int32_t    cnt;
-
-// used for timing of background animation
-int32_t    bcnt;
-
-int32_t    cnt_time;
-int32_t    cnt_total_time;
-int32_t    cnt_par;
-int32_t    cnt_pause;
-
-
-int32_t  sp_state;
-
-int32_t cnt_kills;
-int32_t cnt_items;
-int32_t cnt_secret;
-
-boolean snl_pointeron;
-
-
-//******************************************************************************
-#endif // GLOBAL_DEFS_H
-
-} globals_t;
-
-
-extern globals_t* _g;
+extern int32_t    _g_cnt;
 
 
 extern enum automapmode_e automapmode;

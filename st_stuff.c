@@ -53,6 +53,63 @@
 #define DISABLE_STATUS_BAR
 
 
+// 0-9, tall numbers
+static int16_t tallnum[10];
+
+// 0-9, short, yellow (,different!) numbers
+static int16_t shortnum[10];
+
+static int16_t keys[NUMCARDS];
+
+// face status patches
+static int16_t faces[ST_NUMFACES];
+
+
+// weapon ownership patches
+static int16_t arms[6][2];
+
+// ready-weapon widget
+static st_number_t w_ready;
+
+// health widget
+static st_number_t st_health;
+
+// weapon ownership widgets
+static st_multicon_t w_arms[6];
+
+// face status widget
+static st_multicon_t w_faces;
+
+// keycard widgets
+static st_multicon_t w_keyboxes[3];
+
+// ammo widgets
+static st_number_t w_ammo[4];
+
+// max ammo widgets
+static st_number_t w_maxammo[4];
+
+// armor widget
+static st_number_t  st_armor;
+
+// used for evil grin
+static boolean  oldweaponsowned[NUMWEAPONS];
+
+ // count until face changes
+static int32_t      st_facecount;
+
+// current face index, used by w_faces
+static int32_t      st_faceindex;
+
+// holds key-type for each key box on bar
+static int32_t      keyboxes[3];
+
+// a random number per tick
+static int16_t      st_randomnumber;
+
+static int8_t st_palette;
+
+
 // Size of statusbar.
 // Now sensitive for scaling.
 
@@ -227,7 +284,7 @@ static int16_t ST_calcPainOffset(void)
 {
   static int16_t lastcalc;
   static int16_t oldhealth = -1;
-  int16_t health = _g->player.health > 100 ? 100 : _g->player.health;
+  int16_t health = _g_player.health > 100 ? 100 : _g_player.health;
 
   if (health != oldhealth)
     {
@@ -256,35 +313,35 @@ static void ST_updateFaceWidget(void)
     if (priority < 10)
     {
         // dead
-        if (!_g->player.health)
+        if (!_g_player.health)
         {
             priority = 9;
-            _g->st_faceindex = ST_DEADFACE;
-            _g->st_facecount = 1;
+            st_faceindex = ST_DEADFACE;
+            st_facecount = 1;
         }
     }
 
     if (priority < 9)
     {
-        if (_g->player.bonuscount)
+        if (_g_player.bonuscount)
         {
             // picking up bonus
             doevilgrin = false;
 
             for (i=0;i<NUMWEAPONS;i++)
             {
-                if (_g->oldweaponsowned[i] != _g->player.weaponowned[i])
+                if (oldweaponsowned[i] != _g_player.weaponowned[i])
                 {
                     doevilgrin = true;
-                    _g->oldweaponsowned[i] = _g->player.weaponowned[i];
+                    oldweaponsowned[i] = _g_player.weaponowned[i];
                 }
             }
             if (doevilgrin)
             {
                 // evil grin if just picked up weapon
                 priority = 8;
-                _g->st_facecount = ST_EVILGRINCOUNT;
-                _g->st_faceindex = ST_calcPainOffset() + ST_EVILGRINOFFSET;
+                st_facecount = ST_EVILGRINCOUNT;
+                st_faceindex = ST_calcPainOffset() + ST_EVILGRINOFFSET;
             }
         }
 
@@ -293,7 +350,7 @@ static void ST_updateFaceWidget(void)
 	//Restore the face looking at enemies direction in this SVN... Cause it's handy! ~Kippykip
 	if (priority < 8)
     {
-        if (_g->player.damagecount && _g->player.attacker && _g->player.attacker != _g->player.mo)
+        if (_g_player.damagecount && _g_player.attacker && _g_player.attacker != _g_player.mo)
 		{
 			// being attacked
 			priority = 7;
@@ -301,49 +358,49 @@ static void ST_updateFaceWidget(void)
 			// haleyjd 10/12/03: classic DOOM problem of missing OUCH face
 			// was due to inversion of this test:
 			// if(plyr->health - st_oldhealth > ST_MUCHPAIN)
-            if(st_oldhealth - _g->player.health > ST_MUCHPAIN)
+            if(st_oldhealth - _g_player.health > ST_MUCHPAIN)
 			{
-				_g->st_facecount = ST_TURNCOUNT;
-				_g->st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
+				st_facecount = ST_TURNCOUNT;
+				st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
 			}
 			else
 			{
-                badguyangle = R_PointToAngle2(_g->player.mo->x,
-                _g->player.mo->y,
-                _g->player.attacker->x,
-                _g->player.attacker->y);
+                badguyangle = R_PointToAngle2(_g_player.mo->x,
+                _g_player.mo->y,
+                _g_player.attacker->x,
+                _g_player.attacker->y);
 
-                if (badguyangle > _g->player.mo->angle)
+                if (badguyangle > _g_player.mo->angle)
 				{
 					// whether right or left
-                    diffang = badguyangle - _g->player.mo->angle;
+                    diffang = badguyangle - _g_player.mo->angle;
 					i = diffang > ANG180;
 				}
 				else
 				{
 					// whether left or right
-                    diffang = _g->player.mo->angle - badguyangle;
+                    diffang = _g_player.mo->angle - badguyangle;
 					i = diffang <= ANG180;
 				} // confusing, aint it?
 
 
-				_g->st_facecount = ST_TURNCOUNT;
-				_g->st_faceindex = ST_calcPainOffset();
+				st_facecount = ST_TURNCOUNT;
+				st_faceindex = ST_calcPainOffset();
 
 				if (diffang < ANG45)
 				{
 					// head-on
-					_g->st_faceindex += ST_RAMPAGEOFFSET;
+					st_faceindex += ST_RAMPAGEOFFSET;
 				}
 				else if (i)
 				{
 					// turn face right
-					_g->st_faceindex += ST_TURNOFFSET;
+					st_faceindex += ST_TURNOFFSET;
 				}
 				else
 				{
 					// turn face left
-					_g->st_faceindex += ST_TURNOFFSET+1;
+					st_faceindex += ST_TURNOFFSET+1;
 				}
 			}
 		}
@@ -351,22 +408,22 @@ static void ST_updateFaceWidget(void)
 
     if (priority < 7)
     {
-        if (_g->player.damagecount)
+        if (_g_player.damagecount)
         {
             // haleyjd 10/12/03: classic DOOM problem of missing OUCH face
             // was due to inversion of this test:
             // if(plyr->health - st_oldhealth > ST_MUCHPAIN)
-            if(st_oldhealth - _g->player.health > ST_MUCHPAIN)
+            if(st_oldhealth - _g_player.health > ST_MUCHPAIN)
             {
                 priority = 7;
-                _g->st_facecount = ST_TURNCOUNT;
-                _g->st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
+                st_facecount = ST_TURNCOUNT;
+                st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
             }
             else
             {
                 priority = 6;
-                _g->st_facecount = ST_TURNCOUNT;
-                _g->st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
+                st_facecount = ST_TURNCOUNT;
+                st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
             }
 
         }
@@ -375,15 +432,15 @@ static void ST_updateFaceWidget(void)
     if (priority < 6)
     {
         // rapid firing
-        if (_g->player.attackdown)
+        if (_g_player.attackdown)
         {
             if (lastattackdown==-1)
                 lastattackdown = ST_RAMPAGEDELAY;
             else if (!--lastattackdown)
             {
                 priority = 5;
-                _g->st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
-                _g->st_facecount = 1;
+                st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
+                st_facecount = 1;
                 lastattackdown = 1;
             }
         }
@@ -395,27 +452,27 @@ static void ST_updateFaceWidget(void)
     if (priority < 5)
     {
         // invulnerability
-        if ((_g->player.cheats & CF_GODMODE)
-                || _g->player.powers[pw_invulnerability])
+        if ((_g_player.cheats & CF_GODMODE)
+                || _g_player.powers[pw_invulnerability])
         {
             priority = 4;
 
-            _g->st_faceindex = ST_GODFACE;
-            _g->st_facecount = 1;
+            st_faceindex = ST_GODFACE;
+            st_facecount = 1;
 
         }
 
     }
 
     // look left or look right if the facecount has timed out
-    if (!_g->st_facecount)
+    if (!st_facecount)
     {
-        _g->st_faceindex = ST_calcPainOffset() + (_g->st_randomnumber % 3);
-        _g->st_facecount = ST_STRAIGHTFACECOUNT;
+        st_faceindex = ST_calcPainOffset() + (st_randomnumber % 3);
+        st_facecount = ST_STRAIGHTFACECOUNT;
         priority = 0;
     }
 
-    _g->st_facecount--;
+    st_facecount--;
 
 }
 
@@ -426,24 +483,24 @@ static void ST_updateWidgets(void)
 {
     int8_t         i;
 
-    if(_g->fps_show)
-        _g->w_ready.num = &_g->fps_framerate;
-    else if (weaponinfo[_g->player.readyweapon].ammo == am_noammo)
-        _g->w_ready.num = &largeammo;
+    if(_g_fps_show)
+        w_ready.num = &_g_fps_framerate;
+    else if (weaponinfo[_g_player.readyweapon].ammo == am_noammo)
+        w_ready.num = &largeammo;
     else
-        _g->w_ready.num = &_g->player.ammo[weaponinfo[_g->player.readyweapon].ammo];
+        w_ready.num = &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo];
 
 
     // update keycard multiple widgets
     for (i=0;i<3;i++)
     {
-        _g->keyboxes[i] = _g->player.cards[i] ? i : -1;
+        keyboxes[i] = _g_player.cards[i] ? i : -1;
 
         //jff 2/24/98 select double key
         //killough 2/28/98: preserve traditional keys by config option
 
-        if (_g->player.cards[i+3])
-            _g->keyboxes[i] = i+3;
+        if (_g_player.cards[i+3])
+            keyboxes[i] = i+3;
     }
 
     // refresh everything if this is him coming back to life
@@ -452,21 +509,21 @@ static void ST_updateWidgets(void)
 
 void ST_Ticker(void)
 {
-  _g->st_randomnumber = M_Random();
+  st_randomnumber = M_Random();
   ST_updateWidgets();
-  st_oldhealth = _g->player.health;
+  st_oldhealth = _g_player.health;
 }
 
 
 static void ST_doPaletteStuff(void)
 {
     int8_t         palette;
-    int32_t cnt = _g->player.damagecount;
+    int32_t cnt = _g_player.damagecount;
 
-    if (_g->player.powers[pw_strength])
+    if (_g_player.powers[pw_strength])
     {
         // slowly fade the berzerk out
-        int32_t bzc = 12 - (_g->player.powers[pw_strength]>>6);
+        int32_t bzc = 12 - (_g_player.powers[pw_strength]>>6);
         if (bzc > cnt)
             cnt = bzc;
     }
@@ -479,26 +536,26 @@ static void ST_doPaletteStuff(void)
 
         /* cph 2006/08/06 - if in the menu, reduce the red tint - navigating to
        * load a game can be tricky if the screen is all red */
-        if (_g->menuactive) palette >>=1;
+        if (_g_menuactive) palette >>=1;
 
         palette += STARTREDPALS;
     }
     else
-        if (_g->player.bonuscount)
+        if (_g_player.bonuscount)
         {
-            palette = (_g->player.bonuscount+7)>>3;
+            palette = (_g_player.bonuscount+7)>>3;
             if (palette >= NUMBONUSPALS)
                 palette = NUMBONUSPALS-1;
             palette += STARTBONUSPALS;
         }
         else
-            if (_g->player.powers[pw_ironfeet] > 4*32 || _g->player.powers[pw_ironfeet] & 8)
+            if (_g_player.powers[pw_ironfeet] > 4*32 || _g_player.powers[pw_ironfeet] & 8)
                 palette = RADIATIONPAL;
             else
                 palette = 0;
 
-    if (palette != _g->st_palette) {
-        I_SetPalette(_g->st_palette = palette); // CPhipps - use new palette function
+    if (palette != st_palette) {
+        I_SetPalette(st_palette = palette); // CPhipps - use new palette function
     }
 }
 
@@ -583,32 +640,32 @@ static void STlib_drawNum(st_number_t* n)
 
 static void ST_drawWidgets(void)
 {
-    STlib_drawNum(&_g->w_ready);
+    STlib_drawNum(&w_ready);
 	
 	// Restore the ammo numbers for backpack stats I guess, etc ~Kippykip
 	for (int8_t i = 0; i < 4; i++)
     {
-		STlib_drawNum(&_g->w_ammo[i]);
-		STlib_drawNum(&_g->w_maxammo[i]);
+		STlib_drawNum(&w_ammo[i]);
+		STlib_drawNum(&w_maxammo[i]);
     }
 
-    STlib_drawNum(&_g->st_health);
-    STlib_drawNum(&_g->st_armor);
+    STlib_drawNum(&st_health);
+    STlib_drawNum(&st_armor);
 
-    STlib_updateMultIcon(&_g->w_faces);
+    STlib_updateMultIcon(&w_faces);
 
     for (int8_t i = 0; i < 3 ;i++)
-        STlib_updateMultIcon(&_g->w_keyboxes[i]);
+        STlib_updateMultIcon(&w_keyboxes[i]);
 
     for (int8_t i = 0; i < 6; i++)
-        STlib_updateMultIcon(&_g->w_arms[i]);
+        STlib_updateMultIcon(&w_arms[i]);
 }
 
 
 static void ST_refreshBackground(void)
 {
 	const uint16_t st_offset = (SCREENHEIGHT - ST_SCALED_HEIGHT) * SCREENWIDTH;
-	W_ReadLumpByName("STBAR", &_g->screen[st_offset]);
+	W_ReadLumpByName("STBAR", &_g_screen[st_offset]);
 }
 
 
@@ -626,37 +683,37 @@ static void ST_doRefresh(void)
 static boolean ST_NeedUpdate()
 {
 	// ready weapon ammo
-	if(_g->w_ready.oldnum != *_g->w_ready.num)
+	if(w_ready.oldnum != *w_ready.num)
         return true;
 	
-    if(_g->st_health.oldnum != *_g->st_health.num)
+    if(st_health.oldnum != *st_health.num)
         return true;
 
-    if(_g->st_armor.oldnum != *_g->st_armor.num)
+    if(st_armor.oldnum != *st_armor.num)
         return true;
 
-    if(_g->w_faces.oldinum != *_g->w_faces.inum)
+    if(w_faces.oldinum != *w_faces.inum)
         return true;
 	
 	// ammo
     for(int8_t i=0; i<4; i++)
     {
-        if(_g->w_ammo[i].oldnum != *_g->w_ammo[i].num)
+        if(w_ammo[i].oldnum != *w_ammo[i].num)
             return true;
-		if(_g->w_maxammo[i].oldnum != *_g->w_maxammo[i].num)
+		if(w_maxammo[i].oldnum != *w_maxammo[i].num)
             return true;
     }
 
     // weapons owned
     for(int8_t i=0; i<6; i++)
     {
-        if(_g->w_arms[i].oldinum != *_g->w_arms[i].inum)
+        if(w_arms[i].oldinum != *w_arms[i].inum)
             return true;
     }
 
     for(int8_t i = 0; i < 3; i++)
     {
-        if(_g->w_keyboxes[i].oldinum != *_g->w_keyboxes[i].inum)
+        if(w_keyboxes[i].oldinum != *w_keyboxes[i].inum)
             return true;
     }
 
@@ -665,6 +722,8 @@ static boolean ST_NeedUpdate()
 
 void ST_Drawer(void)
 {
+    static uint32_t st_needrefresh = 0;
+
     ST_doPaletteStuff();  // Do red-/gold-shifts from damage/items
 
     boolean needupdate = false;
@@ -672,9 +731,9 @@ void ST_Drawer(void)
     if(ST_NeedUpdate())
     {
         needupdate = true;
-        _g->st_needrefresh = 2;
+        st_needrefresh = 2; //2 screen buffers
     }
-    else if(_g->st_needrefresh)
+    else if(st_needrefresh)
     {
         needupdate = true;
     }
@@ -683,7 +742,7 @@ void ST_Drawer(void)
     {
         ST_doRefresh();
 
-        _g->st_needrefresh--;
+        st_needrefresh--;
     }
 }
 
@@ -703,17 +762,17 @@ static void ST_loadGraphics(void)
     for (i=0;i<10;i++)
     {
 		sprintf(namebuf, "STGANUM%d", i); //Special GBA Doom II Red Numbers ~Kippykip
-        _g->tallnum[i] = W_GetNumForName(namebuf);
+        tallnum[i] = W_GetNumForName(namebuf);
 
         sprintf(namebuf, "STYSNUM%d", i);
-        _g->shortnum[i] = W_GetNumForName(namebuf);
+        shortnum[i] = W_GetNumForName(namebuf);
     }
 
     // key cards
     for (i=0;i<NUMCARDS;i++)
     {
         sprintf(namebuf, "STKEYS%d", i);
-        _g->keys[i] = W_GetNumForName(namebuf);
+        keys[i] = W_GetNumForName(namebuf);
     }
 
     // arms ownership widgets
@@ -722,10 +781,10 @@ static void ST_loadGraphics(void)
         sprintf(namebuf, "STGNUM%d", i+2);
 
         // gray #
-        _g->arms[i][0] = W_GetNumForName(namebuf);
+        arms[i][0] = W_GetNumForName(namebuf);
 
         // yellow #
-        _g->arms[i][1] = _g->shortnum[i+2];
+        arms[i][1] = shortnum[i+2];
     }
 
     // face states
@@ -736,21 +795,21 @@ static void ST_loadGraphics(void)
         for (int8_t j=0;j<ST_NUMSTRAIGHTFACES;j++)
         {
             sprintf(namebuf, "STFST%d%d", i, j);
-            _g->faces[facenum++] = W_GetNumForName(namebuf);
+            faces[facenum++] = W_GetNumForName(namebuf);
         }
         sprintf(namebuf, "STFTR%d0", i);	// turn right
-        _g->faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
         sprintf(namebuf, "STFTL%d0", i);	// turn left
-        _g->faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
         sprintf(namebuf, "STFOUCH%d", i);	// ouch!
-        _g->faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
         sprintf(namebuf, "STFEVL%d", i);	// evil grin ;)
-        _g->faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
         sprintf(namebuf, "STFKILL%d", i);	// pissed off
-        _g->faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
     }
-    _g->faces[facenum++] = W_GetNumForName("STFGOD0");
-    _g->faces[facenum++] = W_GetNumForName("STFDEAD0");
+    faces[facenum++] = W_GetNumForName("STFGOD0");
+    faces[facenum++] = W_GetNumForName("STFDEAD0");
 }
 
 static void ST_loadData(void)
@@ -762,16 +821,16 @@ static void ST_initData(void)
 {
     int8_t i;
 
-    _g->st_faceindex = 0;
-    _g->st_palette = -1;
+    st_faceindex = 0;
+    st_palette = -1;
 
     st_oldhealth = -1;
 
     for (i=0;i<NUMWEAPONS;i++)
-        _g->oldweaponsowned[i] = _g->player.weaponowned[i];
+        oldweaponsowned[i] = _g_player.weaponowned[i];
 
     for (i=0;i<3;i++)
-        _g->keyboxes[i] = -1;
+        keyboxes[i] = -1;
 }
 
 
@@ -818,39 +877,39 @@ static void STlib_initNum(st_number_t* n, int32_t x, int32_t y, int16_t* pl, int
 static void ST_createWidgets(void)
 {
     // ready weapon ammo
-    STlib_initNum(&_g->w_ready, ST_AMMOX, ST_AMMOY, _g->tallnum, &_g->player.ammo[weaponinfo[_g->player.readyweapon].ammo], ST_AMMOWIDTH);
+    STlib_initNum(&w_ready, ST_AMMOX, ST_AMMOY, tallnum, &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo], ST_AMMOWIDTH);
 
     // health percentage
-    STlib_initNum(&_g->st_health, ST_HEALTHX, ST_HEALTHY, _g->tallnum, &_g->player.health, ST_HEALTHWIDTH);
+    STlib_initNum(&st_health, ST_HEALTHX, ST_HEALTHY, tallnum, &_g_player.health, ST_HEALTHWIDTH);
 					  
     // armor percentage - should be colored later
-    STlib_initNum(&_g->st_armor, ST_ARMORX, ST_ARMORY, _g->tallnum, &_g->player.armorpoints, ST_ARMORWIDTH);
+    STlib_initNum(&st_armor, ST_ARMORX, ST_ARMORY, tallnum, &_g_player.armorpoints, ST_ARMORWIDTH);
 
     // weapons owned
     for(int8_t i = 0; i < 6; i++)
     {
-        STlib_initMultIcon(&_g->w_arms[i], ST_ARMSX+(i%3)*ST_ARMSXSPACE, ST_ARMSY+(i/3)*ST_ARMSYSPACE, _g->arms[i], (int32_t*) &_g->player.weaponowned[i+1]);
+        STlib_initMultIcon(&w_arms[i], ST_ARMSX+(i%3)*ST_ARMSXSPACE, ST_ARMSY+(i/3)*ST_ARMSYSPACE, arms[i], (int32_t*) &_g_player.weaponowned[i+1]);
     }
 	
     // keyboxes 0-2
-    STlib_initMultIcon(&_g->w_keyboxes[0], ST_KEY0X, ST_KEY0Y, _g->keys, &_g->keyboxes[0]);
-    STlib_initMultIcon(&_g->w_keyboxes[1], ST_KEY1X, ST_KEY1Y, _g->keys, &_g->keyboxes[1]);
-    STlib_initMultIcon(&_g->w_keyboxes[2], ST_KEY2X, ST_KEY2Y, _g->keys, &_g->keyboxes[2]);			
+    STlib_initMultIcon(&w_keyboxes[0], ST_KEY0X, ST_KEY0Y, keys, &keyboxes[0]);
+    STlib_initMultIcon(&w_keyboxes[1], ST_KEY1X, ST_KEY1Y, keys, &keyboxes[1]);
+    STlib_initMultIcon(&w_keyboxes[2], ST_KEY2X, ST_KEY2Y, keys, &keyboxes[2]);			
 			
 	// ammo count (all four kinds)
-	STlib_initNum(&_g->w_ammo[0], ST_AMMO0X, ST_AMMO0Y, _g->shortnum, &_g->player.ammo[0], ST_AMMO0WIDTH);
-	STlib_initNum(&_g->w_ammo[1], ST_AMMO1X, ST_AMMO1Y, _g->shortnum, &_g->player.ammo[1], ST_AMMO1WIDTH);
-	STlib_initNum(&_g->w_ammo[2], ST_AMMO2X, ST_AMMO2Y, _g->shortnum, &_g->player.ammo[2], ST_AMMO2WIDTH);
-	STlib_initNum(&_g->w_ammo[3], ST_AMMO3X, ST_AMMO3Y, _g->shortnum, &_g->player.ammo[3], ST_AMMO3WIDTH);
+	STlib_initNum(&w_ammo[0], ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
+	STlib_initNum(&w_ammo[1], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
+	STlib_initNum(&w_ammo[2], ST_AMMO2X, ST_AMMO2Y, shortnum, &_g_player.ammo[2], ST_AMMO2WIDTH);
+	STlib_initNum(&w_ammo[3], ST_AMMO3X, ST_AMMO3Y, shortnum, &_g_player.ammo[3], ST_AMMO3WIDTH);
 
 	// max ammo count (all four kinds)
-	STlib_initNum(&_g->w_maxammo[0], ST_MAXAMMO0X, ST_MAXAMMO0Y, _g->shortnum, &_g->player.maxammo[0], ST_MAXAMMO0WIDTH);
-	STlib_initNum(&_g->w_maxammo[1], ST_MAXAMMO1X, ST_MAXAMMO1Y, _g->shortnum, &_g->player.maxammo[1], ST_MAXAMMO1WIDTH);
-	STlib_initNum(&_g->w_maxammo[2], ST_MAXAMMO2X, ST_MAXAMMO2Y, _g->shortnum, &_g->player.maxammo[2], ST_MAXAMMO2WIDTH);
-	STlib_initNum(&_g->w_maxammo[3], ST_MAXAMMO3X, ST_MAXAMMO3Y, _g->shortnum, &_g->player.maxammo[3], ST_MAXAMMO3WIDTH);
+	STlib_initNum(&w_maxammo[0], ST_MAXAMMO0X, ST_MAXAMMO0Y, shortnum, &_g_player.maxammo[0], ST_MAXAMMO0WIDTH);
+	STlib_initNum(&w_maxammo[1], ST_MAXAMMO1X, ST_MAXAMMO1Y, shortnum, &_g_player.maxammo[1], ST_MAXAMMO1WIDTH);
+	STlib_initNum(&w_maxammo[2], ST_MAXAMMO2X, ST_MAXAMMO2Y, shortnum, &_g_player.maxammo[2], ST_MAXAMMO2WIDTH);
+	STlib_initNum(&w_maxammo[3], ST_MAXAMMO3X, ST_MAXAMMO3Y, shortnum, &_g_player.maxammo[3], ST_MAXAMMO3WIDTH);
 			
     // faces
-    STlib_initMultIcon(&_g->w_faces, ST_FACESX, ST_FACESY, _g->faces, &_g->st_faceindex);
+    STlib_initMultIcon(&w_faces, ST_FACESX, ST_FACESY, faces, &st_faceindex);
 }
 
 static boolean st_stopped = true;

@@ -70,6 +70,7 @@
 #include "m_cheat.h"
 #include "globdata.h"
 
+static void D_DoAdvanceDemo(void);
 static void D_PageDrawer(void);
 static void D_UpdateFPS(void);
 
@@ -86,6 +87,19 @@ const boolean nodrawers = false;
 
 static int32_t maketic;
 
+
+static int16_t  pagetic;
+
+static boolean singletics; // debug flag to cancel adaptiveness
+static boolean advancedemo;
+boolean _g_fps_show;
+
+uint32_t _g_gamma;
+
+//fps counter stuff
+uint16_t _g_fps_framerate;
+
+
 /*
  * D_PostEvent - Event handling
  *
@@ -99,11 +113,11 @@ void D_PostEvent(event_t *ev)
 {
     /* cph - suppress all input events at game start
    * FIXME: This is a lousy kludge */
-    if (_g->gametic < 3)
+    if (_g_gametic < 3)
         return;
 
     M_Responder(ev) ||
-            (_g->gamestate == GS_LEVEL && (
+            (_g_gamestate == GS_LEVEL && (
                  C_Responder(ev) ||
                  ST_Responder(ev) ||
                  AM_Responder(ev)
@@ -123,7 +137,7 @@ static void D_BuildNewTiccmds(void)
     while (newtics--)
     {
         I_StartTic();
-        if (maketic - _g->gametic > 3)
+        if (maketic - _g_gametic > 3)
             break;
 
         G_BuildTiccmd();
@@ -149,12 +163,12 @@ static void D_Display (void)
     I_StartDisplay();
 
     // save the current screen if about to wipe
-    boolean wipe = (_g->gamestate != wipegamestate);
+    boolean wipe = (_g_gamestate != wipegamestate);
 
     if (wipe)
         wipe_StartScreen();
 
-    if (_g->gamestate != GS_LEVEL) { // Not a level
+    if (_g_gamestate != GS_LEVEL) { // Not a level
         switch (oldgamestate)
         {
             case -1:
@@ -164,7 +178,7 @@ static void D_Display (void)
                 break;
         }
 
-        switch (_g->gamestate)
+        switch (_g_gamestate)
         {
             case GS_INTERMISSION:
                 WI_Drawer();
@@ -179,7 +193,7 @@ static void D_Display (void)
                 break;
         }
     }
-    else if (_g->gametic != _g->basetic)
+    else if (_g_gametic != _g_basetic)
     { // In a level
 
         HU_Erase();
@@ -189,7 +203,7 @@ static void D_Display (void)
 
         // Now do the drawing
         if (viewactive)
-            R_RenderPlayerView (&_g->player);
+            R_RenderPlayerView (&_g_player);
 
         if (automapmode & am_active)
             AM_Drawer();
@@ -199,7 +213,7 @@ static void D_Display (void)
         HU_Drawer();
     }
 
-    oldgamestate = wipegamestate = _g->gamestate;
+    oldgamestate = wipegamestate = _g_gamestate;
 
     // menus go directly to the screen
     M_Drawer();          // menu is drawn even on top of everything
@@ -227,7 +241,7 @@ static void TryRunTics (void)
 
         D_BuildNewTiccmds();
 
-        runtics = maketic - _g->gametic;
+        runtics = maketic - _g_gametic;
         if (runtics <= 0)
         {
             if (I_GetTime() - entertime > 10)
@@ -243,12 +257,12 @@ static void TryRunTics (void)
     while (runtics-- > 0)
     {
 
-        if (_g->advancedemo)
+        if (advancedemo)
             D_DoAdvanceDemo ();
 
         M_Ticker ();
         G_Ticker ();
-        _g->gametic++;
+        _g_gametic++;
     }
 }
 
@@ -271,32 +285,32 @@ static void D_DoomLoop(void)
         // frame syncronous IO operations
 
         // process one or more tics
-        if (_g->singletics)
+        if (singletics)
         {
             I_StartTic ();
             G_BuildTiccmd ();
 
-            if (_g->advancedemo)
+            if (advancedemo)
                 D_DoAdvanceDemo ();
 
             M_Ticker ();
             G_Ticker ();
 
-            _g->gametic++;
+            _g_gametic++;
             maketic++;
         }
         else
             TryRunTics (); // will run at least one tic
 
         // killough 3/16/98: change consoleplayer to displayplayer
-        if (_g->player.mo) // cph 2002/08/10
+        if (_g_player.mo) // cph 2002/08/10
             S_UpdateSounds();// move positional sounds
 
         // Update display, next frame, with current state.
         D_Display();
 
 
-        if(_g->fps_show)
+        if(_g_fps_show)
         {
             D_UpdateFPS();
         }
@@ -305,24 +319,27 @@ static void D_DoomLoop(void)
 
 static void D_UpdateFPS()
 {
-    _g->fps_frames++;
+    static uint32_t fps_frames = 0;
+    static uint32_t fps_timebefore = 0;
+
+    fps_frames++;
 
     uint32_t timenow = I_GetTime();
-    if(timenow >= (_g->fps_timebefore + TICRATE))
+    if(timenow >= (fps_timebefore + TICRATE))
     {
-        uint32_t tics_elapsed = timenow - _g->fps_timebefore;
-        fixed_t f_realfps = FixedDiv((_g->fps_frames*(TICRATE*10)) << FRACBITS, tics_elapsed <<FRACBITS);
+        uint32_t tics_elapsed = timenow - fps_timebefore;
+        fixed_t f_realfps = FixedDiv((fps_frames*(TICRATE*10)) << FRACBITS, tics_elapsed <<FRACBITS);
 
-        _g->fps_framerate = (f_realfps >> FRACBITS);
+        _g_fps_framerate = (f_realfps >> FRACBITS);
 
-        _g->fps_frames = 0;
-        _g->fps_timebefore = timenow;
+        fps_frames = 0;
+        fps_timebefore = timenow;
     }
-    else if(timenow < _g->fps_timebefore)
+    else if(timenow < fps_timebefore)
     {
         //timer overflow.
-        _g->fps_timebefore = timenow;
-        _g->fps_frames = 0;
+        fps_timebefore = timenow;
+        fps_frames = 0;
     }
 }
 
@@ -337,7 +354,7 @@ static void D_UpdateFPS()
 //
 void D_PageTicker(void)
 {
-    if (--_g->pagetic < 0)
+    if (--pagetic < 0)
         D_AdvanceDemo();
 }
 
@@ -347,7 +364,7 @@ void D_PageTicker(void)
 
 static void D_PageDrawer(void)
 {
-	W_ReadLumpByName("TITLEPIC", _g->screen);
+	W_ReadLumpByName("TITLEPIC", _g_screen);
 }
 
 //
@@ -356,7 +373,7 @@ static void D_PageDrawer(void)
 //
 void D_AdvanceDemo (void)
 {
-    _g->advancedemo = true;
+    advancedemo = true;
 }
 
 /* killough 11/98: functions to perform demo sequences
@@ -373,7 +390,7 @@ static void D_DrawTitle1(const char *name)
 	UNUSED(name);
 
 	S_StartMusic(mus_intro);
-	_g->pagetic = (TICRATE*30);
+	pagetic = (TICRATE*30);
 }
 
 
@@ -396,6 +413,8 @@ const demostates[] =
     {NULL, NULL},
 };
 
+static int16_t  demosequence;
+
 /*
  * This cycles through the demo sequences.
  * killough 11/98: made table-driven
@@ -403,18 +422,18 @@ const demostates[] =
 
 void D_DoAdvanceDemo(void)
 {
-    _g->player.playerstate = PST_LIVE;  /* not reborn */
-    _g->advancedemo = _g->usergame = false;
-    _g->gameaction = ga_nothing;
+    _g_player.playerstate = PST_LIVE;  /* not reborn */
+    advancedemo = _g_usergame = false;
+    _g_gameaction = ga_nothing;
 
-    _g->pagetic = TICRATE * 11;         /* killough 11/98: default behavior */
-    _g->gamestate = GS_DEMOSCREEN;
+    pagetic = TICRATE * 11;         /* killough 11/98: default behavior */
+    _g_gamestate = GS_DEMOSCREEN;
 
 
-    if (!demostates[++_g->demosequence].func)
-        _g->demosequence = 0;
+    if (!demostates[++demosequence].func)
+        demosequence = 0;
 
-    demostates[_g->demosequence].func(demostates[_g->demosequence].name);
+    demostates[demosequence].func(demostates[demosequence].name);
 }
 
 //
@@ -422,8 +441,8 @@ void D_DoAdvanceDemo(void)
 //
 void D_StartTitle (void)
 {
-    _g->gameaction = ga_nothing;
-    _g->demosequence = -1;
+    _g_gameaction = ga_nothing;
+    demosequence = -1;
     D_AdvanceDemo();
 }
 
@@ -455,7 +474,7 @@ static int16_t M_CheckParm(char *check)
 
 static void D_InitNetGame (void)
 {
-    _g->playeringame = true;
+    _g_playeringame = true;
 }
 
 
@@ -494,21 +513,21 @@ static void D_DoomMainSetup(void)
     printf("ST_Init: Init status bar.\n");
     ST_Init();
 
-    _g->highDetail = false;
+    _g_highDetail = false;
 
     G_LoadSettings();
 
-    _g->fps_show = false;
+    _g_fps_show = false;
 
     I_InitGraphics();
 
     int16_t p = M_CheckParm("-timedemo");
     if (p && p < myargc - 1)
     {
-        _g->singletics = true;
-        _g->timingdemo = true;            // show stats after quit
+        singletics = true;
+        _g_timingdemo = true;            // show stats after quit
         G_DeferedPlayDemo(myargv[p + 1]);
-        _g->singledemo = true;            // quit after one demo
+        _g_singledemo = true;            // quit after one demo
     }
     else
     {

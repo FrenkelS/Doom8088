@@ -118,11 +118,6 @@ void I_PlaySong(int32_t handle, int32_t looping)
 }
 
 
-void I_ResumeSong (int32_t handle)
-{
-	UNUSED(handle);
-}
-
 void I_StopSong(int32_t handle)
 {
 	UNUSED(handle);
