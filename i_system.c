@@ -250,7 +250,7 @@ static void I_FinishUpdate_dos(void)
 #define PEL_WRITE_ADR   0x3c8
 #define PEL_DATA        0x3c9
 
-static void I_SetPalette_dos(const byte* palette)
+static void I_SetPalette_dos(const byte __far* palette)
 {
 	int_fast16_t i;
 
@@ -272,7 +272,7 @@ static void I_UploadNewPalette(int8_t pal)
 	else
 		lumpName[7] = '0' + _g_gamma;
 
-	const uint8_t* palette_lump = W_GetLumpByName(lumpName);
+	const uint8_t __far* palette_lump = W_GetLumpByName(lumpName);
 	I_SetPalette_dos(&palette_lump[pal*256*3]);
 	Z_ChangeTagToCache(palette_lump);
 }
