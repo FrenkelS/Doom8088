@@ -257,7 +257,7 @@ boolean EV_DoCeiling
 {
   int32_t   secnum;
   boolean   rtn;
-  sector_t* sec;
+  sector_t __far* sec;
   ceiling_t __far* ceiling;
 
   secnum = -1;

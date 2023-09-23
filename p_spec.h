@@ -556,29 +556,6 @@ typedef struct
 
 } fireflicker_t;
 
-typedef struct
-{
-  thinker_t thinker;
-  sector_t* sector;
-  int32_t count;
-  int32_t maxlight;
-  int32_t minlight;
-  int32_t maxtime;
-  int32_t mintime;
-
-} lightflash_t;
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t* sector;
-  int32_t count;
-  int32_t minlight;
-  int32_t maxlight;
-  int32_t darktime;
-  int32_t brighttime;
-
-} strobe_t;
 
 typedef struct
 {
@@ -792,13 +769,9 @@ fixed_t P_FindShortestTextureAround
 fixed_t P_FindShortestUpperAround
 ( int32_t secnum ); // jff 2/04/98
 
-sector_t* P_FindModelFloorSector
-( fixed_t floordestheight,
-  int32_t secnum ); //jff 02/04/98
+sector_t __far* P_FindModelFloorSector(fixed_t floordestheight, int32_t secnum);
 
-sector_t* P_FindModelCeilingSector
-( fixed_t ceildestheight,
-  int32_t secnum ); //jff 02/04/98
+sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight, int32_t secnum);
 
 int32_t P_FindSectorFromLineTag
 ( const line_t *line,
@@ -808,13 +781,9 @@ int32_t P_FindLineFromLineTag
 ( const line_t *line,
   int32_t start );   // killough 4/17/98
 
-int32_t P_FindMinSurroundingLight
-( sector_t* sector,
-  int32_t max );
+int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max);
 
-sector_t* getNextSector
-( const line_t* line,
-  sector_t* sec );
+sector_t* getNextSector(const line_t* line, sector_t __far* sec);
 
 boolean P_CheckTag
 (const line_t *line); // jff 2/27/98
@@ -823,9 +792,7 @@ boolean P_CanUnlockGenDoor
 ( const line_t* line,
   player_t* player);
 
-boolean P_SectorActive
-( special_e t,
-  const sector_t* s );
+boolean P_SectorActive(special_e t, const sector_t __far* s);
 
 
 void P_ChangeSwitchTexture
@@ -1028,13 +995,9 @@ void P_PlayerInSpecialSector
 void P_SpawnFireFlicker
 ( sector_t* sector );
 
-void P_SpawnLightFlash
-( sector_t* sector );
+void P_SpawnLightFlash(sector_t __far* sector);
 
-void P_SpawnStrobeFlash
-( sector_t* sector,
-  int32_t fastOrSlow,
-  int32_t inSync );
+void P_SpawnStrobeFlash(sector_t __far* sector, int32_t fastOrSlow, int32_t inSync);
 
 void P_SpawnGlowingLight
 ( sector_t* sector );

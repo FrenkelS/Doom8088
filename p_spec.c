@@ -154,9 +154,7 @@ boolean twoSided
 //
 // Note: returns NULL if not two-sided line, or both sides refer to sector
 //
-sector_t* getNextSector
-( const line_t*       line,
-  sector_t*     sec )
+sector_t* getNextSector(const line_t* line, sector_t __far* sec)
 {
 
 
@@ -424,7 +422,7 @@ fixed_t P_FindShortestTextureAround(int32_t secnum)
   int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
   side_t*     side;
   int32_t i;
-  sector_t *sec = &_g_sectors[secnum];
+  sector_t __far* sec = &_g_sectors[secnum];
 
   for (i = 0; i < sec->linecount; i++)
   {
@@ -457,7 +455,7 @@ fixed_t P_FindShortestUpperAround(int32_t secnum)
   int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
   side_t*     side;
   int32_t i;
-  sector_t *sec = &_g_sectors[secnum];
+  sector_t __far* sec = &_g_sectors[secnum];
 
   for (i = 0; i < sec->linecount; i++)
   {
@@ -491,10 +489,10 @@ fixed_t P_FindShortestUpperAround(int32_t secnum)
 // jff 3/14/98 change first parameter to plain height to allow call
 //  from routine not using floormove_t
 //
-sector_t *P_FindModelFloorSector(fixed_t floordestheight,int32_t secnum)
+sector_t __far* P_FindModelFloorSector(fixed_t floordestheight,int32_t secnum)
 {
   int32_t i;
-  sector_t *sec=NULL;
+  sector_t __far* sec;
   int32_t linecount;
 
   sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
@@ -533,10 +531,10 @@ sector_t *P_FindModelFloorSector(fixed_t floordestheight,int32_t secnum)
 // jff 3/14/98 change first parameter to plain height to allow call
 //  from routine not using ceiling_t
 //
-sector_t *P_FindModelCeilingSector(fixed_t ceildestheight,int32_t secnum)
+sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight,int32_t secnum)
 {
   int32_t i;
-  sector_t *sec=NULL;
+  sector_t __far* sec;
   int32_t linecount;
 
   sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
@@ -605,9 +603,7 @@ static void P_InitTagLists(void)
 // in a surrounding sector less than that passed. If no smaller light
 // level exists, the light level passed is returned.
 //
-int32_t P_FindMinSurroundingLight
-( sector_t*     sector,
-  int32_t           max )
+int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
 {
   int32_t         i;
   int32_t         min;
@@ -792,7 +788,7 @@ boolean P_CanUnlockGenDoor
 // jff 2/23/98 added to prevent old demos from
 //  succeeding in starting multiple specials on one sector
 //
-boolean PUREFUNC P_SectorActive(special_e t, const sector_t *sec)
+boolean PUREFUNC P_SectorActive(special_e t, const sector_t __far* sec)
 {
     switch (t)             // return whether thinker of same type is active
     {
@@ -2152,7 +2148,7 @@ static void P_SpawnScrollers(void);
 // Parses command line parameters.
 void P_SpawnSpecials (void)
 {
-  sector_t*   sector;
+  sector_t __far*   sector;
   int32_t         i;
 
   //  Init special sectors.
