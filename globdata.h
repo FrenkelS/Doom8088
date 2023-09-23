@@ -289,7 +289,7 @@ extern int16_t skyflatnum;
 
 
 // variables used to look up and range check thing_t sprites patches
-extern spritedef_t *sprites;
+extern spritedef_t __far* sprites;
 
 
 // These are not used, but should be (menu).
