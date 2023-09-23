@@ -667,12 +667,12 @@ typedef struct
   // ID
   int32_t tag;
   int32_t olddirection;
-  struct ceilinglist *list;   // jff 2/22/98 copied from killough's plats
+  struct ceilinglist __far* list;
 } ceiling_t;
 
 typedef struct ceilinglist {
   ceiling_t __far* ceiling;
-  struct ceilinglist *next,**prev;
+  struct ceilinglist __far* next, __far*__far* prev;
 } ceilinglist_t;
 
 // p_floor

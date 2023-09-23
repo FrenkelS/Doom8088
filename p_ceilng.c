@@ -380,7 +380,7 @@ boolean P_ActivateInStasisCeiling(const line_t *line)
 
   for (cl=activeceilings; cl; cl=cl->next)
   {
-    ceiling_t *ceiling = cl->ceiling;
+    ceiling_t __far* ceiling = cl->ceiling;
     if (ceiling->tag == line->tag && ceiling->direction == 0)
     {
       ceiling->direction = ceiling->olddirection;
@@ -407,7 +407,7 @@ boolean EV_CeilingCrushStop(const line_t* line)
   ceilinglist_t __far* cl;
   for (cl=activeceilings; cl; cl=cl->next)
   {
-    ceiling_t *ceiling = cl->ceiling;
+    ceiling_t __far* ceiling = cl->ceiling;
     if (ceiling->direction != 0 && ceiling->tag == line->tag)
     {
       ceiling->olddirection = ceiling->direction;
@@ -451,7 +451,7 @@ void P_AddActiveCeiling(ceiling_t __far* ceiling)
 //
 static void P_RemoveActiveCeiling(ceiling_t* ceiling)
 {
-  ceilinglist_t *list = ceiling->list;
+  ceilinglist_t __far* list = ceiling->list;
   ceiling->sector->ceilingdata = NULL;  //jff 2/22/98
 
   P_RemoveThinker(&ceiling->thinker);
@@ -473,7 +473,7 @@ void P_RemoveAllActiveCeilings(void)
 {
   while (activeceilings)
   {
-    ceilinglist_t *next = activeceilings->next;
+    ceilinglist_t __far* next = activeceilings->next;
     Z_Free(activeceilings);
     activeceilings = next;
   }
