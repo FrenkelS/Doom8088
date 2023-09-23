@@ -1211,8 +1211,8 @@ static void R_DrawSprite (const vissprite_t* spr)
 static void R_DrawPSprite (pspdef_t *psp, int32_t lightlevel)
 {
     int32_t           x1, x2;
-    spritedef_t   *sprdef;
-    spriteframe_t *sprframe;
+    spritedef_t   __far* sprdef;
+    spriteframe_t __far* sprframe;
     boolean       flip;
     vissprite_t   *vis;
     vissprite_t   avis;
@@ -1469,8 +1469,8 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
         return;
 
     // decide which patch to use for sprite relative to player
-    const spritedef_t*   sprdef   = &sprites[thing->sprite];
-    const spriteframe_t* sprframe = &sprdef->spriteframes[thing->frame & FF_FRAMEMASK];
+    const spritedef_t __far*   sprdef   = &sprites[thing->sprite];
+    const spriteframe_t __far* sprframe = &sprdef->spriteframes[thing->frame & FF_FRAMEMASK];
 
     uint32_t rot = 0;
 
