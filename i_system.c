@@ -181,7 +181,7 @@ void I_StartTic(void)
 //
 
 static boolean isGraphicsModeSet = false;
-static uint16_t *screen;
+static uint16_t __far* screen;
 static uint16_t  backBuffer[SCREENWIDTH * SCREENHEIGHT];
 
 static int8_t newpal;
@@ -231,7 +231,7 @@ void I_StartDisplay(void)
 void I_DrawBuffer(uint16_t *buffer)
 {
 	uint16_t* src = buffer;
-	uint16_t* dst = screen;
+	uint16_t __far* dst = screen;
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
 		for (uint_fast8_t x = 0; x < (SCREENWIDTH * 2) / 2; x++) {
 			*dst++ = *src++;
