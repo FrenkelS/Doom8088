@@ -101,8 +101,8 @@ typedef struct
 
 
   // thinker_t for reversable actions
-  void *floordata;    // jff 2/22/98 make thinkers on
-  void *ceilingdata;  // floors, ceilings, lighting,
+  void __far* floordata;    // jff 2/22/98 make thinkers on
+  void __far* ceilingdata;  // floors, ceilings, lighting,
 
   // list of mobjs that are at least partially in the sector
   // thinglist is a subset of touching_thinglist

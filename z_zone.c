@@ -364,7 +364,7 @@ static void Z_FreeBlock(memblock_t __far* block)
 //
 // Z_Free
 //
-void Z_Free (const void* ptr)
+void Z_Free (const void __far* ptr)
 {
 	Z_FreeBlock(segmentToPointer(pointerToSegment(ptr) - 1));
 }

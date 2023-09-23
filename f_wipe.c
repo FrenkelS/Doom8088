@@ -51,8 +51,8 @@
 #include "i_system.h"
 
 
-static uint16_t* frontbuffer;
-static  int16_t* wipe_y_lookup;
+static uint16_t __far* frontbuffer;
+static  int16_t __far* wipe_y_lookup;
 
 
 void wipe_StartScreen(void)

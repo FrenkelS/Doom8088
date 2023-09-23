@@ -73,7 +73,7 @@ void P_InitThinkers(void)
 // Adds a new thinker at the end of the list.
 //
 
-void P_AddThinker(thinker_t* thinker)
+void P_AddThinker(thinker_t __far* thinker)
 {
   _g_thinkerclasscap.prev->next = thinker;
   thinker->next = &_g_thinkerclasscap;

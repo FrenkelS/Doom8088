@@ -44,7 +44,7 @@
 
 
 // the list of ceilings moving currently, including crushers
-static ceilinglist_t *activeceilings;
+static ceilinglist_t __far* activeceilings;
 
 
 static void P_RemoveActiveCeiling(ceiling_t* ceiling);
@@ -258,7 +258,7 @@ boolean EV_DoCeiling
   int32_t   secnum;
   boolean   rtn;
   sector_t* sec;
-  ceiling_t*  ceiling;
+  ceiling_t __far* ceiling;
 
   secnum = -1;
   rtn = false;
@@ -431,7 +431,7 @@ void P_AddActiveCeiling(ceiling_t* ceiling)
 {
     ceilinglist_t *old_head = activeceilings;
 
-    ceilinglist_t *list = activeceilings = Z_MallocLevel(sizeof *list, (void **)&activeceilings);
+    ceilinglist_t *list = activeceilings = Z_MallocLevel(sizeof *list, (void __far**)&activeceilings);
     list->ceiling = ceiling;
     ceiling->list = list;
 

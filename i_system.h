@@ -59,6 +59,6 @@ void I_StartTic();
 
 uint16_t* I_GetBackBuffer();
 
-void I_CopyBackBufferToBuffer(uint16_t* buffer);
+void I_CopyBackBufferToBuffer(uint16_t __far* buffer);
 
 #endif

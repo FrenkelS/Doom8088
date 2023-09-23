@@ -192,10 +192,10 @@ uint16_t* I_GetBackBuffer(void)
 }
 
 
-void I_CopyBackBufferToBuffer(uint16_t* buffer)
+void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
 {
 	uint16_t* src = &backBuffer[0];
-	uint16_t* dst = buffer;
+	uint16_t __far* dst = buffer;
 	for (int16_t i = 0; i < SCREENWIDTH * SCREENHEIGHT; i++)
 		*dst++ = *src++;
 }

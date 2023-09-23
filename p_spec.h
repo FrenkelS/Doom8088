@@ -613,7 +613,7 @@ typedef struct
 // New limit-free plat structure -- killough
 
 typedef struct platlist {
-  plat_t *plat;
+  plat_t __far* plat;
   struct platlist *next,**prev;
 } platlist_t;
 
@@ -1041,8 +1041,7 @@ void P_SpawnGlowingLight
 
 // p_plats
 
-void P_AddActivePlat
-( plat_t* plat );
+void P_AddActivePlat(plat_t __far* plat);
 
 void P_RemoveAllActivePlats
 ( void );    // killough

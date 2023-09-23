@@ -77,7 +77,7 @@ static int16_t numlumps;
 
 static filelump_t *fileinfo;
 
-static void **lumpcache;
+static void __far** lumpcache;
 
 //
 // LUMP BASED ROUTINES.
@@ -189,11 +189,11 @@ const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 }
 
 
-static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
+static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void __far** user)
 {
 	const filelump_t* lump = &fileinfo[num];
 
-	void* ptr = Z_MallocStaticWithUser(lump->size, user);
+	void __far* ptr = Z_MallocStaticWithUser(lump->size, user);
 
 	fseek(fileWAD, lump->filepos, SEEK_SET);
 	_ffread(ptr, lump->size, fileWAD);

@@ -44,7 +44,7 @@
 #include "globdata.h"
 
 
-static platlist_t *activeplats;
+static platlist_t __far* activeplats;
 
 
 static void P_RemoveActivePlat(plat_t* plat);
@@ -187,7 +187,7 @@ boolean EV_DoPlat
   plattype_e    type,
   int32_t           amount )
 {
-  plat_t* plat;
+  plat_t __far* plat;
   int32_t             secnum;
   boolean             rtn;
   sector_t*       sec;
@@ -345,7 +345,7 @@ boolean EV_DoPlat
 //
 void P_ActivateInStasis(int32_t tag)
 {
-  platlist_t *pl;
+  platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)   // search the active plats
   {
     plat_t *plat = pl->plat;              // for one in stasis with right tag
@@ -369,7 +369,7 @@ void P_ActivateInStasis(int32_t tag)
 //
 void EV_StopPlat(const line_t* line)
 {
-  platlist_t *pl;
+  platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)  // search the active plats
   {
     plat_t *plat = pl->plat;             // for one with the tag not in stasis
@@ -390,11 +390,11 @@ void EV_StopPlat(const line_t* line)
 // Passed a pointer to the plat to add
 // Returns nothing
 //
-void P_AddActivePlat(plat_t* plat)
+void P_AddActivePlat(plat_t __far* plat)
 {
-    platlist_t* old_head = activeplats;
+    platlist_t __far* old_head = activeplats;
 
-    platlist_t *list = activeplats = Z_MallocLevel(sizeof *list, (void **)&activeplats);
+    platlist_t __far* list = activeplats = Z_MallocLevel(sizeof *list, (void __far**)&activeplats);
     list->plat = plat;
     plat->list = list;
     if ((list->next = old_head))
