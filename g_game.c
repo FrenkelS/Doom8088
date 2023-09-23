@@ -736,7 +736,7 @@ static void G_DoWorldDone (void)
 #define MIN_MAXPLAYERS 4
 
 
-inline static void LoadSRAM(byte* eeprom, uint32_t size, uint32_t offset)
+inline static void LoadSRAM(byte __far* eeprom, uint32_t size, uint32_t offset)
 {
 	UNUSED(eeprom);
 	UNUSED(size);
@@ -752,7 +752,7 @@ void G_UpdateSaveGameStrings()
     uint32_t savebuffersize = sizeof(gba_save_data_t) * 8;
 
 
-    byte* loadbuffer = Z_MallocStatic(savebuffersize);
+    byte __far* loadbuffer = Z_MallocStatic(savebuffersize);
 
     LoadSRAM(loadbuffer, savebuffersize, 0);
 
@@ -789,7 +789,7 @@ static void G_DoLoadGame(void)
     uint32_t savebuffersize = sizeof(gba_save_data_t) * 8;
 
 
-    byte* loadbuffer = Z_MallocStatic(savebuffersize);
+    byte __far* loadbuffer = Z_MallocStatic(savebuffersize);
 
     LoadSRAM(loadbuffer, savebuffersize, 0);
 
@@ -829,7 +829,7 @@ void G_SaveGame(int32_t slot)
 }
 
 
-inline static void SaveSRAM(const byte* eeprom, uint32_t size, uint32_t offset)
+inline static void SaveSRAM(const byte __far* eeprom, uint32_t size, uint32_t offset)
 {
 	UNUSED(eeprom);
 	UNUSED(size);
@@ -841,7 +841,7 @@ static void G_DoSaveGame(void)
 {
     uint32_t savebuffersize = sizeof(gba_save_data_t) * 8;
 
-    byte* savebuffer = Z_MallocStatic(savebuffersize);
+    byte __far* savebuffer = Z_MallocStatic(savebuffersize);
 
     LoadSRAM(savebuffer, savebuffersize, 0);
 
