@@ -45,7 +45,7 @@
 
 boolean P_GivePower(player_t *, int32_t);
 void P_TouchSpecialThing(mobj_t *special, mobj_t *toucher);
-void P_DamageMobj(mobj_t *target,mobj_t *inflictor,mobj_t *source,int32_t damage);
+void P_DamageMobj(mobj_t *target, mobj_t __far* inflictor, mobj_t *source, int32_t damage);
 
 /* killough 5/2/98: moved from d_deh.c, g_game.c, m_misc.c, others: */
 
