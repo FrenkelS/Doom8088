@@ -265,33 +265,8 @@ extern uint16_t *_g_screen;
 // used to accelerate or skip a stage
 extern boolean   _g_acceleratestage;
 
- // specifies current state
-extern stateenum_t  _g_state;
-
-// contains information passed into intermission
-extern wbstartstruct_t* _g_wbs;
-
-extern wbplayerstruct_t* _g_plrs;  // wbs->plyr[]
-
 // used for general timing
 extern int32_t    _g_cnt;
-
-// used for timing of background animation
-extern int32_t    _g_bcnt;
-
-extern int32_t    _g_cnt_time;
-extern int32_t    _g_cnt_total_time;
-extern int32_t    _g_cnt_par;
-extern int32_t    _g_cnt_pause;
-
-
-extern int32_t  _g_sp_state;
-
-extern int32_t _g_cnt_kills;
-extern int32_t _g_cnt_items;
-extern int32_t _g_cnt_secret;
-
-extern boolean _g_snl_pointeron;
 
 
 extern enum automapmode_e automapmode;
