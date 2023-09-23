@@ -50,7 +50,7 @@
 #include "globdata.h"
 
 
-static mobj_t    *tmthing;
+static mobj_t    __far* tmthing;
 static fixed_t   tmx;
 static fixed_t   tmy;
 
@@ -1507,7 +1507,7 @@ static boolean PIT_GetSectors(const line_t* ld)
 // P_CreateSecNodeList alters/creates the sector_list that shows what sectors
 // the object resides in.
 
-void P_CreateSecNodeList(mobj_t* thing)
+void P_CreateSecNodeList(mobj_t __far* thing)
 {
   mobj_t* saved_tmthing = tmthing; /* cph - see comment at func end */
 
