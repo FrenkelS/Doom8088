@@ -160,7 +160,7 @@ static sector_t  *frontsector;
 static sector_t  *backsector;
 static drawseg_t *ds_p;
 
-static visplane_t *floorplane, *ceilingplane;
+static visplane_t __far* floorplane, __far* ceilingplane;
 static int32_t             rw_angle1;
 
 static angle_t         rw_normalangle; // angle to line origin
@@ -235,7 +235,7 @@ boolean highDetail = false;
 
 
 uint16_t validcount = 1;         // increment every time a check is made
-visplane_t __far**freehead;
+visplane_t __far*__far* freehead;
 
 //*****************************************
 // Constants
@@ -1676,7 +1676,7 @@ static visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int32_t lig
  *
  * cph 2003/04/18 - create duplicate of existing visplane and set initial range
  */
-static visplane_t __far* R_DupPlane(const visplane_t *pl, int32_t start, int32_t stop)
+static visplane_t __far* R_DupPlane(const visplane_t __far* pl, int32_t start, int32_t stop)
 {
     uint32_t hash = visplane_hash(pl->picnum, pl->lightlevel, pl->height);
     visplane_t __far* new_pl = new_visplane(hash);

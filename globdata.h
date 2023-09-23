@@ -279,7 +279,7 @@ extern int32_t showMessages;    // Show messages has default, 0 = off, 1 = on
 
 
 extern uint16_t validcount;         // increment every time a check is made
-extern visplane_t __far**freehead;
+extern visplane_t __far*__far* freehead;
 
 
 //
