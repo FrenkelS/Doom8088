@@ -50,7 +50,7 @@ static mobj_t* P_TeleportDestination(const line_t* line)
 {
   int32_t i;
   for (i = -1; (i = P_FindSectorFromLineTag(line, i)) >= 0;) {
-    register thinker_t* th = NULL;
+    register thinker_t __far* th = NULL;
     while ((th = P_NextThinker(th)) != NULL)
       if (th->function == P_MobjThinker) {
         register mobj_t* m = (mobj_t*)th;
