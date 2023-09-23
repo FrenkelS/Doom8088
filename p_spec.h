@@ -671,7 +671,7 @@ typedef struct
 } ceiling_t;
 
 typedef struct ceilinglist {
-  ceiling_t *ceiling;
+  ceiling_t __far* ceiling;
   struct ceilinglist *next,**prev;
 } ceilinglist_t;
 
@@ -1061,8 +1061,7 @@ void P_SpawnDoorRaiseIn5Mins(sector_t* sec);
 void P_RemoveAllActiveCeilings
 ( void );                //jff 2/22/98
 
-void P_AddActiveCeiling
-( ceiling_t* c );
+void P_AddActiveCeiling(ceiling_t __far* c);
 
 boolean P_ActivateInStasisCeiling
 ( const line_t* line );

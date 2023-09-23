@@ -375,7 +375,7 @@ boolean EV_DoCeiling
 //jff 4/5/98 return if activated
 boolean P_ActivateInStasisCeiling(const line_t *line)
 {
-  ceilinglist_t *cl;
+  ceilinglist_t __far* cl;
   boolean rtn=false;
 
   for (cl=activeceilings; cl; cl=cl->next)
@@ -404,7 +404,7 @@ boolean EV_CeilingCrushStop(const line_t* line)
 {
   boolean rtn=false;
 
-  ceilinglist_t *cl;
+  ceilinglist_t __far* cl;
   for (cl=activeceilings; cl; cl=cl->next)
   {
     ceiling_t *ceiling = cl->ceiling;
@@ -427,11 +427,11 @@ boolean EV_CeilingCrushStop(const line_t* line)
 // Passed the ceiling motion structure
 // Returns nothing
 //
-void P_AddActiveCeiling(ceiling_t* ceiling)
+void P_AddActiveCeiling(ceiling_t __far* ceiling)
 {
-    ceilinglist_t *old_head = activeceilings;
+    ceilinglist_t __far* old_head = activeceilings;
 
-    ceilinglist_t *list = activeceilings = Z_MallocLevel(sizeof *list, (void __far**)&activeceilings);
+    ceilinglist_t __far* list = activeceilings = Z_MallocLevel(sizeof *list, (void __far**)&activeceilings);
     list->ceiling = ceiling;
     ceiling->list = list;
 
