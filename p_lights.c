@@ -180,7 +180,7 @@ static void T_Glow(glow_t* g)
 //
 void P_SpawnFireFlicker (sector_t*  sector)
 {
-  fireflicker_t*  flick;
+  fireflicker_t __far*  flick;
 
   // Note that we are resetting sector attributes.
   // Nothing special about it during gameplay.
@@ -207,7 +207,7 @@ void P_SpawnFireFlicker (sector_t*  sector)
 //
 void P_SpawnLightFlash (sector_t* sector)
 {
-  lightflash_t* flash;
+  lightflash_t __far* flash;
 
   // nothing special about it during gameplay
   sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
@@ -241,7 +241,7 @@ void P_SpawnStrobeFlash
   int32_t   fastOrSlow,
   int32_t   inSync )
 {
-  strobe_t* flash;
+  strobe_t __far* flash;
 
   flash = Z_CallocLevSpec(sizeof(*flash));
 
@@ -276,7 +276,7 @@ void P_SpawnStrobeFlash
 //
 void P_SpawnGlowingLight(sector_t*  sector)
 {
-  glow_t* g;
+  glow_t __far* g;
 
   g = Z_CallocLevSpec(sizeof(*g));
 
