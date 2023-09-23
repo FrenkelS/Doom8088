@@ -54,7 +54,7 @@ uint16_t *_g_screen;
  * so the st bar and menus don't look like garbage.
  */
 
-static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
+static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 {
     y -= patch->topoffset;
     x -= patch->leftoffset;
@@ -141,7 +141,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
 }
 
 
-void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch)
+void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
 {
     y -= patch->topoffset;
     x -= patch->leftoffset;
@@ -177,7 +177,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch)
 
 void V_DrawNumPatch(int16_t x, int16_t y, int16_t num)
 {
-	const patch_t* patch = W_GetLumpByNum(num);
+	const patch_t __far* patch = W_GetLumpByNum(num);
 	V_DrawPatch(x, y, patch);
 	Z_ChangeTagToCache(patch);
 }
@@ -185,7 +185,7 @@ void V_DrawNumPatch(int16_t x, int16_t y, int16_t num)
 
 void V_DrawNamePatch(int16_t x, int16_t y, const char *name)
 {
-	const patch_t* patch = W_GetLumpByName(name);
+	const patch_t __far* patch = W_GetLumpByName(name);
 	V_DrawPatch(x, y, patch);
 	Z_ChangeTagToCache(patch);
 }
@@ -193,7 +193,7 @@ void V_DrawNamePatch(int16_t x, int16_t y, const char *name)
 
 void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
 {
-	const patch_t* patch = W_GetLumpByNum(num);
+	const patch_t __far* patch = W_GetLumpByNum(num);
 	V_DrawPatchNoScale(x, y, patch);
 	Z_ChangeTagToCache(patch);
 }

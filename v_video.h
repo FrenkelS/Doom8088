@@ -52,7 +52,7 @@
 void V_DrawNumPatch(int16_t x, int16_t y, int16_t lump);
 void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t lump);
 
-void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch);
+void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch);
 
 
 // V_DrawNamePatch - Draws the patch from lump "name"

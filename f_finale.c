@@ -157,7 +157,7 @@ static int32_t Get_TextSpeed(void)
 static void V_DrawBackground(const char* flatname)
 {
     /* erase the entire screen to a tiled background */
-    const byte* src = W_GetLumpByName(flatname);
+    const byte __far* src = W_GetLumpByName(flatname);
     uint16_t *dest = _g_screen;
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
@@ -165,14 +165,14 @@ static void V_DrawBackground(const char* flatname)
         for(uint16_t x = 0; x < 240; x+=64)
         {
             uint16_t* d = &dest[ ScreenYToOffset(y) + (x >> 1)];
-            const byte* s = &src[((y&63) * 64) + (x&63)];
+            const byte __far* s = &src[((y&63) * 64) + (x&63)];
 
             uint8_t len = 64;
 
             if( (240-x) < 64)
                 len = 240-x;
 
-            memcpy(d, s, len);
+            _fmemcpy(d, s, len);
         }
     }
 
@@ -224,7 +224,7 @@ static void F_TextWrite (void)
 
 		c = toupper(c);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND) {
-			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
 			V_DrawPatchNoScale(cx, cy, patch);
 			cx += patch->width;
 			Z_ChangeTagToCache(patch);
