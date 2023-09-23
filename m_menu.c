@@ -339,9 +339,9 @@ static void M_DrawSaveLoad(const char* name)
 
 	V_DrawNamePatch(72 ,LOADGRAPHIC_Y, name);
 
-	const patch_t* lpatch = W_GetLumpByName("M_LSLEFT");
-	const patch_t* mpatch = W_GetLumpByName("M_LSCNTR");
-	const patch_t* rpatch = W_GetLumpByName("M_LSRGHT");
+	const patch_t __far* lpatch = W_GetLumpByName("M_LSLEFT");
+	const patch_t __far* mpatch = W_GetLumpByName("M_LSCNTR");
+	const patch_t __far* rpatch = W_GetLumpByName("M_LSRGHT");
 
 	for (i = 0; i < load_end; i++)
 	{
@@ -1153,7 +1153,7 @@ static int16_t M_StringWidth(const char __far* string)
 		char c = toupper(string[i]);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
-			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
 			w += patch->width;
 			Z_ChangeTagToCache(patch);
 		} else
@@ -1199,7 +1199,7 @@ static void M_WriteText (int16_t x, int16_t y, const char __far* string)
 		c = toupper(c);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
-			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
 			V_DrawPatchNoScale(cx, cy, patch);
 			cx += patch->width;
 			Z_ChangeTagToCache(patch);
