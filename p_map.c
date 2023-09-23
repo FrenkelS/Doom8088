@@ -50,9 +50,9 @@
 #include "globdata.h"
 
 
-mobj_t    *_g_tmthing;
-fixed_t   _g_tmx;
-fixed_t   _g_tmy;
+static mobj_t    *tmthing;
+static fixed_t   tmx;
+static fixed_t   tmy;
 
 
 // The tm* items are used to hold information globally, usually for
@@ -68,8 +68,7 @@ fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 
 const line_t    *_g_ceilingline;
 const line_t        *_g_blockline;    /* killough 8/11/98: blocking linedef */
-const line_t        *_g_floorline;    /* killough 8/1/98: Highest touched floor */
-int32_t         _g_tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
+static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
@@ -82,25 +81,25 @@ int32_t _g_numspechit;
 // Temporary holder for thing_sectorlist threads
 msecnode_t* _g_sector_list;
 
-fixed_t   _g_bestslidefrac;
-const line_t*   _g_bestslideline;
-mobj_t*   _g_slidemo;
-fixed_t   _g_tmxmove;
-fixed_t   _g_tmymove;
+static fixed_t   bestslidefrac;
+static const line_t*   bestslideline;
+static mobj_t*   slidemo;
+static fixed_t   tmxmove;
+static fixed_t   tmymove;
 
 mobj_t*   _g_linetarget; // who got hit (or NULL)
-mobj_t*   _g_shootthing;
+static mobj_t*   shootthing;
 
 // Height if not aiming up or down
-fixed_t   _g_shootz;
+static fixed_t   shootz;
 
-int32_t       _g_la_damage;
+static int32_t       la_damage;
 fixed_t   _g_attackrange;
 
 // slopes to top and bottom of target
 
-fixed_t  _g_topslope;
-fixed_t  _g_bottomslope;
+static fixed_t  topslope;
+static fixed_t  bottomslope;
 
 static mobj_t *bombsource, *bombspot;
 static int32_t bombdamage;
@@ -116,7 +115,7 @@ boolean   _g_felldown;
 
 boolean _g_crushchange, _g_nofit;
 
-boolean _g_telefrag;   /* killough 8/9/98: whether to telefrag at exit */
+static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 
 
 // MAXRADIUS is for precalculated sector block boxes
@@ -140,22 +139,22 @@ static boolean PIT_StompThing (mobj_t* thing)
 
   // don't clip against self
 
-  if (thing == _g_tmthing)
+  if (thing == tmthing)
     return true;
 
   if (!(thing->flags & MF_SHOOTABLE)) // Can't shoot it? Can't stomp it!
     return true;
 
-  blockdist = thing->radius + _g_tmthing->radius;
+  blockdist = thing->radius + tmthing->radius;
 
-  if (D_abs(thing->x - _g_tmx) >= blockdist || D_abs(thing->y - _g_tmy) >= blockdist)
+  if (D_abs(thing->x - tmx) >= blockdist || D_abs(thing->y - tmy) >= blockdist)
     return true; // didn't hit it
 
   // monsters don't stomp things except on boss level
-  if (!_g_telefrag)  // killough 8/9/98: make consistent across all levels
+  if (!telefrag)  // killough 8/9/98: make consistent across all levels
     return false;
 
-  P_DamageMobj (thing, _g_tmthing, _g_tmthing, 10000); // Stomp!
+  P_DamageMobj (thing, tmthing, tmthing, 10000); // Stomp!
 
   return true;
   }
@@ -177,19 +176,19 @@ boolean P_TeleportMove (mobj_t* thing,fixed_t x,fixed_t y, boolean boss)
   subsector_t*  newsubsec;
 
   /* killough 8/9/98: make telefragging more consistent, preserve compatibility */
-  _g_telefrag = P_MobjIsPlayer(thing) || boss;
+  telefrag = P_MobjIsPlayer(thing) || boss;
 
   // kill anything occupying the position
 
-  _g_tmthing = thing;
+  tmthing = thing;
 
-  _g_tmx = x;
-  _g_tmy = y;
+  tmx = x;
+  tmy = y;
 
-  _g_tmbbox[BOXTOP] = y + _g_tmthing->radius;
-  _g_tmbbox[BOXBOTTOM] = y - _g_tmthing->radius;
-  _g_tmbbox[BOXRIGHT] = x + _g_tmthing->radius;
-  _g_tmbbox[BOXLEFT] = x - _g_tmthing->radius;
+  _g_tmbbox[BOXTOP]    = y + tmthing->radius;
+  _g_tmbbox[BOXBOTTOM] = y - tmthing->radius;
+  _g_tmbbox[BOXRIGHT]  = x + tmthing->radius;
+  _g_tmbbox[BOXLEFT]   = x - tmthing->radius;
 
   newsubsec = R_PointInSubsector (x,y);
   _g_ceilingline = NULL;
@@ -252,10 +251,10 @@ static boolean untouched(const line_t *ld)
 {
   fixed_t x, y, tmbbox[4];
   return
-    (tmbbox[BOXRIGHT] = (x=_g_tmthing->x)+_g_tmthing->radius) <= ld->bbox[BOXLEFT] ||
-    (tmbbox[BOXLEFT] = x-_g_tmthing->radius) >= ld->bbox[BOXRIGHT] ||
-    (tmbbox[BOXTOP] = (y=_g_tmthing->y)+_g_tmthing->radius) <= ld->bbox[BOXBOTTOM] ||
-    (tmbbox[BOXBOTTOM] = y-_g_tmthing->radius) >= ld->bbox[BOXTOP] ||
+    (tmbbox[BOXRIGHT] = (x=tmthing->x)+tmthing->radius) <= ld->bbox[BOXLEFT] ||
+    (tmbbox[BOXLEFT] = x-tmthing->radius) >= ld->bbox[BOXRIGHT] ||
+    (tmbbox[BOXTOP] = (y=tmthing->y)+tmthing->radius) <= ld->bbox[BOXBOTTOM] ||
+    (tmbbox[BOXBOTTOM] = y-tmthing->radius) >= ld->bbox[BOXTOP] ||
     P_BoxOnLineSide(tmbbox, ld) != -1;
 }
 
@@ -290,18 +289,18 @@ boolean PIT_CheckLine (const line_t* ld)
   if (!LN_BACKSECTOR(ld)) // one sided line
     {
       _g_blockline = ld;
-      return _g_tmunstuck && !untouched(ld) &&
-  FixedMul(_g_tmx-_g_tmthing->x,ld->dy) > FixedMul(_g_tmy-_g_tmthing->y,ld->dx);
+      return tmunstuck && !untouched(ld) &&
+  FixedMul(tmx-tmthing->x,ld->dy) > FixedMul(tmy-tmthing->y,ld->dx);
     }
 
   // killough 8/10/98: allow bouncing objects to pass through as missiles
-  if (!(_g_tmthing->flags & (MF_MISSILE)))
+  if (!(tmthing->flags & (MF_MISSILE)))
     {
       if (ld->flags & ML_BLOCKING)           // explicitly blocking everything
-  return _g_tmunstuck && !untouched(ld);  // killough 8/1/98: allow escape
+  return tmunstuck && !untouched(ld);  // killough 8/1/98: allow escape
 
       // killough 8/9/98: monster-blockers don't affect friends
-      if (!(_g_tmthing->flags & MF_FRIEND || P_MobjIsPlayer(_g_tmthing))
+      if (!(tmthing->flags & MF_FRIEND || P_MobjIsPlayer(tmthing))
     && ld->flags & ML_BLOCKMONSTERS)
   return false; // block monsters only
     }
@@ -323,7 +322,6 @@ boolean PIT_CheckLine (const line_t* ld)
   if (_g_openbottom > _g_tmfloorz)
     {
       _g_tmfloorz = _g_openbottom;
-      _g_floorline = ld;          // killough 8/1/98: remember floor linedef
       _g_blockline = ld;
     }
 
@@ -357,9 +355,9 @@ static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
   if (!(thing->flags & (MF_SOLID|MF_SPECIAL|MF_SHOOTABLE)))
     return true;
 
-  blockdist = thing->radius + _g_tmthing->radius;
+  blockdist = thing->radius + tmthing->radius;
 
-  if (D_abs(thing->x - _g_tmx) >= blockdist || D_abs(thing->y - _g_tmy) >= blockdist)
+  if (D_abs(thing->x - tmx) >= blockdist || D_abs(thing->y - tmy) >= blockdist)
     return true; // didn't hit it
 
   // killough 11/98:
@@ -369,24 +367,24 @@ static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
 
   // don't clip against self
 
-  if (thing == _g_tmthing)
+  if (thing == tmthing)
     return true;
 
   // check for skulls slamming into things
 
-  if (_g_tmthing->flags & MF_SKULLFLY)
+  if (tmthing->flags & MF_SKULLFLY)
     {
       // A flying skull is smacking something.
       // Determine damage amount, and the skull comes to a dead stop.
 
-      int32_t damage = ((P_Random()%8)+1)*mobjinfo[_g_tmthing->type].damage;
+      int32_t damage = ((P_Random()%8)+1)*mobjinfo[tmthing->type].damage;
 
-      P_DamageMobj (thing, _g_tmthing, _g_tmthing, damage);
+      P_DamageMobj (thing, tmthing, tmthing, damage);
 
-      _g_tmthing->flags &= ~MF_SKULLFLY;
-      _g_tmthing->momx = _g_tmthing->momy = _g_tmthing->momz = 0;
+      tmthing->flags &= ~MF_SKULLFLY;
+      tmthing->momx = tmthing->momy = tmthing->momz = 0;
 
-      P_SetMobjState (_g_tmthing, mobjinfo[_g_tmthing->type].spawnstate);
+      P_SetMobjState (tmthing, mobjinfo[tmthing->type].spawnstate);
 
       return false;   // stop moving
     }
@@ -394,19 +392,19 @@ static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
   // missiles can hit other things
   // killough 8/10/98: bouncing non-solid things can hit other things too
 
-  if (_g_tmthing->flags & MF_MISSILE)
+  if (tmthing->flags & MF_MISSILE)
     {
       // see if it went over / under
 
-      if (_g_tmthing->z > thing->z + thing->height)
+      if (tmthing->z > thing->z + thing->height)
   return true;    // overhead
 
-      if (_g_tmthing->z+_g_tmthing->height < thing->z)
+      if (tmthing->z+tmthing->height < thing->z)
   return true;    // underneath
 
-      if (_g_tmthing->target && (_g_tmthing->target->type == thing->type))
+      if (tmthing->target && (tmthing->target->type == thing->type))
       {
-  if (thing == _g_tmthing->target)
+  if (thing == tmthing->target)
     return true;                // Don't hit same species as originator.
   else
     if (thing->type != MT_PLAYER) // Explode, but do no damage.
@@ -416,16 +414,16 @@ static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
       // killough 8/10/98: if moving thing is not a missile, no damage
       // is inflicted, and momentum is reduced if object hit is solid.
 
-      if (!(_g_tmthing->flags & MF_MISSILE)) {
+      if (!(tmthing->flags & MF_MISSILE)) {
   if (!(thing->flags & MF_SOLID)) {
       return true;
   } else {
-      _g_tmthing->momx = -_g_tmthing->momx;
-      _g_tmthing->momy = -_g_tmthing->momy;
-      if (!(_g_tmthing->flags & MF_NOGRAVITY))
+      tmthing->momx = -tmthing->momx;
+      tmthing->momy = -tmthing->momy;
+      if (!(tmthing->flags & MF_NOGRAVITY))
         {
-    _g_tmthing->momx >>= 2;
-    _g_tmthing->momy >>= 2;
+    tmthing->momx >>= 2;
+    tmthing->momy >>= 2;
         }
       return false;
   }
@@ -436,8 +434,8 @@ static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
 
       // damage / explode
 
-      damage = ((P_Random()%8)+1)*mobjinfo[_g_tmthing->type].damage;
-      P_DamageMobj (thing, _g_tmthing, _g_tmthing->target, damage);
+      damage = ((P_Random()%8)+1)*mobjinfo[tmthing->type].damage;
+      P_DamageMobj (thing, tmthing, tmthing->target, damage);
 
       // don't traverse any more
       return false;
@@ -448,8 +446,8 @@ static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
   if (thing->flags & MF_SPECIAL)
     {
       uint32_t solid = thing->flags & MF_SOLID;
-      if (_g_tmthing->flags & MF_PICKUP)
-  P_TouchSpecialThing(thing, _g_tmthing); // can remove thing
+      if (tmthing->flags & MF_PICKUP)
+  P_TouchSpecialThing(thing, tmthing); // can remove thing
       return !solid;
     }
 
@@ -496,21 +494,21 @@ boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
   int32_t     by;
   subsector_t*  newsubsec;
 
-  _g_tmthing = thing;
+  tmthing = thing;
 
-  _g_tmx = x;
-  _g_tmy = y;
+  tmx = x;
+  tmy = y;
 
-  _g_tmbbox[BOXTOP] = y + _g_tmthing->radius;
-  _g_tmbbox[BOXBOTTOM] = y - _g_tmthing->radius;
-  _g_tmbbox[BOXRIGHT] = x + _g_tmthing->radius;
-  _g_tmbbox[BOXLEFT] = x - _g_tmthing->radius;
+  _g_tmbbox[BOXTOP] = y + tmthing->radius;
+  _g_tmbbox[BOXBOTTOM] = y - tmthing->radius;
+  _g_tmbbox[BOXRIGHT] = x + tmthing->radius;
+  _g_tmbbox[BOXLEFT] = x - tmthing->radius;
 
   newsubsec = R_PointInSubsector (x,y);
-  _g_floorline = _g_blockline = _g_ceilingline = NULL; // killough 8/1/98
+  _g_blockline = _g_ceilingline = NULL; // killough 8/1/98
 
   // Whether object can get out of a sticky situation:
-  _g_tmunstuck = P_MobjIsPlayer(thing) &&          /* only players */
+  tmunstuck = P_MobjIsPlayer(thing) &&          /* only players */
     P_MobjIsPlayer(thing)->mo == thing; /* not under old demos */
 
   // The base floor / ceiling is from the subsector
@@ -523,7 +521,7 @@ boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
   validcount++;
   _g_numspechit = 0;
 
-  if ( _g_tmthing->flags & MF_NOCLIP )
+  if ( tmthing->flags & MF_NOCLIP )
     return true;
 
   // Check things first, possibly picking things up.
@@ -660,26 +658,26 @@ static void P_HitSlideLine (const line_t* ld)
 
     if (ld->slopetype == ST_HORIZONTAL)
     {
-        _g_tmymove = 0; // no more movement in the Y direction
+        tmymove = 0; // no more movement in the Y direction
         return;
     }
 
     if (ld->slopetype == ST_VERTICAL)
     {                                                          // phares
-        _g_tmxmove = 0; // no more movement in the X direction
+        tmxmove = 0; // no more movement in the X direction
         return;
     }
 
     // The wall is angled. Bounce if the angle of approach is         // phares
     // less than 45 degrees.                                          // phares
 
-    side = P_PointOnLineSide (_g_slidemo->x, _g_slidemo->y, ld);
+    side = P_PointOnLineSide (slidemo->x, slidemo->y, ld);
 
     lineangle = R_PointToAngle2 (0,0, ld->dx, ld->dy);
     if (side == 1)
         lineangle += ANG180;
 
-    moveangle = R_PointToAngle2 (0,0, _g_tmxmove, _g_tmymove);
+    moveangle = R_PointToAngle2 (0,0, tmxmove, tmymove);
 
     // killough 3/2/98:
     // The moveangle+=10 breaks v1.9 demo compatibility in
@@ -688,7 +686,7 @@ static void P_HitSlideLine (const line_t* ld)
     moveangle += 10; // prevents sudden path reversal due to        // phares
     // rounding error                              //   |
     deltaangle = moveangle-lineangle;                                 //   V
-    movelen = P_AproxDistance (_g_tmxmove, _g_tmymove);
+    movelen = P_AproxDistance (tmxmove, tmymove);
     //   |
     // phares
     if (deltaangle > ANG180)
@@ -699,8 +697,8 @@ static void P_HitSlideLine (const line_t* ld)
     lineangle >>= ANGLETOFINESHIFT;
     deltaangle >>= ANGLETOFINESHIFT;
     newlen = FixedMul (movelen, finecosine(deltaangle));
-    _g_tmxmove = FixedMul (newlen, finecosine(lineangle));
-    _g_tmymove = FixedMul (newlen, finesine(  lineangle));
+    tmxmove = FixedMul (newlen, finecosine(lineangle));
+    tmymove = FixedMul (newlen, finesine(  lineangle));
     // phares
 }
 
@@ -720,7 +718,7 @@ static boolean PTR_SlideTraverse (intercept_t* in)
 
   if ( ! (li->flags & ML_TWOSIDED) )
     {
-    if (P_PointOnLineSide (_g_slidemo->x, _g_slidemo->y, li))
+    if (P_PointOnLineSide (slidemo->x, slidemo->y, li))
       return true; // don't hit the back side
     goto isblocking;
     }
@@ -730,13 +728,13 @@ static boolean PTR_SlideTraverse (intercept_t* in)
 
   P_LineOpening (li);
 
-  if (_g_openrange < _g_slidemo->height)
+  if (_g_openrange < slidemo->height)
     goto isblocking;  // doesn't fit
 
-  if (_g_opentop - _g_slidemo->z < _g_slidemo->height)
+  if (_g_opentop - slidemo->z < slidemo->height)
     goto isblocking;  // mobj is too high
 
-  if (_g_openbottom - _g_slidemo->z > 24*FRACUNIT )
+  if (_g_openbottom - slidemo->z > 24*FRACUNIT )
     goto isblocking;  // too big a step up
 
   // this line doesn't block movement
@@ -748,10 +746,10 @@ static boolean PTR_SlideTraverse (intercept_t* in)
 
 isblocking:
 
-  if (in->frac < _g_bestslidefrac)
+  if (in->frac < bestslidefrac)
     {
-    _g_bestslidefrac = in->frac;
-    _g_bestslideline = li;
+    bestslidefrac = in->frac;
+    bestslideline = li;
     }
 
   return false; // stop
@@ -773,7 +771,7 @@ void P_SlideMove(mobj_t *mo)
 {
   int8_t hitcount = 3;
 
-  _g_slidemo = mo; // the object that's sliding
+  slidemo = mo; // the object that's sliding
 
   do
     {
@@ -794,7 +792,7 @@ void P_SlideMove(mobj_t *mo)
       else
   leady = mo->y - mo->radius, traily = mo->y + mo->radius;
 
-      _g_bestslidefrac = FRACUNIT+1;
+      bestslidefrac = FRACUNIT+1;
 
       P_PathTraverse(leadx, leady, leadx+mo->momx, leady+mo->momy,
          PT_ADDLINES, PTR_SlideTraverse);
@@ -805,7 +803,7 @@ void P_SlideMove(mobj_t *mo)
 
       // move up to the wall
 
-      if (_g_bestslidefrac == FRACUNIT+1)
+      if (bestslidefrac == FRACUNIT+1)
   {
     // the move must have hit the middle, so stairstep
 
@@ -829,10 +827,10 @@ void P_SlideMove(mobj_t *mo)
 
       // fudge a bit to make sure it doesn't hit
 
-      if ((_g_bestslidefrac -= 0x800) > 0)
+      if ((bestslidefrac -= 0x800) > 0)
   {
-    fixed_t newx = FixedMul(mo->momx, _g_bestslidefrac);
-    fixed_t newy = FixedMul(mo->momy, _g_bestslidefrac);
+    fixed_t newx = FixedMul(mo->momx, bestslidefrac);
+    fixed_t newy = FixedMul(mo->momy, bestslidefrac);
 
     if (!P_TryMove(mo, mo->x+newx, mo->y+newy))
       goto stairstep;
@@ -841,33 +839,33 @@ void P_SlideMove(mobj_t *mo)
       // Now continue along the wall.
       // First calculate remainder.
 
-      _g_bestslidefrac = FRACUNIT-(_g_bestslidefrac+0x800);
+      bestslidefrac = FRACUNIT-(bestslidefrac+0x800);
 
-      if (_g_bestslidefrac > FRACUNIT)
-            _g_bestslidefrac = FRACUNIT;
+      if (bestslidefrac > FRACUNIT)
+            bestslidefrac = FRACUNIT;
 
-      if (_g_bestslidefrac <= 0)
+      if (bestslidefrac <= 0)
   break;
 
-      _g_tmxmove = FixedMul(mo->momx, _g_bestslidefrac);
-      _g_tmymove = FixedMul(mo->momy, _g_bestslidefrac);
+      tmxmove = FixedMul(mo->momx, bestslidefrac);
+      tmymove = FixedMul(mo->momy, bestslidefrac);
 
-      P_HitSlideLine(_g_bestslideline); // clip the moves
+      P_HitSlideLine(bestslideline); // clip the moves
 
-      mo->momx = _g_tmxmove;
-      mo->momy = _g_tmymove;
+      mo->momx = tmxmove;
+      mo->momy = tmymove;
 
       /* killough 10/98: affect the bobbing the same way (but not voodoo dolls)
        * cph - DEMOSYNC? */
   if (P_MobjIsPlayer(mo) && P_MobjIsPlayer(mo)->mo == mo)
   {
-    if (D_abs(P_MobjIsPlayer(mo)->momx) > D_abs(_g_tmxmove))
-      P_MobjIsPlayer(mo)->momx = _g_tmxmove;
-    if (D_abs(P_MobjIsPlayer(mo)->momy) > D_abs(_g_tmymove))
-      P_MobjIsPlayer(mo)->momy = _g_tmymove;
+    if (D_abs(P_MobjIsPlayer(mo)->momx) > D_abs(tmxmove))
+      P_MobjIsPlayer(mo)->momx = tmxmove;
+    if (D_abs(P_MobjIsPlayer(mo)->momy) > D_abs(tmymove))
+      P_MobjIsPlayer(mo)->momy = tmymove;
   }
     }
-  while (!P_TryMove(mo, mo->x+_g_tmxmove, mo->y+_g_tmymove));
+  while (!P_TryMove(mo, mo->x+tmxmove, mo->y+tmymove));
 }
 
 
@@ -910,20 +908,20 @@ static boolean PTR_AimTraverse (intercept_t* in)
 
         if (LN_FRONTSECTOR(li)->floorheight != LN_BACKSECTOR(li)->floorheight)
         {
-            slope = FixedDiv (_g_openbottom - _g_shootz , dist);
+            slope = FixedDiv (_g_openbottom - shootz , dist);
 
-            if (slope > _g_bottomslope)
-                _g_bottomslope = slope;
+            if (slope > bottomslope)
+                bottomslope = slope;
         }
 
         if (LN_FRONTSECTOR(li)->ceilingheight != LN_BACKSECTOR(li)->ceilingheight)
         {
-            slope = FixedDiv (_g_opentop - _g_shootz , dist);
-            if (slope < _g_topslope)
-                _g_topslope = slope;
+            slope = FixedDiv (_g_opentop - shootz , dist);
+            if (slope < topslope)
+                topslope = slope;
         }
 
-        if (_g_topslope <= _g_bottomslope)
+        if (topslope <= bottomslope)
             return false;   // stop
 
         return true;    // shot continues
@@ -932,7 +930,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
     // shoot a thing
 
     th = in->d.thing;
-    if (th == _g_shootthing)
+    if (th == shootthing)
         return true;    // can't shoot self
 
     if (!(th->flags&MF_SHOOTABLE))
@@ -941,29 +939,29 @@ static boolean PTR_AimTraverse (intercept_t* in)
     /* killough 7/19/98, 8/2/98:
    * friends don't aim at friends (except players), at least not first
    */
-    if (th->flags & _g_shootthing->flags & aim_flags_mask && !P_MobjIsPlayer(th))
+    if (th->flags & shootthing->flags & aim_flags_mask && !P_MobjIsPlayer(th))
         return true;
 
     // check angles to see if the thing can be aimed at
 
     dist = FixedMul (_g_attackrange, in->frac);
-    thingtopslope = FixedDiv (th->z+th->height - _g_shootz , dist);
+    thingtopslope = FixedDiv (th->z+th->height - shootz , dist);
 
-    if (thingtopslope < _g_bottomslope)
+    if (thingtopslope < bottomslope)
         return true;    // shot over the thing
 
-    thingbottomslope = FixedDiv (th->z - _g_shootz, dist);
+    thingbottomslope = FixedDiv (th->z - shootz, dist);
 
-    if (thingbottomslope > _g_topslope)
+    if (thingbottomslope > topslope)
         return true;    // shot under the thing
 
     // this thing can be hit!
 
-    if (thingtopslope > _g_topslope)
-        thingtopslope = _g_topslope;
+    if (thingtopslope > topslope)
+        thingtopslope = topslope;
 
-    if (thingbottomslope < _g_bottomslope)
-        thingbottomslope = _g_bottomslope;
+    if (thingbottomslope < bottomslope)
+        thingbottomslope = bottomslope;
 
     aimslope = (thingtopslope + thingbottomslope) / 2;
     _g_linetarget = th;
@@ -994,7 +992,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     const line_t *li = in->d.line;
 
     if (LN_SPECIAL(li))
-      P_ShootSpecialLine (_g_shootthing, li);
+      P_ShootSpecialLine (shootthing, li);
 
       if (li->flags & ML_TWOSIDED)
   {  // crosses a two sided (really 2s) line
@@ -1004,9 +1002,9 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     // killough 11/98: simplify
 
     if ((LN_FRONTSECTOR(li)->floorheight==LN_BACKSECTOR(li)->floorheight ||
-         (slope = FixedDiv(_g_openbottom - _g_shootz , dist)) <= aimslope) &&
+         (slope = FixedDiv(_g_openbottom - shootz , dist)) <= aimslope) &&
         (LN_FRONTSECTOR(li)->ceilingheight==LN_BACKSECTOR(li)->ceilingheight ||
-         (slope = FixedDiv (_g_opentop - _g_shootz , dist)) >= aimslope))
+         (slope = FixedDiv (_g_opentop - shootz , dist)) >= aimslope))
       return true;      // shot continues
   }
 
@@ -1016,7 +1014,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     frac = in->frac - FixedDiv(4 * FRACUNIT, _g_attackrange);
     x = _g_trace.x + FixedMul(_g_trace.dx, frac);
     y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-    z = _g_shootz  + FixedMul(aimslope, FixedMul(frac, _g_attackrange));
+    z = shootz  + FixedMul(aimslope, FixedMul(frac, _g_attackrange));
 
     if (LN_FRONTSECTOR(li)->ceilingpic == skyflatnum)
       {
@@ -1048,7 +1046,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   // shoot a thing
 
   th = in->d.thing;
-  if (th == _g_shootthing)
+  if (th == shootthing)
     return true;  // can't shoot self
 
   if (!(th->flags&MF_SHOOTABLE))
@@ -1057,12 +1055,12 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   // check angles to see if the thing can be aimed at
 
   dist = FixedMul (_g_attackrange, in->frac);
-  thingtopslope = FixedDiv (th->z+th->height - _g_shootz , dist);
+  thingtopslope = FixedDiv (th->z+th->height - shootz , dist);
 
   if (thingtopslope < aimslope)
     return true;  // shot over the thing
 
-  thingbottomslope = FixedDiv (th->z - _g_shootz, dist);
+  thingbottomslope = FixedDiv (th->z - shootz, dist);
 
   if (thingbottomslope > aimslope)
     return true;  // shot under the thing
@@ -1074,17 +1072,17 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   x = _g_trace.x + FixedMul(_g_trace.dx, frac);
   y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-  z = _g_shootz  + FixedMul(aimslope, FixedMul(frac, _g_attackrange));
+  z = shootz  + FixedMul(aimslope, FixedMul(frac, _g_attackrange));
 
   // Spawn bullet puffs or blod spots,
   // depending on target type.
   if (in->d.thing->flags & MF_NOBLOOD)
     P_SpawnPuff (x,y,z);
   else
-    P_SpawnBlood (x,y,z, _g_la_damage);
+    P_SpawnBlood (x,y,z, la_damage);
 
-  if (_g_la_damage)
-    P_DamageMobj (th, _g_shootthing, _g_shootthing, _g_la_damage);
+  if (la_damage)
+    P_DamageMobj (th, shootthing, shootthing, la_damage);
 
   // don't go any farther
   return false;
@@ -1100,16 +1098,16 @@ fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, boolean frien
   fixed_t y2;
 
   angle >>= ANGLETOFINESHIFT;
-  _g_shootthing = t1;
+  shootthing = t1;
 
   x2 = t1->x + (distance>>FRACBITS)*finecosine(angle);
   y2 = t1->y + (distance>>FRACBITS)*finesine(  angle);
-  _g_shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
+  shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
 
   // can't shoot outside view angles
 
-  _g_topslope    =  100 * FRACUNIT / 160;
-  _g_bottomslope = -100 * FRACUNIT / 160;
+  topslope    =  100 * FRACUNIT / 160;
+  bottomslope = -100 * FRACUNIT / 160;
 
   _g_attackrange = distance;
   _g_linetarget  = NULL;
@@ -1138,11 +1136,11 @@ void P_LineAttack(mobj_t* t1, angle_t angle, fixed_t distance, fixed_t slope, in
   fixed_t y2;
 
   angle >>= ANGLETOFINESHIFT;
-  _g_shootthing = t1;
-  _g_la_damage = damage;
+  shootthing = t1;
+  la_damage = damage;
   x2 = t1->x + (distance>>FRACBITS)*finecosine(angle);
   y2 = t1->y + (distance>>FRACBITS)*finesine(  angle);
-  _g_shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
+  shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
   _g_attackrange = distance;
   aimslope = slope;
 
@@ -1486,7 +1484,7 @@ static boolean PIT_GetSectors(const line_t* ld)
   // allowed to move to this position, then the sector_list
   // will be attached to the Thing's mobj_t at touching_sectorlist.
 
-  P_AddSecnode(LN_FRONTSECTOR(ld),_g_tmthing);
+  P_AddSecnode(LN_FRONTSECTOR(ld),tmthing);
 
   /* Don't assume all lines are 2-sided, since some Things
    * like MT_TFOG are allowed regardless of whether their radius takes
@@ -1498,7 +1496,7 @@ static boolean PIT_GetSectors(const line_t* ld)
    * cph - DEMOSYNC? */
 
   if (LN_BACKSECTOR(ld) && LN_BACKSECTOR(ld) != LN_FRONTSECTOR(ld))
-    P_AddSecnode(LN_BACKSECTOR(ld), _g_tmthing);
+    P_AddSecnode(LN_BACKSECTOR(ld), tmthing);
 
   return true;
   }
@@ -1511,7 +1509,7 @@ static boolean PIT_GetSectors(const line_t* ld)
 
 void P_CreateSecNodeList(mobj_t* thing)
 {
-  mobj_t* saved_tmthing = _g_tmthing; /* cph - see comment at func end */
+  mobj_t* saved_tmthing = tmthing; /* cph - see comment at func end */
 
   // First, clear out the existing m_thing fields. As each node is
   // added or verified as needed, m_thing will be set properly. When
@@ -1525,15 +1523,15 @@ void P_CreateSecNodeList(mobj_t* thing)
     node = node->m_tnext;
     }
 
-  _g_tmthing = thing;
+  tmthing = thing;
 
-  _g_tmx = thing->x;
-  _g_tmy = thing->y;
+  tmx = thing->x;
+  tmy = thing->y;
 
-  _g_tmbbox[BOXTOP]    = thing->y + _g_tmthing->radius;
-  _g_tmbbox[BOXBOTTOM] = thing->y - _g_tmthing->radius;
-  _g_tmbbox[BOXRIGHT]  = thing->x + _g_tmthing->radius;
-  _g_tmbbox[BOXLEFT]   = thing->x - _g_tmthing->radius;
+  _g_tmbbox[BOXTOP]    = thing->y + tmthing->radius;
+  _g_tmbbox[BOXBOTTOM] = thing->y - tmthing->radius;
+  _g_tmbbox[BOXRIGHT]  = thing->x + tmthing->radius;
+  _g_tmbbox[BOXLEFT]   = thing->x - tmthing->radius;
 
   validcount++; // used to make sure we only process a line once
 
@@ -1574,17 +1572,17 @@ void P_CreateSecNodeList(mobj_t* thing)
    * OTOH for Boom/MBF demos we have to preserve the buggy behavior.
    *  Fun. We restore its previous value unless we're in a Boom/MBF demo.
    */
-  _g_tmthing = saved_tmthing;
+  tmthing = saved_tmthing;
 }
 
 /* cphipps 2004/08/30 - 
  * Must clear tmthing at tic end, as it might contain a pointer to a removed thinker, or the level might have ended/been ended and we clear the objects it was pointing too. Hopefully we don't need to carry this between tics for sync. */
 void P_MapStart(void)
 {
-    if (_g_tmthing) I_Error("P_MapStart: tmthing set!");
+    if (tmthing) I_Error("P_MapStart: tmthing set!");
 }
 
 void P_MapEnd(void)
 {
-    _g_tmthing = NULL;
+    tmthing = NULL;
 }

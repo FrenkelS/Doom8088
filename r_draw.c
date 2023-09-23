@@ -65,7 +65,7 @@ visplane_t *_g_visplanes[MAXVISPLANES];
 visplane_t *_g_freetail;
 
 
-drawseg_t _g_drawsegs[MAXDRAWSEGS];
+static drawseg_t _s_drawsegs[MAXDRAWSEGS];
 
 int16_t _g_openings[MAXOPENINGS];
 int16_t* _g_lastopening;
@@ -1140,7 +1140,7 @@ static void R_DrawSprite (const vissprite_t* spr)
     // (pointer check was originally nonportable
     // and buggy, by going past LEFT end of array):
 
-    const drawseg_t* drawsegs  =_g_drawsegs;
+    const drawseg_t* drawsegs  =_s_drawsegs;
 
     for (const drawseg_t* ds = ds_p; ds-- > drawsegs; )  // new -- killough
     {
@@ -1358,7 +1358,7 @@ static void R_SortVisSprites (void)
 static void R_DrawMasked(void)
 {
     drawseg_t *ds;
-    drawseg_t* drawsegs = _g_drawsegs;
+    drawseg_t* drawsegs = _s_drawsegs;
 
 
     R_SortVisSprites();
@@ -2124,7 +2124,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     angle_t offsetangle;
 
     // don't overflow and crash
-    if (ds_p == &_g_drawsegs[MAXDRAWSEGS])
+    if (ds_p == &_s_drawsegs[MAXDRAWSEGS])
     {
 #ifdef RANGECHECK
         I_Error("Drawsegs overflow.");
@@ -2841,7 +2841,7 @@ static void R_RenderBSPNode(int32_t bspnum)
 
 static void R_ClearDrawSegs(void)
 {
-    ds_p = _g_drawsegs;
+    ds_p = _s_drawsegs;
 }
 
 static void R_ClearClipSegs (void)

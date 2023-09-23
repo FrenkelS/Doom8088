@@ -52,13 +52,10 @@
 
 
 // the set of channels available
-channel_t *_g_channels;
+static channel_t *channels;
 
 // music currently being played
-int32_t _g_mus_playing;
-
-// whether songs are mus_paused
-boolean _g_mus_paused;
+static int32_t mus_playing;
 
 
 // when to clip out sounds
@@ -122,16 +119,13 @@ void S_Init(int32_t sfxVolume, int32_t musicVolume)
         // (the maximum numer of sounds rendered
         // simultaneously) within zone memory.
         // CPhipps - calloc
-        _g_channels =
+        channels =
                 (channel_t *) calloc(numChannels,sizeof(channel_t));
     }
 
     // CPhipps - music init reformatted
     if (!nomusicparm) {
         S_SetMusicVolume(musicVolume);
-
-        // no sounds are playing, and they are not mus_paused
-        _g_mus_paused = 0;
     }
 }
 
@@ -142,7 +136,7 @@ void S_Stop(void)
     //jff 1/22/98 skip sound init if sound not enabled
     if (!nosfxparm)
         for (cnum=0 ; cnum<numChannels ; cnum++)
-            if (_g_channels[cnum].sfxinfo)
+            if (channels[cnum].sfxinfo)
                 S_StopChannel(cnum);
 }
 
@@ -163,9 +157,6 @@ void S_Start(void)
     //jff 1/22/98 return if music is not enabled
     if (nomusicparm)
         return;
-
-    // start new music for the level
-    _g_mus_paused = 0;
 
     mnum = mus_e1m1 + _g_gamemap-1;
 
@@ -217,8 +208,8 @@ static void S_StartSoundAtVolume(mobj_t *origin, int32_t sfx_id, int32_t volume)
 
     // kill old sound
     for (cnum=0 ; cnum<numChannels ; cnum++)
-        if (_g_channels[cnum].sfxinfo && _g_channels[cnum].origin == origin &&
-                (_g_channels[cnum].is_pickup == is_pickup))
+        if (channels[cnum].sfxinfo && channels[cnum].origin == origin &&
+                (channels[cnum].is_pickup == is_pickup))
         {
             S_StopChannel(cnum);
             break;
@@ -233,8 +224,8 @@ static void S_StartSoundAtVolume(mobj_t *origin, int32_t sfx_id, int32_t volume)
     int32_t h = I_StartSound(sfx_id, cnum, volume, sep);
     if (h != -1)
     {
-        _g_channels[cnum].handle = h;
-        _g_channels[cnum].tickend = (_g_gametic + sfx->ticks);
+        channels[cnum].handle = h;
+        channels[cnum].tickend = (_g_gametic + sfx->ticks);
     }
 
 }
@@ -282,7 +273,7 @@ void S_StopSound(void *origin)
         return;
 
     for (cnum=0 ; cnum<numChannels ; cnum++)
-        if (_g_channels[cnum].sfxinfo && _g_channels[cnum].origin == origin)
+        if (channels[cnum].sfxinfo && channels[cnum].origin == origin)
         {
             S_StopChannel(cnum);
             break;
@@ -292,7 +283,7 @@ void S_StopSound(void *origin)
 
 static boolean S_SoundIsPlaying(int32_t cnum)
 {
-    const channel_t* channel = &_g_channels[cnum];
+    const channel_t* channel = &channels[cnum];
 
     if(channel->sfxinfo)
     {
@@ -318,7 +309,7 @@ void S_UpdateSounds(void)
 	for (cnum=0 ; cnum<numChannels ; cnum++)
 	{
         const sfxinfo_t *sfx;
-        channel_t *c = &_g_channels[cnum];
+        channel_t *c = &channels[cnum];
 		
 		if ((sfx = c->sfxinfo))
 		{
@@ -398,7 +389,7 @@ void S_ChangeMusic(int32_t musicnum, int32_t looping)
     if (musicnum <= mus_None || musicnum >= NUMMUSIC)
         I_Error("S_ChangeMusic: Bad music number %ld", musicnum);
 
-    if (_g_mus_playing == musicnum)
+    if (mus_playing == musicnum)
         return;
 
     // shutdown old music
@@ -407,7 +398,7 @@ void S_ChangeMusic(int32_t musicnum, int32_t looping)
     // play it
     I_PlaySong(musicnum, looping);
 
-    _g_mus_playing = musicnum;
+    mus_playing = musicnum;
 }
 
 
@@ -418,14 +409,11 @@ static void S_StopMusic(void)
     if (nomusicparm)
         return;
 
-    if (_g_mus_playing)
+    if (mus_playing)
     {
-        if (_g_mus_paused)
-            I_ResumeSong(mus_None);
-
         I_StopSong(mus_None);
 
-        _g_mus_playing = mus_None;
+        mus_playing = mus_None;
     }
 }
 
@@ -434,7 +422,7 @@ static void S_StopMusic(void)
 static void S_StopChannel(int32_t cnum)
 {
     int32_t i;
-    channel_t *c = &_g_channels[cnum];
+    channel_t *c = &channels[cnum];
 
     //jff 1/22/98 return if sound is not enabled
     if (nosfxparm)
@@ -445,7 +433,7 @@ static void S_StopChannel(int32_t cnum)
         // check to see
         //  if other channels are playing the sound
         for (i=0 ; i<numChannels ; i++)
-            if (cnum != i && c->sfxinfo == _g_channels[i].sfxinfo)
+            if (cnum != i && c->sfxinfo == channels[i].sfxinfo)
                 break;
 
         // degrade usefulness of sound data
@@ -544,9 +532,9 @@ static int32_t S_getChannel(void *origin, const sfxinfo_t *sfxinfo, int32_t is_p
         return -1;
 
     // Find an open channel
-    for (cnum=0; cnum<numChannels && _g_channels[cnum].sfxinfo; cnum++)
-        if (origin && _g_channels[cnum].origin == origin &&
-                _g_channels[cnum].is_pickup == is_pickup)
+    for (cnum=0; cnum<numChannels && channels[cnum].sfxinfo; cnum++)
+        if (origin && channels[cnum].origin == origin &&
+                channels[cnum].is_pickup == is_pickup)
         {
             S_StopChannel(cnum);
             break;
@@ -556,7 +544,7 @@ static int32_t S_getChannel(void *origin, const sfxinfo_t *sfxinfo, int32_t is_p
     if (cnum == numChannels)
     {      // Look for lower priority
         for (cnum=0 ; cnum<numChannels ; cnum++)
-            if (_g_channels[cnum].sfxinfo->priority >= sfxinfo->priority)
+            if (channels[cnum].sfxinfo->priority >= sfxinfo->priority)
                 break;
         if (cnum == numChannels)
             return -1;                  // No lower priority.  Sorry, Charlie.
@@ -564,7 +552,7 @@ static int32_t S_getChannel(void *origin, const sfxinfo_t *sfxinfo, int32_t is_p
             S_StopChannel(cnum);        // Otherwise, kick out lower priority.
     }
 
-    c = &_g_channels[cnum];              // channel is decided to be cnum.
+    c = &channels[cnum];              // channel is decided to be cnum.
     c->sfxinfo = sfxinfo;
     c->origin = origin;
     c->is_pickup = is_pickup;         // killough 4/25/98

@@ -68,7 +68,7 @@ int32_t      _g_numsectors;
 sector_t *_g_sectors;
 
 
-int32_t      _g_numsubsectors;
+static int32_t      numsubsectors;
 subsector_t *_g_subsectors;
 
 
@@ -78,7 +78,7 @@ const line_t   *_g_lines;
 linedata_t* _g_linedata;
 
 
-int32_t      _g_numsides;
+static int32_t      numsides;
 side_t   *_g_sides;
 
 // BLOCKMAP
@@ -184,14 +184,14 @@ static void P_LoadSubsectors (int16_t lump)
   const mapsubsector_t *data;
   int32_t  i;
 
-  _g_numsubsectors = W_LumpLength (lump) / sizeof(mapsubsector_t);
-  _g_subsectors = Z_CallocLevel(_g_numsubsectors * sizeof(subsector_t));
+  numsubsectors = W_LumpLength (lump) / sizeof(mapsubsector_t);
+  _g_subsectors = Z_CallocLevel(numsubsectors * sizeof(subsector_t));
   data = (const mapsubsector_t *)W_GetLumpByNumAutoFree(lump);
 
-  if ((!data) || (!_g_numsubsectors))
+  if ((!data) || (!numsubsectors))
     I_Error("P_LoadSubsectors: no subsectors in level");
 
-  for (i=0; i<_g_numsubsectors; i++)
+  for (i=0; i<numsubsectors; i++)
   {
     _g_subsectors[i].numlines  = (uint16_t)SHORT(data[i].numsegs );
     _g_subsectors[i].firstline = (uint16_t)SHORT(data[i].firstseg);
@@ -257,7 +257,7 @@ static void P_LoadNodes (int16_t lump)
   if ((!nodes) || (!numnodes))
   {
     // allow trivial maps
-    if (_g_numsubsectors == 1)
+    if (numsubsectors == 1)
       printf("P_LoadNodes: trivial map (no nodes, one subsector)\n");
     else
       I_Error("P_LoadNodes: no nodes in level");
@@ -390,8 +390,8 @@ typedef PACKEDATTR_PRE struct {
 
 static void P_LoadSideDefs (int16_t lump)
 {
-  _g_numsides = W_LumpLength(lump) / sizeof(mapsidedef_t);
-  _g_sides = Z_CallocLevel(_g_numsides * sizeof(side_t));
+  numsides = W_LumpLength(lump) / sizeof(mapsidedef_t);
+  _g_sides = Z_CallocLevel(numsides * sizeof(side_t));
 }
 
 // killough 4/4/98: delay using texture names until
@@ -402,7 +402,7 @@ static void P_LoadSideDefs2(int16_t lump)
 {
     const byte *data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
 
-    for (int32_t i = 0; i < _g_numsides; i++)
+    for (int32_t i = 0; i < numsides; i++)
     {
         register const mapsidedef_t *msd = (const mapsidedef_t *) data + i;
         register side_t *sd = _g_sides + i;
@@ -525,7 +525,7 @@ static void P_GroupLines (void)
     int32_t i,j, total = _g_numlines;
 
     // figgi
-    for (i=0 ; i<_g_numsubsectors ; i++)
+    for (i=0 ; i<numsubsectors ; i++)
     {
         const seg_t *seg = &_g_segs[_g_subsectors[i].firstline];
         _g_subsectors[i].sector = NULL;

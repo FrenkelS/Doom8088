@@ -97,11 +97,6 @@ extern char _g_savegamestrings[8][8];
 //p_map.c
 //******************************************************************************
 
-extern mobj_t    *_g_tmthing;
-extern fixed_t   _g_tmx;
-extern fixed_t   _g_tmy;
-
-
 // The tm* items are used to hold information globally, usually for
 // line or object intersection checking
 
@@ -115,8 +110,6 @@ extern fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 
 extern const line_t    *_g_ceilingline;
 extern const line_t        *_g_blockline;    /* killough 8/11/98: blocking linedef */
-extern const line_t        *_g_floorline;    /* killough 8/1/98: Highest touched floor */
-extern int32_t         _g_tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
@@ -129,25 +122,9 @@ extern int32_t _g_numspechit;
 // Temporary holder for thing_sectorlist threads
 extern msecnode_t* _g_sector_list;
 
-extern fixed_t   _g_bestslidefrac;
-extern const line_t*   _g_bestslideline;
-extern mobj_t*   _g_slidemo;
-extern fixed_t   _g_tmxmove;
-extern fixed_t   _g_tmymove;
-
 extern mobj_t*   _g_linetarget; // who got hit (or NULL)
-extern mobj_t*   _g_shootthing;
 
-// Height if not aiming up or down
-extern fixed_t   _g_shootz;
-
-extern int32_t       _g_la_damage;
 extern fixed_t   _g_attackrange;
-
-// slopes to top and bottom of target
-
-extern fixed_t  _g_topslope;
-extern fixed_t  _g_bottomslope;
 
 // If "floatok" true, move would be ok
 // if within "tmfloorz - tmceilingz".
@@ -157,9 +134,6 @@ extern boolean   _g_floatok;
 extern boolean   _g_felldown;
 
 extern boolean _g_crushchange, _g_nofit;
-
-extern boolean _g_telefrag;   /* killough 8/9/98: whether to telefrag at exit */
-
 
 
 //******************************************************************************
@@ -171,18 +145,7 @@ extern fixed_t _g_openbottom;
 extern fixed_t _g_openrange;
 extern fixed_t _g_lowfloor;
 
-// moved front and back outside P-LineOpening and changed    // phares 3/7/98
-// them to these so we can pick up the new friction value
-// in PIT_CheckLine()
-extern sector_t *_g_openfrontsector;
-extern sector_t *_g_openbacksector;
-
 extern divline_t _g_trace;
-
-
-// 1/11/98 killough: Intercept limit removed
-extern intercept_t _g_intercepts[MAXINTERCEPTS];
-extern intercept_t* _g_intercept_p;
 
 
 //******************************************************************************
@@ -204,7 +167,6 @@ extern int32_t      _g_numsectors;
 extern sector_t *_g_sectors;
 
 
-extern int32_t      _g_numsubsectors;
 extern subsector_t *_g_subsectors;
 
 
@@ -214,7 +176,6 @@ extern const line_t   *_g_lines;
 extern linedata_t* _g_linedata;
 
 
-extern int32_t      _g_numsides;
 extern side_t   *_g_sides;
 
 // BLOCKMAP
@@ -260,9 +221,6 @@ extern uint32_t _g_thingPoolSize;
 //p_switch.c
 //******************************************************************************
 
-extern int16_t _g_switchlist[MAXSWITCHES * 2];
-extern int32_t   _g_numswitches;
-
 extern button_t  _g_buttonlist[MAXBUTTONS];
 
 
@@ -289,89 +247,8 @@ extern visplane_t *_g_freetail;
 //r_segs.c
 //******************************************************************************
 
-//
-// regular wall
-//
-extern drawseg_t _g_drawsegs[MAXDRAWSEGS];
-
 extern int16_t _g_openings[MAXOPENINGS];
 extern int16_t* _g_lastopening;
-
-
-//******************************************************************************
-//s_sound.c
-//******************************************************************************
-
-// the set of channels available
-extern channel_t *_g_channels;
-
-// music currently being played
-extern int32_t _g_mus_playing;
-
-// whether songs are mus_paused
-extern boolean _g_mus_paused;
-
-//******************************************************************************
-//st_stuff.c
-//******************************************************************************
-
-extern uint32_t _g_st_needrefresh;
-
-// 0-9, tall numbers
-extern int16_t _g_tallnum[10];
-
-// 0-9, short, yellow (,different!) numbers
-extern int16_t _g_shortnum[10];
-
-extern int16_t _g_keys[NUMCARDS];
-
-// face status patches
-extern int16_t _g_faces[ST_NUMFACES];
-
-
-// weapon ownership patches
-extern int16_t _g_arms[6][2];
-
-// ready-weapon widget
-extern st_number_t _g_w_ready;
-
-// health widget
-extern st_number_t _g_st_health;
-
-// weapon ownership widgets
-extern st_multicon_t _g_w_arms[6];
-
-// face status widget
-extern st_multicon_t _g_w_faces;
-
-// keycard widgets
-extern st_multicon_t _g_w_keyboxes[3];
-
-// ammo widgets
-extern st_number_t _g_w_ammo[4];
-
-// max ammo widgets
-extern st_number_t _g_w_maxammo[4];
-
-// armor widget
-extern st_number_t  _g_st_armor;
-
-// used for evil grin
-extern boolean  _g_oldweaponsowned[NUMWEAPONS];
-
- // count until face changes
-extern int32_t      _g_st_facecount;
-
-// current face index, used by w_faces
-extern int32_t      _g_st_faceindex;
-
-// holds key-type for each key box on bar
-extern int32_t      _g_keyboxes[3];
-
-// a random number per tick
-extern int32_t      _g_st_randomnumber;
-
-extern int8_t _g_st_palette;
 
 
 //******************************************************************************

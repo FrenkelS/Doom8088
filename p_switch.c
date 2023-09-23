@@ -45,8 +45,8 @@
 #include "globdata.h"
 
 
-int16_t _g_switchlist[MAXSWITCHES * 2];
-int32_t   _g_numswitches;
+static int16_t switchlist[MAXSWITCHES * 2];
+static int16_t   numswitches;
 
 button_t  _g_buttonlist[MAXBUTTONS];
 
@@ -84,25 +84,23 @@ static const switchlist_t alphSwitchList[] =
 //
 void P_InitSwitchList(void)
 {
-    int32_t		i;
-    int32_t		index;
-    int32_t		episode;
-
-    episode = 1;
+    int16_t		i;
+    int16_t		index;
+    const int16_t		episode = 1;
 
     for (index = 0,i = 0;i < MAXSWITCHES;i++)
     {
         if (!alphSwitchList[i].episode)
         {
-            _g_numswitches = index/2;
-            _g_switchlist[index] = -1;
+            numswitches = index/2;
+            switchlist[index] = -1;
             break;
         }
 
         if (alphSwitchList[i].episode <= episode)
         {
-            _g_switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name1);
-            _g_switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name2);
+            switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name1);
+            switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name2);
         }
     }
 }
@@ -158,7 +156,7 @@ static void P_StartButton
 void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
 {
     /* Rearranged a bit to avoid too much code duplication */
-    int32_t     i, sound;
+    int16_t     i, sound;
     int16_t   *texture, ttop, tmid, tbot;
     bwhere_e position;
 
@@ -176,21 +174,21 @@ void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
     texture = NULL;
     position = 0;
 
-    for (i = 0; i < _g_numswitches*2; i++)
+    for (i = 0; i < numswitches*2; i++)
     {
-        if (_g_switchlist[i] == ttop)
+        if (switchlist[i] == ttop)
         {
             texture = &ttop;
             position = top;
             break;
         }
-        else if (_g_switchlist[i] == tmid)
+        else if (switchlist[i] == tmid)
         {
             texture = &tmid;
             position = middle;
             break;
         }
-        else if (_g_switchlist[i] == tbot)
+        else if (switchlist[i] == tbot)
         {
             texture = &tbot;
             position = bottom;
@@ -201,7 +199,7 @@ void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
     if (texture == NULL)
         return; /* no switch texture was found to change */
 
-    *texture = _g_switchlist[i^1];
+    *texture = switchlist[i^1];
 
     switch(position)
     {
@@ -221,7 +219,7 @@ void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
     S_StartSound2(&LN_FRONTSECTOR(line)->soundorg, sound);
 
     if (useAgain)
-        P_StartButton(line, position, _g_switchlist[i], BUTTONTIME);
+        P_StartButton(line, position, switchlist[i], BUTTONTIME);
 }
 
 

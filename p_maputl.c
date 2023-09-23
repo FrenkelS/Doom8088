@@ -50,18 +50,13 @@ fixed_t _g_openbottom;
 fixed_t _g_openrange;
 fixed_t _g_lowfloor;
 
-// moved front and back outside P-LineOpening and changed    // phares 3/7/98
-// them to these so we can pick up the new friction value
-// in PIT_CheckLine()
-sector_t *_g_openfrontsector;
-sector_t *_g_openbacksector;
 
 divline_t _g_trace;
 
 
 // 1/11/98 killough: Intercept limit removed
-intercept_t _g_intercepts[MAXINTERCEPTS];
-intercept_t* _g_intercept_p;
+static intercept_t intercepts[MAXINTERCEPTS];
+static intercept_t* intercept_p;
 
 
 //
@@ -179,32 +174,37 @@ fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
 // OPTIMIZE: keep this precalculated
 //
 
-
 void P_LineOpening(const line_t *linedef)
 {
+    // moved front and back outside P-LineOpening and changed
+    // them to these so we can pick up the new friction value
+    // in PIT_CheckLine()
+    sector_t *openfrontsector;
+    sector_t *openbacksector;
+
     if (linedef->sidenum[1] == NO_INDEX)      // single sided line
     {
         _g_openrange = 0;
         return;
     }
 
-    _g_openfrontsector = LN_FRONTSECTOR(linedef);
-    _g_openbacksector = LN_BACKSECTOR(linedef);
+    openfrontsector = LN_FRONTSECTOR(linedef);
+    openbacksector  = LN_BACKSECTOR(linedef);
 
-    if (_g_openfrontsector->ceilingheight < _g_openbacksector->ceilingheight)
-        _g_opentop = _g_openfrontsector->ceilingheight;
+    if (openfrontsector->ceilingheight < openbacksector->ceilingheight)
+        _g_opentop = openfrontsector->ceilingheight;
     else
-        _g_opentop = _g_openbacksector->ceilingheight;
+        _g_opentop = openbacksector->ceilingheight;
 
-    if (_g_openfrontsector->floorheight > _g_openbacksector->floorheight)
+    if (openfrontsector->floorheight > openbacksector->floorheight)
     {
-        _g_openbottom = _g_openfrontsector->floorheight;
-        _g_lowfloor = _g_openbacksector->floorheight;
+        _g_openbottom = openfrontsector->floorheight;
+        _g_lowfloor = openbacksector->floorheight;
     }
     else
     {
-        _g_openbottom = _g_openbacksector->floorheight;
-        _g_lowfloor = _g_openfrontsector->floorheight;
+        _g_openbottom = openbacksector->floorheight;
+        _g_lowfloor = openfrontsector->floorheight;
     }
     _g_openrange = _g_opentop - _g_openbottom;
 }
@@ -419,7 +419,7 @@ boolean P_BlockThingsIterator(int32_t x, int32_t y, boolean func(mobj_t*))
 // Check for limit and double size if necessary -- killough
 static boolean check_intercept(void)
 {
-    size_t offset = _g_intercept_p - _g_intercepts;
+    size_t offset = intercept_p - intercepts;
 
     return (offset < MAXINTERCEPTS);
 }
@@ -468,10 +468,10 @@ static boolean PIT_AddLineIntercepts(const line_t *ld)
   if(!check_intercept())
     return false;
 
-  _g_intercept_p->frac = frac;
-  _g_intercept_p->isaline = true;
-  _g_intercept_p->d.line = ld;
-  _g_intercept_p++;
+  intercept_p->frac = frac;
+  intercept_p->isaline = true;
+  intercept_p->d.line = ld;
+  intercept_p++;
 
   return true;  // continue
 }
@@ -524,10 +524,10 @@ static boolean PIT_AddThingIntercepts(mobj_t *thing)
   if(!check_intercept())
       return false;
 
-  _g_intercept_p->frac = frac;
-  _g_intercept_p->isaline = false;
-  _g_intercept_p->d.thing = thing;
-  _g_intercept_p++;
+  intercept_p->frac = frac;
+  intercept_p->isaline = false;
+  intercept_p->d.thing = thing;
+  intercept_p++;
 
   return true;          // keep going
 }
@@ -542,12 +542,12 @@ static boolean PIT_AddThingIntercepts(mobj_t *thing)
 static boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
 {
   intercept_t *in = NULL;
-  int32_t count = _g_intercept_p - _g_intercepts;
+  int32_t count = intercept_p - intercepts;
   while (count--)
     {
       fixed_t dist = INT32_MAX;
       intercept_t *scan;
-      for (scan = _g_intercepts; scan < _g_intercept_p; scan++)
+      for (scan = intercepts; scan < intercept_p; scan++)
         if (scan->frac < dist)
           dist = (in=scan)->frac;
       if (dist > maxfrac)
@@ -581,7 +581,7 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
   int32_t     count;
 
   validcount++;
-  _g_intercept_p = _g_intercepts;
+  intercept_p = intercepts;
 
   if (!((x1-_g_bmaporgx)&(MAPBLOCKSIZE-1)))
     x1 += FRACUNIT;     // don't side exactly on a line

@@ -53,63 +53,61 @@
 #define DISABLE_STATUS_BAR
 
 
-uint32_t _g_st_needrefresh;
-
 // 0-9, tall numbers
-int16_t _g_tallnum[10];
+static int16_t tallnum[10];
 
 // 0-9, short, yellow (,different!) numbers
-int16_t _g_shortnum[10];
+static int16_t shortnum[10];
 
-int16_t _g_keys[NUMCARDS];
+static int16_t keys[NUMCARDS];
 
 // face status patches
-int16_t _g_faces[ST_NUMFACES];
+static int16_t faces[ST_NUMFACES];
 
 
 // weapon ownership patches
-int16_t _g_arms[6][2];
+static int16_t arms[6][2];
 
 // ready-weapon widget
-st_number_t _g_w_ready;
+static st_number_t w_ready;
 
 // health widget
-st_number_t _g_st_health;
+static st_number_t st_health;
 
 // weapon ownership widgets
-st_multicon_t _g_w_arms[6];
+static st_multicon_t w_arms[6];
 
 // face status widget
-st_multicon_t _g_w_faces;
+static st_multicon_t w_faces;
 
 // keycard widgets
-st_multicon_t _g_w_keyboxes[3];
+static st_multicon_t w_keyboxes[3];
 
 // ammo widgets
-st_number_t _g_w_ammo[4];
+static st_number_t w_ammo[4];
 
 // max ammo widgets
-st_number_t _g_w_maxammo[4];
+static st_number_t w_maxammo[4];
 
 // armor widget
-st_number_t  _g_st_armor;
+static st_number_t  st_armor;
 
 // used for evil grin
-boolean  _g_oldweaponsowned[NUMWEAPONS];
+static boolean  oldweaponsowned[NUMWEAPONS];
 
  // count until face changes
-int32_t      _g_st_facecount;
+static int32_t      st_facecount;
 
 // current face index, used by w_faces
-int32_t      _g_st_faceindex;
+static int32_t      st_faceindex;
 
 // holds key-type for each key box on bar
-int32_t      _g_keyboxes[3];
+static int32_t      keyboxes[3];
 
 // a random number per tick
-int32_t      _g_st_randomnumber;
+static int16_t      st_randomnumber;
 
-int8_t _g_st_palette;
+static int8_t st_palette;
 
 
 // Size of statusbar.
@@ -318,8 +316,8 @@ static void ST_updateFaceWidget(void)
         if (!_g_player.health)
         {
             priority = 9;
-            _g_st_faceindex = ST_DEADFACE;
-            _g_st_facecount = 1;
+            st_faceindex = ST_DEADFACE;
+            st_facecount = 1;
         }
     }
 
@@ -332,18 +330,18 @@ static void ST_updateFaceWidget(void)
 
             for (i=0;i<NUMWEAPONS;i++)
             {
-                if (_g_oldweaponsowned[i] != _g_player.weaponowned[i])
+                if (oldweaponsowned[i] != _g_player.weaponowned[i])
                 {
                     doevilgrin = true;
-                    _g_oldweaponsowned[i] = _g_player.weaponowned[i];
+                    oldweaponsowned[i] = _g_player.weaponowned[i];
                 }
             }
             if (doevilgrin)
             {
                 // evil grin if just picked up weapon
                 priority = 8;
-                _g_st_facecount = ST_EVILGRINCOUNT;
-                _g_st_faceindex = ST_calcPainOffset() + ST_EVILGRINOFFSET;
+                st_facecount = ST_EVILGRINCOUNT;
+                st_faceindex = ST_calcPainOffset() + ST_EVILGRINOFFSET;
             }
         }
 
@@ -362,8 +360,8 @@ static void ST_updateFaceWidget(void)
 			// if(plyr->health - st_oldhealth > ST_MUCHPAIN)
             if(st_oldhealth - _g_player.health > ST_MUCHPAIN)
 			{
-				_g_st_facecount = ST_TURNCOUNT;
-				_g_st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
+				st_facecount = ST_TURNCOUNT;
+				st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
 			}
 			else
 			{
@@ -386,23 +384,23 @@ static void ST_updateFaceWidget(void)
 				} // confusing, aint it?
 
 
-				_g_st_facecount = ST_TURNCOUNT;
-				_g_st_faceindex = ST_calcPainOffset();
+				st_facecount = ST_TURNCOUNT;
+				st_faceindex = ST_calcPainOffset();
 
 				if (diffang < ANG45)
 				{
 					// head-on
-					_g_st_faceindex += ST_RAMPAGEOFFSET;
+					st_faceindex += ST_RAMPAGEOFFSET;
 				}
 				else if (i)
 				{
 					// turn face right
-					_g_st_faceindex += ST_TURNOFFSET;
+					st_faceindex += ST_TURNOFFSET;
 				}
 				else
 				{
 					// turn face left
-					_g_st_faceindex += ST_TURNOFFSET+1;
+					st_faceindex += ST_TURNOFFSET+1;
 				}
 			}
 		}
@@ -418,14 +416,14 @@ static void ST_updateFaceWidget(void)
             if(st_oldhealth - _g_player.health > ST_MUCHPAIN)
             {
                 priority = 7;
-                _g_st_facecount = ST_TURNCOUNT;
-                _g_st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
+                st_facecount = ST_TURNCOUNT;
+                st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
             }
             else
             {
                 priority = 6;
-                _g_st_facecount = ST_TURNCOUNT;
-                _g_st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
+                st_facecount = ST_TURNCOUNT;
+                st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
             }
 
         }
@@ -441,8 +439,8 @@ static void ST_updateFaceWidget(void)
             else if (!--lastattackdown)
             {
                 priority = 5;
-                _g_st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
-                _g_st_facecount = 1;
+                st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
+                st_facecount = 1;
                 lastattackdown = 1;
             }
         }
@@ -459,22 +457,22 @@ static void ST_updateFaceWidget(void)
         {
             priority = 4;
 
-            _g_st_faceindex = ST_GODFACE;
-            _g_st_facecount = 1;
+            st_faceindex = ST_GODFACE;
+            st_facecount = 1;
 
         }
 
     }
 
     // look left or look right if the facecount has timed out
-    if (!_g_st_facecount)
+    if (!st_facecount)
     {
-        _g_st_faceindex = ST_calcPainOffset() + (_g_st_randomnumber % 3);
-        _g_st_facecount = ST_STRAIGHTFACECOUNT;
+        st_faceindex = ST_calcPainOffset() + (st_randomnumber % 3);
+        st_facecount = ST_STRAIGHTFACECOUNT;
         priority = 0;
     }
 
-    _g_st_facecount--;
+    st_facecount--;
 
 }
 
@@ -486,23 +484,23 @@ static void ST_updateWidgets(void)
     int8_t         i;
 
     if(_g_fps_show)
-        _g_w_ready.num = &_g_fps_framerate;
+        w_ready.num = &_g_fps_framerate;
     else if (weaponinfo[_g_player.readyweapon].ammo == am_noammo)
-        _g_w_ready.num = &largeammo;
+        w_ready.num = &largeammo;
     else
-        _g_w_ready.num = &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo];
+        w_ready.num = &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo];
 
 
     // update keycard multiple widgets
     for (i=0;i<3;i++)
     {
-        _g_keyboxes[i] = _g_player.cards[i] ? i : -1;
+        keyboxes[i] = _g_player.cards[i] ? i : -1;
 
         //jff 2/24/98 select double key
         //killough 2/28/98: preserve traditional keys by config option
 
         if (_g_player.cards[i+3])
-            _g_keyboxes[i] = i+3;
+            keyboxes[i] = i+3;
     }
 
     // refresh everything if this is him coming back to life
@@ -511,7 +509,7 @@ static void ST_updateWidgets(void)
 
 void ST_Ticker(void)
 {
-  _g_st_randomnumber = M_Random();
+  st_randomnumber = M_Random();
   ST_updateWidgets();
   st_oldhealth = _g_player.health;
 }
@@ -556,8 +554,8 @@ static void ST_doPaletteStuff(void)
             else
                 palette = 0;
 
-    if (palette != _g_st_palette) {
-        I_SetPalette(_g_st_palette = palette); // CPhipps - use new palette function
+    if (palette != st_palette) {
+        I_SetPalette(st_palette = palette); // CPhipps - use new palette function
     }
 }
 
@@ -642,25 +640,25 @@ static void STlib_drawNum(st_number_t* n)
 
 static void ST_drawWidgets(void)
 {
-    STlib_drawNum(&_g_w_ready);
+    STlib_drawNum(&w_ready);
 	
 	// Restore the ammo numbers for backpack stats I guess, etc ~Kippykip
 	for (int8_t i = 0; i < 4; i++)
     {
-		STlib_drawNum(&_g_w_ammo[i]);
-		STlib_drawNum(&_g_w_maxammo[i]);
+		STlib_drawNum(&w_ammo[i]);
+		STlib_drawNum(&w_maxammo[i]);
     }
 
-    STlib_drawNum(&_g_st_health);
-    STlib_drawNum(&_g_st_armor);
+    STlib_drawNum(&st_health);
+    STlib_drawNum(&st_armor);
 
-    STlib_updateMultIcon(&_g_w_faces);
+    STlib_updateMultIcon(&w_faces);
 
     for (int8_t i = 0; i < 3 ;i++)
-        STlib_updateMultIcon(&_g_w_keyboxes[i]);
+        STlib_updateMultIcon(&w_keyboxes[i]);
 
     for (int8_t i = 0; i < 6; i++)
-        STlib_updateMultIcon(&_g_w_arms[i]);
+        STlib_updateMultIcon(&w_arms[i]);
 }
 
 
@@ -685,37 +683,37 @@ static void ST_doRefresh(void)
 static boolean ST_NeedUpdate()
 {
 	// ready weapon ammo
-	if(_g_w_ready.oldnum != *_g_w_ready.num)
+	if(w_ready.oldnum != *w_ready.num)
         return true;
 	
-    if(_g_st_health.oldnum != *_g_st_health.num)
+    if(st_health.oldnum != *st_health.num)
         return true;
 
-    if(_g_st_armor.oldnum != *_g_st_armor.num)
+    if(st_armor.oldnum != *st_armor.num)
         return true;
 
-    if(_g_w_faces.oldinum != *_g_w_faces.inum)
+    if(w_faces.oldinum != *w_faces.inum)
         return true;
 	
 	// ammo
     for(int8_t i=0; i<4; i++)
     {
-        if(_g_w_ammo[i].oldnum != *_g_w_ammo[i].num)
+        if(w_ammo[i].oldnum != *w_ammo[i].num)
             return true;
-		if(_g_w_maxammo[i].oldnum != *_g_w_maxammo[i].num)
+		if(w_maxammo[i].oldnum != *w_maxammo[i].num)
             return true;
     }
 
     // weapons owned
     for(int8_t i=0; i<6; i++)
     {
-        if(_g_w_arms[i].oldinum != *_g_w_arms[i].inum)
+        if(w_arms[i].oldinum != *w_arms[i].inum)
             return true;
     }
 
     for(int8_t i = 0; i < 3; i++)
     {
-        if(_g_w_keyboxes[i].oldinum != *_g_w_keyboxes[i].inum)
+        if(w_keyboxes[i].oldinum != *w_keyboxes[i].inum)
             return true;
     }
 
@@ -724,6 +722,8 @@ static boolean ST_NeedUpdate()
 
 void ST_Drawer(void)
 {
+    static uint32_t st_needrefresh = 0;
+
     ST_doPaletteStuff();  // Do red-/gold-shifts from damage/items
 
     boolean needupdate = false;
@@ -731,9 +731,9 @@ void ST_Drawer(void)
     if(ST_NeedUpdate())
     {
         needupdate = true;
-        _g_st_needrefresh = 2;
+        st_needrefresh = 2; //2 screen buffers
     }
-    else if(_g_st_needrefresh)
+    else if(st_needrefresh)
     {
         needupdate = true;
     }
@@ -742,7 +742,7 @@ void ST_Drawer(void)
     {
         ST_doRefresh();
 
-        _g_st_needrefresh--;
+        st_needrefresh--;
     }
 }
 
@@ -762,17 +762,17 @@ static void ST_loadGraphics(void)
     for (i=0;i<10;i++)
     {
 		sprintf(namebuf, "STGANUM%d", i); //Special GBA Doom II Red Numbers ~Kippykip
-        _g_tallnum[i] = W_GetNumForName(namebuf);
+        tallnum[i] = W_GetNumForName(namebuf);
 
         sprintf(namebuf, "STYSNUM%d", i);
-        _g_shortnum[i] = W_GetNumForName(namebuf);
+        shortnum[i] = W_GetNumForName(namebuf);
     }
 
     // key cards
     for (i=0;i<NUMCARDS;i++)
     {
         sprintf(namebuf, "STKEYS%d", i);
-        _g_keys[i] = W_GetNumForName(namebuf);
+        keys[i] = W_GetNumForName(namebuf);
     }
 
     // arms ownership widgets
@@ -781,10 +781,10 @@ static void ST_loadGraphics(void)
         sprintf(namebuf, "STGNUM%d", i+2);
 
         // gray #
-        _g_arms[i][0] = W_GetNumForName(namebuf);
+        arms[i][0] = W_GetNumForName(namebuf);
 
         // yellow #
-        _g_arms[i][1] = _g_shortnum[i+2];
+        arms[i][1] = shortnum[i+2];
     }
 
     // face states
@@ -795,21 +795,21 @@ static void ST_loadGraphics(void)
         for (int8_t j=0;j<ST_NUMSTRAIGHTFACES;j++)
         {
             sprintf(namebuf, "STFST%d%d", i, j);
-            _g_faces[facenum++] = W_GetNumForName(namebuf);
+            faces[facenum++] = W_GetNumForName(namebuf);
         }
         sprintf(namebuf, "STFTR%d0", i);	// turn right
-        _g_faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
         sprintf(namebuf, "STFTL%d0", i);	// turn left
-        _g_faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
         sprintf(namebuf, "STFOUCH%d", i);	// ouch!
-        _g_faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
         sprintf(namebuf, "STFEVL%d", i);	// evil grin ;)
-        _g_faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
         sprintf(namebuf, "STFKILL%d", i);	// pissed off
-        _g_faces[facenum++] = W_GetNumForName(namebuf);
+        faces[facenum++] = W_GetNumForName(namebuf);
     }
-    _g_faces[facenum++] = W_GetNumForName("STFGOD0");
-    _g_faces[facenum++] = W_GetNumForName("STFDEAD0");
+    faces[facenum++] = W_GetNumForName("STFGOD0");
+    faces[facenum++] = W_GetNumForName("STFDEAD0");
 }
 
 static void ST_loadData(void)
@@ -821,16 +821,16 @@ static void ST_initData(void)
 {
     int8_t i;
 
-    _g_st_faceindex = 0;
-    _g_st_palette = -1;
+    st_faceindex = 0;
+    st_palette = -1;
 
     st_oldhealth = -1;
 
     for (i=0;i<NUMWEAPONS;i++)
-        _g_oldweaponsowned[i] = _g_player.weaponowned[i];
+        oldweaponsowned[i] = _g_player.weaponowned[i];
 
     for (i=0;i<3;i++)
-        _g_keyboxes[i] = -1;
+        keyboxes[i] = -1;
 }
 
 
@@ -877,39 +877,39 @@ static void STlib_initNum(st_number_t* n, int32_t x, int32_t y, int16_t* pl, int
 static void ST_createWidgets(void)
 {
     // ready weapon ammo
-    STlib_initNum(&_g_w_ready, ST_AMMOX, ST_AMMOY, _g_tallnum, &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo], ST_AMMOWIDTH);
+    STlib_initNum(&w_ready, ST_AMMOX, ST_AMMOY, tallnum, &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo], ST_AMMOWIDTH);
 
     // health percentage
-    STlib_initNum(&_g_st_health, ST_HEALTHX, ST_HEALTHY, _g_tallnum, &_g_player.health, ST_HEALTHWIDTH);
+    STlib_initNum(&st_health, ST_HEALTHX, ST_HEALTHY, tallnum, &_g_player.health, ST_HEALTHWIDTH);
 					  
     // armor percentage - should be colored later
-    STlib_initNum(&_g_st_armor, ST_ARMORX, ST_ARMORY, _g_tallnum, &_g_player.armorpoints, ST_ARMORWIDTH);
+    STlib_initNum(&st_armor, ST_ARMORX, ST_ARMORY, tallnum, &_g_player.armorpoints, ST_ARMORWIDTH);
 
     // weapons owned
     for(int8_t i = 0; i < 6; i++)
     {
-        STlib_initMultIcon(&_g_w_arms[i], ST_ARMSX+(i%3)*ST_ARMSXSPACE, ST_ARMSY+(i/3)*ST_ARMSYSPACE, _g_arms[i], (int32_t*) &_g_player.weaponowned[i+1]);
+        STlib_initMultIcon(&w_arms[i], ST_ARMSX+(i%3)*ST_ARMSXSPACE, ST_ARMSY+(i/3)*ST_ARMSYSPACE, arms[i], (int32_t*) &_g_player.weaponowned[i+1]);
     }
 	
     // keyboxes 0-2
-    STlib_initMultIcon(&_g_w_keyboxes[0], ST_KEY0X, ST_KEY0Y, _g_keys, &_g_keyboxes[0]);
-    STlib_initMultIcon(&_g_w_keyboxes[1], ST_KEY1X, ST_KEY1Y, _g_keys, &_g_keyboxes[1]);
-    STlib_initMultIcon(&_g_w_keyboxes[2], ST_KEY2X, ST_KEY2Y, _g_keys, &_g_keyboxes[2]);			
+    STlib_initMultIcon(&w_keyboxes[0], ST_KEY0X, ST_KEY0Y, keys, &keyboxes[0]);
+    STlib_initMultIcon(&w_keyboxes[1], ST_KEY1X, ST_KEY1Y, keys, &keyboxes[1]);
+    STlib_initMultIcon(&w_keyboxes[2], ST_KEY2X, ST_KEY2Y, keys, &keyboxes[2]);			
 			
 	// ammo count (all four kinds)
-	STlib_initNum(&_g_w_ammo[0], ST_AMMO0X, ST_AMMO0Y, _g_shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
-	STlib_initNum(&_g_w_ammo[1], ST_AMMO1X, ST_AMMO1Y, _g_shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
-	STlib_initNum(&_g_w_ammo[2], ST_AMMO2X, ST_AMMO2Y, _g_shortnum, &_g_player.ammo[2], ST_AMMO2WIDTH);
-	STlib_initNum(&_g_w_ammo[3], ST_AMMO3X, ST_AMMO3Y, _g_shortnum, &_g_player.ammo[3], ST_AMMO3WIDTH);
+	STlib_initNum(&w_ammo[0], ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
+	STlib_initNum(&w_ammo[1], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
+	STlib_initNum(&w_ammo[2], ST_AMMO2X, ST_AMMO2Y, shortnum, &_g_player.ammo[2], ST_AMMO2WIDTH);
+	STlib_initNum(&w_ammo[3], ST_AMMO3X, ST_AMMO3Y, shortnum, &_g_player.ammo[3], ST_AMMO3WIDTH);
 
 	// max ammo count (all four kinds)
-	STlib_initNum(&_g_w_maxammo[0], ST_MAXAMMO0X, ST_MAXAMMO0Y, _g_shortnum, &_g_player.maxammo[0], ST_MAXAMMO0WIDTH);
-	STlib_initNum(&_g_w_maxammo[1], ST_MAXAMMO1X, ST_MAXAMMO1Y, _g_shortnum, &_g_player.maxammo[1], ST_MAXAMMO1WIDTH);
-	STlib_initNum(&_g_w_maxammo[2], ST_MAXAMMO2X, ST_MAXAMMO2Y, _g_shortnum, &_g_player.maxammo[2], ST_MAXAMMO2WIDTH);
-	STlib_initNum(&_g_w_maxammo[3], ST_MAXAMMO3X, ST_MAXAMMO3Y, _g_shortnum, &_g_player.maxammo[3], ST_MAXAMMO3WIDTH);
+	STlib_initNum(&w_maxammo[0], ST_MAXAMMO0X, ST_MAXAMMO0Y, shortnum, &_g_player.maxammo[0], ST_MAXAMMO0WIDTH);
+	STlib_initNum(&w_maxammo[1], ST_MAXAMMO1X, ST_MAXAMMO1Y, shortnum, &_g_player.maxammo[1], ST_MAXAMMO1WIDTH);
+	STlib_initNum(&w_maxammo[2], ST_MAXAMMO2X, ST_MAXAMMO2Y, shortnum, &_g_player.maxammo[2], ST_MAXAMMO2WIDTH);
+	STlib_initNum(&w_maxammo[3], ST_MAXAMMO3X, ST_MAXAMMO3Y, shortnum, &_g_player.maxammo[3], ST_MAXAMMO3WIDTH);
 			
     // faces
-    STlib_initMultIcon(&_g_w_faces, ST_FACESX, ST_FACESY, _g_faces, &_g_st_faceindex);
+    STlib_initMultIcon(&w_faces, ST_FACESX, ST_FACESY, faces, &st_faceindex);
 }
 
 static boolean st_stopped = true;

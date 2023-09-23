@@ -58,7 +58,6 @@ int32_t I_StartSound(int32_t id, int32_t channel, int32_t vol, int32_t sep);
 // Volume.
 void I_SetMusicVolume(int32_t volume);
 
-void I_ResumeSong(int32_t handle);
 
 // Called by anything that wishes to start music.
 //  plays a song, and when the song is done,
