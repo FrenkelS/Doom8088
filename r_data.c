@@ -86,13 +86,13 @@ typedef PACKEDATTR_PRE struct
 // A maptexture_t describes a rectangular texture, which is composed
 // of one or more mappatch_t structures that arrange graphic patches.
 
-static const texture_t **textures;
+static const texture_t __far*__far* textures;
 
 static void R_LoadTexture(int16_t texture_num)
 {
-    const byte    *pnames = W_GetLumpByName("PNAMES");
-    const int32_t *maptex = W_GetLumpByName("TEXTURE1");
-    const int32_t *directory = maptex+1;
+    const byte    __far* pnames = W_GetLumpByName("PNAMES");
+    const int32_t __far* maptex = W_GetLumpByName("TEXTURE1");
+    const int32_t __far* directory = maptex+1;
 
     const maptexture_t *mtexture = (const maptexture_t *) ((const byte *)maptex + directory[texture_num]);
 
@@ -108,7 +108,7 @@ static void R_LoadTexture(int16_t texture_num)
     texture->widthmask  = w - 1;
 
 
-    texpatch_t* patch = texture->patches;
+    texpatch_t __far* patch = texture->patches;
     const mappatch_t* mpatch = mtexture->patches;
 
     texture->overlapped = false;
@@ -253,10 +253,10 @@ static void R_InitTextures()
 	Z_ChangeTagToCache(mtex1);
 
 	textures = Z_MallocStatic(numtextures*sizeof*textures);
-	memset(textures, 0, numtextures*sizeof*textures);
+	_fmemset(textures, 0, numtextures*sizeof*textures);
 
 	textureheight = Z_MallocStatic(numtextures*sizeof*textureheight);
-	memset(textureheight, 0, numtextures*sizeof*textureheight);
+	_fmemset(textureheight, 0, numtextures*sizeof*textureheight);
 
 	texturetranslation = Z_MallocStatic((numtextures + 1)*sizeof*texturetranslation);
 

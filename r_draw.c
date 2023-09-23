@@ -190,7 +190,7 @@ static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
 const lighttable_t *fullcolormap;
-const lighttable_t *colormaps;
+const lighttable_t __far* colormaps;
 
 const lighttable_t* fixedcolormap;
 

@@ -57,7 +57,7 @@ typedef struct {
 
   const byte          *source; // first pixel in a column
 
-  const lighttable_t  *colormap;
+  const lighttable_t  __far* colormap;
 
   boolean             odd_pixel;
 
@@ -77,7 +77,7 @@ extern int16_t floorclip[SCREENWIDTH];
 extern int16_t ceilingclip[SCREENWIDTH];
 
 extern const lighttable_t *fullcolormap;
-extern const lighttable_t *colormaps;
+extern const lighttable_t __far* colormaps;
 extern const lighttable_t* fixedcolormap;
 
 extern fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
