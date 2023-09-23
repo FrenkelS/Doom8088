@@ -228,9 +228,9 @@ void I_StartDisplay(void)
 }
 
 
-void I_DrawBuffer(uint16_t *buffer)
+void I_DrawBuffer(uint16_t __far* buffer)
 {
-	uint16_t* src = buffer;
+	uint16_t __far* src = buffer;
 	uint16_t __far* dst = screen;
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
 		for (uint_fast8_t x = 0; x < (SCREENWIDTH * 2) / 2; x++) {
