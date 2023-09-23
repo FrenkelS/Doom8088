@@ -189,10 +189,10 @@ static fixed_t  rw_midtexturemid;
 static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
-const lighttable_t *fullcolormap;
+const lighttable_t __far* fullcolormap;
 const lighttable_t __far* colormaps;
 
-const lighttable_t* fixedcolormap;
+const lighttable_t __far* fixedcolormap;
 
 static int32_t extralight;                           // bumped light from gun blasts
 
@@ -229,7 +229,6 @@ static int32_t      worldhigh;
 static int32_t      worldlow;
 
 static lighttable_t current_colormap[256];
-static const lighttable_t* current_colormap_ptr;
 
 boolean highDetail = false;
 
@@ -497,7 +496,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
 #define NUMCOLORMAPS 32
 
 
-static const lighttable_t* R_ColourMap(int32_t lightlevel)
+static const lighttable_t __far* R_ColourMap(int32_t lightlevel)
 {
     if (fixedcolormap)
         return fixedcolormap;
@@ -527,11 +526,13 @@ static const lighttable_t* R_ColourMap(int32_t lightlevel)
 
 const lighttable_t* R_LoadColorMap(int32_t lightlevel)
 {
-    const lighttable_t* lm = R_ColourMap(lightlevel);
+    static const lighttable_t __far* current_colormap_ptr = NULL;
+
+    const lighttable_t __far* lm = R_ColourMap(lightlevel);
 
     if(current_colormap_ptr != lm)
     {
-        memcpy(current_colormap, lm, 256);
+        _fmemcpy(current_colormap, lm, 256);
         current_colormap_ptr = lm;
     }
 
@@ -552,7 +553,7 @@ const lighttable_t* R_LoadColorMap(int32_t lightlevel)
 #define COLEXTRABITS 9
 #define COLBITS (FRACBITS + COLEXTRABITS)
 
-inline static void R_DrawColumnPixel(uint16_t* dest, const byte* source, const byte* colormap, uint32_t frac)
+inline static void R_DrawColumnPixel(uint16_t* dest, const byte* source, const byte __far* colormap, uint32_t frac)
 {
 	uint16_t color = colormap[source[frac>>COLBITS]];
 
@@ -569,7 +570,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
         return;
 
     const byte *source   = dcvars->source;
-    const byte *colormap = dcvars->colormap;
+    const byte __far* colormap = dcvars->colormap;
 
     uint16_t* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
@@ -693,7 +694,7 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
         return;
 
     const byte *source = dcvars->source;
-    const byte *colormap = dcvars->colormap;
+    const byte __far* colormap = dcvars->colormap;
 
     volatile uint16_t* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
@@ -771,7 +772,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
     if (count <= 0)
         return;
 
-    const byte* colormap = &fullcolormap[6 * 256];
+    const byte __far* colormap = &fullcolormap[6 * 256];
 
     uint16_t* dest = _g_screen + ScreenYToOffset(dc_yl) + dcvars->x;
 
@@ -879,7 +880,7 @@ typedef struct vissprite_s
   uint32_t mobjflags;
 
   // for color translation and shadow draw, maxbright frames as well
-  const lighttable_t *colormap;
+  const lighttable_t __far* colormap;
 
 } vissprite_t;
 

@@ -76,9 +76,9 @@ extern angle_t viewangle;
 extern int16_t floorclip[SCREENWIDTH];
 extern int16_t ceilingclip[SCREENWIDTH];
 
-extern const lighttable_t *fullcolormap;
+extern const lighttable_t __far* fullcolormap;
 extern const lighttable_t __far* colormaps;
-extern const lighttable_t* fixedcolormap;
+extern const lighttable_t __far* fixedcolormap;
 
 extern fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
 
