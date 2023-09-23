@@ -145,7 +145,7 @@ static int16_t negonearray[SCREENWIDTH] =
 //*****************************************
 
 int32_t numnodes;
-const mapnode_t *nodes;
+const mapnode_t __far* nodes;
 
 fixed_t  viewx, viewy, viewz;
 
@@ -156,8 +156,8 @@ static byte solidcol[SCREENWIDTH];
 static const seg_t     *curline;
 static side_t    *sidedef;
 static const line_t    *linedef;
-static sector_t  *frontsector;
-static sector_t  *backsector;
+static sector_t  __far* frontsector;
+static sector_t  __far* backsector;
 static drawseg_t *ds_p;
 
 static visplane_t __far* floorplane, __far* ceilingplane;
@@ -324,7 +324,7 @@ static CONSTFUNC int32_t SlopeDiv(uint32_t num, uint32_t den)
 // killough 5/2/98: reformatted
 //
 
-static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t *node)
+static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
 {
     fixed_t dx = (fixed_t)node->dx << FRACBITS;
     fixed_t dy = (fixed_t)node->dy << FRACBITS;
@@ -353,7 +353,7 @@ static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t *nod
 //
 // killough 5/2/98: reformatted, cleaned up
 
-subsector_t *R_PointInSubsector(fixed_t x, fixed_t y)
+subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y)
 {
     int32_t nodenum = numnodes-1;
 
@@ -1584,7 +1584,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
 // During BSP traversal, this adds sprites by sector.
 //
 // killough 9/18/98: add lightlevel as parameter, fixing underwater lighting
-static void R_AddSprites(subsector_t* subsec, int32_t lightlevel)
+static void R_AddSprites(subsector_t __far* subsec, int32_t lightlevel)
 {
   sector_t* sec=subsec->sector;
   mobj_t *thing;
@@ -2624,7 +2624,7 @@ static void R_Subsector(int32_t num)
 {
     int32_t         count;
     const seg_t       *line;
-    subsector_t *sub;
+    subsector_t __far* sub;
 
     sub = &_g_subsectors[num];
     frontsector = sub->sector;
@@ -2688,7 +2688,7 @@ static const byte checkcoord[12][4] = // killough -- static const
 };
 
 // killough 1/28/98: static // CPhipps - const parameter, reformatted
-static boolean R_CheckBBox(const int16_t *bspcoord)
+static boolean R_CheckBBox(const int16_t __far* bspcoord)
 {
     angle_t angle1, angle2;
 
@@ -2786,7 +2786,7 @@ static void R_RenderBSPNode(int32_t bspnum)
     int32_t stack[MAX_BSP_DEPTH];
     int32_t sp = 0;
 
-    const mapnode_t* bsp;
+    const mapnode_t __far* bsp;
     int32_t side = 0;
 
     while(true)

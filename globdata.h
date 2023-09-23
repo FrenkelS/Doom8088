@@ -164,10 +164,10 @@ extern const vertex_t __far* _g_vertexes;
 extern const seg_t    *_g_segs;
 
 extern int32_t      _g_numsectors;
-extern sector_t *_g_sectors;
+extern sector_t __far* _g_sectors;
 
 
-extern subsector_t *_g_subsectors;
+extern subsector_t __far* _g_subsectors;
 
 
 
@@ -193,7 +193,7 @@ extern int16_t       _g_bmapwidth, _g_bmapheight;  // size in mapblocks
 extern const int16_t      *_g_blockmap;
 
 // offsets in blockmap are from here
-extern const int16_t      *_g_blockmaplump;
+extern const int16_t      __far* _g_blockmaplump;
 
 extern fixed_t   _g_bmaporgx, _g_bmaporgy;     // origin of block map
 

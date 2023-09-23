@@ -65,11 +65,11 @@ const vertex_t __far* _g_vertexes;
 const seg_t    *_g_segs;
 
 int32_t      _g_numsectors;
-sector_t *_g_sectors;
+sector_t __far* _g_sectors;
 
 
 static int32_t      numsubsectors;
-subsector_t *_g_subsectors;
+subsector_t __far* _g_subsectors;
 
 
 
@@ -96,7 +96,7 @@ int16_t       _g_bmapwidth, _g_bmapheight;  // size in mapblocks
 const int16_t      *_g_blockmap;
 
 // offsets in blockmap are from here
-const int16_t      *_g_blockmaplump;
+const int16_t      __far* _g_blockmaplump;
 
 fixed_t   _g_bmaporgx, _g_bmaporgy;     // origin of block map
 
@@ -216,7 +216,7 @@ typedef PACKEDATTR_PRE struct {
 
 static void P_LoadSectors (int16_t lump)
 {
-  const byte *data; // cph - const*
+  const byte __far* data;
   int32_t  i;
 
   _g_numsectors = W_LumpLength (lump) / sizeof(mapsector_t);
@@ -225,7 +225,7 @@ static void P_LoadSectors (int16_t lump)
 
   for (i=0; i<_g_numsectors; i++)
     {
-      sector_t *ss = _g_sectors + i;
+      sector_t __far* ss = _g_sectors + i;
       const mapsector_t *ms = (const mapsector_t *) data + i;
 
       ss->floorheight = ((int32_t)SHORT(ms->floorheight))<<FRACBITS;

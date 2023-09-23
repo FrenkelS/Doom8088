@@ -67,7 +67,7 @@ typedef struct {
 //Global vars.
 
 extern int32_t numnodes;
-extern const mapnode_t *nodes;
+extern const mapnode_t __far* nodes;
 
 extern fixed_t  viewx, viewy, viewz;
 
@@ -93,7 +93,7 @@ extern boolean highDetail;
 //
 
 angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2);
-subsector_t *R_PointInSubsector(fixed_t x, fixed_t y);
+subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 
 void R_GetColumn(const texture_t __far* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c);
 
