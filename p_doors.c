@@ -345,7 +345,7 @@ boolean EV_DoDoor
   int32_t   secnum;
   boolean   rtn;
   sector_t* sec;
-  vldoor_t* door;
+  vldoor_t __far* door;
 
   secnum = -1;
   rtn = false;
@@ -436,7 +436,7 @@ void EV_VerticalDoor
 {
   player_t* player;
   sector_t* sec;
-  vldoor_t* door;
+  vldoor_t __far* door;
 
   //  Check for locks
   player = P_MobjIsPlayer(thing);
@@ -633,7 +633,7 @@ void EV_VerticalDoor
 //
 void P_SpawnDoorCloseIn30 (sector_t* sec)
 {
-  vldoor_t* door;
+  vldoor_t __far* door;
 
   door = Z_CallocLevSpec(sizeof(*door));
 
@@ -662,7 +662,7 @@ void P_SpawnDoorCloseIn30 (sector_t* sec)
 //
 void P_SpawnDoorRaiseIn5Mins(sector_t* sec)
 {
-  vldoor_t* door;
+  vldoor_t __far* door;
 
   door = Z_CallocLevSpec(sizeof(*door));
 
