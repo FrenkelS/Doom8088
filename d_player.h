@@ -161,7 +161,7 @@ typedef struct player_s
   int32_t                 bonuscount;
 
   // Who did damage (NULL for floors/ceilings).
-  mobj_t*             attacker;
+  mobj_t __far*             attacker;
 
   // So gun flashes light up areas.
   int32_t                 extralight;

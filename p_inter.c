@@ -513,7 +513,7 @@ void P_TouchSpecialThing(mobj_t *special, mobj_t *toucher)
 static void P_KillMobj(mobj_t *source, mobj_t *target)
 {
   mobjtype_t item;
-  mobj_t     *mo;
+  mobj_t     __far* mo;
 
   target->flags &= ~(MF_SHOOTABLE|MF_FLOAT|MF_SKULLFLY);
   target->flags &= ~MF_NOGRAVITY;

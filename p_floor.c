@@ -115,7 +115,7 @@ static boolean P_ThingHeightClip (mobj_t* thing)
 
 static void PIT_ChangeSector (mobj_t* thing)
   {
-  mobj_t* mo;
+  mobj_t __far* mo;
 
   if (P_ThingHeightClip (thing))
     return;
