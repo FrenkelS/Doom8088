@@ -102,7 +102,7 @@ void P_AddThinker(thinker_t __far* thinker)
 static void P_RemoveThinkerDelayed(thinker_t *thinker)
 {
 
-    thinker_t *next = thinker->next;
+    thinker_t __far* next = thinker->next;
     /* Note that currentthinker is guaranteed to point to us,
          * and since we're freeing our memory, we had better change that. So
          * point it to thinker->prev, so the iterator will correctly move on to
@@ -115,7 +115,7 @@ static void P_RemoveThinkerDelayed(thinker_t *thinker)
 static void P_RemoveThingDelayed(thinker_t *thinker)
 {
 
-    thinker_t *next = thinker->next;
+    thinker_t __far* next = thinker->next;
     /* Note that currentthinker is guaranteed to point to us,
          * and since we're freeing our memory, we had better change that. So
          * point it to thinker->prev, so the iterator will correctly move on to
@@ -157,7 +157,7 @@ void P_RemoveThing(mobj_t *thing)
 /* cph 2002/01/13 - iterator for thinker list
  * WARNING: Do not modify thinkers between calls to this function
  */
-thinker_t* P_NextThinker(thinker_t* th)
+thinker_t __far* P_NextThinker(thinker_t __far* th)
 {
   thinker_t* top = &_g_thinkerclasscap;
   if (!th) th = top;
@@ -208,12 +208,12 @@ void P_SetTarget(mobj_t **mop, mobj_t *targ)
 
 static void P_RunThinkers (void)
 {
-    thinker_t* th = _g_thinkerclasscap.next;
+    thinker_t __far* th = _g_thinkerclasscap.next;
     thinker_t* th_end = &_g_thinkerclasscap;
 
     while(th != th_end)
     {
-        thinker_t* th_next = th->next;
+        thinker_t __far* th_next = th->next;
         if(th->function)
             th->function(th);
 

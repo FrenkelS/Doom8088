@@ -53,6 +53,6 @@ void P_SetTarget(mobj_t **mo, mobj_t *target);   // killough 11/98
 
 
 /* cph 2002/01/13 - iterator for thinker lists */
-thinker_t* P_NextThinker(thinker_t*);
+thinker_t __far* P_NextThinker(thinker_t __far*);
 
 #endif
