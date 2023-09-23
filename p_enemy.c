@@ -1001,7 +1001,7 @@ void A_Explode(mobj_t *thingy)
 
 void A_BossDeath(mobj_t *mo)
 {
-    thinker_t *th;
+    thinker_t __far* th;
     line_t    junk;
 
     if (_g_gamemap != 8)

@@ -2285,7 +2285,7 @@ static void T_Scroll(scroll_t *s)
 
 static void Add_Scroller(int32_t affectee)
 {
-  scroll_t *s = Z_CallocLevSpec(sizeof *s);
+  scroll_t __far* s = Z_CallocLevSpec(sizeof *s);
   s->thinker.function = T_Scroll;
   s->affectee = affectee;
   P_AddThinker(&s->thinker);
