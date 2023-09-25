@@ -572,7 +572,7 @@ typedef struct
 typedef struct
 {
   thinker_t thinker;
-  sector_t* sector;
+  sector_t __far* sector;
   fixed_t speed;
   fixed_t low;
   fixed_t high;
@@ -747,9 +747,7 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec);
 
 fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec);
 
-fixed_t P_FindNextLowestCeiling
-( sector_t *sec,
-  int32_t currentheight ); // jff 2/04/98
+fixed_t P_FindNextLowestCeiling(sector_t __far* sec, int32_t currentheight);
 
 fixed_t P_FindNextHighestCeiling(sector_t __far* sec, int32_t currentheight);
 

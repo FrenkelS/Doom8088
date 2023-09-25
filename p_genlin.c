@@ -397,7 +397,7 @@ manual_ceiling:
     {
       if (ChgM)   // if a numeric model change
       {
-        sector_t *sec;
+        sector_t __far* sec;
 
         //jff 5/23/98 find model with floor at target height if target
         //is a floor type
@@ -475,7 +475,7 @@ boolean EV_DoGenLift
   int32_t             secnum;
   boolean             rtn;
   boolean         manual;
-  sector_t*       sec;
+  sector_t __far*       sec;
   uint32_t        value = (uint32_t)LN_SPECIAL(line) - GenLiftBase;
 
   // parse the bit fields in the line's special type
@@ -630,7 +630,7 @@ boolean EV_DoGenStairs
   boolean                   rtn;
   boolean               manual;
 
-  sector_t*             sec;
+  sector_t __far*             sec;
   sector_t*             tsec;
 
   floormove_t __far*  floor;
@@ -807,7 +807,7 @@ boolean EV_DoGenCrusher
   int32_t                   secnum;
   boolean                   rtn;
   boolean               manual;
-  sector_t*             sec;
+  sector_t __far*             sec;
   ceiling_t __far*            ceiling;
   uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenCrusherBase;
 
@@ -903,7 +903,7 @@ boolean EV_DoGenLockedDoor
 {
   int32_t   secnum;
   boolean   rtn;
-  sector_t* sec;
+  sector_t __far* sec;
   vldoor_t __far* door;
   boolean manual;
   uint32_t  value = (uint32_t)LN_SPECIAL(line) - GenLockedBase;
@@ -1010,7 +1010,7 @@ boolean EV_DoGenDoor
 {
   int32_t   secnum;
   boolean   rtn;
-  sector_t* sec;
+  sector_t __far* sec;
   boolean   manual;
   vldoor_t __far* door;
   uint32_t  value = (uint32_t)LN_SPECIAL(line) - GenDoorBase;
