@@ -175,7 +175,7 @@ sector_t* getNextSector(const line_t* line, sector_t __far* sec)
 // Returns the fixed point value of the lowest floor height
 // in the sector passed or its surrounding sectors.
 //
-fixed_t P_FindLowestFloorSurrounding(sector_t* sec)
+fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec)
 {
   int32_t                 i;
   const line_t*             check;

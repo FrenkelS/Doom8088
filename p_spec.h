@@ -735,8 +735,7 @@ side_t* getSide
   int32_t   line,
   int32_t   side );
 
-fixed_t P_FindLowestFloorSurrounding
-( sector_t* sec );
+fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec);
 
 fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec);
 
