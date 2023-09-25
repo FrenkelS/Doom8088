@@ -245,7 +245,7 @@ void S_StartSound(mobj_t __far* origin, int32_t sfx_id)
     S_StartSoundAtVolume(origin, sfx_id, snd_SfxVolume);
 }
 
-void S_StartSound2(degenmobj_t* origin, int32_t sfx_id)
+void S_StartSound2(degenmobj_t __far* origin, int32_t sfx_id)
 {
     //Look at this mess.
 

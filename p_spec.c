@@ -203,7 +203,7 @@ fixed_t P_FindLowestFloorSurrounding(sector_t* sec)
 // Passed a sector, returns the fixed point value of the largest
 // floor height in the surrounding sectors, not including that passed
 //
-fixed_t P_FindHighestFloorSurrounding(sector_t *sec)
+fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 {
   int32_t i;
   const line_t* check;

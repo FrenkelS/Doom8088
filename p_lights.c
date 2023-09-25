@@ -297,7 +297,7 @@ void P_SpawnStrobeFlash(sector_t __far* sector, int32_t fastOrSlow, int32_t inSy
 // Passed the sector that spawned the thinker
 // Returns nothing
 //
-void P_SpawnGlowingLight(sector_t*  sector)
+void P_SpawnGlowingLight(sector_t __far* sector)
 {
   glow_t __far* g;
 

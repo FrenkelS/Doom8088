@@ -64,7 +64,7 @@ void S_Start(void);
 //
 void S_StartSound(mobj_t __far* origin, int32_t sfx_id);
 
-void S_StartSound2(degenmobj_t* origin, int32_t sfx_id);
+void S_StartSound2(degenmobj_t __far* origin, int32_t sfx_id);
 
 // killough 4/25/98: mask used to indicate sound origin is player item pickup
 #define PICKUP_SOUND (0x8000)

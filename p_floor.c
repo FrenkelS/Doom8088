@@ -174,7 +174,7 @@ static void PIT_ChangeSector (mobj_t* thing)
 // sector. Both more accurate and faster.
 //
 
-static boolean P_CheckSector(sector_t* sector,boolean crunch)
+static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
   {
   msecnode_t *n;
 
@@ -231,13 +231,7 @@ static boolean P_CheckSector(sector_t* sector,boolean crunch)
 //  pastdest - plane moved normally and is now at destination height
 //  crushed - plane encountered an obstacle, is holding until removed
 //
-result_e T_MovePlane
-( sector_t*     sector,
-  fixed_t       speed,
-  fixed_t       dest,
-  boolean       crush,
-  int32_t           floorOrCeiling,
-  int32_t           direction )
+result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int32_t floorOrCeiling, int32_t direction)
 {
   boolean       flag;
   fixed_t       lastpos;
@@ -561,7 +555,7 @@ boolean EV_DoFloor
   int32_t           secnum;
   boolean           rtn;
   int32_t           i;
-  sector_t*     sec;
+  sector_t __far*     sec;
   floormove_t __far*  floor;
 
   secnum = -1;

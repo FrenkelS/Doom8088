@@ -560,7 +560,7 @@ typedef struct
 typedef struct
 {
   thinker_t thinker;
-  sector_t* sector;
+  sector_t __far* sector;
   int32_t minlight;
   int32_t maxlight;
   int32_t direction;
@@ -626,7 +626,7 @@ typedef struct
 {
   thinker_t thinker;
   ceiling_e type;
-  sector_t* sector;
+  sector_t __far* sector;
   fixed_t bottomheight;
   fixed_t topheight;
   fixed_t speed;
@@ -659,7 +659,7 @@ typedef struct
   thinker_t thinker;
   floor_e type;
   boolean crush;
-  sector_t* sector;
+  sector_t __far* sector;
   int32_t direction;
   int32_t newspecial;
   int32_t oldspecial;   //jff 3/14/98 add to fix bug in change transfers
@@ -738,8 +738,7 @@ side_t* getSide
 fixed_t P_FindLowestFloorSurrounding
 ( sector_t* sec );
 
-fixed_t P_FindHighestFloorSurrounding
-( sector_t* sec );
+fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec);
 
 fixed_t P_FindNextHighestFloor
 ( sector_t* sec,
@@ -822,13 +821,7 @@ void T_MoveCeiling
 
 // p_floor
 
-result_e T_MovePlane
-( sector_t* sector,
-  fixed_t speed,
-  fixed_t dest,
-  boolean crush,
-  int32_t floorOrCeiling,
-  int32_t direction );
+result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int32_t floorOrCeiling, int32_t direction);
 
 void T_MoveFloor
 ( floormove_t* floor );
@@ -999,8 +992,7 @@ void P_SpawnLightFlash(sector_t __far* sector);
 
 void P_SpawnStrobeFlash(sector_t __far* sector, int32_t fastOrSlow, int32_t inSync);
 
-void P_SpawnGlowingLight
-( sector_t* sector );
+void P_SpawnGlowingLight(sector_t __far* sector);
 
 // p_plats
 
