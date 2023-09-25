@@ -235,7 +235,7 @@ fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 //
 // Rewritten by Lee Killough to avoid fixed array and to be faster
 //
-fixed_t P_FindNextHighestFloor(sector_t *sec, int32_t currentheight)
+fixed_t P_FindNextHighestFloor(sector_t __far* sec, int32_t currentheight)
 {
   sector_t *other;
   int32_t i;

@@ -673,7 +673,7 @@ typedef struct
 {
   thinker_t thinker;
   elevator_e type;
-  sector_t* sector;
+  sector_t __far* sector;
   int32_t direction;
   fixed_t floordestheight;
   fixed_t ceilingdestheight;
@@ -739,9 +739,7 @@ fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec);
 
 fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec);
 
-fixed_t P_FindNextHighestFloor
-( sector_t* sec,
-  int32_t currentheight );
+fixed_t P_FindNextHighestFloor(sector_t __far* sec, int32_t currentheight);
 
 fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight);
 

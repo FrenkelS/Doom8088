@@ -770,8 +770,8 @@ boolean EV_DoChange
 {
   int32_t                   secnum;
   boolean                   rtn;
-  sector_t*             sec;
-  sector_t*             secm;
+  sector_t __far*             sec;
+  sector_t __far*             secm;
 
   secnum = -1;
   rtn = false;
@@ -855,7 +855,7 @@ boolean EV_BuildStairs
   while ((ssec = P_FindSectorFromLineTagWithLowerBound(line,ssec,minssec)) >= 0)
   {
    int32_t           secnum = ssec;
-   sector_t*     sec = &_g_sectors[secnum];
+   sector_t __far*     sec = &_g_sectors[secnum];
 
     // don't start a stair if the first step's floor is already moving
    if (!P_SectorActive(floor_special,sec)) { //jff 2/22/98
@@ -968,7 +968,7 @@ boolean EV_BuildStairs
 //
 boolean EV_DoDonut(const line_t*  line)
 {
-  sector_t* s1;
+  sector_t __far* s1;
   sector_t* s2;
   sector_t* s3;
   int32_t       secnum;
@@ -1054,7 +1054,7 @@ boolean EV_DoElevator
 {
   int32_t                   secnum;
   boolean                   rtn;
-  sector_t*             sec;
+  sector_t __far*             sec;
   elevator_t __far*           elevator;
 
   secnum = -1;
