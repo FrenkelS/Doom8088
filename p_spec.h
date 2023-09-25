@@ -743,9 +743,7 @@ fixed_t P_FindNextHighestFloor
 ( sector_t* sec,
   int32_t currentheight );
 
-fixed_t P_FindNextLowestFloor
-( sector_t* sec,
-  int32_t currentheight );
+fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight);
 
 fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec);
 

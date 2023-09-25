@@ -270,7 +270,7 @@ fixed_t P_FindNextHighestFloor(sector_t *sec, int32_t currentheight)
 //
 // jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
 //
-fixed_t P_FindNextLowestFloor(sector_t *sec, int32_t currentheight)
+fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight)
 {
   sector_t *other;
   int32_t i;
