@@ -204,7 +204,7 @@ static void T_Glow(glow_t* g)
 // Passed the sector that spawned the thinker
 // Returns nothing
 //
-void P_SpawnFireFlicker (sector_t*  sector)
+void P_SpawnFireFlicker(sector_t __far* sector)
 {
   fireflicker_t __far*  flick;
 

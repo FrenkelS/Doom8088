@@ -549,7 +549,7 @@ typedef struct
 typedef struct
 {
   thinker_t thinker;
-  sector_t* sector;
+  sector_t __far* sector;
   int32_t count;
   int32_t maxlight;
   int32_t minlight;
@@ -600,7 +600,7 @@ typedef struct
 {
   thinker_t thinker;
   vldoor_e type;
-  sector_t* sector;
+  sector_t __far* sector;
   fixed_t topheight;
   fixed_t speed;
 
@@ -748,11 +748,9 @@ fixed_t P_FindNextLowestFloor
 ( sector_t* sec,
   int32_t currentheight );
 
-fixed_t P_FindLowestCeilingSurrounding
-( sector_t* sec ); // jff 2/04/98
+fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec);
 
-fixed_t P_FindHighestCeilingSurrounding
-( sector_t* sec ); // jff 2/04/98
+fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec);
 
 fixed_t P_FindNextLowestCeiling
 ( sector_t *sec,
@@ -985,8 +983,7 @@ void P_PlayerInSpecialSector
 
 // p_lights
 
-void P_SpawnFireFlicker
-( sector_t* sector );
+void P_SpawnFireFlicker(sector_t __far* sector);
 
 void P_SpawnLightFlash(sector_t __far* sector);
 
@@ -1006,10 +1003,9 @@ void P_ActivateInStasis
 
 // p_doors
 
-void P_SpawnDoorCloseIn30
-( sector_t* sec );
+void P_SpawnDoorCloseIn30(sector_t __far* sec);
 
-void P_SpawnDoorRaiseIn5Mins(sector_t* sec);
+void P_SpawnDoorRaiseIn5Mins(sector_t __far* sec);
 
 // p_ceilng
 

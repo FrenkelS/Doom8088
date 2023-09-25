@@ -359,7 +359,7 @@ fixed_t P_FindNextHighestCeiling(sector_t *sec, int32_t currentheight)
 // Passed a sector, returns the fixed point value of the smallest
 // ceiling height in the surrounding sectors, not including that passed
 //
-fixed_t P_FindLowestCeilingSurrounding(sector_t* sec)
+fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 {
   int32_t                 i;
   const line_t*             check;
@@ -387,7 +387,7 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t* sec)
 // Passed a sector, returns the fixed point value of the largest
 // ceiling height in the surrounding sectors, not including that passed
 //
-fixed_t P_FindHighestCeilingSurrounding(sector_t* sec)
+fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
 {
   int32_t             i;
   const line_t* check;

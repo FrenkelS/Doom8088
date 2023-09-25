@@ -344,7 +344,7 @@ boolean EV_DoDoor
 {
   int32_t   secnum;
   boolean   rtn;
-  sector_t* sec;
+  sector_t __far* sec;
   vldoor_t __far* door;
 
   secnum = -1;
@@ -631,7 +631,7 @@ void EV_VerticalDoor
 // Passed the sector of the door, whose type specified the door action
 // Returns nothing
 //
-void P_SpawnDoorCloseIn30 (sector_t* sec)
+void P_SpawnDoorCloseIn30(sector_t __far* sec)
 {
   vldoor_t __far* door;
 
@@ -660,7 +660,7 @@ void P_SpawnDoorCloseIn30 (sector_t* sec)
 // Passed the sector of the door, whose type specified the door action
 // Returns nothing
 //
-void P_SpawnDoorRaiseIn5Mins(sector_t* sec)
+void P_SpawnDoorRaiseIn5Mins(sector_t __far* sec)
 {
   vldoor_t __far* door;
 
