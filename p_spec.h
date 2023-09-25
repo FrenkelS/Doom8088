@@ -751,9 +751,7 @@ fixed_t P_FindNextLowestCeiling
 ( sector_t *sec,
   int32_t currentheight ); // jff 2/04/98
 
-fixed_t P_FindNextHighestCeiling
-( sector_t *sec,
-  int32_t currentheight ); // jff 2/04/98
+fixed_t P_FindNextHighestCeiling(sector_t __far* sec, int32_t currentheight);
 
 fixed_t P_FindShortestTextureAround
 ( int32_t secnum ); // jff 2/04/98

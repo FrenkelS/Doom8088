@@ -67,7 +67,7 @@ boolean EV_DoGenFloor
   int32_t                   secnum;
   boolean                   rtn;
   boolean               manual;
-  sector_t*             sec;
+  sector_t __far*             sec;
   floormove_t __far*          floor;
   uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenFloorBase;
 
@@ -190,7 +190,7 @@ manual_floor:
     {
       if (ChgM) // if a numeric model change
       {
-        sector_t *sec;
+        sector_t __far* sec;
 
         //jff 5/23/98 find model with ceiling at target height if target
         //is a ceiling type
@@ -270,7 +270,7 @@ boolean EV_DoGenCeiling
   boolean                   rtn;
   boolean               manual;
   fixed_t               targheight;
-  sector_t*             sec;
+  sector_t __far*             sec;
   ceiling_t __far*            ceiling;
   uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenCeilingBase;
 
