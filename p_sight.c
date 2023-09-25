@@ -83,7 +83,7 @@ static boolean P_CrossSubsector(int32_t num)
     const seg_t *seg = _g_segs + _g_subsectors[num].firstline;
     int32_t count;
     fixed_t opentop = 0, openbottom = 0;
-    const sector_t *front = NULL, *back = NULL;
+    const sector_t __far* front = NULL, __far* back = NULL;
 
     for (count = _g_subsectors[num].numlines; --count >= 0; seg++)
     { // check lines
@@ -181,7 +181,7 @@ static boolean P_CrossBSPNode(int32_t bspnum)
 {
     while (!(bspnum & NF_SUBSECTOR))
     {
-        const mapnode_t *bsp = nodes + bspnum;
+        const mapnode_t __far* bsp = nodes + bspnum;
 
         divline_t dl;
         dl.x = ((fixed_t)bsp->x << FRACBITS);
@@ -213,7 +213,7 @@ static boolean P_CrossBSPNode(int32_t bspnum)
 //
 // killough 4/20/98: cleaned up, made to use new LOS struct
 
-boolean P_CheckSight(mobj_t *t1, mobj_t *t2)
+boolean P_CheckSight(mobj_t *t1, mobj_t __far* t2)
 {
   const sector_t *s1 = t1->subsector->sector;
   const sector_t *s2 = t2->subsector->sector;

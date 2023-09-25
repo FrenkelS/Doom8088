@@ -141,7 +141,7 @@ void P_NoiseAlert(mobj_t *emitter)
 
 static boolean P_CheckMeleeRange(mobj_t *actor)
 {
-  mobj_t *pl = actor->target;
+  mobj_t __far* pl = actor->target;
 
   return  // killough 7/18/98: friendly monsters don't attack other friends
     pl && !(actor->flags & pl->flags & MF_FRIEND) &&
