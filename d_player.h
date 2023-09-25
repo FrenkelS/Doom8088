@@ -93,7 +93,7 @@ typedef enum
 //
 typedef struct player_s
 {
-  mobj_t*             mo;
+  mobj_t __far*             mo;
   playerstate_t       playerstate;
   ticcmd_t            cmd;
 

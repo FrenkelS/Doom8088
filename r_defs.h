@@ -94,7 +94,7 @@ typedef struct
   fixed_t floorheight;
   fixed_t ceilingheight;
 
-  mobj_t *soundtarget;   // thing that made a sound (or null)
+  mobj_t __far* soundtarget;   // thing that made a sound (or null)
   degenmobj_t soundorg;  // origin for any sounds played by the sector
   int32_t validcount;        // if == validcount, already checked
   mobj_t *thinglist;     // list of mobjs in sector

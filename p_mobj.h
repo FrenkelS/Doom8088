@@ -268,7 +268,7 @@ typedef struct mobj_s
 
     // Thing being chased/attacked (or NULL),
     // also the originator for missiles.
-    struct mobj_s*      target;
+    struct mobj_s __far*      target;
 
     // Movement direction, movement generation (zig-zagging).
 
@@ -289,10 +289,10 @@ typedef struct mobj_s
     int16_t             reactiontime;
 
     // Thing being chased/attacked for tracers.
-    struct mobj_s*      tracer;
+    struct mobj_s __far*      tracer;
 
     // new field: last known enemy -- killough 2/15/98
-    struct mobj_s*      lastenemy;
+    struct mobj_s __far*      lastenemy;
 
                                        // phares 3/17/98
     // a linked list of sectors where this object appears

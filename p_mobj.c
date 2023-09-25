@@ -447,7 +447,7 @@ static void P_NightmareRespawn(mobj_t* mobj)
     fixed_t      x;
     fixed_t      y;
     fixed_t      z;
-    subsector_t* ss;
+    subsector_t __far* ss;
     mobj_t __far*      mo;
 
     /* haleyjd: stupid nightmare respawning bug fix
@@ -782,7 +782,7 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
   fixed_t   x;
   fixed_t   y;
   fixed_t   z;
-  mobj_t*   mobj;
+  mobj_t __far*   mobj;
 
   // not playing?
 
