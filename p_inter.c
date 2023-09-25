@@ -509,8 +509,7 @@ void P_TouchSpecialThing(mobj_t *special, mobj_t *toucher)
 //
 // KillMobj
 //
-// killough 11/98: make static
-static void P_KillMobj(mobj_t *source, mobj_t *target)
+static void P_KillMobj(mobj_t __far* source, mobj_t *target)
 {
   mobjtype_t item;
   mobj_t     __far* mo;
@@ -726,7 +725,7 @@ void P_DamageMobj(mobj_t *target, mobj_t __far* inflictor, mobj_t __far* source,
      target->target != source)) // remember last enemy - killough
   P_SetTarget(&target->lastenemy, target->target);
 
-      P_SetTarget(&target->target, source);       // killough 11/98
+      P_SetTarget(&target->target, source);
       target->threshold = BASETHRESHOLD;
       if (target->state == &states[mobjinfo[target->type].spawnstate]
           && mobjinfo[target->type].seestate != S_NULL)
