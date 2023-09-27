@@ -172,11 +172,11 @@ extern subsector_t __far* _g_subsectors;
 
 
 extern int32_t      _g_numlines;
-extern const line_t   *_g_lines;
-extern linedata_t* _g_linedata;
+extern const line_t   __far* _g_lines;
+extern linedata_t __far* _g_linedata;
 
 
-extern side_t   *_g_sides;
+extern side_t   __far* _g_sides;
 
 // BLOCKMAP
 // Created from axis aligned bounding box
@@ -190,7 +190,7 @@ extern side_t   *_g_sides;
 extern int16_t       _g_bmapwidth, _g_bmapheight;  // size in mapblocks
 
 // killough 3/1/98: remove blockmap limit internally:
-extern const int16_t      *_g_blockmap;
+extern const int16_t      __far* _g_blockmap;
 
 // offsets in blockmap are from here
 extern const int16_t      __far* _g_blockmaplump;
@@ -208,12 +208,12 @@ extern mobj_t    **_g_blocklinks;           // for thing chains
 // be used as a PVS lookup as well.
 //
 
-extern const byte *_g_rejectmatrix;
+extern const byte __far* _g_rejectmatrix;
 
 // Maintain single and multi player starting spots.
 extern mapthing_t _g_playerstarts[MAXPLAYERS];
 
-extern mobj_t*      _g_thingPool;
+extern mobj_t __far*      _g_thingPool;
 extern uint32_t _g_thingPoolSize;
 
 

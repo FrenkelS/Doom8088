@@ -130,7 +130,7 @@ typedef struct
 
 typedef struct
 {
-    sector_t* sector;      // Sector the SideDef is facing.
+    sector_t __far* sector;      // Sector the SideDef is facing.
 
     int16_t textureoffset; // add this to the calculated texture column
     int16_t rowoffset;     // add this to the calculated texture top
@@ -278,7 +278,7 @@ typedef struct
 
 typedef struct subsector_s
 {
-  sector_t *sector;
+  sector_t __far* sector;
   uint16_t numlines, firstline;
 } subsector_t;
 

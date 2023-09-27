@@ -74,12 +74,12 @@ subsector_t __far* _g_subsectors;
 
 
 int32_t      _g_numlines;
-const line_t   *_g_lines;
-linedata_t* _g_linedata;
+const line_t   __far* _g_lines;
+linedata_t __far* _g_linedata;
 
 
 static int32_t      numsides;
-side_t   *_g_sides;
+side_t   __far* _g_sides;
 
 // BLOCKMAP
 // Created from axis aligned bounding box
@@ -93,7 +93,7 @@ side_t   *_g_sides;
 int16_t       _g_bmapwidth, _g_bmapheight;  // size in mapblocks
 
 // killough 3/1/98: remove blockmap limit internally:
-const int16_t      *_g_blockmap;
+const int16_t      __far* _g_blockmap;
 
 // offsets in blockmap are from here
 const int16_t      __far* _g_blockmaplump;
@@ -111,12 +111,12 @@ mobj_t    **_g_blocklinks;           // for thing chains
 // be used as a PVS lookup as well.
 //
 
-const byte *_g_rejectmatrix;
+const byte __far* _g_rejectmatrix;
 
 // Maintain single and multi player starting spots.
 mapthing_t _g_playerstarts[MAXPLAYERS];
 
-mobj_t*      _g_thingPool;
+mobj_t __far*      _g_thingPool;
 uint32_t _g_thingPoolSize;
 
 
@@ -334,7 +334,7 @@ static void P_LoadThings (int16_t lump)
 
     for (i=0; i<numthings; i++)
     {
-        const mapthing_t* mt = &data[i];
+        const mapthing_t __far* mt = &data[i];
 
         if (!P_IsDoomnumAllowed(mt->type))
             continue;
@@ -405,8 +405,8 @@ static void P_LoadSideDefs2(int16_t lump)
     for (int32_t i = 0; i < numsides; i++)
     {
         register const mapsidedef_t *msd = (const mapsidedef_t *) data + i;
-        register side_t *sd = _g_sides + i;
-        register sector_t *sec;
+        register side_t __far* sd = _g_sides + i;
+        register sector_t __far* sec;
 
         sd->textureoffset = msd->textureoffset;
         sd->rowoffset     = msd->rowoffset;
@@ -494,7 +494,7 @@ static void P_LoadReject(int16_t lump)
 // figgi 09/18/00 -- adapted for gl-nodes
 
 // cph - convenient sub-function
-static void P_AddLineToSector(const line_t* li, sector_t* sector)
+static void P_AddLineToSector(const line_t __far* li, sector_t __far* sector)
 {
   sector->lines[sector->linecount++] = li;
 }
@@ -520,8 +520,8 @@ static void M_AddToBox(fixed_t* box,fixed_t x,fixed_t y)
 
 static void P_GroupLines (void)
 {
-    register const line_t *li;
-    register sector_t *sector;
+    register const line_t __far* li;
+    register sector_t __far* sector;
     int32_t i,j, total = _g_numlines;
 
     // figgi

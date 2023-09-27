@@ -841,7 +841,7 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 // already be in host byte order.
 //
 
-void P_SpawnMapThing (const mapthing_t* mthing)
+void P_SpawnMapThing(const mapthing_t __far* mthing)
 {
     int32_t     i;
     mobj_t __far* mobj;
