@@ -88,8 +88,7 @@ void P_ZBumpCheck(mobj_t *);                                        // phares
 //
 // killough 5/5/98: reformatted, cleaned up
 
-static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
-           mobj_t *soundtarget)
+static void P_RecursiveSound(sector_t __far* sec, int32_t soundblocks, mobj_t __far* soundtarget)
 {
   int32_t i;
 
@@ -103,8 +102,8 @@ static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
 
   for (i=0; i<sec->linecount; i++)
     {
-      sector_t *other;
-      const line_t *check = sec->lines[i];
+      sector_t __far* other;
+      const line_t __far* check = sec->lines[i];
 
       if (!(check->flags & ML_TWOSIDED))
         continue;
@@ -237,7 +236,7 @@ static boolean P_CheckMissileRange(mobj_t *actor)
 
 static boolean P_IsOnLift(const mobj_t __far* actor)
 {
-  const sector_t *sec = actor->subsector->sector;
+  const sector_t __far* sec = actor->subsector->sector;
 
   // Short-circuit: it's on a lift which is active.
   if (sec->floordata && ((thinker_t *) sec->floordata)->function==T_PlatRaise)
@@ -826,7 +825,7 @@ void A_Chase(mobj_t *actor)
 //
 // A_FaceTarget
 //
-void A_FaceTarget(mobj_t *actor)
+void A_FaceTarget(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
