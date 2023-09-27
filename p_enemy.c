@@ -235,7 +235,7 @@ static boolean P_CheckMissileRange(mobj_t *actor)
  * while it goes up or down.
  */
 
-static boolean P_IsOnLift(const mobj_t *actor)
+static boolean P_IsOnLift(const mobj_t __far* actor)
 {
   const sector_t *sec = actor->subsector->sector;
 
@@ -523,7 +523,7 @@ static fixed_t P_AvoidDropoff(mobj_t *actor)
 
 static void P_NewChaseDir(mobj_t *actor)
 {
-    mobj_t *target = actor->target;
+    mobj_t __far* target = actor->target;
     fixed_t deltax = target->x - actor->x;
     fixed_t deltay = target->y - actor->y;
 
@@ -570,7 +570,7 @@ static void P_NewChaseDir(mobj_t *actor)
 // killough 9/9/98: whether a target is visible to a monster
 //
 
-static boolean P_IsVisible(mobj_t *actor, mobj_t *mo, boolean allaround)
+static boolean P_IsVisible(mobj_t *actor, mobj_t __far* mo, boolean allaround)
 {
     if (!allaround)
     {
@@ -639,7 +639,7 @@ static boolean P_LookForTargets(mobj_t *actor, int32_t allaround)
 
 void A_Look(mobj_t *actor)
 {
-    mobj_t *targ = actor->subsector->sector->soundtarget;
+    mobj_t __far* targ = actor->subsector->sector->soundtarget;
     actor->threshold = 0; // any shot will wake up
 
     /* killough 7/18/98:

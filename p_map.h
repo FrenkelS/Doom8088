@@ -55,7 +55,7 @@ fixed_t P_AimLineAttack(mobj_t *t1,angle_t angle,fixed_t distance, boolean frien
 
 void    P_LineAttack(mobj_t *t1, angle_t angle, fixed_t distance,
                      fixed_t slope, int32_t damage );
-void    P_RadiusAttack(mobj_t *spot, mobj_t *source, int32_t damage);
+void    P_RadiusAttack(mobj_t *spot, mobj_t __far* source, int32_t damage);
 boolean P_CheckPosition(mobj_t *thing, fixed_t x, fixed_t y);
 
 

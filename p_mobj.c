@@ -1028,7 +1028,7 @@ static void P_CheckMissileSpawn (mobj_t* th)
 // P_SpawnMissile
 //
 
-mobj_t* P_SpawnMissile(mobj_t* source,mobj_t* dest,mobjtype_t type)
+mobj_t* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_t type)
   {
   mobj_t* th;
   angle_t an;

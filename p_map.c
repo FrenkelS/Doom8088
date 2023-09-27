@@ -1299,7 +1299,7 @@ static boolean PIT_RadiusAttack (mobj_t* thing)
 // P_RadiusAttack
 // Source is the creature that caused the explosion at spot.
 //
-void P_RadiusAttack(mobj_t* spot,mobj_t* source,int32_t damage)
+void P_RadiusAttack(mobj_t* spot, mobj_t __far* source, int32_t damage)
   {
   int32_t x;
   int32_t y;
