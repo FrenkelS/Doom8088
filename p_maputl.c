@@ -232,7 +232,7 @@ void P_UnsetThingPosition (mobj_t *thing)
        * pointers, allows head node pointers to be treated like everything else
        */
 
-      mobj_t **sprev = thing->sprev;
+      mobj_t *__far* sprev = thing->sprev;
       mobj_t  *snext = thing->snext;
       if ((*sprev = snext))  // unlink from sector list
         snext->sprev = sprev;
@@ -267,7 +267,7 @@ void P_UnsetThingPosition (mobj_t *thing)
        * linking.
        */
 
-      mobj_t *bnext, **bprev = thing->bprev;
+      mobj_t *bnext, *__far*bprev = thing->bprev;
       if (bprev && (*bprev = bnext = thing->bnext))  // unlink from block map
         bnext->bprev = bprev;
     }
@@ -279,11 +279,10 @@ void P_UnsetThingPosition (mobj_t *thing)
 // based on it's x y.
 // Sets thing->subsector properly
 //
-// killough 5/3/98: reformatted, cleaned up
 
 void P_SetThingPosition(mobj_t __far* thing)
 {                                                      // link into subsector
-  subsector_t *ss = thing->subsector = R_PointInSubsector(thing->x, thing->y);
+  subsector_t __far* ss = thing->subsector = R_PointInSubsector(thing->x, thing->y);
   if (!(thing->flags & MF_NOSECTOR))
     {
       // invisible things don't go into the sector links
@@ -364,7 +363,7 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
         return true;
 
     const int32_t offset = _g_blockmap[y*_g_bmapwidth+x];
-    const int16_t* list = _g_blockmaplump+offset;     // original was reading         // phares
+    const int16_t __far* list = _g_blockmaplump+offset;     // original was reading         // phares
 
 
     // delmiting 0 as linedef 0     // phares

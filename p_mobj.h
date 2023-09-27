@@ -228,7 +228,7 @@ typedef struct mobj_s
 
     // More list: links in sector (if needed)
     struct mobj_s*      snext;
-    struct mobj_s**     sprev; // killough 8/10/98: change to ptr-to-ptr
+    struct mobj_s *__far*     sprev; // killough 8/10/98: change to ptr-to-ptr
 
     //More drawing info: to determine current sprite.
     angle_t             angle;  // orientation
@@ -238,9 +238,9 @@ typedef struct mobj_s
     // Interaction info, by BLOCKMAP.
     // Links in blocks (if needed).
     struct mobj_s*      bnext;
-    struct mobj_s**     bprev; // killough 8/11/98: change to ptr-to-ptr
+    struct mobj_s *__far*     bprev; // killough 8/11/98: change to ptr-to-ptr
 
-    struct subsector_s* subsector;
+    struct subsector_s __far* subsector;
 
     // The closest interval over all contacted Sectors.
     fixed_t             floorz;
