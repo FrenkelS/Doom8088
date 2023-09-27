@@ -1444,7 +1444,7 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 #define MINZ        (FRACUNIT*4)
 #define MAXZ        (FRACUNIT*1280)
 
-static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
+static void R_ProjectSprite(mobj_t __far* thing, int32_t lightlevel)
 {
     const fixed_t fx = thing->x;
     const fixed_t fy = thing->y;
@@ -1587,7 +1587,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
 static void R_AddSprites(subsector_t __far* subsec, int32_t lightlevel)
 {
   sector_t __far* sec=subsec->sector;
-  mobj_t *thing;
+  mobj_t __far* thing;
 
   // BSP is traversed by subsector.
   // A sector might have been split into several
