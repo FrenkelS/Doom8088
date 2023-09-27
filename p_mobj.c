@@ -708,7 +708,7 @@ mobj_t __far* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
 // P_RemoveMobj
 //
 
-void P_RemoveMobj (mobj_t* mobj)
+void P_RemoveMobj(mobj_t __far* mobj)
 {
   P_UnsetThingPosition (mobj);
 

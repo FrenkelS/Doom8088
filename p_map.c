@@ -484,7 +484,7 @@ static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
 //  numspeciallines
 //
 
-boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
+boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   {
   int32_t     xl;
   int32_t     xh;

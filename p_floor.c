@@ -58,7 +58,7 @@
 // and false will be returned.
 //
 
-static boolean P_ThingHeightClip (mobj_t* thing)
+static boolean P_ThingHeightClip(mobj_t __far* thing)
 {
   boolean   onfloor;
 
@@ -113,7 +113,7 @@ static boolean P_ThingHeightClip (mobj_t* thing)
 // PIT_ChangeSector
 //
 
-static void PIT_ChangeSector (mobj_t* thing)
+static void PIT_ChangeSector(mobj_t __far* thing)
   {
   mobj_t __far* mo;
 
