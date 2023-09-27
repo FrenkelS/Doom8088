@@ -232,7 +232,7 @@ void Z_Init (void)
 	mainzone_sentinal = (memblock_t *)b;
 
 	// set the entire zone to one free block
-	memblock_t* block = (memblock_t *)mainzone;
+	memblock_t __far* block = (memblock_t __far*)mainzone;
 	mainzone_rover_segment = pointerToSegment(block);
 
 	mainzone_sentinal->tag  = PU_STATIC;
