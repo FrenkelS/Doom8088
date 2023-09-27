@@ -553,7 +553,7 @@ const lighttable_t* R_LoadColorMap(int32_t lightlevel)
 #define COLEXTRABITS 9
 #define COLBITS (FRACBITS + COLEXTRABITS)
 
-inline static void R_DrawColumnPixel(uint16_t* dest, const byte* source, const byte __far* colormap, uint32_t frac)
+inline static void R_DrawColumnPixel(uint16_t __far* dest, const byte* source, const byte __far* colormap, uint32_t frac)
 {
 	uint16_t color = colormap[source[frac>>COLBITS]];
 
@@ -572,7 +572,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     const byte *source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
-    uint16_t* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+    uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery) * dcvars->iscale) << COLEXTRABITS;
@@ -637,7 +637,7 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 	const uint16_t color = (texture << 8) | texture;
 
-	uint16_t* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+	uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
 	uint32_t l = count >> 4;
 
@@ -696,7 +696,7 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
     const byte *source = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
-    volatile uint16_t* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+    volatile uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery)*dcvars->iscale) << COLEXTRABITS;
@@ -774,7 +774,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     const byte __far* colormap = &fullcolormap[6 * 256];
 
-    uint16_t* dest = _g_screen + ScreenYToOffset(dc_yl) + dcvars->x;
+    uint16_t __far* dest = _g_screen + ScreenYToOffset(dc_yl) + dcvars->x;
 
     static int16_t fuzzpos = 0;
 

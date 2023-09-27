@@ -158,13 +158,13 @@ static void V_DrawBackground(const char* flatname)
 {
     /* erase the entire screen to a tiled background */
     const byte __far* src = W_GetLumpByName(flatname);
-    uint16_t *dest = _g_screen;
+    uint16_t __far* dest = _g_screen;
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
     {
         for(uint16_t x = 0; x < 240; x+=64)
         {
-            uint16_t* d = &dest[ ScreenYToOffset(y) + (x >> 1)];
+            uint16_t __far* d = &dest[ ScreenYToOffset(y) + (x >> 1)];
             const byte __far* s = &src[((y&63) * 64) + (x&63)];
 
             uint8_t len = 64;

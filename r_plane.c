@@ -51,7 +51,7 @@ static int16_t firstflat;
 #if defined FLAT_SPAN
 static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, uint16_t color)
 {
-	uint16_t* dest = _g_screen + ScreenYToOffset(y) + x1;
+	uint16_t __far* dest = _g_screen + ScreenYToOffset(y) + x1;
 
 	uint32_t count = x2 - x1;
 	uint32_t l = count >> 4;
