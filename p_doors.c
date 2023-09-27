@@ -278,10 +278,7 @@ void T_VerticalDoor (vldoor_t* door)
 // and the thing that activated the line
 // Returns true if a thinker created
 //
-boolean EV_DoLockedDoor
-( const line_t* line,
-  vldoor_e  type,
-  mobj_t* thing )
+boolean EV_DoLockedDoor(const line_t* line, vldoor_e type, mobj_t __far* thing)
 {
   player_t* p;
 
@@ -430,12 +427,10 @@ boolean EV_DoDoor
 //
 // Passed the line activating the door and the thing activating it
 //
-void EV_VerticalDoor
-( const line_t* line,
-  mobj_t* thing )
+void EV_VerticalDoor(const line_t* line, mobj_t __far* thing)
 {
   player_t* player;
-  sector_t* sec;
+  sector_t __far* sec;
   vldoor_t __far* door;
 
   //  Check for locks

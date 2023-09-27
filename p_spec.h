@@ -540,7 +540,7 @@ typedef struct
   bwhere_e where;
   int32_t   btexture;
   int32_t   btimer;
-  degenmobj_t* soundorg;
+  degenmobj_t __far* soundorg;
 
 } button_t;
 
@@ -848,18 +848,13 @@ boolean EV_CeilingCrushStop
 
 // p_doors
 
-void EV_VerticalDoor
-( const line_t* line,
-  mobj_t* thing );
+void EV_VerticalDoor(const line_t* line, mobj_t  __far* thing);
 
 boolean EV_DoDoor
 ( const line_t* line,
   vldoor_e type );
 
-boolean EV_DoLockedDoor
-( const line_t* line,
-  vldoor_e type,
-  mobj_t* thing );
+boolean EV_DoLockedDoor(const line_t* line, vldoor_e type, mobj_t __far* thing);
 
 // p_lights
 
