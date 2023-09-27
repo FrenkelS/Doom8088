@@ -154,8 +154,8 @@ angle_t  viewangle;
 static byte solidcol[SCREENWIDTH];
 
 static const seg_t     *curline;
-static side_t    *sidedef;
-static const line_t    *linedef;
+static side_t    __far* sidedef;
+static const line_t    __far* linedef;
 static sector_t  __far* frontsector;
 static sector_t  __far* backsector;
 static drawseg_t *ds_p;
@@ -1586,7 +1586,7 @@ static void R_ProjectSprite (mobj_t* thing, int32_t lightlevel)
 // killough 9/18/98: add lightlevel as parameter, fixing underwater lighting
 static void R_AddSprites(subsector_t __far* subsec, int32_t lightlevel)
 {
-  sector_t* sec=subsec->sector;
+  sector_t __far* sec=subsec->sector;
   mobj_t *thing;
 
   // BSP is traversed by subsector.
@@ -2134,7 +2134,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     }
 
 
-    linedata_t* linedata = &_g_linedata[curline->linenum];
+    linedata_t __far* linedata = &_g_linedata[curline->linenum];
 
     // mark the segment as visible for auto map
     linedata->r_flags |= ML_MAPPED;
@@ -2435,9 +2435,9 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 
 static void R_RecalcLineFlags(void)
 {
-    linedata_t* linedata = &_g_linedata[linedef->lineno];
+    linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
-    const side_t* side = &_g_sides[curline->sidenum];
+    const side_t __far* side = &_g_sides[curline->sidenum];
 
     linedata->r_validcount = LOWORD(_g_gametic);
 
@@ -2599,7 +2599,7 @@ static void R_AddLine (const seg_t *line)
 
     /* cph - roll up linedef properties in flags */
     linedef = &_g_lines[curline->linenum];
-    linedata_t* linedata = &_g_linedata[linedef->lineno];
+    linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
     if (linedata->r_validcount != LOWORD(_g_gametic))
         R_RecalcLineFlags();
