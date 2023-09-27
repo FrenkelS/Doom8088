@@ -958,10 +958,7 @@ void P_UpdateSpecials(void);
 void P_UpdateAnimatedFlat(void);
 
 // when needed
-boolean P_UseSpecialLine
-( mobj_t* thing,
-  const line_t* line,
-  int32_t   side );
+boolean P_UseSpecialLine(mobj_t __far* thing, const line_t* line, int32_t side);
 
 void P_ShootSpecialLine
 ( mobj_t* thing,

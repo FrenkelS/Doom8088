@@ -217,7 +217,7 @@ typedef struct line_s
 typedef struct msecnode_s
 {
   sector_t          *m_sector; // a sector containing this object
-  struct mobj_s     *m_thing;  // this object
+  struct mobj_s __far* m_thing;  // this object
   struct msecnode_s *m_tprev;  // prev msecnode_t for this thing
   struct msecnode_s *m_tnext;  // next msecnode_t for this thing
   struct msecnode_s *m_sprev;  // prev msecnode_t for this sector

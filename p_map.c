@@ -101,10 +101,10 @@ fixed_t   _g_attackrange;
 static fixed_t  topslope;
 static fixed_t  bottomslope;
 
-static mobj_t *bombsource, *bombspot;
+static mobj_t __far* bombsource, *bombspot;
 static int32_t bombdamage;
 
-static mobj_t*   usething;
+static mobj_t __far*   usething;
 
 // If "floatok" true, move would be ok
 // if within "tmfloorz - tmceilingz".
@@ -173,7 +173,7 @@ boolean P_TeleportMove (mobj_t* thing,fixed_t x,fixed_t y, boolean boss)
   int32_t     bx;
   int32_t     by;
 
-  subsector_t*  newsubsec;
+  subsector_t __far*  newsubsec;
 
   /* killough 8/9/98: make telefragging more consistent, preserve compatibility */
   telefrag = P_MobjIsPlayer(thing) || boss;
@@ -492,7 +492,7 @@ boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
   int32_t     yh;
   int32_t     bx;
   int32_t     by;
-  subsector_t*  newsubsec;
+  subsector_t __far*  newsubsec;
 
   tmthing = thing;
 
@@ -1358,7 +1358,7 @@ inline static void P_PutSecnode(msecnode_t* node)
 // sectors this object appears in. This is called when creating a list of
 // nodes that will get linked in later.
 
-static void P_AddSecnode(sector_t* s, mobj_t* thing)
+static void P_AddSecnode(sector_t* s, mobj_t __far* thing)
   {
   msecnode_t* node;
 
@@ -1509,7 +1509,7 @@ static boolean PIT_GetSectors(const line_t* ld)
 
 void P_CreateSecNodeList(mobj_t __far* thing)
 {
-  mobj_t* saved_tmthing = tmthing; /* cph - see comment at func end */
+  mobj_t __far* saved_tmthing = tmthing; /* cph - see comment at func end */
 
   // First, clear out the existing m_thing fields. As each node is
   // added or verified as needed, m_thing will be set properly. When

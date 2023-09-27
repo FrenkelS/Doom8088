@@ -270,7 +270,7 @@ boolean P_GivePower(player_t *player, int32_t power)
 // P_TouchSpecialThing
 //
 
-void P_TouchSpecialThing(mobj_t *special, mobj_t *toucher)
+void P_TouchSpecialThing(mobj_t *special, mobj_t __far* toucher)
 {
   player_t *player;
   int32_t      i;
