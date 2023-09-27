@@ -754,9 +754,7 @@ sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight, int32_t secnum)
 
 int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start);
 
-int32_t P_FindLineFromLineTag
-( const line_t *line,
-  int32_t start );   // killough 4/17/98
+int32_t P_FindLineFromLineTag(const line_t __far* line, int32_t start);
 
 int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max);
 
@@ -813,7 +811,7 @@ boolean EV_Teleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
 boolean EV_SilentTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing);
 
 // killough 1/31/98: Add silent line teleporter
-boolean EV_SilentLineTeleport(const line_t* line, int32_t side, mobj_t __far* thing, boolean reverse);
+boolean EV_SilentLineTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing, boolean reverse);
 
 // p_floor
 

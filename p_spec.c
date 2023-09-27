@@ -570,7 +570,7 @@ int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start)
 
 // killough 4/16/98: Same thing, only for linedefs
 
-int32_t P_FindLineFromLineTag(const line_t *line, int32_t start)
+int32_t P_FindLineFromLineTag(const line_t __far* line, int32_t start)
 {
 
     int32_t	i;

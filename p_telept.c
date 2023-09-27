@@ -211,7 +211,7 @@ boolean EV_SilentTeleport(const line_t __far* line, int32_t side, mobj_t __far* 
 // maximum fixed_t units to move object to avoid hiccups
 #define FUDGEFACTOR 10
 
-boolean EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t __far* thing, boolean reverse)
+boolean EV_SilentLineTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing, boolean reverse)
 {
   int32_t i;
   const line_t __far* l;
