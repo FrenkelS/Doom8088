@@ -335,9 +335,7 @@ boolean EV_DoLockedDoor(const line_t* line, vldoor_e type, mobj_t __far* thing)
 // Passed the line activating the door and the type of door
 // Returns true if a thinker created
 //
-boolean EV_DoDoor
-( const line_t* line,
-  vldoor_e  type )
+boolean EV_DoDoor(const line_t __far* line, vldoor_e type)
 {
   int32_t   secnum;
   boolean   rtn;

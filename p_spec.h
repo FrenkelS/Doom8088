@@ -608,7 +608,7 @@ typedef struct
   int32_t topcountdown;
 
   //jff 1/31/98 keep track of line door is triggered by
-  const line_t *line;
+  const line_t __far* line;
 
   /* killough 10/98: sector tag for gradual lighting effects */
   int32_t lighttag;
@@ -844,9 +844,7 @@ boolean EV_CeilingCrushStop
 
 void EV_VerticalDoor(const line_t* line, mobj_t  __far* thing);
 
-boolean EV_DoDoor
-( const line_t* line,
-  vldoor_e type );
+boolean EV_DoDoor(const line_t __far* line, vldoor_e type);
 
 boolean EV_DoLockedDoor(const line_t* line, vldoor_e type, mobj_t __far* thing);
 
