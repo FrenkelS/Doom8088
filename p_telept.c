@@ -215,7 +215,7 @@ boolean EV_SilentTeleport(const line_t *line, int32_t side, mobj_t __far* thing)
 boolean EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t __far* thing, boolean reverse)
 {
   int32_t i;
-  const line_t *l;
+  const line_t __far* l;
 
   if (side || thing->flags & MF_MISSILE)
     return false;

@@ -79,7 +79,7 @@ fixed_t CONSTFUNC P_AproxDistance(fixed_t dx, fixed_t dy)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-int32_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t *line)
+int32_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* line)
 {
   return
     !line->dx ? x <= line->v1.x ? line->dy > 0 : line->dy < 0 :
@@ -179,8 +179,8 @@ void P_LineOpening(const line_t *linedef)
     // moved front and back outside P-LineOpening and changed
     // them to these so we can pick up the new friction value
     // in PIT_CheckLine()
-    sector_t *openfrontsector;
-    sector_t *openbacksector;
+    sector_t __far* openfrontsector;
+    sector_t __far* openbacksector;
 
     if (linedef->sidenum[1] == NO_INDEX)      // single sided line
     {
@@ -380,14 +380,14 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
     {
         const int16_t lineno = *list;
 
-        linedata_t *lt = &_g_linedata[lineno];
+        linedata_t __far* lt = &_g_linedata[lineno];
 
         if (lt->validcount == vcount)
             continue;       // line has already been checked
 
         lt->validcount = vcount;
 
-        const line_t *ld = &_g_lines[lineno];
+        const line_t __far* ld = &_g_lines[lineno];
 
         if (!func(ld))
             return false;
