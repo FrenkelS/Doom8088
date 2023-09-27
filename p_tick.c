@@ -177,7 +177,7 @@ thinker_t __far* P_NextThinker(thinker_t __far* th)
  * references, and delay removal until the count is 0.
  */
 
-void P_SetTarget(mobj_t __far**mop, mobj_t __far* targ)
+void P_SetTarget(mobj_t __far*__far* mop, mobj_t __far* targ)
 {
     *mop = targ;    // Set new target and if non-NULL, increase its counter
 }

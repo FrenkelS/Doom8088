@@ -509,7 +509,7 @@ void P_TouchSpecialThing(mobj_t *special, mobj_t *toucher)
 //
 // KillMobj
 //
-static void P_KillMobj(mobj_t __far* source, mobj_t *target)
+static void P_KillMobj(mobj_t __far* source, mobj_t __far* target)
 {
   mobjtype_t item;
   mobj_t     __far* mo;

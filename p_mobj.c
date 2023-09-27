@@ -60,7 +60,7 @@ void A_CyberAttack(mobj_t *actor);
 // Returns true if the mobj is still present.
 //
 
-boolean P_SetMobjState(mobj_t* mobj, statenum_t state)
+boolean P_SetMobjState(mobj_t __far* mobj, statenum_t state)
 {
     const state_t*	st;
 
