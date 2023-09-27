@@ -148,7 +148,7 @@ boolean twoSided
 //
 // Note: returns NULL if not two-sided line, or both sides refer to sector
 //
-sector_t __far* getNextSector(const line_t* line, sector_t __far* sec)
+sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec)
 {
 
 
@@ -172,7 +172,7 @@ sector_t __far* getNextSector(const line_t* line, sector_t __far* sec)
 fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec)
 {
   int32_t                 i;
-  const line_t*             check;
+  const line_t __far*             check;
   sector_t __far*           other;
   fixed_t             floor = sec->floorheight;
 
@@ -200,7 +200,7 @@ fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec)
 fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 {
   int32_t i;
-  const line_t* check;
+  const line_t __far* check;
   sector_t __far* other;
   fixed_t floor = -32000*FRACUNIT;
 
@@ -356,7 +356,7 @@ fixed_t P_FindNextHighestCeiling(sector_t __far* sec, int32_t currentheight)
 fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 {
   int32_t                 i;
-  const line_t*             check;
+  const line_t __far*             check;
   sector_t __far*           other;
   fixed_t             height = 32000*FRACUNIT;
 
@@ -384,7 +384,7 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
 {
   int32_t             i;
-  const line_t* check;
+  const line_t __far* check;
   sector_t __far*       other;
   fixed_t height = -32000*FRACUNIT;
 
@@ -601,7 +601,7 @@ int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
 {
   int32_t         i;
   int32_t         min;
-  const line_t*     line;
+  const line_t __far*     line;
   sector_t __far*   check;
 
   min = max;

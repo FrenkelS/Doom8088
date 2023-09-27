@@ -762,7 +762,7 @@ int32_t P_FindLineFromLineTag
 
 int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max);
 
-sector_t __far* getNextSector(const line_t* line, sector_t __far* sec);
+sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec);
 
 boolean P_CheckTag
 (const line_t *line); // jff 2/27/98
