@@ -1073,7 +1073,7 @@ mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_
 // Tries to aim at a nearby monster
 //
 
-void P_SpawnPlayerMissile(mobj_t* source,mobjtype_t type)
+void P_SpawnPlayerMissile(mobj_t __far* source, mobjtype_t type)
 {
 	mobj_t __far* th;
 	fixed_t x, y, z, slope = 0;

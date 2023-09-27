@@ -1092,7 +1092,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 //
 // P_AimLineAttack
 //
-fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, boolean friend)
+fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boolean friend)
   {
   fixed_t x2;
   fixed_t y2;
@@ -1130,7 +1130,7 @@ fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, boolean frien
 // that will leave linetarget set.
 //
 
-void P_LineAttack(mobj_t* t1, angle_t angle, fixed_t distance, fixed_t slope, int32_t damage)
+void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int32_t damage)
 {
   fixed_t x2;
   fixed_t y2;

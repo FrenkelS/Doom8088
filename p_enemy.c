@@ -129,7 +129,7 @@ static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
 // If a monster yells at a player,
 // it will alert other monsters to the player.
 //
-void P_NoiseAlert(mobj_t *emitter)
+void P_NoiseAlert(mobj_t __far* emitter)
 {
   validcount++;
   P_RecursiveSound(emitter->subsector->sector, 0, emitter);
