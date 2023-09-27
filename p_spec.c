@@ -632,9 +632,7 @@ int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
 // jff 02/05/98 routine added to test for unlockability of
 //  generalized locked doors
 //
-boolean P_CanUnlockGenDoor
-( const line_t* line,
-  player_t* player)
+boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player)
 {
   // does this line special distinguish between skulls and keys?
   int32_t skulliscard = (LN_SPECIAL(line) & LockedNKeys)>>LockedNKeysShift;
@@ -809,7 +807,7 @@ boolean PUREFUNC P_SectorActive(special_e t, const sector_t __far* sec)
 //
 // jff 2/27/98 Added to check for zero tag allowed for regular special types
 //
-boolean P_CheckTag(const line_t *line)
+boolean P_CheckTag(const line_t __far* line)
 {
   /* tag not zero, allowed, or
    * killough 11/98: compatibility option */
@@ -922,7 +920,7 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t __far* thing)
 
     // pointer to line function is NULL by default, set non-null if
     // line special is walkover generalized linedef type
-    boolean (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
@@ -1784,7 +1782,7 @@ void P_ShootSpecialLine
 {
     // pointer to line function is NULL by default, set non-null if
     // line special is gun triggered generalized linedef type
-    boolean (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)

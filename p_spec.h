@@ -536,7 +536,7 @@ typedef PACKEDATTR_PRE struct
 
 typedef struct
 {
-  const line_t* line;
+  const line_t __far* line;
   bwhere_e where;
   int32_t   btexture;
   int32_t   btimer;
@@ -762,12 +762,9 @@ int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max);
 
 sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec);
 
-boolean P_CheckTag
-(const line_t *line); // jff 2/27/98
+boolean P_CheckTag(const line_t __far* line);
 
-boolean P_CanUnlockGenDoor
-( const line_t* line,
-  player_t* player);
+boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player);
 
 boolean P_SectorActive(special_e t, const sector_t __far* s);
 
@@ -810,24 +807,19 @@ void T_MoveFloor
 
 // p_telept
 
-boolean EV_Teleport(const line_t* line, int32_t side, mobj_t __far* thing);
+boolean EV_Teleport(const line_t __far* line, int32_t side, mobj_t __far* thing);
 
 // killough 2/14/98: Add silent teleporter
-boolean EV_SilentTeleport(const line_t* line, int32_t side, mobj_t __far* thing);
+boolean EV_SilentTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing);
 
 // killough 1/31/98: Add silent line teleporter
 boolean EV_SilentLineTeleport(const line_t* line, int32_t side, mobj_t __far* thing, boolean reverse);
 
 // p_floor
 
-boolean
-EV_DoElevator
-( const line_t* line,
-  elevator_e type );
+boolean EV_DoElevator(const line_t __far* line, elevator_e type);
 
-boolean EV_BuildStairs
-( const line_t* line,
-  stair_e type );
+boolean EV_BuildStairs(const line_t __far* line, stair_e type);
 
 boolean EV_DoFloor(const line_t __far* line, floor_e floortype);
 
@@ -835,70 +827,53 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype);
 
 boolean EV_DoCeiling(const line_t __far* line, ceiling_e type);
 
-boolean EV_CeilingCrushStop
-( const line_t* line );
+boolean EV_CeilingCrushStop(const line_t __far* line);
 
 // p_doors
 
-void EV_VerticalDoor(const line_t* line, mobj_t  __far* thing);
+void EV_VerticalDoor(const line_t __far* line, mobj_t  __far* thing);
 
 boolean EV_DoDoor(const line_t __far* line, vldoor_e type);
 
-boolean EV_DoLockedDoor(const line_t* line, vldoor_e type, mobj_t __far* thing);
+boolean EV_DoLockedDoor(const line_t __far* line, vldoor_e type, mobj_t __far* thing);
 
 // p_lights
 
-void EV_StartLightStrobing
-( const line_t* line );
+void EV_StartLightStrobing(const line_t __far* line);
 
-void EV_TurnTagLightsOff
-( const line_t* line );
+void EV_TurnTagLightsOff(const line_t __far* line);
 
 void EV_LightTurnOn(const line_t __far* line, int32_t bright);
 
-void EV_LightTurnOnPartway(const line_t* line, fixed_t level); // killough 10/10/98
+void EV_LightTurnOnPartway(const line_t __far* line, fixed_t level);
 
 // p_floor
 
-boolean EV_DoChange
-( const line_t* line,
-  change_e changetype );
+boolean EV_DoChange(const line_t __far* line, change_e changetype);
 
-boolean EV_DoDonut
-( const line_t* line );
+boolean EV_DoDonut(const line_t __far* line);
 
 // p_plats
 
-boolean EV_DoPlat
-( const line_t* line,
-  plattype_e  type,
-  int32_t amount );
+boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount);
 
-void EV_StopPlat
-( const line_t* line );
+void EV_StopPlat(const line_t __far* line);
 
 // p_genlin
 
-boolean EV_DoGenFloor
-( const line_t* line );
+boolean EV_DoGenFloor(const line_t __far* line);
 
-boolean EV_DoGenCeiling
-( const line_t* line );
+boolean EV_DoGenCeiling(const line_t __far* line);
 
-boolean EV_DoGenLift
-( const line_t* line );
+boolean EV_DoGenLift(const line_t __far* line);
 
-boolean EV_DoGenStairs
-( const line_t* line );
+boolean EV_DoGenStairs(const line_t __far* line);
 
-boolean EV_DoGenCrusher
-( const line_t* line );
+boolean EV_DoGenCrusher(const line_t __far* line);
 
-boolean EV_DoGenDoor
-( const line_t* line );
+boolean EV_DoGenDoor(const line_t __far* line);
 
-boolean EV_DoGenLockedDoor
-( const line_t* line );
+boolean EV_DoGenLockedDoor(const line_t __far* line);
 
 ////////////////////////////////////////////////////////////////
 //

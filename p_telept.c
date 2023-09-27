@@ -46,7 +46,7 @@
 
 #include "globdata.h"
 
-static mobj_t* P_TeleportDestination(const line_t* line)
+static mobj_t* P_TeleportDestination(const line_t __far* line)
 {
   int32_t i;
   for (i = -1; (i = P_FindSectorFromLineTag(line, i)) >= 0;) {
@@ -64,9 +64,8 @@ static mobj_t* P_TeleportDestination(const line_t* line)
 //
 // TELEPORTATION
 //
-// killough 5/3/98: reformatted, cleaned up
 
-boolean EV_Teleport(const line_t *line, int32_t side, mobj_t __far* thing)
+boolean EV_Teleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
 {
   mobj_t    *m;
 
@@ -130,7 +129,7 @@ boolean EV_Teleport(const line_t *line, int32_t side, mobj_t __far* thing)
 // Primarily for rooms-over-rooms etc.
 //
 
-boolean EV_SilentTeleport(const line_t *line, int32_t side, mobj_t __far* thing)
+boolean EV_SilentTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
 {
   mobj_t    *m;
 

@@ -327,7 +327,7 @@ void P_SpawnGlowingLight(sector_t __far* sector)
 //
 // Passed the line that activated the strobing
 //
-void EV_StartLightStrobing(const line_t* line)
+void EV_StartLightStrobing(const line_t __far* line)
 {
   int32_t   secnum;
   sector_t __far* sec;
@@ -352,7 +352,7 @@ void EV_StartLightStrobing(const line_t* line)
 //
 // Passed the line that activated the lights being turned off
 //
-void EV_TurnTagLightsOff(const line_t* line)
+void EV_TurnTagLightsOff(const line_t __far* line)
 {
   int32_t j;
 
@@ -416,7 +416,7 @@ void EV_LightTurnOn(const line_t __far* line, int32_t bright)
  *
  */
 
-void EV_LightTurnOnPartway(const line_t *line, fixed_t level)
+void EV_LightTurnOnPartway(const line_t __far* line, fixed_t level)
 {
   int32_t i;
 

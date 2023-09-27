@@ -398,7 +398,7 @@ boolean P_ActivateInStasisCeiling(const line_t __far* line)
 // Passed the linedef stopping the ceilings
 // Returns true if a ceiling put in stasis
 //
-boolean EV_CeilingCrushStop(const line_t* line)
+boolean EV_CeilingCrushStop(const line_t __far* line)
 {
   boolean rtn=false;
 

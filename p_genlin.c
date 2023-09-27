@@ -61,8 +61,7 @@
 // jff 02/04/98 Added this routine (and file) to handle generalized
 // floor movers using bit fields in the line special type.
 //
-boolean EV_DoGenFloor
-( const line_t*       line )
+boolean EV_DoGenFloor(const line_t __far* line)
 {
   int32_t                   secnum;
   boolean                   rtn;
@@ -263,8 +262,7 @@ manual_floor:
 // jff 02/04/98 Added this routine (and file) to handle generalized
 // floor movers using bit fields in the line special type.
 //
-boolean EV_DoGenCeiling
-( const line_t*       line )
+boolean EV_DoGenCeiling(const line_t __far* line)
 {
   int32_t                   secnum;
   boolean                   rtn;
@@ -468,8 +466,7 @@ manual_ceiling:
 // Passed the linedef activating the lift
 // Returns true if a thinker is created
 //
-boolean EV_DoGenLift
-( const line_t*       line )
+boolean EV_DoGenLift(const line_t __far* line)
 {
   plat_t __far*         plat;
   int32_t             secnum;
@@ -617,8 +614,7 @@ manual_lift:
 // Passed the linedef activating the stairs
 // Returns true if a thinker is created
 //
-boolean EV_DoGenStairs
-( const line_t*       line )
+boolean EV_DoGenStairs(const line_t __far* line)
 {
   int32_t                   secnum;
   int32_t                   osecnum; //jff 3/4/98 preserve loop index
@@ -631,7 +627,7 @@ boolean EV_DoGenStairs
   boolean               manual;
 
   sector_t __far*             sec;
-  sector_t*             tsec;
+  sector_t __far*             tsec;
 
   floormove_t __far*  floor;
 
@@ -801,8 +797,7 @@ manual_stair:
 // Passed the linedef activating the crusher
 // Returns true if a thinker created
 //
-boolean EV_DoGenCrusher
-( const line_t*       line )
+boolean EV_DoGenCrusher(const line_t __far* line)
 {
   int32_t                   secnum;
   boolean                   rtn;
@@ -898,8 +893,7 @@ manual_crusher:
 // Passed the linedef activating the generalized locked door
 // Returns true if a thinker created
 //
-boolean EV_DoGenLockedDoor
-( const line_t* line )
+boolean EV_DoGenLockedDoor(const line_t __far* line)
 {
   int32_t   secnum;
   boolean   rtn;
@@ -1005,8 +999,7 @@ manual_locked:
 // Passed the linedef activating the generalized door
 // Returns true if a thinker created
 //
-boolean EV_DoGenDoor
-( const line_t* line )
+boolean EV_DoGenDoor(const line_t __far* line)
 {
   int32_t   secnum;
   boolean   rtn;

@@ -762,9 +762,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 //
 // jff 3/15/98 added to better support generalized sector types
 //
-boolean EV_DoChange
-( const line_t*       line,
-  change_e      changetype )
+boolean EV_DoChange(const line_t __far* line, change_e changetype)
 {
   int32_t                   secnum;
   boolean                   rtn;
@@ -827,8 +825,7 @@ boolean EV_DoChange
  * stairs
  * - Boom fixed the bug, and MBF/PrBoom without comp_stairs work right
  */
-static inline int32_t P_FindSectorFromLineTagWithLowerBound
-(const line_t* l, int32_t start, int32_t min)
+static inline int32_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* l, int32_t start, int32_t min)
 {
   /* Emulate original Doom's linear lower-bounded P_FindSectorFromLineTag
    * as needed */
@@ -838,9 +835,7 @@ static inline int32_t P_FindSectorFromLineTagWithLowerBound
   return start;
 }
 
-boolean EV_BuildStairs
-( const line_t*       line,
-  stair_e       type )
+boolean EV_BuildStairs(const line_t __far* line, stair_e type)
 {
   /* cph 2001/09/22 - cleaned up this function to save my sanity. A separate
    * outer loop index makes the logic much cleared, and local variables moved
@@ -964,7 +959,7 @@ boolean EV_BuildStairs
 // Passed the linedef that triggered the donut
 // Returns whether a thinker was created
 //
-boolean EV_DoDonut(const line_t*  line)
+boolean EV_DoDonut(const line_t __far* line)
 {
   sector_t __far* s1;
   sector_t __far* s2;
@@ -1046,9 +1041,7 @@ boolean EV_DoDonut(const line_t*  line)
 //
 // jff 2/22/98 new type to move floor and ceiling in parallel
 //
-boolean EV_DoElevator
-( const line_t*       line,
-  elevator_e    elevtype )
+boolean EV_DoElevator(const line_t __far* line, elevator_e elevtype)
 {
   int32_t                   secnum;
   boolean                   rtn;

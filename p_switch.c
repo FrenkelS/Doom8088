@@ -114,11 +114,7 @@ void P_InitSwitchList(void)
 // to remain active in gametics.
 // No return.
 //
-static void P_StartButton
-( const line_t*       line,
-  bwhere_e      w,
-  int32_t           texture,
-  int32_t           time )
+static void P_StartButton(const line_t __far* line, bwhere_e w, int32_t texture, int32_t time)
 {
   int32_t           i;
 
@@ -246,7 +242,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int32_t 
   {
     // pointer to line function is NULL by default, set non-null if
     // line special is push or switch generalized linedef type
-    boolean (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
