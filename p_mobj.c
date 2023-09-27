@@ -207,7 +207,7 @@ static void P_XYMovement (mobj_t* mo)
 
                     if (_g_ceilingline)
                     {
-                        const sector_t* ceilingBackSector = LN_BACKSECTOR(_g_ceilingline);
+                        const sector_t __far* ceilingBackSector = LN_BACKSECTOR(_g_ceilingline);
 
                         if(ceilingBackSector && ceilingBackSector->ceilingpic == skyflatnum)
                         {
