@@ -182,11 +182,11 @@ void I_StartTic(void)
 
 static boolean isGraphicsModeSet = false;
 static uint16_t __far* screen;
-static uint16_t  backBuffer[SCREENWIDTH * SCREENHEIGHT];
+static uint16_t __far backBuffer[SCREENWIDTH * SCREENHEIGHT];
 
 static int8_t newpal;
 
-uint16_t* I_GetBackBuffer(void)
+uint16_t __far* I_GetBackBuffer(void)
 {
 	return &backBuffer[0];
 }
@@ -194,7 +194,7 @@ uint16_t* I_GetBackBuffer(void)
 
 void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
 {
-	uint16_t* src = &backBuffer[0];
+	uint16_t __far* src = &backBuffer[0];
 	uint16_t __far* dst = buffer;
 	for (int16_t i = 0; i < SCREENWIDTH * SCREENHEIGHT; i++)
 		*dst++ = *src++;

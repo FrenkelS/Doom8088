@@ -256,7 +256,7 @@ extern int16_t* _g_lastopening;
 //******************************************************************************
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-extern uint16_t *_g_screen;
+extern uint16_t __far* _g_screen;
 
 //******************************************************************************
 //wi_stuff.c

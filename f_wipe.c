@@ -67,7 +67,7 @@ static boolean wipe_ScreenWipe(int32_t ticks)
 {
     boolean done = true;
 
-    uint16_t* backbuffer = I_GetBackBuffer();
+    uint16_t __far* backbuffer = I_GetBackBuffer();
 
     while (ticks--)
     {

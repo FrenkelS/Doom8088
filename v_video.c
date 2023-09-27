@@ -46,7 +46,7 @@
 
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-uint16_t *_g_screen;
+uint16_t __far* _g_screen;
 
 
 /*
