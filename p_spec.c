@@ -554,7 +554,7 @@ sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight,int32_t secnum)
 //
 // RETURN NEXT SECTOR # THAT LINE TAG REFERS TO
 //
-int32_t P_FindSectorFromLineTag(const line_t* line, int32_t start)
+int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start)
 {
     int32_t	i;
 

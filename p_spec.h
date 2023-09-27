@@ -772,9 +772,7 @@ boolean P_CanUnlockGenDoor
 boolean P_SectorActive(special_e t, const sector_t __far* s);
 
 
-void P_ChangeSwitchTexture
-( const line_t* line,
-  int32_t useAgain );
+void P_ChangeSwitchTexture(const line_t __far* line, int32_t useAgain);
 
 ////////////////////////////////////////////////////////////////
 //
@@ -860,9 +858,7 @@ void EV_StartLightStrobing
 void EV_TurnTagLightsOff
 ( const line_t* line );
 
-void EV_LightTurnOn
-( const line_t* line,
-  int32_t   bright );
+void EV_LightTurnOn(const line_t __far* line, int32_t bright);
 
 void EV_LightTurnOnPartway(const line_t* line, fixed_t level); // killough 10/10/98
 

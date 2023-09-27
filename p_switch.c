@@ -153,7 +153,7 @@ static void P_StartButton
 //
 // No return
 //
-void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
+void P_ChangeSwitchTexture(const line_t __far* line, int32_t useAgain)
 {
     /* Rearranged a bit to avoid too much code duplication */
     int16_t     i, sound;
