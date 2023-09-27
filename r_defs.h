@@ -97,7 +97,7 @@ typedef struct
   mobj_t __far* soundtarget;   // thing that made a sound (or null)
   degenmobj_t soundorg;  // origin for any sounds played by the sector
   int32_t validcount;        // if == validcount, already checked
-  mobj_t *thinglist;     // list of mobjs in sector
+  mobj_t __far* thinglist;     // list of mobjs in sector
 
 
   // thinker_t for reversable actions
