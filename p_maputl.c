@@ -95,7 +95,7 @@ int32_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* lin
 //
 // killough 5/3/98: reformatted, cleaned up
 
-int32_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t *ld)
+int32_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
 {
     int32_t p;
     switch (ld->slopetype)

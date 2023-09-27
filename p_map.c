@@ -131,7 +131,7 @@ static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 //
 
 
-static boolean PIT_StompThing (mobj_t* thing)
+static boolean PIT_StompThing(mobj_t __far* thing)
   {
   fixed_t blockdist;
 
@@ -263,8 +263,7 @@ static boolean untouched(const line_t *ld)
 // Adjusts tmfloorz and tmceilingz as lines are contacted
 //
 
-static // killough 3/26/98: make static
-boolean PIT_CheckLine (const line_t* ld)
+static boolean PIT_CheckLine (const line_t __far* ld)
 {
   if (_g_tmbbox[BOXRIGHT] <= ld->bbox[BOXLEFT]
    || _g_tmbbox[BOXLEFT] >= ld->bbox[BOXRIGHT]
@@ -346,7 +345,7 @@ boolean PIT_CheckLine (const line_t* ld)
 // PIT_CheckThing
 //
 
-static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
+static boolean PIT_CheckThing(mobj_t __far* thing)
 {
   fixed_t blockdist;
   int32_t damage;
@@ -1260,7 +1259,7 @@ void P_UseLines (player_t*  player)
 // that caused the explosion at "bombspot".
 //
 
-static boolean PIT_RadiusAttack (mobj_t* thing)
+static boolean PIT_RadiusAttack (mobj_t __far* thing)
   {
   fixed_t dx;
   fixed_t dy;
@@ -1466,7 +1465,7 @@ void P_DelSeclist(void)
 // at this location, so don't bother with checking impassable or
 // blocking lines.
 
-static boolean PIT_GetSectors(const line_t* ld)
+static boolean PIT_GetSectors(const line_t __far* ld)
   {
   if (_g_tmbbox[BOXRIGHT]  <= ld->bbox[BOXLEFT]   ||
       _g_tmbbox[BOXLEFT]   >= ld->bbox[BOXRIGHT]  ||

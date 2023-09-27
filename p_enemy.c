@@ -456,7 +456,7 @@ static void P_DoNewChaseDir(mobj_t *actor, fixed_t deltax, fixed_t deltay)
 // monsters to free themselves without making them tend to
 // hang over dropoffs.
 
-static boolean PIT_AvoidDropoff(const line_t *line)
+static boolean PIT_AvoidDropoff(const line_t __far* line)
 {
   if (LN_BACKSECTOR(line)                          && // Ignore one-sided linedefs
       _g_tmbbox[BOXRIGHT]  > line->bbox[BOXLEFT]   &&

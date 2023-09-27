@@ -72,7 +72,7 @@ typedef boolean (*traverser_t)(intercept_t *in);
 
 fixed_t CONSTFUNC P_AproxDistance (fixed_t dx, fixed_t dy);
 int32_t     P_PointOnLineSide (fixed_t x, fixed_t y, const line_t __far* line);
-int32_t     P_BoxOnLineSide (const fixed_t *tmbox, const line_t *ld);
+int32_t     P_BoxOnLineSide (const fixed_t *tmbox, const line_t __far* ld);
 /* cph - old compatibility version below */
 fixed_t P_InterceptVector2(const divline_t *v2, const divline_t *v1);
 
