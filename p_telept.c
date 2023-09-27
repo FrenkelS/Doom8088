@@ -66,7 +66,7 @@ static mobj_t* P_TeleportDestination(const line_t* line)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-boolean EV_Teleport(const line_t *line, int32_t side, mobj_t *thing)
+boolean EV_Teleport(const line_t *line, int32_t side, mobj_t __far* thing)
 {
   mobj_t    *m;
 
@@ -130,7 +130,7 @@ boolean EV_Teleport(const line_t *line, int32_t side, mobj_t *thing)
 // Primarily for rooms-over-rooms etc.
 //
 
-boolean EV_SilentTeleport(const line_t *line, int32_t side, mobj_t *thing)
+boolean EV_SilentTeleport(const line_t *line, int32_t side, mobj_t __far* thing)
 {
   mobj_t    *m;
 
@@ -212,8 +212,7 @@ boolean EV_SilentTeleport(const line_t *line, int32_t side, mobj_t *thing)
 // maximum fixed_t units to move object to avoid hiccups
 #define FUDGEFACTOR 10
 
-boolean EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t *thing,
-                          boolean reverse)
+boolean EV_SilentLineTeleport(const line_t *line, int32_t side, mobj_t __far* thing, boolean reverse)
 {
   int32_t i;
   const line_t *l;

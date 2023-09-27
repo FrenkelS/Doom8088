@@ -906,7 +906,7 @@ boolean P_CheckTag(const line_t *line)
 //  crossed. Change is qualified by demo_compatibility.
 //
 // CPhipps - take a line_t pointer instead of a line number, as in MBF
-void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
+void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t __far* thing)
 {
   int32_t         ok;
 

@@ -164,7 +164,7 @@ static boolean PIT_StompThing (mobj_t* thing)
 // P_TeleportMove
 //
 
-boolean P_TeleportMove (mobj_t* thing,fixed_t x,fixed_t y, boolean boss)
+boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss)
   {
   int32_t     xl;
   int32_t     xh;

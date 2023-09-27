@@ -823,23 +823,13 @@ void T_MoveFloor
 
 // p_telept
 
-boolean EV_Teleport
-( const line_t* line,
-  int32_t side,
-  mobj_t* thing );
+boolean EV_Teleport(const line_t* line, int32_t side, mobj_t __far* thing);
 
 // killough 2/14/98: Add silent teleporter
-boolean EV_SilentTeleport
-( const line_t* line,
-  int32_t side,
-  mobj_t* thing );
+boolean EV_SilentTeleport(const line_t* line, int32_t side, mobj_t __far* thing);
 
 // killough 1/31/98: Add silent line teleporter
-boolean EV_SilentLineTeleport
-( const line_t* line,
-  int32_t side,
-  mobj_t* thing,
-  boolean reverse);
+boolean EV_SilentLineTeleport(const line_t* line, int32_t side, mobj_t __far* thing, boolean reverse);
 
 // p_floor
 
@@ -964,7 +954,7 @@ void P_ShootSpecialLine
 ( mobj_t* thing,
   const line_t* line );
 
-void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing);
+void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t __far* thing);
 
 void P_PlayerInSpecialSector
 ( player_t* player );
