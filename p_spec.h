@@ -833,9 +833,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype);
 
 // p_ceilng
 
-boolean EV_DoCeiling
-( const line_t* line,
-  ceiling_e type );
+boolean EV_DoCeiling(const line_t __far* line, ceiling_e type);
 
 boolean EV_CeilingCrushStop
 ( const line_t* line );
@@ -968,7 +966,6 @@ void P_RemoveAllActiveCeilings
 
 void P_AddActiveCeiling(ceiling_t __far* c);
 
-boolean P_ActivateInStasisCeiling
-( const line_t* line );
+boolean P_ActivateInStasisCeiling(const line_t __far* line);
 
 #endif

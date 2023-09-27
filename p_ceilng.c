@@ -251,9 +251,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
 // Passed the linedef activating the function and the type of function desired
 // returns true if a thinker started
 //
-boolean EV_DoCeiling
-( const line_t* line,
-  ceiling_e type )
+boolean EV_DoCeiling(const line_t __far* line, ceiling_e type)
 {
   int32_t   secnum;
   boolean   rtn;
@@ -373,7 +371,7 @@ boolean EV_DoCeiling
 // Returns true if a ceiling reactivated
 //
 //jff 4/5/98 return if activated
-boolean P_ActivateInStasisCeiling(const line_t *line)
+boolean P_ActivateInStasisCeiling(const line_t __far* line)
 {
   ceilinglist_t __far* cl;
   boolean rtn=false;
