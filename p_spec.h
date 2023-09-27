@@ -584,15 +584,9 @@ typedef struct
   int32_t tag;
   plattype_e type;
 
-  struct platlist *list;   // killough
+  struct platlist __far* list;
 } plat_t;
 
-// New limit-free plat structure -- killough
-
-typedef struct platlist {
-  plat_t __far* plat;
-  struct platlist *next,**prev;
-} platlist_t;
 
 // p_ceilng
 

@@ -44,6 +44,14 @@
 #include "globdata.h"
 
 
+// New limit-free plat structure -- killough
+
+typedef struct platlist {
+  plat_t __far* plat;
+  struct platlist __far* next, __far*__far* prev;
+} platlist_t;
+
+
 static platlist_t __far* activeplats;
 
 
@@ -190,7 +198,7 @@ boolean EV_DoPlat
   plat_t __far* plat;
   int32_t             secnum;
   boolean             rtn;
-  sector_t*       sec;
+  sector_t __far*       sec;
 
   secnum = -1;
   rtn = false;
@@ -348,7 +356,7 @@ void P_ActivateInStasis(int32_t tag)
   platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)   // search the active plats
   {
-    plat_t *plat = pl->plat;              // for one in stasis with right tag
+    plat_t __far* plat = pl->plat;              // for one in stasis with right tag
     if (plat->tag == tag && plat->status == in_stasis)
     {
       if (plat->type==toggleUpDn) //jff 3/14/98 reactivate toggle type
@@ -372,7 +380,7 @@ void EV_StopPlat(const line_t* line)
   platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)  // search the active plats
   {
-    plat_t *plat = pl->plat;             // for one with the tag not in stasis
+    plat_t __far* plat = pl->plat;             // for one with the tag not in stasis
     if (plat->status != in_stasis && plat->tag == line->tag)
     {
       plat->oldstatus = plat->status;    // put it in stasis
@@ -413,7 +421,7 @@ void P_AddActivePlat(plat_t __far* plat)
 //
 static void P_RemoveActivePlat(plat_t* plat)
 {
-  platlist_t *list = plat->list;
+  platlist_t __far* list = plat->list;
   plat->sector->floordata = NULL; //jff 2/23/98 multiple thinkers
 
   P_RemoveThinker(&plat->thinker);
@@ -435,7 +443,7 @@ void P_RemoveAllActivePlats(void)
 {
   while (activeplats)
   {
-    platlist_t *next = activeplats->next;
+    platlist_t __far* next = activeplats->next;
     Z_Free(activeplats);
     activeplats = next;
   }
