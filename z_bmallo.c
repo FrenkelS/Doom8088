@@ -46,19 +46,19 @@
 #include "i_system.h"
 
 typedef struct bmalpool_s {
-	struct bmalpool_s *nextpool;
+	struct bmalpool_s __far* nextpool;
 	size_t             blocks;
 	byte               used[];
 } bmalpool_t;
 
 
-__inline static void* getelem(bmalpool_t *p, size_t size, size_t n)
+__inline static void* getelem(bmalpool_t __far* p, size_t size, size_t n)
 {
 	return (((byte*)p) + sizeof(bmalpool_t) + sizeof(byte) * (p->blocks) + size * n);
 }
 
 
-__inline static PUREFUNC uint32_t linearAddress(const void* ptr)
+__inline static PUREFUNC uint32_t linearAddress(const void __far* ptr)
 {
 	uint32_t seg = FP_SEG(ptr);
 	uint16_t off = FP_OFF(ptr);
@@ -66,7 +66,7 @@ __inline static PUREFUNC uint32_t linearAddress(const void* ptr)
 }
 
 
-__inline static PUREFUNC int32_t iselem(const bmalpool_t *pool, size_t size, const void* p)
+__inline static PUREFUNC int32_t iselem(const bmalpool_t __far* pool, size_t size, const void* p)
 {
 	int32_t dif = linearAddress(p) - linearAddress(pool);
 
@@ -83,11 +83,11 @@ __inline static PUREFUNC int32_t iselem(const bmalpool_t *pool, size_t size, con
 enum { unused_block = 0, used_block = 1};
 
 
-void* Z_BMalloc(struct block_memory_alloc_s *pzone)
+void __far* Z_BMalloc(struct block_memory_alloc_s *pzone)
 {
-	register bmalpool_t **pool = (bmalpool_t **)&(pzone->firstpool);
+	register bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
 	while (*pool != NULL) {
-		byte *p = memchr((*pool)->used, unused_block, (*pool)->blocks); // Scan for unused marker
+		byte __far* p = _fmemchr((*pool)->used, unused_block, (*pool)->blocks); // Scan for unused marker
 		if (p) {
 			int32_t n = p - (*pool)->used;
 			(*pool)->used[n] = used_block;
@@ -97,7 +97,7 @@ void* Z_BMalloc(struct block_memory_alloc_s *pzone)
 	}
 
 	// Nothing available, must allocate a new pool
-	bmalpool_t *newpool;
+	bmalpool_t __far* newpool;
 
 	// CPhipps: Allocate new memory, initialised to 0
 
@@ -113,15 +113,15 @@ void* Z_BMalloc(struct block_memory_alloc_s *pzone)
 
 void Z_BFree(struct block_memory_alloc_s *pzone, void* p)
 {
-	register bmalpool_t **pool = (bmalpool_t**)&(pzone->firstpool);
+	register bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
 
 	while (*pool != NULL) {
 		int32_t n = iselem(*pool, pzone->size, p);
 		if (n >= 0) {
 			(*pool)->used[n] = unused_block;
-			if (memchr(((*pool)->used), used_block, (*pool)->blocks) == NULL) {
+			if (_fmemchr(((*pool)->used), used_block, (*pool)->blocks) == NULL) {
 				// Block is all unused, can be freed
-				bmalpool_t *oldpool = *pool;
+				bmalpool_t __far* oldpool = *pool;
 				*pool = (*pool)->nextpool;
 				Z_Free(oldpool);
 			}

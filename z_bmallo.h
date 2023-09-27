@@ -39,6 +39,6 @@ struct block_memory_alloc_s {
 	size_t perpool;
 };
 
-void* Z_BMalloc(struct block_memory_alloc_s *pzone);
+void __far* Z_BMalloc(struct block_memory_alloc_s *pzone);
 
 void Z_BFree(struct block_memory_alloc_s *pzone, void* p);
