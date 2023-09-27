@@ -108,21 +108,21 @@ extern fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // keep track of the line that lowers the ceiling,
 // so missiles don't explode against sky hack walls
 
-extern const line_t    *_g_ceilingline;
+extern const line_t    __far* _g_ceilingline;
 extern const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-extern const line_t *_g_spechit[4];
+extern const line_t __far* _g_spechit[4];
 
 extern int32_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
 extern msecnode_t* _g_sector_list;
 
-extern mobj_t*   _g_linetarget; // who got hit (or NULL)
+extern mobj_t __far*   _g_linetarget; // who got hit (or NULL)
 
 extern fixed_t   _g_attackrange;
 

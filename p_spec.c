@@ -898,7 +898,7 @@ boolean P_CheckTag(const line_t __far* line)
 //  crossed. Change is qualified by demo_compatibility.
 //
 // CPhipps - take a line_t pointer instead of a line number, as in MBF
-void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t __far* thing)
+void P_CrossSpecialLine(const line_t __far* line, int32_t side, mobj_t __far* thing)
 {
   int32_t         ok;
 
@@ -1776,9 +1776,7 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t __far* thing)
 // of the line, should the sector already be in motion when the line is
 // impacted. Change is qualified by demo_compatibility.
 //
-void P_ShootSpecialLine
-( mobj_t*       thing,
-  const line_t*       line )
+void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 {
     // pointer to line function is NULL by default, set non-null if
     // line special is gun triggered generalized linedef type

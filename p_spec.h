@@ -899,11 +899,9 @@ void P_UpdateAnimatedFlat(void);
 // when needed
 boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int32_t side);
 
-void P_ShootSpecialLine
-( mobj_t* thing,
-  const line_t* line );
+void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line);
 
-void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t __far* thing);
+void P_CrossSpecialLine(const line_t __far* line, int32_t side, mobj_t __far* thing);
 
 void P_PlayerInSpecialSector
 ( player_t* player );

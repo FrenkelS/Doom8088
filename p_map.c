@@ -66,7 +66,7 @@ fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // keep track of the line that lowers the ceiling,
 // so missiles don't explode against sky hack walls
 
-const line_t    *_g_ceilingline;
+const line_t    __far* _g_ceilingline;
 const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
 static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
 
@@ -74,7 +74,7 @@ static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsti
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-const line_t *_g_spechit[4];
+const line_t _far* _g_spechit[4];
 
 int32_t _g_numspechit;
 
@@ -82,13 +82,13 @@ int32_t _g_numspechit;
 msecnode_t* _g_sector_list;
 
 static fixed_t   bestslidefrac;
-static const line_t*   bestslideline;
+static const line_t __far*   bestslideline;
 static mobj_t*   slidemo;
 static fixed_t   tmxmove;
 static fixed_t   tmymove;
 
-mobj_t*   _g_linetarget; // who got hit (or NULL)
-static mobj_t*   shootthing;
+mobj_t __far*   _g_linetarget; // who got hit (or NULL)
+static mobj_t __far*   shootthing;
 
 // Height if not aiming up or down
 static fixed_t   shootz;
@@ -636,7 +636,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
 // If the floor is icy, then you can bounce off a wall.             // phares
 //
 
-static void P_HitSlideLine (const line_t* ld)
+static void P_HitSlideLine(const line_t __far* ld)
 {
     int32_t     side;
     angle_t lineangle;
@@ -708,7 +708,7 @@ static void P_HitSlideLine (const line_t* ld)
 
 static boolean PTR_SlideTraverse (intercept_t* in)
   {
-  const line_t* li;
+  const line_t __far* li;
 
   if (!in->isaline)
     I_Error ("PTR_SlideTraverse: not a line?");
@@ -880,8 +880,8 @@ static fixed_t  aimslope;
 //
 static boolean PTR_AimTraverse (intercept_t* in)
 {
-    const line_t* li;
-    mobj_t* th;
+    const line_t __far* li;
+    mobj_t __far* th;
     fixed_t slope;
     fixed_t thingtopslope;
     fixed_t thingbottomslope;
@@ -979,7 +979,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   fixed_t z;
   fixed_t frac;
 
-  mobj_t* th;
+  mobj_t __far* th;
 
   fixed_t slope;
   fixed_t dist;
@@ -988,7 +988,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   if (in->isaline)
     {
-    const line_t *li = in->d.line;
+    const line_t __far* li = in->d.line;
 
     if (LN_SPECIAL(li))
       P_ShootSpecialLine (shootthing, li);
