@@ -213,7 +213,7 @@ static boolean P_CrossBSPNode(int32_t bspnum)
 //
 // killough 4/20/98: cleaned up, made to use new LOS struct
 
-boolean P_CheckSight(mobj_t *t1, mobj_t __far* t2)
+boolean P_CheckSight(mobj_t __far* t1, mobj_t __far* t2)
 {
   const sector_t __far* s1 = t1->subsector->sector;
   const sector_t __far* s2 = t2->subsector->sector;

@@ -752,9 +752,7 @@ sector_t __far* P_FindModelFloorSector(fixed_t floordestheight, int32_t secnum);
 
 sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight, int32_t secnum);
 
-int32_t P_FindSectorFromLineTag
-( const line_t *line,
-  int32_t start ); // killough 4/17/98
+int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start);
 
 int32_t P_FindLineFromLineTag
 ( const line_t *line,
@@ -833,9 +831,7 @@ boolean EV_BuildStairs
 ( const line_t* line,
   stair_e type );
 
-boolean EV_DoFloor
-( const line_t* line,
-  floor_e floortype );
+boolean EV_DoFloor(const line_t __far* line, floor_e floortype);
 
 // p_ceilng
 
@@ -934,7 +930,7 @@ void P_UpdateSpecials(void);
 void P_UpdateAnimatedFlat(void);
 
 // when needed
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t* line, int32_t side);
+boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int32_t side);
 
 void P_ShootSpecialLine
 ( mobj_t* thing,

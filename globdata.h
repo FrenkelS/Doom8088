@@ -109,7 +109,7 @@ extern fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // so missiles don't explode against sky hack walls
 
 extern const line_t    *_g_ceilingline;
-extern const line_t        *_g_blockline;    /* killough 8/11/98: blocking linedef */
+extern const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid

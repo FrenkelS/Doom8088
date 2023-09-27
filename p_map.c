@@ -67,7 +67,7 @@ fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // so missiles don't explode against sky hack walls
 
 const line_t    *_g_ceilingline;
-const line_t        *_g_blockline;    /* killough 8/11/98: blocking linedef */
+const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
 static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
 
 // keep track of special lines as they are hit,
@@ -247,7 +247,7 @@ boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss)
  * assuming NO movement occurs -- used to avoid sticky situations.
  */
 
-static boolean untouched(const line_t *ld)
+static boolean untouched(const line_t __far* ld)
 {
   fixed_t x, y, tmbbox[4];
   return
@@ -1201,7 +1201,7 @@ static boolean PTR_UseTraverse (intercept_t* in)
 
 static boolean PTR_NoWayTraverse(intercept_t* in)
   {
-  const line_t *ld = in->d.line;
+  const line_t __far* ld = in->d.line;
                                            // This linedef
   return LN_SPECIAL(ld) || !(                 // Ignore specials
    ld->flags & ML_BLOCKING || (            // Always blocking
@@ -1357,7 +1357,7 @@ inline static void P_PutSecnode(msecnode_t* node)
 // sectors this object appears in. This is called when creating a list of
 // nodes that will get linked in later.
 
-static void P_AddSecnode(sector_t* s, mobj_t __far* thing)
+static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   {
   msecnode_t* node;
 

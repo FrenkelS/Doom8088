@@ -174,7 +174,7 @@ fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
 // OPTIMIZE: keep this precalculated
 //
 
-void P_LineOpening(const line_t *linedef)
+void P_LineOpening(const line_t __far* linedef)
 {
     // moved front and back outside P-LineOpening and changed
     // them to these so we can pick up the new friction value

@@ -548,9 +548,7 @@ static void T_MoveElevator(elevator_t* elevator)
 // Passed the line that activated the floor and the type of floor motion
 // Returns true if a thinker was created.
 //
-boolean EV_DoFloor
-( const line_t*       line,
-  floor_e       floortype )
+boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 {
   int32_t           secnum;
   boolean           rtn;
@@ -691,7 +689,7 @@ boolean EV_DoFloor
       case raiseToTexture:
         {
           int32_t minsize = ((int32_t)32000)<<FRACBITS; /* jff 3/13/98 no ovf */
-          side_t*     side;
+          side_t __far*     side;
 
           floor->direction = 1;
           floor->sector = sec;
@@ -907,7 +905,7 @@ boolean EV_BuildStairs
 
       for (i = 0;i < sec->linecount;i++)
       {          
-        sector_t* tsec = LN_FRONTSECTOR((sec->lines[i]));
+        sector_t __far* tsec = LN_FRONTSECTOR((sec->lines[i]));
         int32_t newsecnum;
         if ( !((sec->lines[i])->flags & ML_TWOSIDED) )
           continue;
@@ -969,8 +967,8 @@ boolean EV_BuildStairs
 boolean EV_DoDonut(const line_t*  line)
 {
   sector_t __far* s1;
-  sector_t* s2;
-  sector_t* s3;
+  sector_t __far* s2;
+  sector_t __far* s3;
   int32_t       secnum;
   boolean       rtn;
   int32_t       i;

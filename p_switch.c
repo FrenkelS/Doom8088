@@ -234,7 +234,7 @@ void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
 // Passed the thing using the line, the line being used, and the side used
 // Returns true if a thinker was created
 //
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t* line, int32_t side)
+boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int32_t side)
 {
 
   // e6y
