@@ -46,7 +46,7 @@ void P_Ticker(void);
 void P_InitThinkers(void);
 void P_AddThinker(thinker_t __far* thinker);
 void P_RemoveThinker(thinker_t *thinker);
-void P_RemoveThing(mobj_t *thing);
+void P_RemoveThing(mobj_t __far* thing);
 
 
 void P_SetTarget(mobj_t __far*__far* mo, mobj_t __far* target);

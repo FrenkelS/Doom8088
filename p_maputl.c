@@ -221,7 +221,7 @@ void P_LineOpening(const line_t *linedef)
 // these structures need to be updated.
 //
 
-void P_UnsetThingPosition (mobj_t *thing)
+void P_UnsetThingPosition(mobj_t __far* thing)
 {
   if (!(thing->flags & MF_NOSECTOR))
     {

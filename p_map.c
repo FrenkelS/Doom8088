@@ -562,7 +562,7 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
 // Attempt to move to a new position,
 // crossing special lines unless MF_TELEPORT is set.
 //
-boolean P_TryMove(mobj_t* thing,fixed_t x,fixed_t y)
+boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
 {
     fixed_t oldx;
     fixed_t oldy;

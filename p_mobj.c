@@ -52,7 +52,7 @@
 #include "globdata.h"
 
 
-void A_CyberAttack(mobj_t *actor);
+void A_CyberAttack(mobj_t __far* actor);
 
 
 //
@@ -108,7 +108,7 @@ boolean P_SetMobjState(mobj_t __far* mobj, statenum_t state)
 // P_ExplodeMissile
 //
 
-static void P_ExplodeMissile (mobj_t* mo)
+static void P_ExplodeMissile(mobj_t __far* mo)
   {
   mo->momx = mo->momy = mo->momz = 0;
 
@@ -844,7 +844,7 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 void P_SpawnMapThing (const mapthing_t* mthing)
 {
     int32_t     i;
-    mobj_t* mobj;
+    mobj_t __far* mobj;
     fixed_t x;
     fixed_t y;
     fixed_t z;
@@ -954,7 +954,7 @@ void P_SpawnMapThing (const mapthing_t* mthing)
 //
 void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
   {
-  mobj_t* th;
+  mobj_t __far* th;
   // killough 5/5/98: remove dependence on order of evaluation:
   int32_t t = P_Random();
   z += (t - P_Random())<<10;
@@ -978,7 +978,7 @@ void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
 //
 void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int32_t damage)
   {
-  mobj_t* th;
+  mobj_t __far* th;
   // killough 5/5/98: remove dependence on order of evaluation:
   int32_t t = P_Random();
   z += (t - P_Random())<<10;
@@ -1002,7 +1002,7 @@ void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int32_t damage)
 //  and possibly explodes it right there.
 //
 
-static void P_CheckMissileSpawn (mobj_t* th)
+static void P_CheckMissileSpawn(mobj_t __far* th)
   {
   th->tics -= P_Random()&3;
   if (th->tics < 1)
@@ -1028,9 +1028,9 @@ static void P_CheckMissileSpawn (mobj_t* th)
 // P_SpawnMissile
 //
 
-mobj_t* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_t type)
+mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_t type)
   {
-  mobj_t* th;
+  mobj_t __far* th;
   angle_t an;
   int32_t     dist;
 
@@ -1075,7 +1075,7 @@ mobj_t* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_t type
 
 void P_SpawnPlayerMissile(mobj_t* source,mobjtype_t type)
 {
-	mobj_t *th;
+	mobj_t __far* th;
 	fixed_t x, y, z, slope = 0;
 
 	// see which target is to be aimed at

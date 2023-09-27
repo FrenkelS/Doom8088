@@ -43,7 +43,7 @@
 #define MELEERANGE      (64*FRACUNIT)
 #define MISSILERANGE    (32*64*FRACUNIT)
 
-boolean P_TryMove(mobj_t *thing, fixed_t x, fixed_t y);
+boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y);
 
 // killough 8/9/98: extra argument for telefragging
 boolean P_TeleportMove(mobj_t *thing, fixed_t x, fixed_t y,boolean boss);

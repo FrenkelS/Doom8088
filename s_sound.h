@@ -70,7 +70,7 @@ void S_StartSound2(degenmobj_t __far* origin, int32_t sfx_id);
 #define PICKUP_SOUND (0x8000)
 
 // Stop sound for thing at <origin>
-void S_StopSound(void* origin);
+void S_StopSound(void __far* origin);
 
 // Start music using <music_id> from sounds.h
 void S_StartMusic(int32_t music_id);

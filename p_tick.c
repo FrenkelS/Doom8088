@@ -148,7 +148,7 @@ void P_RemoveThinker(thinker_t *thinker)
   thinker->function = P_RemoveThinkerDelayed;
 }
 
-void P_RemoveThing(mobj_t *thing)
+void P_RemoveThing(mobj_t __far* thing)
 {
   thing->thinker.function = P_RemoveThingDelayed;
 }

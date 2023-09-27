@@ -915,7 +915,7 @@ void A_SargAttack(mobj_t *actor)
 }
 
 
-void A_CyberAttack(mobj_t *actor)
+void A_CyberAttack(mobj_t __far* actor)
 {
   if (!actor->target)
     return;

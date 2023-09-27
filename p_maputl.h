@@ -77,7 +77,7 @@ int32_t     P_BoxOnLineSide (const fixed_t *tmbox, const line_t *ld);
 fixed_t P_InterceptVector2(const divline_t *v2, const divline_t *v1);
 
 void    P_LineOpening (const line_t *linedef);
-void    P_UnsetThingPosition(mobj_t *thing);
+void    P_UnsetThingPosition(mobj_t __far* thing);
 void    P_SetThingPosition(mobj_t __far* thing);
 boolean P_BlockLinesIterator (int32_t x, int32_t y, boolean func(const line_t *));
 boolean P_BlockThingsIterator(int32_t x, int32_t y, boolean func(mobj_t *));

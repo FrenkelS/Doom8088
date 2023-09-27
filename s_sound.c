@@ -274,7 +274,7 @@ void S_StartSound2(degenmobj_t __far* origin, int32_t sfx_id)
     S_StartSoundAtVolume((mobj_t*) &fm, sfx_id, snd_SfxVolume);
 }
 
-void S_StopSound(void *origin)
+void S_StopSound(void __far* origin)
 {
     int32_t cnum;
 
