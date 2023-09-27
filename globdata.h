@@ -197,7 +197,7 @@ extern const int16_t      __far* _g_blockmaplump;
 
 extern fixed_t   _g_bmaporgx, _g_bmaporgy;     // origin of block map
 
-extern mobj_t    **_g_blocklinks;           // for thing chains
+extern mobj_t    __far**_g_blocklinks;           // for thing chains
 
 //
 // REJECT

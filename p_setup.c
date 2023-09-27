@@ -100,7 +100,7 @@ const int16_t      __far* _g_blockmaplump;
 
 fixed_t   _g_bmaporgx, _g_bmaporgy;     // origin of block map
 
-mobj_t    **_g_blocklinks;           // for thing chains
+mobj_t    __far**_g_blocklinks;           // for thing chains
 
 //
 // REJECT
@@ -554,7 +554,7 @@ static void P_GroupLines (void)
     }
 
     {  // allocate line tables for each sector
-        const line_t **linebuffer = Z_MallocLevel(total*sizeof(line_t *), NULL);
+        const line_t __far**linebuffer = Z_MallocLevel(total*sizeof(line_t *), NULL);
 
         for (i=0, sector = _g_sectors; i<_g_numsectors; i++, sector++)
         {
