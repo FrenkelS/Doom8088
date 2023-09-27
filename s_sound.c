@@ -107,7 +107,7 @@ static void S_StopChannel(int32_t cnum);
 
 static void S_StopMusic(void);
 
-static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t __far* source, int32_t *vol, int32_t *sep);
+static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int32_t *vol, int32_t *sep);
 
 static int32_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup);
 
@@ -459,7 +459,7 @@ static void S_StopChannel(int32_t cnum)
 // Otherwise, modifies parameters and returns 1.
 //
 
-static boolean S_AdjustSoundParams(mobj_t *listener, mobj_t __far* source, int32_t *vol, int32_t *sep)
+static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int32_t *vol, int32_t *sep)
 {
 	fixed_t adx, ady,approx_dist;
 
