@@ -89,7 +89,7 @@ static boolean P_CrossSubsector(int32_t num)
     { // check lines
         int32_t linenum = seg->linenum;
 
-        const line_t *line = &_g_lines[linenum];
+        const line_t __far* line = &_g_lines[linenum];
         divline_t divl;
 
         // allready checked other side?
@@ -127,7 +127,7 @@ static boolean P_CrossSubsector(int32_t num)
         }
 
         // Forget this line if it doesn't cross the line of sight
-        const vertex_t *v1,*v2;
+        const vertex_t __far* v1, __far* v2;
 
         v1 = &line->v1;
         v2 = &line->v2;
@@ -215,8 +215,8 @@ static boolean P_CrossBSPNode(int32_t bspnum)
 
 boolean P_CheckSight(mobj_t *t1, mobj_t __far* t2)
 {
-  const sector_t *s1 = t1->subsector->sector;
-  const sector_t *s2 = t2->subsector->sector;
+  const sector_t __far* s1 = t1->subsector->sector;
+  const sector_t __far* s2 = t2->subsector->sector;
   int32_t pnum = (s1-_g_sectors)*_g_numsectors + (s2-_g_sectors);
 
   // First check for trivial rejection.
