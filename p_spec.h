@@ -730,10 +730,7 @@ boolean twoSided
 ( int32_t sector,
   int32_t line );
 
-side_t* getSide
-( int32_t   currentSector,
-  int32_t   line,
-  int32_t   side );
+side_t __far* getSide(int32_t currentSector, int32_t line, int32_t side);
 
 fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec);
 
@@ -771,7 +768,7 @@ int32_t P_FindLineFromLineTag
 
 int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max);
 
-sector_t* getNextSector(const line_t* line, sector_t __far* sec);
+sector_t __far* getNextSector(const line_t* line, sector_t __far* sec);
 
 boolean P_CheckTag
 (const line_t *line); // jff 2/27/98

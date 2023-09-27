@@ -100,10 +100,7 @@ void P_InitPicAnims (void)
 //
 // Note: if side=1 is specified, it must exist or results undefined
 //
-side_t* getSide
-( int32_t           currentSector,
-  int32_t           line,
-  int32_t           side )
+side_t __far* getSide(int32_t currentSector, int32_t line, int32_t side)
 {
   return &_g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ];
 }
@@ -118,10 +115,7 @@ side_t* getSide
 //
 // Note: if side=1 is specified, it must exist or results undefined
 //
-static sector_t* getSector
-( int32_t           currentSector,
-  int32_t           line,
-  int32_t           side )
+static sector_t __far* getSector(int32_t currentSector, int32_t line, int32_t side)
 {
   return _g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ].sector;
 }
@@ -154,7 +148,7 @@ boolean twoSided
 //
 // Note: returns NULL if not two-sided line, or both sides refer to sector
 //
-sector_t* getNextSector(const line_t* line, sector_t __far* sec)
+sector_t __far* getNextSector(const line_t* line, sector_t __far* sec)
 {
 
 
@@ -179,7 +173,7 @@ fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec)
 {
   int32_t                 i;
   const line_t*             check;
-  sector_t*           other;
+  sector_t __far*           other;
   fixed_t             floor = sec->floorheight;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -207,7 +201,7 @@ fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 {
   int32_t i;
   const line_t* check;
-  sector_t* other;
+  sector_t __far* other;
   fixed_t floor = -32000*FRACUNIT;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -237,7 +231,7 @@ fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 //
 fixed_t P_FindNextHighestFloor(sector_t __far* sec, int32_t currentheight)
 {
-  sector_t *other;
+  sector_t __far* other;
   int32_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -272,7 +266,7 @@ fixed_t P_FindNextHighestFloor(sector_t __far* sec, int32_t currentheight)
 //
 fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight)
 {
-  sector_t *other;
+  sector_t __far* other;
   int32_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -303,7 +297,7 @@ fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight)
 //
 fixed_t P_FindNextLowestCeiling(sector_t __far* sec, int32_t currentheight)
 {
-  sector_t *other;
+  sector_t __far* other;
   int32_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -334,7 +328,7 @@ fixed_t P_FindNextLowestCeiling(sector_t __far* sec, int32_t currentheight)
 //
 fixed_t P_FindNextHighestCeiling(sector_t __far* sec, int32_t currentheight)
 {
-  sector_t *other;
+  sector_t __far* other;
   int32_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -363,7 +357,7 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 {
   int32_t                 i;
   const line_t*             check;
-  sector_t*           other;
+  sector_t __far*           other;
   fixed_t             height = 32000*FRACUNIT;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -391,7 +385,7 @@ fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
 {
   int32_t             i;
   const line_t* check;
-  sector_t*       other;
+  sector_t __far*       other;
   fixed_t height = -32000*FRACUNIT;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -420,7 +414,7 @@ fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
 fixed_t P_FindShortestTextureAround(int32_t secnum)
 {
   int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
-  side_t*     side;
+  side_t __far*     side;
   int32_t i;
   sector_t __far* sec = &_g_sectors[secnum];
 
@@ -453,7 +447,7 @@ fixed_t P_FindShortestTextureAround(int32_t secnum)
 fixed_t P_FindShortestUpperAround(int32_t secnum)
 {
   int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
-  side_t*     side;
+  side_t __far*     side;
   int32_t i;
   sector_t __far* sec = &_g_sectors[secnum];
 
@@ -608,7 +602,7 @@ int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
   int32_t         i;
   int32_t         min;
   const line_t*     line;
-  sector_t*   check;
+  sector_t __far*   check;
 
   min = max;
   for (i=0 ; i < sector->linecount ; i++)
@@ -1964,7 +1958,7 @@ void P_ShootSpecialLine
 //
 void P_PlayerInSpecialSector (player_t* player)
 {
-  sector_t*   sector;
+  sector_t __far*   sector;
 
   sector = player->mo->subsector->sector;
 
@@ -2257,7 +2251,7 @@ void P_SpawnSpecials (void)
 
 static void T_Scroll(scroll_t *s)
 {
-    side_t *side  =_g_sides + s->affectee;
+    side_t __far* side  =_g_sides + s->affectee;
     side->textureoffset++;
 }
 
@@ -2291,7 +2285,7 @@ static void Add_Scroller(int32_t affectee)
 static void P_SpawnScrollers(void)
 {
     int32_t i;
-    const line_t *l = _g_lines;
+    const line_t __far* l = _g_lines;
 
     for (i=0;i<_g_numlines;i++,l++)
     {
