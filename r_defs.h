@@ -300,7 +300,7 @@ typedef byte  lighttable_t;
 
 typedef struct drawseg_s
 {
-  const seg_t *curline;
+  const seg_t __far* curline;
   int16_t x1, x2;
   fixed_t scale1, scale2, scalestep;
   int32_t silhouette;                       // 0=none, 1=bottom, 2=top, 3=both

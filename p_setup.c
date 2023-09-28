@@ -62,7 +62,7 @@
 int32_t      _g_numvertexes;
 const vertex_t __far* _g_vertexes;
 
-const seg_t    *_g_segs;
+const seg_t    __far* _g_segs;
 
 int32_t      _g_numsectors;
 sector_t __far* _g_sectors;
@@ -161,7 +161,7 @@ static void P_LoadVertexes (int16_t lump)
 static void P_LoadSegs (int16_t lump)
 {
     int32_t numsegs = W_LumpLength(lump) / sizeof(seg_t);
-    _g_segs = (const seg_t *)W_GetLumpByNumAutoFree(lump);
+    _g_segs = (const seg_t __far*)W_GetLumpByNumAutoFree(lump);
 
     if (!numsegs)
       I_Error("P_LoadSegs: no segs in level");
@@ -181,12 +181,12 @@ typedef PACKEDATTR_PRE struct {
 static void P_LoadSubsectors (int16_t lump)
 {
   /* cph 2006/07/29 - make data a const mapsubsector_t *, so the loop below is simpler & gives no constness warnings */
-  const mapsubsector_t *data;
+  const mapsubsector_t __far* data;
   int32_t  i;
 
   numsubsectors = W_LumpLength (lump) / sizeof(mapsubsector_t);
   _g_subsectors = Z_CallocLevel(numsubsectors * sizeof(subsector_t));
-  data = (const mapsubsector_t *)W_GetLumpByNumAutoFree(lump);
+  data = (const mapsubsector_t __far*)W_GetLumpByNumAutoFree(lump);
 
   if ((!data) || (!numsubsectors))
     I_Error("P_LoadSubsectors: no subsectors in level");
@@ -411,7 +411,7 @@ static void P_LoadSideDefs2(int16_t lump)
 
     for (int32_t i = 0; i < numsides; i++)
     {
-        register const mapsidedef_t *msd = (const mapsidedef_t *) data + i;
+        register const mapsidedef_t __far* msd = (const mapsidedef_t __far*) data + i;
         register side_t __far* sd = _g_sides + i;
         register sector_t __far* sec;
 
@@ -534,7 +534,7 @@ static void P_GroupLines (void)
     // figgi
     for (i=0 ; i<numsubsectors ; i++)
     {
-        const seg_t *seg = &_g_segs[_g_subsectors[i].firstline];
+        const seg_t __far* seg = &_g_segs[_g_subsectors[i].firstline];
         _g_subsectors[i].sector = NULL;
         for(j=0; j<_g_subsectors[i].numlines; j++)
         {

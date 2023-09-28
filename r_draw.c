@@ -153,7 +153,7 @@ angle_t  viewangle;
 
 static byte solidcol[SCREENWIDTH];
 
-static const seg_t     *curline;
+static const seg_t     __far* curline;
 static side_t    __far* sidedef;
 static const line_t    __far* linedef;
 static sector_t  __far* frontsector;
@@ -1091,7 +1091,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int32_t x1, int32_t x2)
 
 // killough 5/2/98: reformatted
 
-static PUREFUNC int32_t R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t *line)
+static PUREFUNC int32_t R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t __far* line)
 {
     const fixed_t lx = line->v1.x;
     const fixed_t ly = line->v1.y;
@@ -2532,7 +2532,7 @@ static void R_ClipWallSegment(int8_t first, int8_t last, boolean solid)
 // and adds any visible pieces to the line list.
 //
 
-static void R_AddLine (const seg_t *line)
+static void R_AddLine(const seg_t __far* line)
 {
     int8_t      x1;
     int8_t      x2;
@@ -2623,7 +2623,7 @@ static void R_AddLine (const seg_t *line)
 static void R_Subsector(int32_t num)
 {
     int32_t         count;
-    const seg_t       *line;
+    const seg_t       __far* line;
     subsector_t __far* sub;
 
     sub = &_g_subsectors[num];

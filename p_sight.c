@@ -80,7 +80,7 @@ static int32_t P_DivlineSide(fixed_t x, fixed_t y, const divline_t *node)
 
 static boolean P_CrossSubsector(int32_t num)
 {
-    const seg_t *seg = _g_segs + _g_subsectors[num].firstline;
+    const seg_t __far* seg = _g_segs + _g_subsectors[num].firstline;
     int32_t count;
     fixed_t opentop = 0, openbottom = 0;
     const sector_t __far* front = NULL, __far* back = NULL;
