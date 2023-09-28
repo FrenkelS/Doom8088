@@ -214,6 +214,13 @@ typedef PACKEDATTR_PRE struct {
   int16_t tag;
 } PACKEDATTR_POST mapsector_t;
 
+static int16_t R_FlatNumForFarName(const char __far* far_name)
+{
+	char near_name[8];
+	_fstrncpy(near_name, far_name, 8);
+	return R_FlatNumForName(near_name);
+}
+
 static void P_LoadSectors (int16_t lump)
 {
   const byte __far* data;
@@ -226,12 +233,12 @@ static void P_LoadSectors (int16_t lump)
   for (i=0; i<_g_numsectors; i++)
     {
       sector_t __far* ss = _g_sectors + i;
-      const mapsector_t *ms = (const mapsector_t *) data + i;
+      const mapsector_t __far* ms = (const mapsector_t __far*) data + i;
 
       ss->floorheight = ((int32_t)SHORT(ms->floorheight))<<FRACBITS;
       ss->ceilingheight = ((int32_t)SHORT(ms->ceilingheight))<<FRACBITS;
-      ss->floorpic = R_FlatNumForName(ms->floorpic);
-      ss->ceilingpic = R_FlatNumForName(ms->ceilingpic);
+      ss->floorpic   = R_FlatNumForFarName(ms->floorpic);
+      ss->ceilingpic = R_FlatNumForFarName(ms->ceilingpic);
 
       ss->lightlevel = SHORT(ms->lightlevel);
       ss->special = SHORT(ms->special);
