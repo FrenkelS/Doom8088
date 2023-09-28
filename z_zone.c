@@ -487,7 +487,7 @@ static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
 	if (user)
 		base->user = user;
 	else
-		base->user = (void __far**) MK_FP(0,2); // unowned
+		base->user = (void __far*__far*) MK_FP(0,2); // unowned
 #if defined ZONEIDCHECK
     base->id  = ZONEID;
 #endif

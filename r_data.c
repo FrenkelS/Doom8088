@@ -96,7 +96,7 @@ static void R_LoadTexture(int16_t texture_num)
 
     const maptexture_t __far* mtexture = (const maptexture_t __far*) ((const byte __far*)maptex + directory[texture_num]);
 
-    texture_t __far* texture = Z_MallocLevel(sizeof(const texture_t) + sizeof(const texpatch_t)*(mtexture->patchcount-1), (void __far**)&textures[texture_num]);
+    texture_t __far* texture = Z_MallocLevel(sizeof(const texture_t) + sizeof(const texpatch_t)*(mtexture->patchcount-1), (void __far*__far*)&textures[texture_num]);
 
     texture->width      = mtexture->width;
     texture->height     = mtexture->height;

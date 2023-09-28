@@ -257,7 +257,7 @@ static boolean P_IsOnLift(const mobj_t __far* actor)
 
 static int32_t P_IsUnderDamage(mobj_t *actor)
 {
-  const struct msecnode_s *seclist;
+  const struct msecnode_s __far* seclist;
   const ceiling_t __far* cl;             // Crushing ceiling
   int32_t dir = 0;
   for (seclist=actor->touching_sectorlist; seclist; seclist=seclist->m_tnext)

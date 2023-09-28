@@ -176,7 +176,7 @@ static void PIT_ChangeSector(mobj_t __far* thing)
 
 static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
   {
-  msecnode_t *n;
+  msecnode_t __far* n;
 
   _g_nofit = false;
   _g_crushchange = crunch;
