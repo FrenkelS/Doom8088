@@ -280,6 +280,9 @@ static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32
 #endif
 
 
+#define LOBYTE(w)	(((uint8_t __far*)&w)[0])
+
+
 static void R_DoDrawPlane(visplane_t __far* pl)
 {
     if (pl->minx <= pl->maxx)

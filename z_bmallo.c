@@ -52,9 +52,9 @@ typedef struct bmalpool_s {
 } bmalpool_t;
 
 
-__inline static void* getelem(bmalpool_t __far* p, size_t size, size_t n)
+__inline static void __far* getelem(bmalpool_t __far* p, size_t size, size_t n)
 {
-	return (((byte*)p) + sizeof(bmalpool_t) + sizeof(byte) * (p->blocks) + size * n);
+	return (((byte __far*)p) + sizeof(bmalpool_t) + sizeof(byte) * (p->blocks) + size * n);
 }
 
 

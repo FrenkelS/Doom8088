@@ -80,9 +80,9 @@ void R_DrawSky(visplane_t __far* pl)
 			int16_t x_c;
 			R_GetColumn(tex, xc, &patch_num, &x_c);
 			const patch_t __far* patch = W_GetLumpByNum(patch_num);
-			const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
+			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
 
-			dcvars.source = (const byte*)column + 3;
+			dcvars.source = (const byte __far*)column + 3;
 			R_DrawColumn(&dcvars);
 			Z_ChangeTagToCache(patch);
 		}

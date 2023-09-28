@@ -80,7 +80,7 @@ typedef struct
 typedef char assertMemblockSize[sizeof(memblock_t) <= PARAGRAPH_SIZE ? 1 : -1];
 
 
-static memblock_t *mainzone_sentinal;
+static memblock_t __far* mainzone_sentinal;
 static segment_t   mainzone_rover_segment;
 
 
@@ -229,14 +229,14 @@ void Z_Init (void)
 	uint32_t b = (uint32_t) &mainzone_sentinal_buffer[i++];
 	while ((b & (PARAGRAPH_SIZE - 1)) != 0)
 		b = (uint32_t) &mainzone_sentinal_buffer[i++];
-	mainzone_sentinal = (memblock_t *)b;
+	mainzone_sentinal = (memblock_t __far*)b;
 
 	// set the entire zone to one free block
 	memblock_t __far* block = (memblock_t __far*)mainzone;
 	mainzone_rover_segment = pointerToSegment(block);
 
 	mainzone_sentinal->tag  = PU_STATIC;
-	mainzone_sentinal->user = (void *)mainzone;
+	mainzone_sentinal->user = (void __far*)mainzone;
 	mainzone_sentinal->next = mainzone_rover_segment;
 	mainzone_sentinal->prev = mainzone_rover_segment;
 
@@ -256,7 +256,7 @@ void Z_Init (void)
 		memblock_t __far* romblock = segmentToPointer(romblock_segment);
 		romblock->size = (uint32_t)(ems_segment - romblock_segment) * PARAGRAPH_SIZE;
 		romblock->tag  = PU_STATIC;
-		romblock->user = (void *)mainzone;
+		romblock->user = (void __far*)mainzone;
 		romblock->next = ems_segment;
 		romblock->prev = mainzone_rover_segment;
 #if defined ZONEIDCHECK

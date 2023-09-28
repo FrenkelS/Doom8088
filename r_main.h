@@ -40,11 +40,6 @@
 #include "r_data.h"
 
 
-#define LOBYTE(w)	(((uint8_t *)&w)[0])
-
-#define LOWORD(dw)	(((uint16_t *)&dw)[0])
-
-
 #define MAXVISPLANES 32    /* must be a power of 2 */
 
 

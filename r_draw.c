@@ -2439,7 +2439,7 @@ static void R_RecalcLineFlags(void)
 
     const side_t __far* side = &_g_sides[curline->sidenum];
 
-    linedata->r_validcount = LOWORD(_g_gametic);
+    linedata->r_validcount = _g_gametic;
 
     /* First decide if the line is closed, normal, or invisible */
     if (!(linedef->flags & ML_TWOSIDED)
@@ -2601,7 +2601,7 @@ static void R_AddLine(const seg_t __far* line)
     linedef = &_g_lines[curline->linenum];
     linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
-    if (linedata->r_validcount != LOWORD(_g_gametic))
+    if (linedata->r_validcount != _g_gametic)
         R_RecalcLineFlags();
 
     if (linedata->r_flags & RF_IGNORE)
