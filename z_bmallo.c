@@ -66,7 +66,7 @@ __inline static PUREFUNC uint32_t linearAddress(const void __far* ptr)
 }
 
 
-__inline static PUREFUNC int32_t iselem(const bmalpool_t __far* pool, size_t size, const void* p)
+__inline static PUREFUNC int32_t iselem(const bmalpool_t __far* pool, size_t size, const void __far* p)
 {
 	int32_t dif = linearAddress(p) - linearAddress(pool);
 
@@ -111,7 +111,7 @@ void __far* Z_BMalloc(struct block_memory_alloc_s *pzone)
 }
 
 
-void Z_BFree(struct block_memory_alloc_s *pzone, void* p)
+void Z_BFree(struct block_memory_alloc_s *pzone, void __far* p)
 {
 	register bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
 

@@ -561,7 +561,7 @@ static void P_GroupLines (void)
     }
 
     {  // allocate line tables for each sector
-        const line_t __far*__far*linebuffer = Z_MallocLevel(total*sizeof(line_t *), NULL);
+        const line_t __far*__far*linebuffer = Z_MallocLevel(total*sizeof(line_t __far*), NULL);
 
         for (i=0, sector = _g_sectors; i<_g_numsectors; i++, sector++)
         {

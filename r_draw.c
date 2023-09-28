@@ -553,7 +553,7 @@ const lighttable_t* R_LoadColorMap(int32_t lightlevel)
 #define COLEXTRABITS 9
 #define COLBITS (FRACBITS + COLEXTRABITS)
 
-inline static void R_DrawColumnPixel(uint16_t __far* dest, const byte* source, const byte __far* colormap, uint32_t frac)
+inline static void R_DrawColumnPixel(uint16_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t frac)
 {
 	uint16_t color = colormap[source[frac>>COLBITS]];
 
@@ -780,7 +780,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     do
     {        
-        R_DrawColumnPixel(dest, (const byte*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += SCREENWIDTH;
+        R_DrawColumnPixel(dest, (const byte __far*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += SCREENWIDTH;
 
         fuzzpos++;
         if (fuzzpos >= FUZZTABLE)
@@ -802,7 +802,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
 typedef void (*R_DrawColumn_f)(const draw_column_vars_t *dcvars);
 
-static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvars, const column_t *column)
+static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvars, const column_t __far* column)
 {
     const fixed_t basetexturemid = dcvars->texturemid;
 
@@ -936,7 +936,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     while(dcvars.x < SCREENWIDTH)
     {
-        const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[frac >> FRACBITS]);
+        const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column);
 
         frac += xiscale;
@@ -952,7 +952,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
         if(dcvars.x >= SCREENWIDTH)
             break;
 
-        const column_t* column2 = (const column_t *) ((const byte *)patch + patch->columnofs[frac >> FRACBITS]);
+        const column_t __far* column2 = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column2);
 
         frac += xiscale;
@@ -1077,7 +1077,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int32_t x1, int32_t x2)
             int16_t x_c;
             R_GetColumn(texture, xc, &patch_num, &x_c);
             const patch_t __far* patch = W_GetLumpByNum(patch_num);
-            const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
+            const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
 
             R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
             Z_ChangeTagToCache(patch);
@@ -1859,7 +1859,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
 
             if (xc < x2)
             {
-                const column_t* patchcol = (const column_t *)((const byte *)realpatch + realpatch->columnofs[xc - x1]);
+                const column_t __far* patchcol = (const column_t __far*)((const byte __far*)realpatch + realpatch->columnofs[xc - x1]);
 
                 R_DrawColumnInCache (patchcol, tmpCache, patch->originy, tex->height);
             }
@@ -1883,9 +1883,9 @@ static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_colu
         int16_t x_c;
         R_GetColumn(tex, texcolumn, &patch_num, &x_c);
         const patch_t __far* patch = W_GetLumpByNum(patch_num);
-        const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
+        const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
 
-        dcvars->source = (const byte*)column + 3;
+        dcvars->source = (const byte __far*)column + 3;
         R_DrawColumn (dcvars);
         Z_ChangeTagToCache(patch);
     }

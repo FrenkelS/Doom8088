@@ -79,7 +79,7 @@ const line_t __far* _g_spechit[4];
 int32_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
-msecnode_t* _g_sector_list;
+msecnode_t __far* _g_sector_list;
 
 static fixed_t   bestslidefrac;
 static const line_t __far*   bestslideline;
@@ -1338,14 +1338,14 @@ void P_SetSecnodeFirstpoolToNull(void)
 }
 
 
-inline static msecnode_t* P_GetSecnode(void)
+inline static msecnode_t __far* P_GetSecnode(void)
 {
-  return (msecnode_t*)Z_BMalloc(&secnodezone);
+  return (msecnode_t __far*)Z_BMalloc(&secnodezone);
 }
 
 // P_PutSecnode() returns a node to the freelist.
 
-inline static void P_PutSecnode(msecnode_t* node)
+inline static void P_PutSecnode(msecnode_t __far* node)
 {
   Z_BFree(&secnodezone, node);
 }
@@ -1359,7 +1359,7 @@ inline static void P_PutSecnode(msecnode_t* node)
 
 static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   {
-  msecnode_t* node;
+  msecnode_t __far* node;
 
   node = _g_sector_list;
   while (node)
@@ -1402,12 +1402,12 @@ static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
 // sectors this object appears in. Returns a pointer to the next node
 // on the linked list, or NULL.
 
-static msecnode_t* P_DelSecnode(msecnode_t* node)
+static msecnode_t __far* P_DelSecnode(msecnode_t __far* node)
   {
-  msecnode_t* tp;  // prev node on thing thread
-  msecnode_t* tn;  // next node on thing thread
-  msecnode_t* sp;  // prev node on sector thread
-  msecnode_t* sn;  // next node on sector thread
+  msecnode_t __far* tp;  // prev node on thing thread
+  msecnode_t __far* tn;  // next node on thing thread
+  msecnode_t __far* sp;  // prev node on sector thread
+  msecnode_t __far* sn;  // next node on sector thread
 
   if (node)
     {
@@ -1448,7 +1448,7 @@ void P_DelSeclist(void)
 {
 	if (_g_sector_list)
 	{
-		msecnode_t* node = _g_sector_list;
+		msecnode_t __far* node = _g_sector_list;
 		while (node)
 			node = P_DelSecnode(node);
 
@@ -1515,7 +1515,7 @@ void P_CreateSecNodeList(mobj_t __far* thing)
   // finished, delete all nodes where m_thing is still NULL. These
   // represent the sectors the Thing has vacated.
 
-  msecnode_t* node = _g_sector_list;
+  msecnode_t __far* node = _g_sector_list;
   while (node)
     {
     node->m_thing = NULL;

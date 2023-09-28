@@ -46,14 +46,14 @@
 
 #include "globdata.h"
 
-static mobj_t* P_TeleportDestination(const line_t __far* line)
+static mobj_t __far* P_TeleportDestination(const line_t __far* line)
 {
   int32_t i;
   for (i = -1; (i = P_FindSectorFromLineTag(line, i)) >= 0;) {
     register thinker_t __far* th = NULL;
     while ((th = P_NextThinker(th)) != NULL)
       if (th->function == P_MobjThinker) {
-        register mobj_t* m = (mobj_t*)th;
+        register mobj_t __far* m = (mobj_t __far*)th;
         if (m->type == MT_TELEPORTMAN  &&
             m->subsector->sector-_g_sectors == i)
             return m;
@@ -67,7 +67,7 @@ static mobj_t* P_TeleportDestination(const line_t __far* line)
 
 boolean EV_Teleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
 {
-  mobj_t    *m;
+  mobj_t    __far* m;
 
   // don't teleport missiles
   // Don't teleport if hit back of line,
@@ -131,7 +131,7 @@ boolean EV_Teleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
 
 boolean EV_SilentTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
 {
-  mobj_t    *m;
+  mobj_t    __far* m;
 
   // don't teleport missiles
   // Don't teleport if hit back of line,

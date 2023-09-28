@@ -529,7 +529,7 @@ void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
         if (door->thinker.function == T_VerticalDoor) {
           door->direction = outval;
         } else if (door->thinker.function == T_PlatRaise) {
-          plat_t* p = (plat_t*)door;
+          plat_t __far* p = (plat_t __far*)door;
           p->wait = outval;
         } else {
           printf("EV_VerticalDoor: unknown thinker.function in thinker corruption emulation\n");

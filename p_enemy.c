@@ -239,7 +239,7 @@ static boolean P_IsOnLift(const mobj_t __far* actor)
   const sector_t __far* sec = actor->subsector->sector;
 
   // Short-circuit: it's on a lift which is active.
-  if (sec->floordata && ((thinker_t *) sec->floordata)->function==T_PlatRaise)
+  if (sec->floordata && ((thinker_t __far*) sec->floordata)->function==T_PlatRaise)
     return true;
 
   return false;
@@ -1017,7 +1017,7 @@ void A_BossDeath(mobj_t *mo)
     for (th = _g_thinkerclasscap.next; th != &_g_thinkerclasscap; th = th->next)
         if (th->function == P_MobjThinker)
         {
-            mobj_t *mo2 = (mobj_t *) th;
+            mobj_t __far* mo2 = (mobj_t __far*) th;
             if (mo2 != mo && mo2->type == mo->type && mo2->health > 0)
                 return;         // other boss not dead
         }

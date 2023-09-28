@@ -94,7 +94,7 @@ static void R_LoadTexture(int16_t texture_num)
     const int32_t __far* maptex = W_GetLumpByName("TEXTURE1");
     const int32_t __far* directory = maptex+1;
 
-    const maptexture_t *mtexture = (const maptexture_t *) ((const byte *)maptex + directory[texture_num]);
+    const maptexture_t __far* mtexture = (const maptexture_t __far*) ((const byte __far*)maptex + directory[texture_num]);
 
     texture_t __far* texture = Z_MallocLevel(sizeof(const texture_t) + sizeof(const texpatch_t)*(mtexture->patchcount-1), (void __far**)&textures[texture_num]);
 
@@ -109,7 +109,7 @@ static void R_LoadTexture(int16_t texture_num)
 
 
     texpatch_t __far* patch = texture->patches;
-    const mappatch_t* mpatch = mtexture->patches;
+    const mappatch_t __far* mpatch = mtexture->patches;
 
     texture->overlapped = false;
 
@@ -122,7 +122,7 @@ static void R_LoadTexture(int16_t texture_num)
         patch->originy = mpatch->originy;
 
         char pname[8];
-        strncpy(pname, (const char*)&pnames[mpatch->patch * 8], 8);
+        _fstrncpy(pname, (const char __far*)&pnames[mpatch->patch * 8], 8);
 
         patch->patch_num = W_GetNumForName(pname);
     }
