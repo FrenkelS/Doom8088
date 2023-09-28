@@ -756,7 +756,7 @@ void G_UpdateSaveGameStrings()
 
     LoadSRAM(loadbuffer, savebuffersize, 0);
 
-    gba_save_data_t* saveslots = (gba_save_data_t*)loadbuffer;
+    gba_save_data_t __far* saveslots = (gba_save_data_t __far*)loadbuffer;
 
     for(int32_t i = 0; i < 8; i++)
     {
@@ -793,9 +793,9 @@ static void G_DoLoadGame(void)
 
     LoadSRAM(loadbuffer, savebuffersize, 0);
 
-    gba_save_data_t* saveslots = (gba_save_data_t*)loadbuffer;
+    gba_save_data_t __far* saveslots = (gba_save_data_t __far*)loadbuffer;
 
-    gba_save_data_t* savedata = &saveslots[savegameslot];
+    gba_save_data_t __far* savedata = &saveslots[savegameslot];
 
     if(savedata->save_present != 1)
         return;
@@ -806,9 +806,9 @@ static void G_DoLoadGame(void)
     G_InitNew (_g_gameskill, _g_gamemap);
 
     totalleveltimes = savedata->totalleveltimes;
-    memcpy(_g_player.weaponowned, savedata->weaponowned, sizeof(savedata->weaponowned));
-    memcpy(_g_player.ammo, savedata->ammo, sizeof(savedata->ammo));
-    memcpy(_g_player.maxammo, savedata->maxammo, sizeof(savedata->maxammo));
+    _fmemcpy(_g_player.weaponowned, savedata->weaponowned, sizeof(savedata->weaponowned));
+    _fmemcpy(_g_player.ammo, savedata->ammo, sizeof(savedata->ammo));
+    _fmemcpy(_g_player.maxammo, savedata->maxammo, sizeof(savedata->maxammo));
 	
     //If stored maxammo is more than no backpack ammo, player had a backpack.
     if(_g_player.maxammo[am_clip] > maxammo[am_clip])
@@ -845,9 +845,9 @@ static void G_DoSaveGame(void)
 
     LoadSRAM(savebuffer, savebuffersize, 0);
 
-    gba_save_data_t* saveslots = (gba_save_data_t*)savebuffer;
+    gba_save_data_t __far* saveslots = (gba_save_data_t __far*)savebuffer;
 
-    gba_save_data_t* savedata = &saveslots[savegameslot];
+    gba_save_data_t __far* savedata = &saveslots[savegameslot];
 
     savedata->save_present = 1;
 
@@ -855,9 +855,9 @@ static void G_DoSaveGame(void)
     savedata->gamemap = _g_gamemap;
     savedata->totalleveltimes = totalleveltimes;
 
-    memcpy(savedata->weaponowned, _g_player.weaponowned, sizeof(savedata->weaponowned));
-    memcpy(savedata->ammo, _g_player.ammo, sizeof(savedata->ammo));
-    memcpy(savedata->maxammo, _g_player.maxammo, sizeof(savedata->maxammo));
+    _fmemcpy(savedata->weaponowned, _g_player.weaponowned, sizeof(savedata->weaponowned));
+    _fmemcpy(savedata->ammo, _g_player.ammo, sizeof(savedata->ammo));
+    _fmemcpy(savedata->maxammo, _g_player.maxammo, sizeof(savedata->maxammo));
 
     SaveSRAM(savebuffer, savebuffersize, 0);
 
