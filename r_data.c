@@ -200,9 +200,9 @@ static int16_t R_GetTextureNumForName(const char* tex_name)
     {
         int32_t offset = *directory++;
 
-        const maptexture_t* mtexture = (const maptexture_t *) ( (const byte *)maptex + offset);
+        const maptexture_t __far* mtexture = (const maptexture_t __far*) ( (const byte __far*)maptex + offset);
 
-        if (!strncmp(tex_name_upper, mtexture->name, 8))
+        if (!_fstrncmp(tex_name_upper, mtexture->name, 8))
         {
             Z_ChangeTagToCache(maptex);
             return i;

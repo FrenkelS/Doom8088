@@ -157,7 +157,7 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 	for (int16_t i = 0; i < numlumps; i++)
 #endif
 	{
-		if (nameint == *(int64_t*)(fileinfo[i].name))
+		if (nameint == *(int64_t __far*)(fileinfo[i].name))
 		{
 			return i;
 		}
