@@ -737,9 +737,9 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
 
 static void V_PlotPixel(int32_t x, int32_t y, uint8_t color)
 {
-    byte* fb = (byte*)_g_screen;
+    byte __far * fb = (byte __far*)_g_screen;
 
-    byte* dest = &fb[(ScreenYToOffset(y) << 1) + x];
+    byte __far* dest = &fb[(ScreenYToOffset(y) << 1) + x];
 
     //The GBA must write in 16bits.
     if((uint32_t)dest & 1)
@@ -1094,11 +1094,11 @@ static void AM_drawPlayers(void)
 // CPhipps - New function to fill a rectangle with a given colour
 static void V_FillRect(void)
 {
-    byte* dest = (byte*)_g_screen;
+    byte __far* dest = (byte __far*)_g_screen;
     int32_t height = f_h;
     while (height--)
     {
-        memset(dest, mapcolor_back, f_w);
+        _fmemset(dest, mapcolor_back, f_w);
         dest += (SCREENPITCH << 1);
     }
 }
