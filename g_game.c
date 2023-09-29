@@ -883,14 +883,14 @@ void G_SaveSettings()
     settings.soundVolume = snd_SfxVolume;
 	settings.highDetail = _g_highDetail;
 
-    SaveSRAM((byte*)&settings, sizeof(settings), settings_sram_offset);
+    SaveSRAM((byte __far*)&settings, sizeof(settings), settings_sram_offset);
 }
 
 void G_LoadSettings()
 {
     gba_save_settings_t settings;
 
-    LoadSRAM((byte*)&settings, sizeof(settings), settings_sram_offset);
+    LoadSRAM((byte __far*)&settings, sizeof(settings), settings_sram_offset);
 
     if(settings.cookie == settings_cookie)
     {

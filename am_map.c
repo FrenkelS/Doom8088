@@ -745,7 +745,7 @@ static void V_PlotPixel(int32_t x, int32_t y, uint8_t color)
     if((uint32_t)dest & 1)
     {
         //Odd addreses, we combine existing pixel with new one.
-        uint16_t* dest16 = (uint16_t*)(dest - 1);
+        uint16_t __far* dest16 = (uint16_t __far*)(dest - 1);
 
         uint16_t old = *dest16;
 
@@ -753,7 +753,7 @@ static void V_PlotPixel(int32_t x, int32_t y, uint8_t color)
     }
     else
     {
-        uint16_t* dest16 = (uint16_t*)dest;
+        uint16_t __far* dest16 = (uint16_t __far*)dest;
 
         uint16_t old = *dest16;
 

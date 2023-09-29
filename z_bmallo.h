@@ -34,7 +34,7 @@
  *-----------------------------------------------------------------------------*/
 
 struct block_memory_alloc_s {
-	void  *firstpool;
+	void  __far* firstpool;
 	size_t size;
 	size_t perpool;
 };

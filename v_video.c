@@ -115,7 +115,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
                 if((uint32_t)dest & 1)
                 {
                     //Odd addreses, we combine existing pixel with new one.
-                    uint16_t* dest16 = (uint16_t*)(dest - 1);
+                    uint16_t __far* dest16 = (uint16_t __far*)(dest - 1);
 
 
                     uint16_t old = *dest16;
@@ -124,7 +124,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
                 }
                 else
                 {
-                    uint16_t* dest16 = (uint16_t*)dest;
+                    uint16_t __far* dest16 = (uint16_t __far*)dest;
 
                     uint16_t old = *dest16;
 
