@@ -35,6 +35,8 @@
  */
 
 #include <stdint.h>
+
+#include "compiler.h"
 #include "d_player.h"
 #include "d_event.h"
 #include "v_video.h"

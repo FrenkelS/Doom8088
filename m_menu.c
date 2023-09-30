@@ -37,9 +37,11 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include <stdio.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdint.h>
 
+#include "compiler.h"
 #include "doomdef.h"
 #include "d_player.h"
 #include "d_englsh.h"

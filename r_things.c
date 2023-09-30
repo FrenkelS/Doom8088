@@ -33,6 +33,9 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
+#include "compiler.h"
 #include "d_player.h"
 #include "w_wad.h"
 #include "r_main.h"

@@ -46,6 +46,7 @@
 #include "config.h"
 #endif
 
+#include "compiler.h"
 #include "d_player.h"
 #include "f_finale.h"
 #include "doomtype.h"

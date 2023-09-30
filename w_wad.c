@@ -43,7 +43,9 @@
 #endif
 
 #include <fcntl.h>
+#include <stdint.h>
 
+#include "compiler.h"
 #include "d_player.h"
 #include "doomtype.h"
 #include "i_system.h"

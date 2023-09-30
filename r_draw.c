@@ -39,11 +39,13 @@
 //This whole file needs to fit within IWRAM.
 #pragma GCC optimize ("Os")
 
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include "compiler.h"
 #include "d_player.h"
 #include "w_wad.h"
 #include "r_main.h"

@@ -52,7 +52,13 @@ typedef uint32_t segment_t;
 #define __far
 #define _interrupt
 
-#define _fstrncmp(x,y,z) strncmp(x,y,z)
+#define _fmemchr	memchr
+#define _fmemcpy	memcpy
+#define _fmemset	memset
+#define _fstrcpy	strcpy
+#define _fstrncpy	strncpy
+#define _fstrncmp	strncmp
+#define _fstrlen	strlen
 
 #define replaceInterrupt(OldInt,NewInt,vector,handler)				\
 _go32_dpmi_get_protected_mode_interrupt_vector(vector, &OldInt);	\
