@@ -56,7 +56,6 @@ typedef uint32_t segment_t;
 #define _fmemcpy	memcpy
 #define _fmemset	memset
 #define _fstrcpy	strcpy
-#define _fstrncpy	strncpy
 #define _fstrlen	strlen
 
 #define replaceInterrupt(OldInt,NewInt,vector,handler)				\

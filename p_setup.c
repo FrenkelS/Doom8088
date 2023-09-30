@@ -218,8 +218,8 @@ typedef PACKEDATTR_PRE struct {
 
 static int16_t R_FlatNumForFarName(const char __far* far_name)
 {
-	char near_name[8];
-	_fstrncpy(near_name, far_name, 8);
+	uint64_t nameint = *(uint64_t __far*)far_name;
+	char* near_name = (char*)&nameint;
 	return R_FlatNumForName(near_name);
 }
 

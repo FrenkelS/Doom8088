@@ -124,8 +124,8 @@ static void R_LoadTexture(int16_t texture_num)
         patch->originx = mpatch->originx;
         patch->originy = mpatch->originy;
 
-        char pname[8];
-        _fstrncpy(pname, (const char __far*)&pnames[mpatch->patch * 8], 8);
+        uint64_t pnameint = *(uint64_t __far*)&pnames[mpatch->patch * 8];
+        char* pname = (char*)&pnameint;
 
         patch->patch_num = W_GetNumForName(pname);
     }
