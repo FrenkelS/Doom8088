@@ -39,7 +39,7 @@
 #include "p_mobj.h"
 
 
-void P_SetupLevel(int32_t map);
+void P_SetupLevel(int16_t map);
 void P_Init(void);               /* Called by startup code. */
 
 #endif

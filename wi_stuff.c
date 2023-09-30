@@ -71,9 +71,9 @@ static int32_t    cnt_pause;
 
 static int32_t  sp_state;
 
-static int32_t cnt_kills;
-static int32_t cnt_items;
-static int32_t cnt_secret;
+static int16_t cnt_kills;
+static int16_t cnt_items;
+static int16_t cnt_secret;
 
 static boolean snl_pointeron;
 
@@ -218,7 +218,7 @@ static int16_t V_NamePatchHeight(const char *name)
  * Args:    Level, and buffer (must by 9 chars) to write to
  * Returns: void
  */
-static void WI_levelNameLump(int32_t map, char* buf)
+static void WI_levelNameLump(int16_t map, char* buf)
 {
   sprintf(buf, "WILV0%d", map);
 }
@@ -332,7 +332,7 @@ static void WI_drawOnLnode(int8_t n, const char* const c[])
 	else
 	{
 		// DEBUG
-		printf("Could not place patch on level %ld\n", n + 1);
+		printf("Could not place patch on level %d\n", n + 1);
 	}
 }
 
@@ -350,7 +350,7 @@ static void WI_drawOnLnode(int8_t n, const char* const c[])
 //fontwidth = num[0]->width;
 #define fontwidth 11
 
-static int32_t WI_drawNum (int32_t x, int32_t y, int32_t n, int32_t digits)
+static int32_t WI_drawNum (int32_t x, int32_t y, int16_t n, int32_t digits)
 {
 	boolean   neg;
 	int32_t   temp;
@@ -412,7 +412,7 @@ static int32_t WI_drawNum (int32_t x, int32_t y, int32_t n, int32_t digits)
 //          p      -- the percentage value to be drawn, no negatives
 // Returns: void
 // CPhipps - static
-static void WI_drawPercent(int32_t x, int32_t y, int32_t p)
+static void WI_drawPercent(int32_t x, int32_t y, int16_t p)
 {
   if (p < 0)
     return;
@@ -436,7 +436,7 @@ static void WI_drawPercent(int32_t x, int32_t y, int32_t p)
 
 static void WI_drawTime(int32_t x, int32_t y, int32_t t)
 {
-  int32_t   n;
+  int16_t   n;
 
   if (t<0)
     return;

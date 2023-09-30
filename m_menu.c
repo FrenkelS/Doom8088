@@ -437,7 +437,7 @@ static void M_LoadGame (int32_t choice)
 
 // The definitions of the Save Game screen
 
-const static menuitem_t SaveMenu[]=
+static const menuitem_t SaveMenu[]=
 {
   {1,"", M_SaveSelect},
   {1,"", M_SaveSelect},
@@ -449,7 +449,7 @@ const static menuitem_t SaveMenu[]=
   {1,"", M_SaveSelect},
 };
 
-const static menu_t SaveDef =
+static const menu_t SaveDef =
 {
   load_end, // same number of slots as the Load Game screen
   SaveMenu,
@@ -544,7 +544,7 @@ static const menuitem_t OptionsMenu[]=
   {1,"M_SVOL",   M_Sound}
 };
 
-const static menu_t OptionsDef =
+static const menu_t OptionsDef =
 {
   opt_end,
   OptionsMenu,
@@ -1177,7 +1177,7 @@ static int16_t M_StringWidth(const char __far* string)
 {
 	int16_t	w = 0;
 
-	for (int16_t i = 0; i < _fstrlen(string); i++)
+	for (size_t i = 0; i < _fstrlen(string); i++)
 	{
 		char c = string[i];
 		c = toupper(c);

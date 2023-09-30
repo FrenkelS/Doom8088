@@ -48,7 +48,7 @@ extern gameaction_t    _g_gameaction;
 extern gamestate_t     _g_gamestate;
 extern skill_t         _g_gameskill;
 
-extern int32_t             _g_gamemap;
+extern int16_t             _g_gamemap;
 
 extern player_t        _g_player;
 

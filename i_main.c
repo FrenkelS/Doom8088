@@ -76,7 +76,7 @@ static void tprintf(void)
 
 	char* msg = "                          DOOM8088 System Startup                           ";
 
-	for (int_fast8_t i = 0; i < strlen(msg); )
+	for (size_t i = 0; i < strlen(msg); )
 	{
 		regs.h.ah = 9;
 		regs.h.al = msg[i];

@@ -97,19 +97,19 @@ int32_t snd_MusicVolume = 15;
 
 
 // number of channels available
-static const uint32_t numChannels = 8;
+static const int16_t numChannels = 8;
 
 //
 // Internals.
 //
 
-static void S_StopChannel(int32_t cnum);
+static void S_StopChannel(int16_t cnum);
 
 static void S_StopMusic(void);
 
 static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int32_t *vol, int32_t *sep);
 
-static int32_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup);
+static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup);
 
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
@@ -141,7 +141,7 @@ void S_Init(int32_t sfxVolume, int32_t musicVolume)
 
 void S_Stop(void)
 {
-    uint32_t cnum;
+    int16_t cnum;
 
     //jff 1/22/98 skip sound init if sound not enabled
     if (!nosfxparm)
@@ -175,7 +175,8 @@ void S_Start(void)
 
 static void S_StartSoundAtVolume(mobj_t __far* origin, int32_t sfx_id, int32_t volume)
 {
-    int32_t cnum, is_pickup;
+    int16_t cnum;
+    int32_t is_pickup;
     const sfxinfo_t *sfx;
 
     int32_t sep = NORM_SEP;
@@ -276,7 +277,7 @@ void S_StartSound2(degenmobj_t __far* origin, int32_t sfx_id)
 
 void S_StopSound(void __far* origin)
 {
-    int32_t cnum;
+    int16_t cnum;
 
     //jff 1/22/98 return if sound is not enabled
     if (nosfxparm)
@@ -310,7 +311,7 @@ static boolean S_SoundIsPlaying(int32_t cnum)
 //
 void S_UpdateSounds(void)
 {
-	int32_t cnum;
+	int16_t cnum;
 	
 	//jff 1/22/98 return if sound is not enabled
 	if (nosfxparm)
@@ -429,9 +430,9 @@ static void S_StopMusic(void)
 
 
 
-static void S_StopChannel(int32_t cnum)
+static void S_StopChannel(int16_t cnum)
 {
-    int32_t i;
+    int16_t i;
     channel_t *c = &channels[cnum];
 
     //jff 1/22/98 return if sound is not enabled
@@ -531,10 +532,10 @@ static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source,
 //
 // killough 4/25/98: made static, added is_pickup argument
 
-static int32_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup)
+static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup)
 {
     // channel number to use
-    int32_t cnum;
+    int16_t cnum;
     channel_t *c;
 
     //jff 1/22/98 return if sound is not enabled

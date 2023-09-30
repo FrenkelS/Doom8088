@@ -101,7 +101,8 @@ fixed_t   _g_attackrange;
 static fixed_t  topslope;
 static fixed_t  bottomslope;
 
-static mobj_t __far* bombsource, *bombspot;
+static mobj_t __far* bombsource;
+static mobj_t *bombspot;
 static int32_t bombdamage;
 
 static mobj_t __far*   usething;

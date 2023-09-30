@@ -620,7 +620,7 @@ static void P_FreeLevelData()
 //
 // killough 5/3/98: reformatted, cleaned up
 
-void P_SetupLevel(int32_t map)
+void P_SetupLevel(int16_t map)
 {
     int_fast8_t   i;
     char  lumpname[9];

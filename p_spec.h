@@ -519,20 +519,12 @@ typedef enum
 
 // switch animation structure type
 
-#if defined(__MWERKS__)
-#pragma options align=packed
-#endif
-
 typedef PACKEDATTR_PRE struct
 {
   char name1[9];
   char name2[9];
   int16_t episode;
 } PACKEDATTR_POST switchlist_t; //jff 3/23/98 pack to read from memory
-
-#if defined(__MWERKS__)
-#pragma options align=reset
-#endif
 
 typedef struct
 {
