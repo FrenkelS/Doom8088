@@ -27,7 +27,6 @@ typedef uint16_t segment_t;
 
 #else
 //32-bit
-#define halloc(numb,size) malloc(numb*size)
 
 typedef uint32_t segment_t;
 
