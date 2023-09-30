@@ -182,22 +182,19 @@ void I_StartTic(void)
 
 static boolean isGraphicsModeSet = false;
 static uint16_t __far* screen;
-
-//hack for gcc-ia16. Let's hope these two variables stay next to each other in memory.
-static uint16_t __far backBuffer[SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT)];
-static uint16_t __far backBufferBottom[SCREENWIDTH * ST_HEIGHT];
+static uint16_t __far* backBuffer;
 
 static int8_t newpal;
 
 uint16_t __far* I_GetBackBuffer(void)
 {
-	return &backBuffer[0];
+	return backBuffer;
 }
 
 
 void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
 {
-	uint16_t __far* src = &backBuffer[0];
+	uint16_t __far* src = backBuffer;
 	uint16_t __far* dst = buffer;
 	for (int16_t i = 0; i < SCREENWIDTH * SCREENHEIGHT; i++)
 		*dst++ = *src++;
@@ -221,12 +218,13 @@ void I_InitGraphics(void)
 	isGraphicsModeSet = true;
 
 	screen = MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH * 2) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
 }
 
 
 void I_StartDisplay(void)
 {
-	_g_screen = &backBuffer[0];
+	_g_screen = backBuffer;
 }
 
 
@@ -245,7 +243,7 @@ void I_DrawBuffer(uint16_t __far* buffer)
 
 static void I_FinishUpdate_dos(void)
 {
-	I_DrawBuffer(&backBuffer[0]);
+	I_DrawBuffer(backBuffer);
 }
 
 

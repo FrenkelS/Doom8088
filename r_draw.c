@@ -35,10 +35,6 @@
  *
  *-----------------------------------------------------------------------------*/
 
-//This is to keep the codesize under control.
-//This whole file needs to fit within IWRAM.
-#pragma GCC optimize ("Os")
-
 #include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
@@ -550,9 +546,6 @@ const lighttable_t* R_LoadColorMap(int32_t lightlevel)
 //  be used. It has also been used with Wolfenstein 3D.
 //
 
-#pragma GCC push_options
-#pragma GCC optimize ("Ofast")
-
 #define COLEXTRABITS 9
 #define COLBITS (FRACBITS + COLEXTRABITS)
 
@@ -791,9 +784,6 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     } while(--count);
 }
-
-#pragma GCC pop_options
-
 
 
 //
