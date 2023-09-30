@@ -222,6 +222,7 @@ void I_InitGraphics(void)
 
 	screen = MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH * 2) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
+	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
 }
 
 
