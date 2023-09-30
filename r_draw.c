@@ -1668,7 +1668,7 @@ static visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int32_t lig
     check->minx = SCREENWIDTH; // Was SCREENWIDTH -- killough 11/98
     check->maxx = -1;
 
-    _fmemset(check->top, UINT32_MAX, sizeof(check->top));
+    _fmemset(check->top, -1, sizeof(check->top));
 
     check->modified = false;
 
@@ -1691,7 +1691,7 @@ static visplane_t __far* R_DupPlane(const visplane_t __far* pl, int32_t start, i
     new_pl->minx = start;
     new_pl->maxx = stop;
 
-    _fmemset(new_pl->top, UINT32_MAX, sizeof(new_pl->top));
+    _fmemset(new_pl->top, -1, sizeof(new_pl->top));
 
     new_pl->modified = false;
 
