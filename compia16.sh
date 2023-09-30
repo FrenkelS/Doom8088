@@ -1,10 +1,16 @@
 mkdir GCCIA16
 
+unset CFLAGS
+
+ia16-elf-gcc -c p_mobj.c -march=i8088 -mcmodel=medium -li86 -O0 -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic
+ia16-elf-gcc -c p_spec.c -march=i8088 -mcmodel=medium -li86 -O0 -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic
+
 export CFLAGS="-march=i8088 -mcmodel=medium -li86"
-#export CFLAGS=$CFLAGS -g
-#export CFLAGS=$CFLAGS -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -mpreferred-stack-boundary=2 -Wno-attributes -Wpedantic
-#export CFLAGS=$CFLAGS -Wall -Wextra
-#export CFLAGS=$CFLAGS -ffunction-sections -Wl,--gc-sections -Wl,--print-gc-sections
+#export CFLAGS="$CFLAGS -g"
+export CFLAGS="$CFLAGS -Ofast -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
+#export CFLAGS="$CFLAGS -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
+#export CFLAGS="$CFLAGS -Wall -Wextra"
+#export CFLAGS="$CFLAGS -ffunction-sections -Wl,--gc-sections -Wl,--print-gc-sections"
 
 unset GLOBOBJS
 export GLOBOBJS="$GLOBOBJS am_map.c"
@@ -30,12 +36,14 @@ export GLOBOBJS="$GLOBOBJS p_inter.c"
 export GLOBOBJS="$GLOBOBJS p_lights.c"
 export GLOBOBJS="$GLOBOBJS p_map.c"
 export GLOBOBJS="$GLOBOBJS p_maputl.c"
-export GLOBOBJS="$GLOBOBJS p_mobj.c"
+#export GLOBOBJS="$GLOBOBJS p_mobj.c"
+export GLOBOBJS="$GLOBOBJS p_mobj.o"
 export GLOBOBJS="$GLOBOBJS p_plats.c"
 export GLOBOBJS="$GLOBOBJS p_pspr.c"
 export GLOBOBJS="$GLOBOBJS p_setup.c"
 export GLOBOBJS="$GLOBOBJS p_sight.c"
-export GLOBOBJS="$GLOBOBJS p_spec.c"
+#export GLOBOBJS="$GLOBOBJS p_spec.c"
+export GLOBOBJS="$GLOBOBJS p_spec.o"
 export GLOBOBJS="$GLOBOBJS p_switch.c"
 export GLOBOBJS="$GLOBOBJS p_telept.c"
 export GLOBOBJS="$GLOBOBJS p_tick.c"
@@ -56,3 +64,6 @@ export GLOBOBJS="$GLOBOBJS z_bmallo.c"
 export GLOBOBJS="$GLOBOBJS z_zone.c"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS -o GCCIA16/DOOMIA16.EXE
+
+rm p_mobj.o
+rm p_spec.o
