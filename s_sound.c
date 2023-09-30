@@ -267,12 +267,12 @@ void S_StartSound2(degenmobj_t __far* origin, int32_t sfx_id)
     {
         thinker_t ununsed;
         degenmobj_t origin;
-    } fm;
+    } __far fm;
 
     fm.origin.x = origin->x;
     fm.origin.y = origin->y;
 
-    S_StartSoundAtVolume((mobj_t*) &fm, sfx_id, snd_SfxVolume);
+    S_StartSoundAtVolume((mobj_t __far*)&fm, sfx_id, snd_SfxVolume);
 }
 
 void S_StopSound(void __far* origin)

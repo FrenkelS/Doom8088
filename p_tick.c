@@ -112,7 +112,7 @@ static void P_RemoveThinkerDelayed(thinker_t __far* thinker)
     Z_Free(thinker);
 }
 
-static void P_RemoveThingDelayed(thinker_t *thinker)
+static void P_RemoveThingDelayed(thinker_t __far* thinker)
 {
 
     thinker_t __far* next = thinker->next;
@@ -122,7 +122,7 @@ static void P_RemoveThingDelayed(thinker_t *thinker)
          * thinker->prev->next = thinker->next */
     (next->prev = thinker->prev)->next = next;
 
-    mobj_t* thing = (mobj_t*)thinker;
+    mobj_t __far* thing = (mobj_t __far*)thinker;
 
     if(thing->flags & MF_POOLED)
         thing->type = MT_NOTHING;
