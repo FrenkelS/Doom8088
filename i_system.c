@@ -184,6 +184,9 @@ static boolean isGraphicsModeSet = false;
 static uint16_t __far* screen;
 static uint16_t __far* backBuffer;
 
+// The screen is [SCREENWIDTH*SCREENHEIGHT];
+uint16_t __far* _g_screen;
+
 static int8_t newpal;
 
 uint16_t __far* I_GetBackBuffer(void)

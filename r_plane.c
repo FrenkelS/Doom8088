@@ -125,7 +125,7 @@ static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32
 #else
 
 
-inline static void R_DrawSpanPixel(uint16_t* dest, const byte* source, const byte* colormap, uint32_t position)
+inline static void R_DrawSpanPixel(uint16_t __far* dest, const byte __far* source, const byte* colormap, uint32_t position)
 {
     uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
 
@@ -136,7 +136,7 @@ inline static void R_DrawSpanPixel(uint16_t* dest, const byte* source, const byt
 typedef struct {
   uint32_t            position;
   uint32_t            step;
-  const byte          *source; // start of a 64*64 tile image
+  const byte          __far* source; // start of a 64*64 tile image
   const lighttable_t  *colormap;
 } draw_span_vars_t;
 
@@ -145,10 +145,10 @@ static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, const draw_span_var
 {
     uint32_t count = (x2 - x1);
 
-    const byte *source = dsvars->source;
+    const byte __far* source = dsvars->source;
     const byte *colormap = dsvars->colormap;
 
-    uint16_t* dest = _g_screen + ScreenYToOffset(y) + x1;
+    uint16_t __far* dest = _g_screen + ScreenYToOffset(y) + x1;
 
     const uint32_t step = dsvars->step;
     uint32_t position = dsvars->position;
@@ -234,7 +234,7 @@ static fixed_t distscale(uint8_t x)
 }
 
 
-static int16_t *flattranslation;             // for global animation
+static int16_t __far* flattranslation;             // for global animation
 
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
