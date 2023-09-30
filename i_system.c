@@ -52,8 +52,8 @@ static boolean isKeyboardIsrSet = false;
 
 #if defined __DJGPP__ 
 static _go32_dpmi_seginfo oldkeyboardisr, newkeyboardisr;
-#elif defined __WATCOMC__
-static void (__interrupt __far *oldkeyboardisr)(void);
+#else
+static void (__interrupt *oldkeyboardisr)(void);
 #endif
 
 static void __interrupt I_KeyboardISR(void)	

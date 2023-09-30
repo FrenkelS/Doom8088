@@ -38,13 +38,6 @@ typedef uint32_t segment_t;
 
 
 
-#if !defined __DJGPP__
-#define __djgpp_nearptr_enable()
-#define __djgpp_conventional_base 0
-#endif
-
-
-
 #if defined __DJGPP__
 //DJGPP
 #include <dpmi.h>
@@ -81,8 +74,11 @@ _go32_dpmi_free_iret_wrapper(&NewInt);
 
 
 
-#elif defined __WATCOMC__
-//Watcom
+#else
+//Watcom and gcc-ia16
+#define __djgpp_nearptr_enable()
+#define __djgpp_conventional_base 0
+
 #if defined _M_I386
 #define int86 int386
 #endif
