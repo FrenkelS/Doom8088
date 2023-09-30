@@ -67,7 +67,7 @@ void R_DrawSky(visplane_t __far* pl)
 
 	dcvars.iscale = (FRACUNIT * 200) / ((SCREENHEIGHT - ST_HEIGHT) + 16);
 
-	const texture_t* tex = R_GetTexture(skytexture);
+	const texture_t __far* tex = R_GetTexture(skytexture);
 
 	// killough 10/98: Use sky scrolling offset
 	for (int16_t x = pl->minx; (dcvars.x = x) <= pl->maxx; x++)
@@ -79,7 +79,7 @@ void R_DrawSky(visplane_t __far* pl)
 			int16_t patch_num;
 			int16_t x_c;
 			R_GetColumn(tex, xc, &patch_num, &x_c);
-			const patch_t __far* patch = W_GetLumpByNum(patch_num);
+			const patch_t  __far* patch  = W_GetLumpByNum(patch_num);
 			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
 
 			dcvars.source = (const byte __far*)column + 3;

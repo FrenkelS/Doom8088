@@ -50,7 +50,7 @@ typedef struct {
   fixed_t             iscale;
   fixed_t             texturemid;
 
-  const byte          *source; // first pixel in a column
+  const byte          __far* source; // first pixel in a column
 
   const lighttable_t  __far* colormap;
 

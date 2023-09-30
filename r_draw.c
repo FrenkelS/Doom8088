@@ -565,7 +565,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     if (count <= 0)
         return;
 
-    const byte *source   = dcvars->source;
+    const byte __far* source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
     uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
@@ -689,7 +689,7 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
     if (count <= 0)
         return;
 
-    const byte *source = dcvars->source;
+    const byte __far* source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
     volatile uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
@@ -820,7 +820,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
         // killough 3/2/98, 3/27/98: Failsafe against overflow/crash:
         if (yl <= yh && yh < viewheight)
         {
-            dcvars->source =  (const byte*)column + 3;
+            dcvars->source =  (const byte __far*)column + 3;
 
             dcvars->texturemid = basetexturemid - (((int32_t)column->topdelta)<<FRACBITS);
 
@@ -832,7 +832,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
             colfunc (dcvars);
         }
 
-        column = (const column_t *)((const byte *)column + column->length + 4);
+        column = (const column_t __far*)((const byte __far*)column + column->length + 4);
     }
 
     dcvars->texturemid = basetexturemid;
