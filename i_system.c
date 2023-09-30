@@ -53,10 +53,10 @@ static boolean isKeyboardIsrSet = false;
 #if defined __DJGPP__ 
 static _go32_dpmi_seginfo oldkeyboardisr, newkeyboardisr;
 #elif defined __WATCOMC__
-static void (_interrupt _far *oldkeyboardisr)(void);
+static void (__interrupt __far *oldkeyboardisr)(void);
 #endif
 
-static void _interrupt I_KeyboardISR(void)	
+static void __interrupt I_KeyboardISR(void)	
 {
 	// Get the scan code
 	keyboardqueue[kbdhead & (KBDQUESIZE - 1)] = inp(0x60);

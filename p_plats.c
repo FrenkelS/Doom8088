@@ -51,7 +51,8 @@
 
 typedef struct platlist {
   plat_t __far* plat;
-  struct platlist __far* next, __far*__far* prev;
+  struct platlist __far* next;
+  struct platlist __far*__far* prev;
 } platlist_t;
 
 

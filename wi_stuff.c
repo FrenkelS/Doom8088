@@ -441,7 +441,7 @@ static void WI_drawTime(int32_t x, int32_t y, int32_t t)
   if (t<0)
     return;
 
-  if (t < 100*60*60)
+  if (t < 100L*60*60)
     for(;;) {
       n = t % 60;
       t /= 60;

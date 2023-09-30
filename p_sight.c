@@ -83,7 +83,8 @@ static boolean P_CrossSubsector(int32_t num)
     const seg_t __far* seg = _g_segs + _g_subsectors[num].firstline;
     int32_t count;
     fixed_t opentop = 0, openbottom = 0;
-    const sector_t __far* front = NULL, __far* back = NULL;
+    const sector_t __far* front = NULL;
+    const sector_t __far* back  = NULL;
 
     for (count = _g_subsectors[num].numlines; --count >= 0; seg++)
     { // check lines
@@ -127,7 +128,8 @@ static boolean P_CrossSubsector(int32_t num)
         }
 
         // Forget this line if it doesn't cross the line of sight
-        const vertex_t __far* v1, __far* v2;
+        const vertex_t __far* v1;
+        const vertex_t __far* v2;
 
         v1 = &line->v1;
         v2 = &line->v2;

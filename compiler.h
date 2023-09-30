@@ -38,6 +38,13 @@ typedef uint32_t segment_t;
 
 
 
+#if !defined __DJGPP__
+#define __djgpp_nearptr_enable()
+#define __djgpp_conventional_base 0
+#endif
+
+
+
 #if defined __DJGPP__
 //DJGPP
 #include <dpmi.h>
@@ -50,7 +57,7 @@ typedef uint32_t segment_t;
 #define outp(port,data)		outportb(port,data)
 
 #define __far
-#define _interrupt
+#define __interrupt
 
 #define _fmemchr	memchr
 #define _fmemcpy	memcpy
@@ -76,9 +83,6 @@ _go32_dpmi_free_iret_wrapper(&NewInt);
 
 #elif defined __WATCOMC__
 //Watcom
-#define __djgpp_nearptr_enable()
-#define __djgpp_conventional_base 0
-
 #if defined _M_I386
 #define int86 int386
 #endif

@@ -162,7 +162,8 @@ static sector_t  __far* frontsector;
 static sector_t  __far* backsector;
 static drawseg_t *ds_p;
 
-static visplane_t __far* floorplane, __far* ceilingplane;
+static visplane_t __far* floorplane;
+static visplane_t __far* ceilingplane;
 static int32_t             rw_angle1;
 
 static angle_t         rw_normalangle; // angle to line origin

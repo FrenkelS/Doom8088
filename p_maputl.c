@@ -267,7 +267,8 @@ void P_UnsetThingPosition(mobj_t __far* thing)
        * linking.
        */
 
-      mobj_t __far* bnext, __far*__far* bprev = thing->bprev;
+      mobj_t __far* bnext;
+      mobj_t __far*__far* bprev = thing->bprev;
       if (bprev && (*bprev = bnext = thing->bnext))  // unlink from block map
         bnext->bprev = bprev;
     }

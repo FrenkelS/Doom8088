@@ -643,7 +643,8 @@ typedef struct
 
 typedef struct ceilinglist {
   ceiling_t __far* ceiling;
-  struct ceilinglist __far* next, __far*__far* prev;
+  struct ceilinglist __far* next;
+  struct ceilinglist __far*__far* prev;
 } ceilinglist_t;
 
 // p_floor
