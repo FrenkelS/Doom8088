@@ -118,8 +118,9 @@ static uint16_t emsHandle;
 
 static segment_t Z_InitExpandedMemory(void)
 {
-	void __far* emsInterruptVector = _dos_getvect(EMS_INT);
-	char __far* emsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
+	__djgpp_nearptr_enable();
+	uint16_t __far* emsInterruptVectorSegment = MK_FP(0, EMS_INT * 4 + 2 + __djgpp_conventional_base);
+	char __far* emsDeviceName = MK_FP(*emsInterruptVectorSegment, 0x000a + __djgpp_conventional_base);
 	if (_fstrncmp(emsDeviceName, "EMMXXXX0", 8))
 		return 0;
 
