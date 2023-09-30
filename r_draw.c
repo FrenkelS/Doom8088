@@ -65,8 +65,11 @@ visplane_t __far* _g_freetail;
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
 
-int16_t _g_openings[MAXOPENINGS];
-int16_t* _g_lastopening;
+
+#define MAXOPENINGS (SCREENWIDTH*16)
+
+static int16_t openings[MAXOPENINGS];
+static int16_t* lastopening;
 
 
 static const int8_t viewangletoxTable[2039];
@@ -2075,7 +2078,7 @@ static void R_RenderSegLoop (int32_t rw_x)
 
 static boolean R_CheckOpenings(const int32_t start)
 {
-    int32_t pos = _g_lastopening - _g_openings;
+    int32_t pos = lastopening - openings;
     int32_t need = (rw_stopx - start)*4 + pos;
 
 #ifdef RANGECHECK
@@ -2084,6 +2087,12 @@ static boolean R_CheckOpenings(const int32_t start)
 #endif
 
     return need <= MAXOPENINGS;
+}
+
+
+void R_ClearLastOpening(void)
+{
+	lastopening = openings;
 }
 
 
@@ -2291,8 +2300,8 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         if (sidedef->midtexture)    // masked midtexture
         {
             maskedtexture = true;
-            ds_p->maskedtexturecol = maskedtexturecol = _g_lastopening - rw_x;
-            _g_lastopening += rw_stopx - rw_x;
+            ds_p->maskedtexturecol = maskedtexturecol = lastopening - rw_x;
+            lastopening += rw_stopx - rw_x;
         }
     }
 
@@ -2392,16 +2401,16 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     // save sprite clipping info
     if ((ds_p->silhouette & SIL_TOP || maskedtexture) && !ds_p->sprtopclip)
     {
-        memcpy((byte*)_g_lastopening, (const byte*)(ceilingclip+start), sizeof(int16_t)*(rw_stopx-start));
-        ds_p->sprtopclip = _g_lastopening - start;
-        _g_lastopening += rw_stopx - start;
+        memcpy((byte*)lastopening, (const byte*)(ceilingclip+start), sizeof(int16_t)*(rw_stopx-start));
+        ds_p->sprtopclip = lastopening - start;
+        lastopening += rw_stopx - start;
     }
 
     if ((ds_p->silhouette & SIL_BOTTOM || maskedtexture) && !ds_p->sprbottomclip)
     {
-        memcpy((byte*)_g_lastopening, (const byte*)(floorclip+start), sizeof(int16_t)*(rw_stopx-start));
-        ds_p->sprbottomclip = _g_lastopening - start;
-        _g_lastopening += rw_stopx - start;
+        memcpy((byte*)lastopening, (const byte*)(floorclip+start), sizeof(int16_t)*(rw_stopx-start));
+        ds_p->sprbottomclip = lastopening - start;
+        lastopening += rw_stopx - start;
     }
 
     if (maskedtexture && !(ds_p->silhouette & SIL_TOP))

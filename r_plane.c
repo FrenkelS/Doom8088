@@ -371,7 +371,7 @@ void R_ClearPlanes(void)
         for (*freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *freehead; )
             freehead = &(*freehead)->next;
 
-    _g_lastopening = _g_openings;
+    R_ClearLastOpening();
 
 #if !defined FLAT_SPAN
     static const fixed_t iprojection = 1092; //( (1 << FRACUNIT) / (SCREENWIDTH / 2))
