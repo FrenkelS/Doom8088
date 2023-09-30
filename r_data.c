@@ -190,11 +190,10 @@ static int16_t R_GetTextureNumForName(const char* tex_name)
 {
     //Convert name to uppercase for comparison.
     char tex_name_upper[9];
-
     strncpy(tex_name_upper, tex_name, 8);
     tex_name_upper[8] = 0; //Ensure null terminated.
-
     strupr(tex_name_upper);
+    int64_t tex_name_int = *(int64_t*)tex_name_upper;
 
     const int32_t __far* maptex = W_GetLumpByName("TEXTURE1");
     const int32_t __far* directory = maptex+1;
@@ -205,7 +204,7 @@ static int16_t R_GetTextureNumForName(const char* tex_name)
 
         const maptexture_t __far* mtexture = (const maptexture_t __far*) ( (const byte __far*)maptex + offset);
 
-        if (!_fstrncmp(tex_name_upper, mtexture->name, 8))
+        if (tex_name_int == *(int64_t __far*)mtexture->name)
         {
             Z_ChangeTagToCache(maptex);
             return i;
