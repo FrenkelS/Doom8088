@@ -119,8 +119,9 @@ static segment_t Z_InitExpandedMemory(void)
 {
 	__djgpp_nearptr_enable();
 	uint16_t __far* emsInterruptVectorSegment = MK_FP(0, EMS_INT * 4 + 2 + __djgpp_conventional_base);
-	char __far* emsDeviceName = MK_FP(*emsInterruptVectorSegment, 0x000a + __djgpp_conventional_base);
-	if (_fstrncmp(emsDeviceName, "EMMXXXX0", 8))
+	uint64_t __far* actualEmsDeviceName = MK_FP(*emsInterruptVectorSegment, 0x000a + __djgpp_conventional_base);
+	uint64_t expectedEmsDeviceName = *(uint64_t*)"EMMXXXX0";
+	if (*actualEmsDeviceName != expectedEmsDeviceName)
 		return 0;
 
 	// EMS detected
