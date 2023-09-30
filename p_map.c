@@ -83,7 +83,7 @@ msecnode_t __far* _g_sector_list;
 
 static fixed_t   bestslidefrac;
 static const line_t __far*   bestslideline;
-static mobj_t*   slidemo;
+static mobj_t __far*   slidemo;
 static fixed_t   tmxmove;
 static fixed_t   tmymove;
 
@@ -767,7 +767,7 @@ isblocking:
 //
 // killough 11/98: reformatted
 
-void P_SlideMove(mobj_t *mo)
+void P_SlideMove(mobj_t __far* mo)
 {
   int8_t hitcount = 3;
 

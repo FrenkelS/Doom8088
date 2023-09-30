@@ -47,7 +47,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y);
 
 // killough 8/9/98: extra argument for telefragging
 boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss);
-void    P_SlideMove(mobj_t *mo);
+void    P_SlideMove(mobj_t __far* mo);
 boolean P_CheckSight(mobj_t __far* t1, mobj_t __far* t2);
 void    P_UseLines(player_t *player);
 

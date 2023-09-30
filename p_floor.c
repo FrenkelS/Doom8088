@@ -386,7 +386,7 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
 
-void T_MoveFloor(floormove_t* floor)
+void T_MoveFloor(floormove_t __far* floor)
 {
   result_e      res;
 
@@ -470,7 +470,7 @@ void T_MoveFloor(floormove_t* floor)
 //
 // jff 02/22/98 added to support parallel floor/ceiling motion
 //
-static void T_MoveElevator(elevator_t* elevator)
+static void T_MoveElevator(elevator_t __far* elevator)
 {
   result_e      res;
 

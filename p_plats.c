@@ -59,7 +59,7 @@ typedef struct platlist {
 static platlist_t __far* activeplats;
 
 
-static void P_RemoveActivePlat(plat_t* plat);
+static void P_RemoveActivePlat(plat_t __far* plat);
 
 //
 // T_PlatRaise()
@@ -72,7 +72,7 @@ static void P_RemoveActivePlat(plat_t* plat);
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
 
-void T_PlatRaise(plat_t* plat)
+void T_PlatRaise(plat_t __far* plat)
 {
   result_e      res;
 
@@ -420,7 +420,7 @@ void P_AddActivePlat(plat_t __far* plat)
 // Passed a pointer to the plat to remove
 // Returns nothing
 //
-static void P_RemoveActivePlat(plat_t* plat)
+static void P_RemoveActivePlat(plat_t __far* plat)
 {
   platlist_t __far* list = plat->list;
   plat->sector->floordata = NULL; //jff 2/23/98 multiple thinkers

@@ -99,7 +99,7 @@ void P_AddThinker(thinker_t __far* thinker)
 // that the next step in P_RunThinkers() will get its successor.
 //
 
-static void P_RemoveThinkerDelayed(thinker_t *thinker)
+static void P_RemoveThinkerDelayed(thinker_t __far* thinker)
 {
 
     thinker_t __far* next = thinker->next;
@@ -143,7 +143,7 @@ static void P_RemoveThingDelayed(thinker_t *thinker)
 // removed automatically as part of the thinker process.
 //
 
-void P_RemoveThinker(thinker_t *thinker)
+void P_RemoveThinker(thinker_t __far* thinker)
 {
   thinker->function = P_RemoveThinkerDelayed;
 }

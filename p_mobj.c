@@ -138,7 +138,7 @@ static void P_ExplodeMissile(mobj_t __far* mo)
 #define MAXMOVE         (30*FRACUNIT)
 #define STOPSPEED       (FRACUNIT/16)
 
-static void P_XYMovement (mobj_t* mo)
+static void P_XYMovement(mobj_t __far* mo)
 {
     player_t *player;
     fixed_t xmove, ymove;
@@ -326,7 +326,7 @@ static void P_XYMovement (mobj_t* mo)
 
 #define GRAVITY         FRACUNIT
 
-static void P_ZMovement (mobj_t* mo)
+static void P_ZMovement(mobj_t __far* mo)
 {
 
     // check for smooth step up
@@ -445,7 +445,7 @@ static void P_ZMovement (mobj_t* mo)
 // P_NightmareRespawn
 //
 
-static void P_NightmareRespawn(mobj_t* mobj)
+static void P_NightmareRespawn(mobj_t __far* mobj)
 {
     fixed_t      x;
     fixed_t      y;
@@ -526,7 +526,7 @@ static void P_NightmareRespawn(mobj_t* mobj)
 }
 
 
-void P_MobjThinker (mobj_t* mobj)
+void P_MobjThinker (mobj_t __far* mobj)
 {
     // killough 11/98:
     // removed old code which looked at target references
@@ -591,7 +591,7 @@ void P_MobjThinker (mobj_t* mobj)
 //Thinker function for stuff that doesn't need to do anything
 //interesting.
 //Just cycles through the states. Allows sprite animation to work.
-static void P_MobjBrainlessThinker(mobj_t* mobj)
+static void P_MobjBrainlessThinker(mobj_t __far* mobj)
 {
     // cycle through states,
     // calling action functions at transitions

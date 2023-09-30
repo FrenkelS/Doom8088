@@ -70,7 +70,6 @@ typedef enum {
   NUMDIRS
 } dirtype_t;
 
-void P_ZBumpCheck(mobj_t *);                                        // phares
 
 //
 // ENEMY THINKING

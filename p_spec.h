@@ -770,25 +770,21 @@ void P_ChangeSwitchTexture(const line_t __far* line, int32_t useAgain);
 
 // p_plats
 
-void T_PlatRaise
-( plat_t* plat );
+void T_PlatRaise(plat_t __far* plat);
 
 // p_doors
 
-void T_VerticalDoor
-( vldoor_t* door );
+void T_VerticalDoor(vldoor_t __far* door);
 
 // p_ceilng
 
-void T_MoveCeiling
-( ceiling_t* ceiling );
+void T_MoveCeiling(ceiling_t __far* ceiling);
 
 // p_floor
 
 result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int32_t floorOrCeiling, int32_t direction);
 
-void T_MoveFloor
-( floormove_t* floor );
+void T_MoveFloor(floormove_t __far* floor);
 
 ////////////////////////////////////////////////////////////////
 //

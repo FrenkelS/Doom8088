@@ -2248,7 +2248,7 @@ void P_SpawnSpecials (void)
 // This is the main scrolling code
 // killough 3/7/98
 
-static void T_Scroll(scroll_t *s)
+static void T_Scroll(scroll_t __far* s)
 {
     side_t __far* side  =_g_sides + s->affectee;
     side->textureoffset++;

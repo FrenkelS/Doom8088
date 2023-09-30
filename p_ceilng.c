@@ -50,7 +50,7 @@
 static ceilinglist_t __far* activeceilings;
 
 
-static void P_RemoveActiveCeiling(ceiling_t* ceiling);
+static void P_RemoveActiveCeiling(ceiling_t __far* ceiling);
 
 /////////////////////////////////////////////////////////////////
 //
@@ -69,7 +69,7 @@ static void P_RemoveActiveCeiling(ceiling_t* ceiling);
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
 //
-void T_MoveCeiling (ceiling_t* ceiling)
+void T_MoveCeiling (ceiling_t __far* ceiling)
 {
   result_e  res;
 
@@ -450,7 +450,7 @@ void P_AddActiveCeiling(ceiling_t __far* ceiling)
 // Passed the ceiling motion structure
 // Returns nothing
 //
-static void P_RemoveActiveCeiling(ceiling_t* ceiling)
+static void P_RemoveActiveCeiling(ceiling_t __far* ceiling)
 {
   ceilinglist_t __far* list = ceiling->list;
   ceiling->sector->ceilingdata = NULL;  //jff 2/22/98
