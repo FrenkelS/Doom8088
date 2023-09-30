@@ -188,12 +188,9 @@ texture = 46; //FIXME not everything has to be the same texture
 
 static int16_t R_GetTextureNumForName(const char* tex_name)
 {
-    //Convert name to uppercase for comparison.
-    char tex_name_upper[9];
-    strncpy(tex_name_upper, tex_name, 8);
-    tex_name_upper[8] = 0; //Ensure null terminated.
-    strupr(tex_name_upper);
-    int64_t tex_name_int = *(int64_t*)tex_name_upper;
+    char tex_name_temp[8];
+    strncpy(tex_name_temp, tex_name, 8);
+    int64_t tex_name_int = *(int64_t*)tex_name_temp;
 
     const int32_t __far* maptex = W_GetLumpByName("TEXTURE1");
     const int32_t __far* directory = maptex+1;
