@@ -182,7 +182,10 @@ void I_StartTic(void)
 
 static boolean isGraphicsModeSet = false;
 static uint16_t __far* screen;
-static uint16_t __far backBuffer[SCREENWIDTH * SCREENHEIGHT];
+
+//hack for gcc-ia16. Let's hope these two variables stay next to each other in memory.
+static uint16_t __far backBuffer[SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT)];
+static uint16_t __far backBufferBottom[SCREENWIDTH * ST_HEIGHT];
 
 static int8_t newpal;
 
