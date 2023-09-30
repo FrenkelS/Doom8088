@@ -57,7 +57,7 @@ typedef struct
   int32_t tickend;
   void __far* origin;        // origin of sound
   int16_t handle;          // handle of the sound being played
-  int16_t is_pickup;       // killough 4/25/98: whether sound is a player's weapon
+  boolean is_pickup;       // whether sound is a player's weapon
 } channel_t;
 
 
@@ -109,7 +109,7 @@ static void S_StopMusic(void);
 
 static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int32_t *vol, int32_t *sep);
 
-static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup);
+static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup);
 
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
@@ -176,7 +176,7 @@ void S_Start(void)
 static void S_StartSoundAtVolume(mobj_t __far* origin, int32_t sfx_id, int32_t volume)
 {
     int16_t cnum;
-    int32_t is_pickup;
+    boolean is_pickup;
     const sfxinfo_t *sfx;
 
     int32_t sep = NORM_SEP;
@@ -530,9 +530,8 @@ static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source,
 // S_getChannel :
 //   If none available, return -1.  Otherwise channel #.
 //
-// killough 4/25/98: made static, added is_pickup argument
 
-static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_t is_pickup)
+static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup)
 {
     // channel number to use
     int16_t cnum;
@@ -566,6 +565,6 @@ static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, int32_
     c = &channels[cnum];              // channel is decided to be cnum.
     c->sfxinfo = sfxinfo;
     c->origin = origin;
-    c->is_pickup = is_pickup;         // killough 4/25/98
+    c->is_pickup = is_pickup;
     return cnum;
 }
