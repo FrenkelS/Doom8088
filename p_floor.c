@@ -643,14 +643,14 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->direction = 1;
         floor->sector = sec;
         floor->speed = FLOORSPEED*4;
-        floor->floordestheight = P_FindNextHighestFloor(sec,sec->floorheight);
+        floor->floordestheight = P_FindNextHighestFloor(sec);
         break;
 
       case raiseFloorToNearest:
         floor->direction = 1;
         floor->sector = sec;
         floor->speed = FLOORSPEED;
-        floor->floordestheight = P_FindNextHighestFloor(sec,sec->floorheight);
+        floor->floordestheight = P_FindNextHighestFloor(sec);
         break;
 
       case raiseFloor24:
@@ -1087,8 +1087,7 @@ boolean EV_DoElevator(const line_t __far* line, elevator_e elevtype)
         elevator->direction = 1;
         elevator->sector = sec;
         elevator->speed = ELEVATORSPEED;
-        elevator->floordestheight =
-          P_FindNextHighestFloor(sec,sec->floorheight);
+        elevator->floordestheight   = P_FindNextHighestFloor(sec);
         elevator->ceilingdestheight =
           elevator->floordestheight + sec->ceilingheight - sec->floorheight;
         break;

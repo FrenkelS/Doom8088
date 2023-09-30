@@ -723,7 +723,7 @@ fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec);
 
 fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec);
 
-fixed_t P_FindNextHighestFloor(sector_t __far* sec, int32_t currentheight);
+fixed_t P_FindNextHighestFloor(sector_t __far* sec);
 
 fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight);
 
@@ -731,9 +731,9 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec);
 
 fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec);
 
-fixed_t P_FindNextLowestCeiling(sector_t __far* sec, int32_t currentheight);
+fixed_t P_FindNextLowestCeiling(sector_t __far* sec);
 
-fixed_t P_FindNextHighestCeiling(sector_t __far* sec, int32_t currentheight);
+fixed_t P_FindNextHighestCeiling(sector_t __far* sec);
 
 fixed_t P_FindShortestTextureAround
 ( int32_t secnum ); // jff 2/04/98

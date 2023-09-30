@@ -222,15 +222,16 @@ fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 //
 // P_FindNextHighestFloor()
 //
-// Passed a sector and a floor height, returns the fixed point value
+// Passed a sector, returns the fixed point value
 // of the smallest floor height in a surrounding sector larger than
 // the floor height passed. If no such height exists the floorheight
-// passed is returned.
+// of the passed sector is returned.
 //
 // Rewritten by Lee Killough to avoid fixed array and to be faster
 //
-fixed_t P_FindNextHighestFloor(sector_t __far* sec, int32_t currentheight)
+fixed_t P_FindNextHighestFloor(sector_t __far* sec)
 {
+  int32_t currentheight = sec->floorheight;
   sector_t __far* other;
   int32_t i;
 
@@ -250,7 +251,7 @@ fixed_t P_FindNextHighestFloor(sector_t __far* sec, int32_t currentheight)
    * If there are no higher neighbouring sectors, Heretic just returned
    * heightlist[0] (local variable), i.e. noise off the stack. 0 is right for
    * RETURN01 E1M2, so let's take that. */
-  return (currentheight);
+  return currentheight;
 }
 
 
@@ -288,15 +289,16 @@ fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight)
 //
 // P_FindNextLowestCeiling()
 //
-// Passed a sector and a ceiling height, returns the fixed point value
+// Passed a sector, returns the fixed point value
 // of the largest ceiling height in a surrounding sector smaller than
 // the ceiling height passed. If no such height exists the ceiling height
-// passed is returned.
+// of the passed sector is returned.
 //
 // jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
 //
-fixed_t P_FindNextLowestCeiling(sector_t __far* sec, int32_t currentheight)
+fixed_t P_FindNextLowestCeiling(sector_t __far* sec)
 {
+  int32_t currentheight = sec->ceilingheight;
   sector_t __far* other;
   int32_t i;
 
@@ -319,15 +321,16 @@ fixed_t P_FindNextLowestCeiling(sector_t __far* sec, int32_t currentheight)
 //
 // P_FindNextHighestCeiling()
 //
-// Passed a sector and a ceiling height, returns the fixed point value
+// Passed a sector, returns the fixed point value
 // of the smallest ceiling height in a surrounding sector larger than
 // the ceiling height passed. If no such height exists the ceiling height
-// passed is returned.
+// of the passed sector is returned.
 //
 // jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
 //
-fixed_t P_FindNextHighestCeiling(sector_t __far* sec, int32_t currentheight)
+fixed_t P_FindNextHighestCeiling(sector_t __far* sec)
 {
+  int32_t currentheight = sec->ceilingheight;
   sector_t __far* other;
   int32_t i;
 
