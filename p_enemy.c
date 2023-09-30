@@ -70,7 +70,6 @@ typedef enum {
   NUMDIRS
 } dirtype_t;
 
-static void P_NewChaseDir(mobj_t *actor);
 void P_ZBumpCheck(mobj_t *);                                        // phares
 
 //
@@ -138,7 +137,7 @@ void P_NoiseAlert(mobj_t __far* emitter)
 // P_CheckMeleeRange
 //
 
-static boolean P_CheckMeleeRange(mobj_t *actor)
+static boolean P_CheckMeleeRange(mobj_t __far* actor)
 {
   mobj_t __far* pl = actor->target;
 
@@ -155,7 +154,7 @@ static boolean P_CheckMeleeRange(mobj_t *actor)
 // killough 12/98
 // This function tries to prevent shooting at friends
 
-static boolean P_HitFriend(mobj_t *actor)
+static boolean P_HitFriend(mobj_t __far* actor)
 {
   return actor->flags & MF_FRIEND && actor->target &&
     (P_AimLineAttack(actor,
@@ -170,7 +169,7 @@ static boolean P_HitFriend(mobj_t *actor)
 //
 // P_CheckMissileRange
 //
-static boolean P_CheckMissileRange(mobj_t *actor)
+static boolean P_CheckMissileRange(mobj_t __far* actor)
 {
   fixed_t dist;
 
@@ -255,7 +254,7 @@ static boolean P_IsOnLift(const mobj_t __far* actor)
  * -1 if it is serious. Used for AI.
  */
 
-static int32_t P_IsUnderDamage(mobj_t *actor)
+static int32_t P_IsUnderDamage(mobj_t __far* actor)
 {
   const struct msecnode_s __far* seclist;
   const ceiling_t __far* cl;             // Crushing ceiling
@@ -276,7 +275,7 @@ static int32_t P_IsUnderDamage(mobj_t *actor)
 static const fixed_t xspeed[8] = {FRACUNIT,47000,0,-47000,-FRACUNIT,-47000,0,47000};
 static const fixed_t yspeed[8] = {0,47000,FRACUNIT,47000,0,-47000,-FRACUNIT,-47000};
 
-static boolean P_Move(mobj_t *actor)
+static boolean P_Move(mobj_t __far* actor)
 {
   fixed_t tryx, tryy, deltax, deltay, origx, origy;
   boolean try_ok;
@@ -370,7 +369,7 @@ static boolean P_Move(mobj_t *actor)
 // an OpenDoor call is made to start it opening.
 //
 
-static boolean P_TryWalk(mobj_t *actor)
+static boolean P_TryWalk(mobj_t __far* actor)
 {
   if (!P_Move(actor))
     return false;
@@ -387,7 +386,7 @@ static boolean P_TryWalk(mobj_t *actor)
 // determines the new direction to take
 //
 
-static void P_DoNewChaseDir(mobj_t *actor, fixed_t deltax, fixed_t deltay)
+static void P_DoNewChaseDir(mobj_t __far* actor, fixed_t deltax, fixed_t deltay)
 {
   int32_t xdir, ydir, tdir;
   int32_t olddir = actor->movedir;
@@ -491,7 +490,7 @@ static boolean PIT_AvoidDropoff(const line_t __far* line)
 // Driver for above
 //
 
-static fixed_t P_AvoidDropoff(mobj_t *actor)
+static fixed_t P_AvoidDropoff(mobj_t __far* actor)
 {
   int32_t yh=((_g_tmbbox[BOXTOP]   = actor->y+actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
   int32_t yl=((_g_tmbbox[BOXBOTTOM]= actor->y-actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
@@ -520,7 +519,7 @@ static fixed_t P_AvoidDropoff(mobj_t *actor)
 // killough 9/8/98: Split into two functions
 //
 
-static void P_NewChaseDir(mobj_t *actor)
+static void P_NewChaseDir(mobj_t __far* actor)
 {
     mobj_t __far* target = actor->target;
     fixed_t deltax = target->x - actor->x;
@@ -569,7 +568,7 @@ static void P_NewChaseDir(mobj_t *actor)
 // killough 9/9/98: whether a target is visible to a monster
 //
 
-static boolean P_IsVisible(mobj_t *actor, mobj_t __far* mo, boolean allaround)
+static boolean P_IsVisible(mobj_t __far* actor, mobj_t __far* mo, boolean allaround)
 {
     if (!allaround)
     {
@@ -587,7 +586,7 @@ static boolean P_IsVisible(mobj_t *actor, mobj_t __far* mo, boolean allaround)
 // Returns true if a player is targeted.
 //
 
-static boolean P_LookForPlayers(mobj_t *actor, boolean allaround)
+static boolean P_LookForPlayers(mobj_t __far* actor, boolean allaround)
 {
     player_t *player;
 
@@ -620,7 +619,7 @@ static boolean P_LookForPlayers(mobj_t *actor, boolean allaround)
 // killough 9/5/98: look for targets to go after, depending on kind of monster
 //
 
-static boolean P_LookForTargets(mobj_t *actor, int32_t allaround)
+static boolean P_LookForTargets(mobj_t __far* actor, int32_t allaround)
 {
     return P_LookForPlayers (actor, allaround);
 }
@@ -636,7 +635,7 @@ static boolean P_LookForTargets(mobj_t *actor, int32_t allaround)
 // Stay in state until a player is sighted.
 //
 
-void A_Look(mobj_t *actor)
+void A_Look(mobj_t __far* actor)
 {
     mobj_t __far* targ = actor->subsector->sector->soundtarget;
     actor->threshold = 0; // any shot will wake up
@@ -702,7 +701,7 @@ void A_Look(mobj_t *actor)
 // so it tries to close as fast as possible
 //
 
-void A_Chase(mobj_t *actor)
+void A_Chase(mobj_t __far* actor)
 {
     if (actor->reactiontime)
         actor->reactiontime--;
@@ -843,7 +842,7 @@ void A_FaceTarget(mobj_t __far* actor)
 // A_PosAttack
 //
 
-void A_PosAttack(mobj_t *actor)
+void A_PosAttack(mobj_t __far* actor)
 {
   int32_t angle, damage, slope, t;
 
@@ -861,7 +860,7 @@ void A_PosAttack(mobj_t *actor)
   P_LineAttack(actor, angle, MISSILERANGE, slope, damage);
 }
 
-void A_SPosAttack(mobj_t* actor)
+void A_SPosAttack(mobj_t __far* actor)
 {
   int32_t i, bangle, slope;
 
@@ -885,7 +884,7 @@ void A_SPosAttack(mobj_t* actor)
 // A_TroopAttack
 //
 
-void A_TroopAttack(mobj_t *actor)
+void A_TroopAttack(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
@@ -901,7 +900,7 @@ void A_TroopAttack(mobj_t *actor)
   P_SpawnMissile(actor, actor->target, MT_TROOPSHOT);  // launch a missile
 }
 
-void A_SargAttack(mobj_t *actor)
+void A_SargAttack(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
@@ -923,7 +922,7 @@ void A_CyberAttack(mobj_t __far* actor)
   P_SpawnMissile(actor, actor->target, MT_ROCKET);
 }
 
-void A_BruisAttack(mobj_t *actor)
+void A_BruisAttack(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
@@ -939,7 +938,7 @@ void A_BruisAttack(mobj_t *actor)
 }
 
 
-void A_Scream(mobj_t *actor)
+void A_Scream(mobj_t __far* actor)
 {
   int32_t sound;
 
@@ -967,18 +966,18 @@ void A_Scream(mobj_t *actor)
   S_StartSound(actor, sound);
 }
 
-void A_XScream(mobj_t *actor)
+void A_XScream(mobj_t __far* actor)
 {
   S_StartSound(actor, sfx_slop);
 }
 
-void A_Pain(mobj_t *actor)
+void A_Pain(mobj_t __far* actor)
 {
   if (mobjinfo[actor->type].painsound)
     S_StartSound(actor, mobjinfo[actor->type].painsound);
 }
 
-void A_Fall(mobj_t *actor)
+void A_Fall(mobj_t __far* actor)
 {
   // actor is on ground, it can be walked over
   actor->flags &= ~MF_SOLID;
@@ -987,7 +986,7 @@ void A_Fall(mobj_t *actor)
 //
 // A_Explode
 //
-void A_Explode(mobj_t *thingy)
+void A_Explode(mobj_t __far* thingy)
 {
   P_RadiusAttack( thingy, thingy->target, 128 );
 }
@@ -998,7 +997,7 @@ void A_Explode(mobj_t *thingy)
 // if on first boss level
 //
 
-void A_BossDeath(mobj_t *mo)
+void A_BossDeath(mobj_t __far* mo)
 {
     thinker_t __far* th;
     line_t    junk;
@@ -1028,7 +1027,7 @@ void A_BossDeath(mobj_t *mo)
 }
 
 
-void A_PlayerScream(mobj_t *mo)
+void A_PlayerScream(mobj_t __far* mo)
 {
   int32_t sound = sfx_pldeth;  // Default death sound.
   S_StartSound(mo, sound);

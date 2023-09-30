@@ -102,7 +102,7 @@ static fixed_t  topslope;
 static fixed_t  bottomslope;
 
 static mobj_t __far* bombsource;
-static mobj_t *bombspot;
+static mobj_t __far* bombspot;
 static int32_t bombdamage;
 
 static mobj_t __far*   usething;
@@ -1299,7 +1299,7 @@ static boolean PIT_RadiusAttack (mobj_t __far* thing)
 // P_RadiusAttack
 // Source is the creature that caused the explosion at spot.
 //
-void P_RadiusAttack(mobj_t* spot, mobj_t __far* source, int32_t damage)
+void P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int32_t damage)
   {
   int32_t x;
   int32_t y;
