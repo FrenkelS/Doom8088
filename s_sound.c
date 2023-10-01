@@ -263,7 +263,7 @@ void S_StartSound2(degenmobj_t __far* origin, int32_t sfx_id)
     //mobj_t-like struct to pass to the sound code.
 
 
-    struct fake_mobj
+    static struct fake_mobj
     {
         thinker_t ununsed;
         degenmobj_t origin;

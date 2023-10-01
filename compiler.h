@@ -27,8 +27,6 @@ typedef uint16_t segment_t;
 
 #else
 //32-bit
-#define halloc(numb,size) malloc(numb*size)
-
 typedef uint32_t segment_t;
 
 #define MK_FP(s,o) (void*)((s<<4)+o)
@@ -72,8 +70,8 @@ _go32_dpmi_free_iret_wrapper(&NewInt);
 
 
 
-#elif defined __WATCOMC__
-//Watcom
+#else
+//Watcom and gcc-ia16
 #define __djgpp_nearptr_enable()
 #define __djgpp_conventional_base 0
 
