@@ -83,7 +83,7 @@ gameaction_t    _g_gameaction;
 gamestate_t     _g_gamestate;
 skill_t         _g_gameskill;
 
-int32_t             _g_gamemap;
+int16_t             _g_gamemap;
 
 player_t        _g_player;
 
@@ -699,7 +699,7 @@ static void G_DoCompleted (void)
     // print "FINISHED: <mapname>" when the player exits the current map
     if (nodrawers && (_g_demoplayback || _g_timingdemo))
     {
-        printf("FINISHED: E1M%ld\n", _g_gamemap);
+        printf("FINISHED: E1M%d\n", _g_gamemap);
     }
 
     WI_Start (&_g_wminfo);

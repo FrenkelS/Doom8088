@@ -204,8 +204,8 @@ typedef struct
   boolean     didsecret;
 
   // previous and next levels, origin 0
-  int32_t         last;
-  int32_t         next;
+  int16_t         last;
+  int16_t         next;
 
   int32_t         maxkills;
   int32_t         maxitems;
