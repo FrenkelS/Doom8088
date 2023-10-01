@@ -195,46 +195,33 @@ void Z_Shutdown(void)
 }
 
 
-#if defined __DJGPP__
-void _dos_allocmem(unsigned int __size, unsigned int *__seg)
-{
-	static uint8_t* ptr;
-
-	if (__size == 0xffff)
-	{
-		int32_t paragraphs = 640 * 1024L / PARAGRAPH_SIZE;
-		ptr = malloc(paragraphs * PARAGRAPH_SIZE);
-
-		// align ptr
-		uint32_t m = (uint32_t) ptr;
-		if ((m & (PARAGRAPH_SIZE - 1)) != 0)
-		{
-			paragraphs--;
-			while ((m & (PARAGRAPH_SIZE - 1)) != 0)
-				m = (uint32_t) ++ptr;
-		}
-
-
-		*__seg = paragraphs;
-	}
-	else
-		*__seg = FP_SEG(ptr);
-}
-#endif
-
-
 //
 // Z_Init
 //
 void Z_Init (void)
 {
-	// allocate all available conventional memory.
-	unsigned int max, segment;
-	_dos_allocmem(0xffff, &max);
-	_dos_allocmem(max, &segment);
-	static uint8_t __far* mainzone; mainzone = MK_FP(segment, 0);
+	uint32_t heapSize;
+	int32_t hallocNumb = 640 * 1024L / PARAGRAPH_SIZE;
+	static uint8_t __far* mainzone;
 
-	uint32_t heapSize = (uint32_t)max * PARAGRAPH_SIZE;
+	// Try to allocate memory.
+	do
+	{
+		mainzone = halloc(hallocNumb, PARAGRAPH_SIZE);
+		hallocNumb--;
+	} while (mainzone == NULL);
+
+	hallocNumb++;
+	heapSize = hallocNumb * PARAGRAPH_SIZE;
+
+	// align mainzone
+	uint32_t m = (uint32_t) mainzone;
+	if ((m & (PARAGRAPH_SIZE - 1)) != 0)
+	{
+		heapSize -= PARAGRAPH_SIZE;
+		while ((m & (PARAGRAPH_SIZE - 1)) != 0)
+			m = (uint32_t) ++mainzone;
+	}
 
 	printf("\t%ld bytes conventional memory\n", heapSize);
 
@@ -499,10 +486,10 @@ static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
     }
 
     base->tag  = tag;
-	if (user)
-		base->user = user;
-	else
-		base->user = (void __far*__far*) MK_FP(0,2); // unowned
+    if (user)
+        base->user = user;
+    else
+        base->user = (void __far*__far*) MK_FP(0,2); // unowned
 #if defined ZONEIDCHECK
     base->id  = ZONEID;
 #endif

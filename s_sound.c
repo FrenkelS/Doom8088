@@ -185,7 +185,7 @@ static void S_StartSoundAtVolume(mobj_t __far* origin, int32_t sfx_id, int32_t v
     if (nosfxparm)
         return;
 
-    is_pickup = sfx_id & PICKUP_SOUND || sfx_id == sfx_oof || (sfx_id == sfx_noway); // killough 4/25/98
+    is_pickup = sfx_id & PICKUP_SOUND || sfx_id == sfx_oof || (sfx_id == sfx_noway);
     sfx_id &= ~PICKUP_SOUND;
 
     // check for bogus sound #
@@ -263,7 +263,7 @@ void S_StartSound2(degenmobj_t __far* origin, int32_t sfx_id)
     //mobj_t-like struct to pass to the sound code.
 
 
-    static struct fake_mobj
+    struct fake_mobj
     {
         thinker_t ununsed;
         degenmobj_t origin;
@@ -292,7 +292,7 @@ void S_StopSound(void __far* origin)
 }
 
 
-static boolean S_SoundIsPlaying(int32_t cnum)
+static boolean S_SoundIsPlaying(int16_t cnum)
 {
     const channel_t* channel = &channels[cnum];
 

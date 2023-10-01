@@ -105,7 +105,7 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
 
 void R_DrawPlanes (void);
 void R_ClearPlanes(void);
-void R_ClearLastOpening(void);
+void R_ClearOpenings(void);
 
 void R_DrawSky(visplane_t __far* pl);
 

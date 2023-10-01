@@ -52,7 +52,7 @@ static boolean isKeyboardIsrSet = false;
 
 #if defined __DJGPP__ 
 static _go32_dpmi_seginfo oldkeyboardisr, newkeyboardisr;
-#else
+#elif defined __WATCOMC__
 static void (__interrupt *oldkeyboardisr)(void);
 #endif
 
@@ -182,7 +182,7 @@ void I_StartTic(void)
 
 static boolean isGraphicsModeSet = false;
 static uint16_t __far* screen;
-static uint16_t __far* backBuffer;
+static uint16_t __far backBuffer[SCREENWIDTH * SCREENHEIGHT];
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
 uint16_t __far* _g_screen;
@@ -191,13 +191,13 @@ static int8_t newpal;
 
 uint16_t __far* I_GetBackBuffer(void)
 {
-	return backBuffer;
+	return &backBuffer[0];
 }
 
 
 void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
 {
-	uint16_t __far* src = backBuffer;
+	uint16_t __far* src = &backBuffer[0];
 	uint16_t __far* dst = buffer;
 	for (int16_t i = 0; i < SCREENWIDTH * SCREENHEIGHT; i++)
 		*dst++ = *src++;
@@ -221,14 +221,12 @@ void I_InitGraphics(void)
 	isGraphicsModeSet = true;
 
 	screen = MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH * 2) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
-	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
-	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
 }
 
 
 void I_StartDisplay(void)
 {
-	_g_screen = backBuffer;
+	_g_screen = &backBuffer[0];
 }
 
 
@@ -247,7 +245,7 @@ void I_DrawBuffer(uint16_t __far* buffer)
 
 static void I_FinishUpdate_dos(void)
 {
-	I_DrawBuffer(backBuffer);
+	I_DrawBuffer(&backBuffer[0]);
 }
 
 

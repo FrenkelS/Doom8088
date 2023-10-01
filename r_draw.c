@@ -2090,7 +2090,7 @@ static boolean R_CheckOpenings(const int32_t start)
 }
 
 
-void R_ClearLastOpening(void)
+void R_ClearOpenings(void)
 {
 	lastopening = openings;
 }
