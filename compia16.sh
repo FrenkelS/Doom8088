@@ -1,4 +1,4 @@
-mkdir GCCIA16 
+mkdir GCCIA16
 
 unset CFLAGS
 
