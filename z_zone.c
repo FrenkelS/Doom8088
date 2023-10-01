@@ -195,8 +195,8 @@ void Z_Shutdown(void)
 }
 
 
-#if defined __DJGPP__
-void _dos_allocmem(unsigned int __size, unsigned int *__seg)
+#if defined __DJGPP__ || defined _M_I386
+static unsigned int _dos_allocmem(unsigned int __size, unsigned int *__seg)
 {
 	static uint8_t* ptr;
 
@@ -219,6 +219,8 @@ void _dos_allocmem(unsigned int __size, unsigned int *__seg)
 	}
 	else
 		*__seg = FP_SEG(ptr);
+
+	return 0;
 }
 #endif
 

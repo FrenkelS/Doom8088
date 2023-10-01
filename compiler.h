@@ -27,11 +27,20 @@ typedef uint16_t segment_t;
 
 #else
 //32-bit
-typedef uint32_t segment_t;
-
 #define MK_FP(s,o) (void*)((s<<4)+o)
 #define FP_SEG(p)  (((uint32_t)p)>>4)
 #define FP_OFF(p)  (((uint32_t)p)&15)
+
+typedef uint32_t segment_t;
+
+#define __far
+
+#define _fmemchr	memchr
+#define _fmemcpy	memcpy
+#define _fmemset	memset
+#define _fstrcpy	strcpy
+#define _fstrlen	strlen
+
 #endif
 
 
@@ -47,14 +56,7 @@ typedef uint32_t segment_t;
 #define inp(port)			inportb(port)
 #define outp(port,data)		outportb(port,data)
 
-#define __far
 #define __interrupt
-
-#define _fmemchr	memchr
-#define _fmemcpy	memcpy
-#define _fmemset	memset
-#define _fstrcpy	strcpy
-#define _fstrlen	strlen
 
 #define replaceInterrupt(OldInt,NewInt,vector,handler)				\
 _go32_dpmi_get_protected_mode_interrupt_vector(vector, &OldInt);	\
