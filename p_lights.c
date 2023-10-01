@@ -83,6 +83,19 @@ static void T_FireFlicker (fireflicker_t* flick)
 // Passed a lightflash_t structure containing light levels and timing
 // Returns nothing
 //
+
+typedef struct
+{
+  thinker_t thinker;
+  sector_t* sector;
+  int32_t count;
+  int32_t maxlight;
+  int32_t minlight;
+  int32_t maxtime;
+  int32_t mintime;
+
+} lightflash_t;
+
 static void T_LightFlash (lightflash_t* flash)
 {
   if (--flash->count)
@@ -109,6 +122,19 @@ static void T_LightFlash (lightflash_t* flash)
 // Passed a strobe_t structure containing light levels and timing
 // Returns nothing
 //
+
+typedef struct
+{
+  thinker_t thinker;
+  sector_t* sector;
+  int32_t count;
+  int32_t minlight;
+  int32_t maxlight;
+  int32_t darktime;
+  int32_t brighttime;
+
+} strobe_t;
+
 static void T_StrobeFlash (strobe_t*   flash)
 {
   if (--flash->count)

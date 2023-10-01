@@ -216,7 +216,7 @@ typedef PACKEDATTR_PRE struct {
 
 static void P_LoadSectors (int16_t lump)
 {
-  const byte *data; // cph - const*
+  const byte *data;
   int32_t  i;
 
   _g_numsectors = W_LumpLength (lump) / sizeof(mapsector_t);
@@ -609,9 +609,8 @@ static void P_FreeLevelData()
 //
 // P_SetupLevel
 //
-// killough 5/3/98: reformatted, cleaned up
 
-void P_SetupLevel(int32_t map)
+void P_SetupLevel(int16_t map)
 {
     int_fast8_t   i;
     char  lumpname[9];

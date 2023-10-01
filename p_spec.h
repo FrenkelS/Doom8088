@@ -519,20 +519,12 @@ typedef enum
 
 // switch animation structure type
 
-#if defined(__MWERKS__)
-#pragma options align=packed
-#endif
-
 typedef PACKEDATTR_PRE struct
 {
   char name1[9];
   char name2[9];
   int16_t episode;
 } PACKEDATTR_POST switchlist_t; //jff 3/23/98 pack to read from memory
-
-#if defined(__MWERKS__)
-#pragma options align=reset
-#endif
 
 typedef struct
 {
@@ -555,30 +547,6 @@ typedef struct
   int32_t minlight;
 
 } fireflicker_t;
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t* sector;
-  int32_t count;
-  int32_t maxlight;
-  int32_t minlight;
-  int32_t maxtime;
-  int32_t mintime;
-
-} lightflash_t;
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t* sector;
-  int32_t count;
-  int32_t minlight;
-  int32_t maxlight;
-  int32_t darktime;
-  int32_t brighttime;
-
-} strobe_t;
 
 typedef struct
 {
@@ -607,15 +575,9 @@ typedef struct
   int32_t tag;
   plattype_e type;
 
-  struct platlist *list;   // killough
+  struct platlist *list;
 } plat_t;
 
-// New limit-free plat structure -- killough
-
-typedef struct platlist {
-  plat_t *plat;
-  struct platlist *next,**prev;
-} platlist_t;
 
 // p_ceilng
 
@@ -667,7 +629,7 @@ typedef struct
   // ID
   int32_t tag;
   int32_t olddirection;
-  struct ceilinglist *list;   // jff 2/22/98 copied from killough's plats
+  struct ceilinglist *list;
 } ceiling_t;
 
 typedef struct ceilinglist {
@@ -764,9 +726,7 @@ fixed_t P_FindLowestFloorSurrounding
 fixed_t P_FindHighestFloorSurrounding
 ( sector_t* sec );
 
-fixed_t P_FindNextHighestFloor
-( sector_t* sec,
-  int32_t currentheight );
+fixed_t P_FindNextHighestFloor(sector_t* sec);
 
 fixed_t P_FindNextLowestFloor
 ( sector_t* sec,
@@ -778,13 +738,9 @@ fixed_t P_FindLowestCeilingSurrounding
 fixed_t P_FindHighestCeilingSurrounding
 ( sector_t* sec ); // jff 2/04/98
 
-fixed_t P_FindNextLowestCeiling
-( sector_t *sec,
-  int32_t currentheight ); // jff 2/04/98
+fixed_t P_FindNextLowestCeiling(sector_t *sec);
 
-fixed_t P_FindNextHighestCeiling
-( sector_t *sec,
-  int32_t currentheight ); // jff 2/04/98
+fixed_t P_FindNextHighestCeiling(sector_t *sec);
 
 fixed_t P_FindShortestTextureAround
 ( int32_t secnum ); // jff 2/04/98
@@ -943,7 +899,7 @@ void EV_LightTurnOn
 ( const line_t* line,
   int32_t   bright );
 
-void EV_LightTurnOnPartway(const line_t* line, fixed_t level); // killough 10/10/98
+void EV_LightTurnOnPartway(const line_t* line, fixed_t level);
 
 // p_floor
 

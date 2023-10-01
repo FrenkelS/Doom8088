@@ -263,8 +263,7 @@ static boolean untouched(const line_t *ld)
 // Adjusts tmfloorz and tmceilingz as lines are contacted
 //
 
-static // killough 3/26/98: make static
-boolean PIT_CheckLine (const line_t* ld)
+static boolean PIT_CheckLine (const line_t* ld)
 {
   if (_g_tmbbox[BOXRIGHT] <= ld->bbox[BOXLEFT]
    || _g_tmbbox[BOXLEFT] >= ld->bbox[BOXRIGHT]
@@ -346,7 +345,7 @@ boolean PIT_CheckLine (const line_t* ld)
 // PIT_CheckThing
 //
 
-static boolean PIT_CheckThing(mobj_t *thing) // killough 3/26/98: make static
+static boolean PIT_CheckThing(mobj_t *thing)
 {
   fixed_t blockdist;
   int32_t damage;

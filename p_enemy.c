@@ -70,8 +70,6 @@ typedef enum {
   NUMDIRS
 } dirtype_t;
 
-static void P_NewChaseDir(mobj_t *actor);
-void P_ZBumpCheck(mobj_t *);                                        // phares
 
 //
 // ENEMY THINKING

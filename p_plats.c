@@ -44,6 +44,14 @@
 #include "globdata.h"
 
 
+// New limit-free plat structure -- killough
+
+typedef struct platlist {
+  plat_t *plat;
+  struct platlist *next,**prev;
+} platlist_t;
+
+
 static platlist_t *activeplats;
 
 
@@ -243,7 +251,7 @@ boolean EV_DoPlat
       case raiseToNearestAndChange:
         plat->speed = PLATSPEED/2;
         sec->floorpic = _g_sides[line->sidenum[0]].sector->floorpic;
-        plat->high = P_FindNextHighestFloor(sec,sec->floorheight);
+        plat->high = P_FindNextHighestFloor(sec);
         plat->wait = 0;
         plat->status = up;
         sec->special = 0;

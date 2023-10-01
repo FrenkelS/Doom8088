@@ -726,7 +726,7 @@ void P_DamageMobj(mobj_t *target,mobj_t *inflictor, mobj_t *source, int32_t dama
      target->target != source)) // remember last enemy - killough
   P_SetTarget(&target->lastenemy, target->target);
 
-      P_SetTarget(&target->target, source);       // killough 11/98
+      P_SetTarget(&target->target, source);
       target->threshold = BASETHRESHOLD;
       if (target->state == &states[mobjinfo[target->type].spawnstate]
           && mobjinfo[target->type].seestate != S_NULL)

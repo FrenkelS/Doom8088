@@ -155,7 +155,7 @@ manual_floor:
         break;
       case FtoNnF:
         floor->floordestheight = Dirn?
-          P_FindNextHighestFloor(sec,sec->floorheight) :
+          P_FindNextHighestFloor(sec) :
           P_FindNextLowestFloor(sec,sec->floorheight);
         break;
       case FtoLnC:
@@ -360,8 +360,8 @@ manual_ceiling:
         break;
       case CtoNnC:
         targheight = Dirn?
-          P_FindNextHighestCeiling(sec,sec->ceilingheight) :
-          P_FindNextLowestCeiling(sec,sec->ceilingheight);
+          P_FindNextHighestCeiling(sec) :
+          P_FindNextLowestCeiling(sec);
         break;
       case CtoHnF:
         targheight = P_FindHighestFloorSurrounding(sec);
