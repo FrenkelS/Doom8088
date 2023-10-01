@@ -6,11 +6,13 @@
 #       0  use 8088 instructions
 #       2  use 286 instructions
 #       3  use 386 instructions
+#      bt  build target
 #       c  compile only
 #      d1  include line number debugging information
 #      d2  include full sybolic debugging information
 #      ei  force enums to be of type int
 #       j  change char default from unsigned to signed
+#      ml  large memory model
 #      mh  huge memory model
 #      oa  relax aliasing checking
 #      od  do not optimize
@@ -29,12 +31,12 @@
 #
 # --------------------------------------------------------------------------
 
-#CCOPTS = -oaxes -oh -ol+ -zp1 -0 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxet -oh -ol+ -zp1 -0 -j -zq -s -ml -wx -za99
-CCOPTS = -oaxes -oh -ol+ -zp1 -2 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxet -oh -ol+ -zp1 -2 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxes -oh -ol+ -zp1 -3 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxet -oh -ol+ -zp1 -3 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -ml -wx -za99
+CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -ml -wx -za99
 
 GLOBOBJS = &
  am_map.obj &
