@@ -1179,8 +1179,7 @@ static int16_t M_StringWidth(const char __far* string)
 
 	for (size_t i = 0; i < _fstrlen(string); i++)
 	{
-		char c = string[i];
-		c = toupper(c);
+		char c = toupper(string[i]);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
 			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);

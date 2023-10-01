@@ -618,7 +618,6 @@ static void P_FreeLevelData()
 //
 // P_SetupLevel
 //
-// killough 5/3/98: reformatted, cleaned up
 
 void P_SetupLevel(int16_t map)
 {
