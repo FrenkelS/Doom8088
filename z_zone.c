@@ -74,7 +74,6 @@ typedef struct
 #endif
 } memblock_t;
 
-#define UNOWNED MK_FP(0,2)
 
 #define PARAGRAPH_SIZE 16
 
@@ -486,7 +485,10 @@ static void* Z_TryMalloc(int32_t size, int8_t tag, void **user)
     }
 
     base->tag  = tag;
-    base->user = user ? user : UNOWNED;
+    if (user)
+        base->user = user;
+    else
+        base->user = MK_FP(0,2); // unowned
 #if defined ZONEIDCHECK
     base->id  = ZONEID;
 #endif

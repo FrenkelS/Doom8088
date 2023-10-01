@@ -45,10 +45,6 @@
 #include "globdata.h"
 
 
-// The screen is [SCREENWIDTH*SCREENHEIGHT];
-uint16_t *_g_screen;
-
-
 /*
  * This function draws at GBA resolution (ie. not pixel doubled)
  * so the st bar and menus don't look like garbage.
