@@ -70,33 +70,4 @@ void M_Init (void);
 void M_StartControlPanel (void);
 
 
-//
-// MENU TYPEDEFS
-//
-
-typedef struct
-{
-  int16_t status; // 0 = no cursor here, 1 = ok, 2 = arrows ok
-  char  name[10];
-
-  // choice = menu item #.
-  // if status = 2,
-  //   choice=0:leftarrow,1:rightarrow
-  void  (*routine)(int32_t choice);
-} menuitem_t;
-
-typedef struct menu_s
-{
-  int16_t           numitems;     // # of menu items
-  const menuitem_t* menuitems;    // menu items
-  void            (*routine)(); // draw routine
-  int16_t           x;
-  int16_t           y;            // x,y of menu
-  const struct menu_s*	prevMenu;	// previous menu
-  int16_t previtemOn;
-} menu_t;
-
-
-
-
 #endif

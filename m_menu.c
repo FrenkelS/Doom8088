@@ -61,6 +61,34 @@
 
 
 //
+// MENU TYPEDEFS
+//
+
+typedef struct
+{
+  int16_t status; // 0 = no cursor here, 1 = ok, 2 = arrows ok
+  char  name[10];
+
+  // choice = menu item #.
+  // if status = 2,
+  //   choice=0:leftarrow,1:rightarrow
+  void  (*routine)(int32_t choice);
+} menuitem_t;
+
+typedef struct menu_s
+{
+  int16_t           numitems;     // # of menu items
+  const menuitem_t* menuitems;    // menu items
+  void            (*routine)(); // draw routine
+  int16_t           x;
+  int16_t           y;            // x,y of menu
+  const struct menu_s*	prevMenu;	// previous menu
+  int16_t previtemOn;
+} menu_t;
+
+
+
+//
 // defaulted values
 //
 int32_t _g_alwaysRun;
@@ -408,7 +436,7 @@ static void M_LoadGame (int32_t choice)
 
 // The definitions of the Save Game screen
 
-const static menuitem_t SaveMenu[]=
+static const menuitem_t SaveMenu[]=
 {
   {1,"", M_SaveSelect},
   {1,"", M_SaveSelect},
@@ -420,7 +448,7 @@ const static menuitem_t SaveMenu[]=
   {1,"", M_SaveSelect},
 };
 
-const static menu_t SaveDef =
+static const menu_t SaveDef =
 {
   load_end, // same number of slots as the Load Game screen
   SaveMenu,
@@ -515,7 +543,7 @@ static const menuitem_t OptionsMenu[]=
   {1,"M_SVOL",   M_Sound}
 };
 
-const static menu_t OptionsDef =
+static const menu_t OptionsDef =
 {
   opt_end,
   OptionsMenu,
@@ -1147,7 +1175,7 @@ static int16_t M_StringWidth(const char* string)
 {
 	int16_t	w = 0;
 
-	for (int16_t i = 0; i < strlen(string); i++)
+	for (size_t i = 0; i < strlen(string); i++)
 	{
 		char c = toupper(string[i]);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
