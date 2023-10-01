@@ -7,6 +7,7 @@ set CFLAGS=-march=i386
 @rem set CFLAGS=%CFLAGS% -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -mpreferred-stack-boundary=2 -Wno-attributes -Wpedantic
 @rem set CFLAGS=%CFLAGS% -Wall -Wextra
 @rem set CFLAGS=%CFLAGS% -ffunction-sections -Wl,--gc-sections -Wl,--print-gc-sections
+set CFLAGS=%CFLAGS% -D__far=
 
 @set GLOBOBJS=
 @set GLOBOBJS=%GLOBOBJS% am_map.c

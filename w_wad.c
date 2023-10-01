@@ -100,7 +100,7 @@ static void _ffread(void __far* ptr, uint16_t size, FILE* fp)
 		size -= BUFFERSIZE;
 	}
 
-	if (size)
+	if (size > 0)
 	{
 		fread(buffer, size, 1, fp);
 		_fmemcpy(dest, buffer, size);
