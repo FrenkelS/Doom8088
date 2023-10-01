@@ -155,7 +155,7 @@ gamestate_t wipegamestate = GS_DEMOSCREEN; // wipegamestate can be set to -1 to 
 
 static void D_Display (void)
 {
-    static gamestate_t oldgamestate = -1;
+    static gamestate_t oldgamestate = GS_LEVEL;
 
     if (nodrawers)                    // for comparative timing / profiling
         return;
@@ -169,14 +169,8 @@ static void D_Display (void)
         wipe_StartScreen();
 
     if (_g_gamestate != GS_LEVEL) { // Not a level
-        switch (oldgamestate)
-        {
-            case -1:
-            case GS_LEVEL:
-                I_SetPalette(0); // cph - use default (basic) palette
-            default:
-                break;
-        }
+        if (oldgamestate == GS_LEVEL)
+            I_SetPalette(0); // cph - use default (basic) palette
 
         switch (_g_gamestate)
         {
