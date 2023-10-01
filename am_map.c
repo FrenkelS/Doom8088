@@ -348,8 +348,8 @@ void AM_Stop (void)
 //
 static void AM_Start(void)
 {
-    static int32_t lastlevel   = -1;
-    static int32_t lastepisode = -1;
+    static int16_t lastlevel   = -1;
+    static int16_t lastepisode = -1;
 
     if (!stopped)
         AM_Stop();
