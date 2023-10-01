@@ -50,7 +50,7 @@ typedef uint32_t segment_t;
 #define outp(port,data)		outportb(port,data)
 
 #define __far
-#define _interrupt
+#define __interrupt
 
 #define _fstrncmp(x,y,z) strncmp(x,y,z)
 
