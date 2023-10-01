@@ -35,11 +35,6 @@
  *
  *-----------------------------------------------------------------------------*/
 
-//This is to keep the codesize under control.
-//This whole file needs to fit within IWRAM.
-#pragma GCC optimize ("Os")
-
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -67,8 +62,11 @@ visplane_t *_g_freetail;
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
 
-int16_t _g_openings[MAXOPENINGS];
-int16_t* _g_lastopening;
+
+#define MAXOPENINGS (SCREENWIDTH*16)
+
+static int16_t openings[MAXOPENINGS];
+static int16_t* lastopening;
 
 
 static const int8_t viewangletoxTable[2039];
@@ -229,7 +227,6 @@ static int32_t      worldhigh;
 static int32_t      worldlow;
 
 static lighttable_t current_colormap[256];
-static const lighttable_t* current_colormap_ptr;
 
 boolean highDetail = false;
 
@@ -527,6 +524,8 @@ static const lighttable_t* R_ColourMap(int32_t lightlevel)
 
 const lighttable_t* R_LoadColorMap(int32_t lightlevel)
 {
+    static const lighttable_t* current_colormap_ptr = NULL;
+
     const lighttable_t* lm = R_ColourMap(lightlevel);
 
     if(current_colormap_ptr != lm)
@@ -545,9 +544,6 @@ const lighttable_t* R_LoadColorMap(int32_t lightlevel)
 // Thus a special case loop for very fast rendering can
 //  be used. It has also been used with Wolfenstein 3D.
 //
-
-#pragma GCC push_options
-#pragma GCC optimize ("Ofast")
 
 #define COLEXTRABITS 9
 #define COLBITS (FRACBITS + COLEXTRABITS)
@@ -787,9 +783,6 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     } while(--count);
 }
-
-#pragma GCC pop_options
-
 
 
 //
@@ -1664,7 +1657,7 @@ static visplane_t *R_FindPlane(fixed_t height, int16_t picnum, int32_t lightleve
     check->minx = SCREENWIDTH; // Was SCREENWIDTH -- killough 11/98
     check->maxx = -1;
 
-    memset(check->top, UINT32_MAX, sizeof(check->top));
+    memset(check->top, -1, sizeof(check->top));
 
     check->modified = false;
 
@@ -1687,7 +1680,7 @@ static visplane_t *R_DupPlane(const visplane_t *pl, int32_t start, int32_t stop)
     new_pl->minx = start;
     new_pl->maxx = stop;
 
-    memset(new_pl->top, UINT32_MAX, sizeof(new_pl->top));
+    memset(new_pl->top, -1, sizeof(new_pl->top));
 
     new_pl->modified = false;
 
@@ -2081,7 +2074,7 @@ static void R_RenderSegLoop (int32_t rw_x)
 
 static boolean R_CheckOpenings(const int32_t start)
 {
-    int32_t pos = _g_lastopening - _g_openings;
+    int32_t pos = lastopening - openings;
     int32_t need = (rw_stopx - start)*4 + pos;
 
 #ifdef RANGECHECK
@@ -2090,6 +2083,12 @@ static boolean R_CheckOpenings(const int32_t start)
 #endif
 
     return need <= MAXOPENINGS;
+}
+
+
+void R_ClearOpenings(void)
+{
+	lastopening = openings;
 }
 
 
@@ -2297,8 +2296,8 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         if (sidedef->midtexture)    // masked midtexture
         {
             maskedtexture = true;
-            ds_p->maskedtexturecol = maskedtexturecol = _g_lastopening - rw_x;
-            _g_lastopening += rw_stopx - rw_x;
+            ds_p->maskedtexturecol = maskedtexturecol = lastopening - rw_x;
+            lastopening += rw_stopx - rw_x;
         }
     }
 
@@ -2398,16 +2397,16 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     // save sprite clipping info
     if ((ds_p->silhouette & SIL_TOP || maskedtexture) && !ds_p->sprtopclip)
     {
-        memcpy((byte*)_g_lastopening, (const byte*)(ceilingclip+start), sizeof(int16_t)*(rw_stopx-start));
-        ds_p->sprtopclip = _g_lastopening - start;
-        _g_lastopening += rw_stopx - start;
+        memcpy((byte*)lastopening, (const byte*)(ceilingclip+start), sizeof(int16_t)*(rw_stopx-start));
+        ds_p->sprtopclip = lastopening - start;
+        lastopening += rw_stopx - start;
     }
 
     if ((ds_p->silhouette & SIL_BOTTOM || maskedtexture) && !ds_p->sprbottomclip)
     {
-        memcpy((byte*)_g_lastopening, (const byte*)(floorclip+start), sizeof(int16_t)*(rw_stopx-start));
-        ds_p->sprbottomclip = _g_lastopening - start;
-        _g_lastopening += rw_stopx - start;
+        memcpy((byte*)lastopening, (const byte*)(floorclip+start), sizeof(int16_t)*(rw_stopx-start));
+        ds_p->sprbottomclip = lastopening - start;
+        lastopening += rw_stopx - start;
     }
 
     if (maskedtexture && !(ds_p->silhouette & SIL_TOP))
@@ -2438,7 +2437,7 @@ static void R_RecalcLineFlags(void)
 
     const side_t* side = &_g_sides[curline->sidenum];
 
-    linedata->r_validcount = LOWORD(_g_gametic);
+    linedata->r_validcount = _g_gametic;
 
     /* First decide if the line is closed, normal, or invisible */
     if (!(linedef->flags & ML_TWOSIDED)
@@ -2600,7 +2599,7 @@ static void R_AddLine (const seg_t *line)
     linedef = &_g_lines[curline->linenum];
     linedata_t* linedata = &_g_linedata[linedef->lineno];
 
-    if (linedata->r_validcount != LOWORD(_g_gametic))
+    if (linedata->r_validcount != _g_gametic)
         R_RecalcLineFlags();
 
     if (linedata->r_flags & RF_IGNORE)

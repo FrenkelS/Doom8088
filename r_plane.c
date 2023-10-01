@@ -280,6 +280,9 @@ static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32
 #endif
 
 
+#define LOBYTE(w)	(((uint8_t *)&w)[0])
+
+
 static void R_DoDrawPlane(visplane_t *pl)
 {
     if (pl->minx <= pl->maxx)
@@ -368,7 +371,7 @@ void R_ClearPlanes(void)
         for (*freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *freehead; )
             freehead = &(*freehead)->next;
 
-    _g_lastopening = _g_openings;
+    R_ClearOpenings();
 
 #if !defined FLAT_SPAN
     static const fixed_t iprojection = 1092; //( (1 << FRACUNIT) / (SCREENWIDTH / 2))

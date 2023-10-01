@@ -60,8 +60,6 @@
 
 #define MAXDRAWSEGS   192
 
-#define MAXOPENINGS (SCREENWIDTH*16)
-
 //
 // INTERNAL MAP TYPES
 //  used by play and refresh
@@ -106,7 +104,7 @@ typedef struct
 
   // list of mobjs that are at least partially in the sector
   // thinglist is a subset of touching_thinglist
-  struct msecnode_s *touching_thinglist;               // phares 3/14/98
+  struct msecnode_s *touching_thinglist;
 
   const struct line_s **lines;
 

@@ -40,11 +40,6 @@
 #include "r_data.h"
 
 
-#define LOBYTE(w)	(((uint8_t *)&w)[0])
-
-#define LOWORD(dw)	(((uint16_t *)&dw)[0])
-
-
 #define MAXVISPLANES 32    /* must be a power of 2 */
 
 
@@ -110,6 +105,7 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
 
 void R_DrawPlanes (void);
 void R_ClearPlanes(void);
+void R_ClearOpenings(void);
 
 void R_DrawSky(visplane_t *pl);
 
