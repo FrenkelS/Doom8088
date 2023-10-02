@@ -164,7 +164,7 @@ typedef struct player_s
   mobj_t*             attacker;
 
   // So gun flashes light up areas.
-  int32_t                 extralight;
+  int16_t                 extralight;
 
   // Current PLAYPAL, ???
   //  can be set to REDCOLORMAP for pain, etc.
