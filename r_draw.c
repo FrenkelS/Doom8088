@@ -361,7 +361,7 @@ subsector_t *R_PointInSubsector(fixed_t x, fixed_t y)
 
     while (!(nodenum & NF_SUBSECTOR))
         nodenum = nodes[nodenum].children[R_PointOnSide(x, y, nodes+nodenum)];
-    return &_g_subsectors[nodenum & ~NF_SUBSECTOR];
+    return &_g_subsectors[(int16_t)(nodenum & ~NF_SUBSECTOR)];
 }
 
 //
