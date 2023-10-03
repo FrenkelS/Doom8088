@@ -44,9 +44,9 @@
 
 
 typedef struct {
-  int32_t                 x;
-  int32_t                 yl;
-  int32_t                 yh;
+  int16_t                 x;
+  int16_t                 yl;
+  int16_t                 yh;
   fixed_t             iscale;
   fixed_t             texturemid;
 
@@ -61,7 +61,7 @@ typedef struct {
 
 //Global vars.
 
-extern int32_t numnodes;
+extern int16_t numnodes;
 extern const mapnode_t __far* nodes;
 
 extern fixed_t  viewx, viewy, viewz;
@@ -92,7 +92,7 @@ subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 
 void R_GetColumn(const texture_t __far* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c);
 
-const lighttable_t* R_LoadColorMap(int32_t lightlevel);
+const lighttable_t* R_LoadColorMap(int16_t lightlevel);
 
 //
 // REFRESH - the actual rendering functions.

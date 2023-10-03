@@ -302,7 +302,7 @@ typedef struct drawseg_s
   const seg_t __far* curline;
   int16_t x1, x2;
   fixed_t scale1, scale2, scalestep;
-  int32_t silhouette;                       // 0=none, 1=bottom, 2=top, 3=both
+  int16_t silhouette;                       // 0=none, 1=bottom, 2=top, 3=both
   fixed_t bsilheight;                   // do not clip sprites above this
   fixed_t tsilheight;                   // do not clip sprites below this
 

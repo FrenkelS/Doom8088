@@ -49,12 +49,12 @@ static int16_t firstflat;
 //
 
 #if defined FLAT_SPAN
-static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, uint16_t color)
+static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint16_t color)
 {
 	uint16_t __far* dest = _g_screen + ScreenYToOffset(y) + x1;
 
-	uint32_t count = x2 - x1;
-	uint32_t l = count >> 4;
+	uint16_t count = x2 - x1;
+	uint16_t l = count >> 4;
 
 	while (l--)
 	{
@@ -104,7 +104,7 @@ static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, uint16_t color)
 // R_MakeSpans
 //
 
-static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32_t b2, uint16_t color)
+static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16_t b2, uint16_t color)
 {
 	static byte spanstart[SCREENHEIGHT];
 
@@ -141,9 +141,9 @@ typedef struct {
 } draw_span_vars_t;
 
 
-static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, const draw_span_vars_t *dsvars)
+static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *dsvars)
 {
-    uint32_t count = (x2 - x1);
+    uint16_t count = (x2 - x1);
 
     const byte __far* source = dsvars->source;
     const byte *colormap = dsvars->colormap;
@@ -153,7 +153,7 @@ static void R_DrawSpan(uint32_t y, uint32_t x1, uint32_t x2, const draw_span_var
     const uint32_t step = dsvars->step;
     uint32_t position = dsvars->position;
 
-    uint32_t l = (count >> 4);
+    uint16_t l = (count >> 4);
 
     while (l--)
     {
@@ -239,7 +239,7 @@ static int16_t __far* flattranslation;             // for global animation
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
 
-static void R_MapPlane(uint32_t y, uint32_t x1, uint32_t x2, draw_span_vars_t *dsvars)
+static void R_MapPlane(uint16_t y, uint16_t x1, uint16_t x2, draw_span_vars_t *dsvars)
 {    
     const fixed_t distance = FixedMul(planeheight, yslope(y));
     dsvars->step = ((FixedMul(distance,basexscale) << 10) & 0xffff0000) | ((FixedMul(distance,baseyscale) >> 6) & 0x0000ffff);
@@ -261,7 +261,7 @@ static void R_MapPlane(uint32_t y, uint32_t x1, uint32_t x2, draw_span_vars_t *d
 // R_MakeSpans
 //
 
-static void R_MakeSpans(int32_t x, uint32_t t1, uint32_t b1, uint32_t t2, uint32_t b2, draw_span_vars_t *dsvars)
+static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16_t b2, draw_span_vars_t *dsvars)
 {
     static byte spanstart[SCREENHEIGHT];
 
@@ -295,15 +295,15 @@ static void R_DoDrawPlane(visplane_t __far* pl)
         else
         {
             // regular flat
-#if defined FLAT_SPAN
-            const int32_t stop = pl->maxx + 1;
+            const int16_t stop = pl->maxx + 1;
 
             pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
 
+#if defined FLAT_SPAN
             uint16_t color = LOBYTE(pl->picnum);
             color = (color << 8) | color;
 
-            for (register int32_t x = pl->minx; x <= stop; x++)
+            for (register int16_t x = pl->minx; x <= stop; x++)
             {
                 R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], color);
             }
@@ -315,11 +315,7 @@ static void R_DoDrawPlane(visplane_t __far* pl)
 
             planeheight = D_abs(pl->height - viewz);
 
-            const int32_t stop = pl->maxx + 1;
-
-            pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
-
-            for (register int32_t x = pl->minx; x <= stop; x++)
+            for (register int16_t x = pl->minx; x <= stop; x++)
             {
                 R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], &dsvars);
             }

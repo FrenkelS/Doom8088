@@ -220,6 +220,7 @@ void I_InitGraphics(void)
 	I_SetScreenMode(0x13);
 	isGraphicsModeSet = true;
 
+	__djgpp_nearptr_enable();
 	screen = MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH * 2) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 }
 
