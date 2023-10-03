@@ -117,11 +117,10 @@ static uint16_t emsHandle;
 
 static segment_t Z_InitExpandedMemory(void)
 {
-	__djgpp_nearptr_enable();
-	uint16_t __far* emsInterruptVectorSegment = MK_FP(0, EMS_INT * 4 + 2 + __djgpp_conventional_base);
-	uint64_t __far* actualEmsDeviceName = MK_FP(*emsInterruptVectorSegment, 0x000a + __djgpp_conventional_base);
-	uint64_t expectedEmsDeviceName = *(uint64_t*)"EMMXXXX0";
-	if (*actualEmsDeviceName != expectedEmsDeviceName)
+#if defined _M_I86
+	void __far* emsInterruptVector = _dos_getvect(EMS_INT);
+	char __far* emsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
+	if (_fstrncmp(emsDeviceName, "EMMXXXX0", 8))
 		return 0;
 
 	// EMS detected
@@ -180,6 +179,9 @@ static segment_t Z_InitExpandedMemory(void)
 	// 64 kB of expanded memory is mapped
 
 	return emsSegment;
+#else
+	return 0;
+#endif
 }
 
 
@@ -238,7 +240,7 @@ void Z_Init (void)
 
 	uint32_t heapSize = (uint32_t)max * PARAGRAPH_SIZE;
 
-	printf("\t%ld bytes conventional memory\n", heapSize);
+	printf("Standard: %ld bytes\n", heapSize);
 
 	// align blocklist
 	uint_fast8_t i = 0;
@@ -269,7 +271,7 @@ void Z_Init (void)
 	segment_t ems_segment = Z_InitExpandedMemory();
 	if (ems_segment)
 	{
-		segment_t romblock_segment = mainzone_rover_segment + heapSize / PARAGRAPH_SIZE;
+		segment_t romblock_segment = mainzone_rover_segment + heapSize / PARAGRAPH_SIZE - 1;
 		memblock_t __far* romblock = segmentToPointer(romblock_segment);
 		romblock->size = (uint32_t)(ems_segment - romblock_segment) * PARAGRAPH_SIZE;
 		romblock->tag  = PU_STATIC;
@@ -290,14 +292,15 @@ void Z_Init (void)
 		emsblock->id   = ZONEID;
 #endif
 
+		block->size -= PARAGRAPH_SIZE;
 		block->next = romblock_segment;
-		printf("\t 65536 bytes expanded memory\n");
-		heapSize += 65536;
+		printf("Expanded:  65536 bytes\n");
+		heapSize += 65536 - PARAGRAPH_SIZE;
 	}
 	else
-		printf("\t     0 bytes expanded memory\n");
+		printf("Expanded:      0 bytes\n");
 
-	printf("\t%ld bytes total memory allocated for zone\n", heapSize);
+	printf("%ld bytes allocated for zone\n", heapSize);
 }
 
 

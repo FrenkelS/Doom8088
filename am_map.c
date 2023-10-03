@@ -737,35 +737,16 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
 #undef DOOUTCODE
 
 
-static void V_PlotPixel(int32_t x, int32_t y, uint8_t color)
+static void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
     byte __far * fb = (byte __far*)_g_screen;
 
-    byte __far* dest = &fb[(ScreenYToOffset(y) << 1) + x];
-
-    //The GBA must write in 16bits.
-    if((uint32_t)dest & 1)
-    {
-        //Odd addreses, we combine existing pixel with new one.
-        uint16_t __far* dest16 = (uint16_t __far*)(dest - 1);
-
-        uint16_t old = *dest16;
-
-        *dest16 = (old & 0xff) | (color << 8);
-    }
-    else
-    {
-        uint16_t __far* dest16 = (uint16_t __far*)dest;
-
-        uint16_t old = *dest16;
-
-        *dest16 = (color | (old & 0xff00));
-    }
+    fb[(ScreenYToOffset(y) << 1) + x] = color;
 }
 
 
 //
-// WRAP_V_DrawLine()
+// V_DrawLine()
 //
 // Draw a line in the frame buffer.
 // Classic Bresenham w/ whatever optimizations needed for speed
@@ -782,10 +763,10 @@ static void V_DrawLine(fline_t* fl, uint8_t color)
     int32_t y1 = fl->b.y;
 
     int32_t dx =  D_abs(x1-x0);
-    int32_t sx = x0<x1 ? 1 : -1;
+    int16_t sx = x0<x1 ? 1 : -1;
 
     int32_t dy = -D_abs(y1-y0);
-    int32_t sy = y0<y1 ? 1 : -1;
+    int16_t sy = y0<y1 ? 1 : -1;
 
     int32_t err = dx + dy;
 
@@ -1093,16 +1074,9 @@ static void AM_drawPlayers(void)
 //
 // V_FillRect
 //
-// CPhipps - New function to fill a rectangle with a given colour
 static void V_FillRect(void)
 {
-    byte __far* dest = (byte __far*)_g_screen;
-    int32_t height = f_h;
-    while (height--)
-    {
-        _fmemset(dest, mapcolor_back, f_w);
-        dest += (SCREENPITCH << 1);
-    }
+	_fmemset(_g_screen, mapcolor_back, SCREENWIDTH * 2 * (SCREENHEIGHT - ST_HEIGHT));
 }
 
 

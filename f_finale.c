@@ -156,10 +156,10 @@ static int32_t Get_TextSpeed(void)
  * cphipps - used to have M_DrawBackground, but that was used the framebuffer
  * directly, so this is my code from the equivalent function in f_finale.c
  */
-static void V_DrawBackground(const char* flatname)
+static void V_DrawBackground(void)
 {
     /* erase the entire screen to a tiled background */
-    const byte __far* src = W_GetLumpByName(flatname);
+    const byte __far* src = W_GetLumpByName("FLOOR4_8");
     uint16_t __far* dest = _g_screen;
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
@@ -198,7 +198,7 @@ static void V_DrawBackground(const char* flatname)
 
 static void F_TextWrite (void)
 {
-	V_DrawBackground("FLOOR4_8");
+	V_DrawBackground();
 
 	int16_t font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 
