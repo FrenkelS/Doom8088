@@ -119,8 +119,9 @@ static segment_t Z_InitExpandedMemory(void)
 {
 #if defined _M_I86
 	void __far* emsInterruptVector = _dos_getvect(EMS_INT);
-	char __far* emsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
-	if (_fstrncmp(emsDeviceName, "EMMXXXX0", 8))
+	uint64_t __far* actualEmsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
+	uint64_t expectedEmsDeviceName = *(uint64_t*)"EMMXXXX0";
+	if (*actualEmsDeviceName != expectedEmsDeviceName)
 		return 0;
 
 	// EMS detected
