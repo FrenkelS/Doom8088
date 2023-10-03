@@ -52,8 +52,6 @@ typedef uint32_t segment_t;
 #define __far
 #define __interrupt
 
-#define _fstrncmp(x,y,z) strncmp(x,y,z)
-
 #define replaceInterrupt(OldInt,NewInt,vector,handler)				\
 _go32_dpmi_get_protected_mode_interrupt_vector(vector, &OldInt);	\
 																	\
