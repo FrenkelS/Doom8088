@@ -2,15 +2,12 @@ mkdir GCCIA16
 
 unset CFLAGS
 
-ia16-elf-gcc -c p_mobj.c -march=i8088 -mcmodel=medium -li86 -O0 -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic
-ia16-elf-gcc -c p_spec.c -march=i8088 -mcmodel=medium -li86 -O0 -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic
+ia16-elf-gcc -c p_mobj.c -march=i286 -mcmodel=medium -li86 -O0
+ia16-elf-gcc -c p_spec.c -march=i286 -mcmodel=medium -li86 -O0
 
-export CFLAGS="-march=i8088 -mcmodel=medium -li86"
-#export CFLAGS="$CFLAGS -g"
-export CFLAGS="$CFLAGS -Ofast -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
+export CFLAGS="-march=i286 -mcmodel=medium -li86 -Os"
 #export CFLAGS="$CFLAGS -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
 #export CFLAGS="$CFLAGS -Wall -Wextra"
-#export CFLAGS="$CFLAGS -ffunction-sections -Wl,--gc-sections -Wl,--print-gc-sections"
 
 unset GLOBOBJS
 export GLOBOBJS="$GLOBOBJS am_map.c"
