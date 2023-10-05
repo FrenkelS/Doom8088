@@ -36,9 +36,11 @@
 #ifndef __I_SYSTEM__
 #define __I_SYSTEM__
 
+#include "config.h"
+
 void I_StartDisplay(void);
 int32_t I_GetTime(void);
-void I_Error (const char *error, ...) __attribute__((__noreturn__));
+void NORETURN_PRE I_Error (const char *error, ...) NORETURN_POST;
 
 void I_InitScreen();
 
