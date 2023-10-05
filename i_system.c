@@ -36,7 +36,7 @@
 
 
 static void I_SetScreenMode(uint16_t mode);
-static void I_Quit(void);
+static void I_Quit(void) __attribute__((__noreturn__));
 
 
 //**************************************************************************************

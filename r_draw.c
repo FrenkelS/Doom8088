@@ -85,7 +85,7 @@ static int8_t viewangletox(int16_t viewangle)
 }
 
 
-static const angle_t tantoangleTable[2049];
+static const angle_t __far tantoangleTable[2049];
 
 #define tantoangle(t) tantoangleTable[t]
 
@@ -3041,7 +3041,7 @@ static const int8_t viewangletoxTable[2039] =
 //
 // Effective size is 2049;
 // The +1 size is to handle the case when x==y without additional checking.
-static const angle_t tantoangleTable[2049] =
+static const angle_t __far tantoangleTable[2049] =
 {
     0,333772,667544,1001315,1335086,1668857,2002626,2336395,
     2670163,3003929,3337694,3671457,4005219,4338979,4672736,5006492,

@@ -38,7 +38,7 @@
 
 void I_StartDisplay(void);
 int32_t I_GetTime(void);
-void I_Error (const char *error, ...);
+void I_Error (const char *error, ...) __attribute__((__noreturn__));
 
 void I_InitScreen();
 
