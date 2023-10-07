@@ -33,6 +33,9 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
+#include "compiler.h"
 #include "d_player.h"
 #include "r_main.h"
 #include "p_spec.h"
@@ -44,10 +47,10 @@
 
 
 // the list of ceilings moving currently, including crushers
-static ceilinglist_t *activeceilings;
+static ceilinglist_t __far* activeceilings;
 
 
-static void P_RemoveActiveCeiling(ceiling_t* ceiling);
+static void P_RemoveActiveCeiling(ceiling_t __far* ceiling);
 
 /////////////////////////////////////////////////////////////////
 //
@@ -66,7 +69,7 @@ static void P_RemoveActiveCeiling(ceiling_t* ceiling);
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
 //
-void T_MoveCeiling (ceiling_t* ceiling)
+void T_MoveCeiling (ceiling_t __far* ceiling)
 {
   result_e  res;
 
@@ -251,14 +254,12 @@ void T_MoveCeiling (ceiling_t* ceiling)
 // Passed the linedef activating the function and the type of function desired
 // returns true if a thinker started
 //
-boolean EV_DoCeiling
-( const line_t* line,
-  ceiling_e type )
+boolean EV_DoCeiling(const line_t __far* line, ceiling_e type)
 {
   int32_t   secnum;
   boolean   rtn;
-  sector_t* sec;
-  ceiling_t*  ceiling;
+  sector_t __far* sec;
+  ceiling_t __far* ceiling;
 
   secnum = -1;
   rtn = false;
@@ -373,14 +374,14 @@ boolean EV_DoCeiling
 // Returns true if a ceiling reactivated
 //
 //jff 4/5/98 return if activated
-boolean P_ActivateInStasisCeiling(const line_t *line)
+boolean P_ActivateInStasisCeiling(const line_t __far* line)
 {
-  ceilinglist_t *cl;
+  ceilinglist_t __far* cl;
   boolean rtn=false;
 
   for (cl=activeceilings; cl; cl=cl->next)
   {
-    ceiling_t *ceiling = cl->ceiling;
+    ceiling_t __far* ceiling = cl->ceiling;
     if (ceiling->tag == line->tag && ceiling->direction == 0)
     {
       ceiling->direction = ceiling->olddirection;
@@ -400,14 +401,14 @@ boolean P_ActivateInStasisCeiling(const line_t *line)
 // Passed the linedef stopping the ceilings
 // Returns true if a ceiling put in stasis
 //
-boolean EV_CeilingCrushStop(const line_t* line)
+boolean EV_CeilingCrushStop(const line_t __far* line)
 {
   boolean rtn=false;
 
-  ceilinglist_t *cl;
+  ceilinglist_t __far* cl;
   for (cl=activeceilings; cl; cl=cl->next)
   {
-    ceiling_t *ceiling = cl->ceiling;
+    ceiling_t __far* ceiling = cl->ceiling;
     if (ceiling->direction != 0 && ceiling->tag == line->tag)
     {
       ceiling->olddirection = ceiling->direction;
@@ -427,11 +428,11 @@ boolean EV_CeilingCrushStop(const line_t* line)
 // Passed the ceiling motion structure
 // Returns nothing
 //
-void P_AddActiveCeiling(ceiling_t* ceiling)
+void P_AddActiveCeiling(ceiling_t __far* ceiling)
 {
-    ceilinglist_t *old_head = activeceilings;
+    ceilinglist_t __far* old_head = activeceilings;
 
-    ceilinglist_t *list = activeceilings = Z_MallocLevel(sizeof *list, (void **)&activeceilings);
+    ceilinglist_t __far* list = activeceilings = Z_MallocLevel(sizeof *list, (void __far*__far*)&activeceilings);
     list->ceiling = ceiling;
     ceiling->list = list;
 
@@ -449,9 +450,9 @@ void P_AddActiveCeiling(ceiling_t* ceiling)
 // Passed the ceiling motion structure
 // Returns nothing
 //
-static void P_RemoveActiveCeiling(ceiling_t* ceiling)
+static void P_RemoveActiveCeiling(ceiling_t __far* ceiling)
 {
-  ceilinglist_t *list = ceiling->list;
+  ceilinglist_t __far* list = ceiling->list;
   ceiling->sector->ceilingdata = NULL;  //jff 2/22/98
 
   P_RemoveThinker(&ceiling->thinker);
@@ -473,7 +474,7 @@ void P_RemoveAllActiveCeilings(void)
 {
   while (activeceilings)
   {
-    ceilinglist_t *next = activeceilings->next;
+    ceilinglist_t __far* next = activeceilings->next;
     Z_Free(activeceilings);
     activeceilings = next;
   }

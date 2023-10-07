@@ -33,6 +33,9 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
+#include "compiler.h"
 #include "d_player.h"
 #include "w_wad.h"
 #include "r_main.h"
@@ -44,7 +47,7 @@
 
 
 // variables used to look up and range check thing_t sprites patches
-spritedef_t *sprites;
+spritedef_t __far* sprites;
 
 
 static int8_t maxframe;
@@ -142,7 +145,7 @@ static void R_InstallSpriteLump(int16_t lump, uint8_t frame,
 
 void R_InitSprites(void)
 {
-  struct { int16_t index, next; } *hash;
+  struct { int16_t index, next; } __far* hash;
   int16_t i;
 
   if (!numentries || !*sprnames)
@@ -150,7 +153,7 @@ void R_InitSprites(void)
 
   sprites = Z_MallocStatic(NUMSPRITES *sizeof(*sprites));
 
-  memset(sprites, 0, NUMSPRITES *sizeof(*sprites));
+  _fmemset(sprites, 0, NUMSPRITES *sizeof(*sprites));
 
   // Create hash table based on just the first four letters of each sprite
   // killough 1/31/98
@@ -162,7 +165,7 @@ void R_InitSprites(void)
 
   for (i=0; i<numentries; i++)             // Prepend each sprite to hash chain
     {                                      // prepend so that later ones win
-      const char* sn = W_GetNameForNum(i + firstspritelump);
+      const char __far* sn = W_GetNameForNum(i + firstspritelump);
 
       int16_t j = R_SpriteNameHash(sn) % numentries;
       hash[i].next = hash[j].index;
@@ -183,7 +186,7 @@ void R_InitSprites(void)
           maxframe = -1;
           do
             {
-              const char* sn = W_GetNameForNum(j + firstspritelump);
+              const char __far* sn = W_GetNameForNum(j + firstspritelump);
 
               // Fast portable comparison -- killough
               // (using int32_t pointer cast is nonportable):
@@ -237,7 +240,7 @@ void R_InitSprites(void)
                   }
               // allocate space for the frames present and copy sprtemp to it
               sprites[i].spriteframes = Z_MallocStatic(maxframe * sizeof(spriteframe_t));
-              memcpy(sprites[i].spriteframes, sprtemp, maxframe*sizeof(spriteframe_t));
+              _fmemcpy(sprites[i].spriteframes, sprtemp, maxframe*sizeof(spriteframe_t));
             }
         }
     }

@@ -50,9 +50,9 @@ typedef struct {
   fixed_t             iscale;
   fixed_t             texturemid;
 
-  const byte          *source; // first pixel in a column
+  const byte          __far* source; // first pixel in a column
 
-  const lighttable_t  *colormap;
+  const lighttable_t  __far* colormap;
 
   boolean             odd_pixel;
 
@@ -62,7 +62,7 @@ typedef struct {
 //Global vars.
 
 extern int16_t numnodes;
-extern const mapnode_t *nodes;
+extern const mapnode_t __far* nodes;
 
 extern fixed_t  viewx, viewy, viewz;
 
@@ -71,13 +71,13 @@ extern angle_t viewangle;
 extern int16_t floorclip[SCREENWIDTH];
 extern int16_t ceilingclip[SCREENWIDTH];
 
-extern const lighttable_t *fullcolormap;
-extern const lighttable_t *colormaps;
-extern const lighttable_t* fixedcolormap;
+extern const lighttable_t __far* fullcolormap;
+extern const lighttable_t __far* colormaps;
+extern const lighttable_t __far* fixedcolormap;
 
-extern fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
+extern fixed_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
 
-extern int16_t       *texturetranslation;
+extern int16_t       __far* texturetranslation;
 
 extern fixed_t  viewcos, viewsin;
 
@@ -88,9 +88,9 @@ extern int16_t highDetail;
 //
 
 angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2);
-subsector_t *R_PointInSubsector(fixed_t x, fixed_t y);
+subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 
-void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c);
+void R_GetColumn(const texture_t __far* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c);
 
 const lighttable_t* R_LoadColorMap(int16_t lightlevel);
 
@@ -107,6 +107,6 @@ void R_DrawPlanes (void);
 void R_ClearPlanes(void);
 void R_ClearOpenings(void);
 
-void R_DrawSky(visplane_t *pl);
+void R_DrawSky(visplane_t __far* pl);
 
 #endif

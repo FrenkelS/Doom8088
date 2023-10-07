@@ -181,24 +181,24 @@ void I_StartTic(void)
 //
 
 static boolean isGraphicsModeSet = false;
-static uint16_t *screen;
-static uint16_t  backBuffer[SCREENWIDTH * SCREENHEIGHT];
+static uint16_t __far* screen;
+static uint16_t __far backBuffer[SCREENWIDTH * SCREENHEIGHT];
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-uint16_t *_g_screen;
+uint16_t __far* _g_screen;
 
 static int8_t newpal;
 
-uint16_t* I_GetBackBuffer(void)
+uint16_t __far* I_GetBackBuffer(void)
 {
 	return &backBuffer[0];
 }
 
 
-void I_CopyBackBufferToBuffer(uint16_t* buffer)
+void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
 {
-	uint16_t* src = &backBuffer[0];
-	uint16_t* dst = buffer;
+	uint16_t __far* src = &backBuffer[0];
+	uint16_t __far* dst = buffer;
 	for (int16_t i = 0; i < SCREENWIDTH * SCREENHEIGHT; i++)
 		*dst++ = *src++;
 }
@@ -231,10 +231,10 @@ void I_StartDisplay(void)
 }
 
 
-void I_DrawBuffer(uint16_t *buffer)
+void I_DrawBuffer(uint16_t __far* buffer)
 {
-	uint16_t* src = buffer;
-	uint16_t* dst = screen;
+	uint16_t __far* src = buffer;
+	uint16_t __far* dst = screen;
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
 		for (uint_fast8_t x = 0; x < (SCREENWIDTH * 2) / 2; x++) {
 			*dst++ = *src++;
@@ -253,7 +253,7 @@ static void I_FinishUpdate_dos(void)
 #define PEL_WRITE_ADR   0x3c8
 #define PEL_DATA        0x3c9
 
-static void I_SetPalette_dos(const byte* palette)
+static void I_SetPalette_dos(const byte __far* palette)
 {
 	int_fast16_t i;
 
@@ -275,7 +275,7 @@ static void I_UploadNewPalette(int8_t pal)
 	else
 		lumpName[7] = '0' + _g_gamma;
 
-	const uint8_t* palette_lump = W_GetLumpByName(lumpName);
+	const uint8_t __far* palette_lump = W_GetLumpByName(lumpName);
 	I_SetPalette_dos(&palette_lump[pal*256*3]);
 	Z_ChangeTagToCache(palette_lump);
 }

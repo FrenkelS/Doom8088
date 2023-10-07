@@ -40,7 +40,7 @@
 
 #include "p_mobj.h"
 
-void P_NoiseAlert (mobj_t *emmiter);
+void P_NoiseAlert (mobj_t __far* emmiter);
 
 
 // ********************************************************************

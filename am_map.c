@@ -39,6 +39,8 @@
 #endif
 
 #include <stdint.h>
+
+#include "compiler.h"
 #include "d_player.h"
 #include "r_defs.h"
 #include "st_stuff.h"
@@ -729,7 +731,7 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
 
 static void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
-    byte* fb = (byte*)_g_screen;
+    byte __far * fb = (byte __far*)_g_screen;
 
     fb[(ScreenYToOffset(y) << 1) + x] = color;
 }
@@ -856,7 +858,7 @@ static int32_t AM_DoorColor(int32_t type)
 // jff 3/14/98 added to simplify checks for whether sector is secret
 //  in automap and other places
 //
-static boolean PUREFUNC P_WasSecret(const sector_t *sec)
+static boolean PUREFUNC P_WasSecret(const sector_t __far* sec)
 {
   return (sec->oldspecial==9 || (sec->oldspecial&SECRET_MASK));
 }
@@ -892,8 +894,8 @@ static void AM_drawWalls(void)
         l.b.y = _g_lines[i].v2.y >> FRACTOMAPBITS;//e6y
 
 
-        const sector_t* backsector = LN_BACKSECTOR(&_g_lines[i]);
-        const sector_t* frontsector = LN_FRONTSECTOR(&_g_lines[i]);
+        const sector_t __far* backsector = LN_BACKSECTOR(&_g_lines[i]);
+        const sector_t __far* frontsector = LN_FRONTSECTOR(&_g_lines[i]);
 
         const uint32_t line_special =  LN_SPECIAL(&_g_lines[i]);
 
@@ -1066,7 +1068,7 @@ static void AM_drawPlayers(void)
 //
 static void V_FillRect(void)
 {
-	memset(_g_screen, mapcolor_back, SCREENWIDTH * 2 * (SCREENHEIGHT - ST_HEIGHT));
+	_fmemset(_g_screen, mapcolor_back, SCREENWIDTH * 2 * (SCREENHEIGHT - ST_HEIGHT));
 }
 
 

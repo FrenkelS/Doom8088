@@ -183,7 +183,7 @@ void P_CalcHeight (player_t* player)
 static void P_MovePlayer (player_t* player)
 {
   ticcmd_t *cmd = &player->cmd;
-  mobj_t *mo = player->mo;
+  mobj_t __far* mo = player->mo;
 
   mo->angle += ((int32_t)cmd->angleturn) << 16;
   onground = mo->z <= mo->floorz;

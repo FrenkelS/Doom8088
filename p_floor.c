@@ -58,7 +58,7 @@
 // and false will be returned.
 //
 
-static boolean P_ThingHeightClip (mobj_t* thing)
+static boolean P_ThingHeightClip(mobj_t __far* thing)
 {
   boolean   onfloor;
 
@@ -113,9 +113,9 @@ static boolean P_ThingHeightClip (mobj_t* thing)
 // PIT_ChangeSector
 //
 
-static void PIT_ChangeSector (mobj_t* thing)
+static void PIT_ChangeSector(mobj_t __far* thing)
   {
-  mobj_t* mo;
+  mobj_t __far* mo;
 
   if (P_ThingHeightClip (thing))
     return;
@@ -174,9 +174,9 @@ static void PIT_ChangeSector (mobj_t* thing)
 // sector. Both more accurate and faster.
 //
 
-static boolean P_CheckSector(sector_t* sector,boolean crunch)
+static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
   {
-  msecnode_t *n;
+  msecnode_t __far* n;
 
   _g_nofit = false;
   _g_crushchange = crunch;
@@ -231,13 +231,7 @@ static boolean P_CheckSector(sector_t* sector,boolean crunch)
 //  pastdest - plane moved normally and is now at destination height
 //  crushed - plane encountered an obstacle, is holding until removed
 //
-result_e T_MovePlane
-( sector_t*     sector,
-  fixed_t       speed,
-  fixed_t       dest,
-  boolean       crush,
-  int32_t           floorOrCeiling,
-  int32_t           direction )
+result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int32_t floorOrCeiling, int32_t direction)
 {
   boolean       flag;
   fixed_t       lastpos;
@@ -392,7 +386,7 @@ result_e T_MovePlane
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
 
-void T_MoveFloor(floormove_t* floor)
+void T_MoveFloor(floormove_t __far* floor)
 {
   result_e      res;
 
@@ -476,7 +470,7 @@ void T_MoveFloor(floormove_t* floor)
 //
 // jff 02/22/98 added to support parallel floor/ceiling motion
 //
-static void T_MoveElevator(elevator_t* elevator)
+static void T_MoveElevator(elevator_t __far* elevator)
 {
   result_e      res;
 
@@ -554,15 +548,13 @@ static void T_MoveElevator(elevator_t* elevator)
 // Passed the line that activated the floor and the type of floor motion
 // Returns true if a thinker was created.
 //
-boolean EV_DoFloor
-( const line_t*       line,
-  floor_e       floortype )
+boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 {
   int32_t           secnum;
   boolean           rtn;
   int32_t           i;
-  sector_t*     sec;
-  floormove_t*  floor;
+  sector_t __far*     sec;
+  floormove_t __far*  floor;
 
   secnum = -1;
   rtn = false;
@@ -697,7 +689,7 @@ boolean EV_DoFloor
       case raiseToTexture:
         {
           int32_t minsize = ((int32_t)32000)<<FRACBITS; /* jff 3/13/98 no ovf */
-          side_t*     side;
+          side_t __far*     side;
 
           floor->direction = 1;
           floor->sector = sec;
@@ -770,14 +762,12 @@ boolean EV_DoFloor
 //
 // jff 3/15/98 added to better support generalized sector types
 //
-boolean EV_DoChange
-( const line_t*       line,
-  change_e      changetype )
+boolean EV_DoChange(const line_t __far* line, change_e changetype)
 {
   int32_t                   secnum;
   boolean                   rtn;
-  sector_t*             sec;
-  sector_t*             secm;
+  sector_t __far*             sec;
+  sector_t __far*             secm;
 
   secnum = -1;
   rtn = false;
@@ -835,8 +825,7 @@ boolean EV_DoChange
  * stairs
  * - Boom fixed the bug, and MBF/PrBoom without comp_stairs work right
  */
-static inline int32_t P_FindSectorFromLineTagWithLowerBound
-(const line_t* l, int32_t start, int32_t min)
+static inline int32_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* l, int32_t start, int32_t min)
 {
   /* Emulate original Doom's linear lower-bounded P_FindSectorFromLineTag
    * as needed */
@@ -846,9 +835,7 @@ static inline int32_t P_FindSectorFromLineTagWithLowerBound
   return start;
 }
 
-boolean EV_BuildStairs
-( const line_t*       line,
-  stair_e       type )
+boolean EV_BuildStairs(const line_t __far* line, stair_e type)
 {
   /* cph 2001/09/22 - cleaned up this function to save my sanity. A separate
    * outer loop index makes the logic much cleared, and local variables moved
@@ -861,11 +848,11 @@ boolean EV_BuildStairs
   while ((ssec = P_FindSectorFromLineTagWithLowerBound(line,ssec,minssec)) >= 0)
   {
    int32_t           secnum = ssec;
-   sector_t*     sec = &_g_sectors[secnum];
+   sector_t __far*     sec = &_g_sectors[secnum];
 
     // don't start a stair if the first step's floor is already moving
    if (!P_SectorActive(floor_special,sec)) { //jff 2/22/98
-    floormove_t*  floor;
+    floormove_t __far*  floor;
     int32_t           texture, height;
     fixed_t       stairsize;
     fixed_t       speed;
@@ -913,7 +900,7 @@ boolean EV_BuildStairs
 
       for (i = 0;i < sec->linecount;i++)
       {          
-        sector_t* tsec = LN_FRONTSECTOR((sec->lines[i]));
+        sector_t __far* tsec = LN_FRONTSECTOR((sec->lines[i]));
         int32_t newsecnum;
         if ( !((sec->lines[i])->flags & ML_TWOSIDED) )
           continue;
@@ -972,15 +959,15 @@ boolean EV_BuildStairs
 // Passed the linedef that triggered the donut
 // Returns whether a thinker was created
 //
-boolean EV_DoDonut(const line_t*  line)
+boolean EV_DoDonut(const line_t __far* line)
 {
-  sector_t* s1;
-  sector_t* s2;
-  sector_t* s3;
+  sector_t __far* s1;
+  sector_t __far* s2;
+  sector_t __far* s3;
   int32_t       secnum;
   boolean       rtn;
   int32_t       i;
-  floormove_t* floor;
+  floormove_t __far* floor;
 
   secnum = -1;
   rtn = false;
@@ -1054,14 +1041,12 @@ boolean EV_DoDonut(const line_t*  line)
 //
 // jff 2/22/98 new type to move floor and ceiling in parallel
 //
-boolean EV_DoElevator
-( const line_t*       line,
-  elevator_e    elevtype )
+boolean EV_DoElevator(const line_t __far* line, elevator_e elevtype)
 {
   int32_t                   secnum;
   boolean                   rtn;
-  sector_t*             sec;
-  elevator_t*           elevator;
+  sector_t __far*             sec;
+  elevator_t __far*           elevator;
 
   secnum = -1;
   rtn = false;

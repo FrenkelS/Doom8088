@@ -60,6 +60,7 @@
 
 #define MAXDRAWSEGS   192
 
+
 //
 // INTERNAL MAP TYPES
 //  used by play and refresh
@@ -92,21 +93,21 @@ typedef struct
   fixed_t floorheight;
   fixed_t ceilingheight;
 
-  mobj_t *soundtarget;   // thing that made a sound (or null)
+  mobj_t __far* soundtarget;   // thing that made a sound (or null)
   degenmobj_t soundorg;  // origin for any sounds played by the sector
   int32_t validcount;        // if == validcount, already checked
-  mobj_t *thinglist;     // list of mobjs in sector
+  mobj_t __far* thinglist;     // list of mobjs in sector
 
 
   // thinker_t for reversable actions
-  void *floordata;    // jff 2/22/98 make thinkers on
-  void *ceilingdata;  // floors, ceilings, lighting,
+  void __far* floordata;    // jff 2/22/98 make thinkers on
+  void __far* ceilingdata;  // floors, ceilings, lighting,
 
   // list of mobjs that are at least partially in the sector
   // thinglist is a subset of touching_thinglist
-  struct msecnode_s *touching_thinglist;
+  struct msecnode_s __far* touching_thinglist;
 
-  const struct line_s **lines;
+  const struct line_s __far*__far*lines;
 
   int16_t linecount;
 
@@ -128,7 +129,7 @@ typedef struct
 
 typedef struct
 {
-    sector_t* sector;      // Sector the SideDef is facing.
+    sector_t __far* sector;      // Sector the SideDef is facing.
 
     int16_t textureoffset; // add this to the calculated texture column
     int16_t rowoffset;     // add this to the calculated texture top
@@ -214,12 +215,12 @@ typedef struct line_s
 
 typedef struct msecnode_s
 {
-  sector_t          *m_sector; // a sector containing this object
-  struct mobj_s     *m_thing;  // this object
-  struct msecnode_s *m_tprev;  // prev msecnode_t for this thing
-  struct msecnode_s *m_tnext;  // next msecnode_t for this thing
-  struct msecnode_s *m_sprev;  // prev msecnode_t for this sector
-  struct msecnode_s *m_snext;  // next msecnode_t for this sector
+  sector_t          __far* m_sector; // a sector containing this object
+  struct mobj_s __far* m_thing;  // this object
+  struct msecnode_s __far* m_tprev;  // prev msecnode_t for this thing
+  struct msecnode_s __far* m_tnext;  // next msecnode_t for this thing
+  struct msecnode_s __far* m_sprev;  // prev msecnode_t for this sector
+  struct msecnode_s __far* m_snext;  // next msecnode_t for this sector
   boolean visited; // killough 4/4/98, 4/7/98: used in search algorithms
 } msecnode_t;
 
@@ -276,7 +277,7 @@ typedef struct
 
 typedef struct subsector_s
 {
-  sector_t *sector;
+  sector_t __far* sector;
   uint16_t numlines, firstline;
 } subsector_t;
 
@@ -298,7 +299,7 @@ typedef byte  lighttable_t;
 
 typedef struct drawseg_s
 {
-  const seg_t *curline;
+  const seg_t __far* curline;
   int16_t x1, x2;
   fixed_t scale1, scale2, scalestep;
   int16_t silhouette;                       // 0=none, 1=bottom, 2=top, 3=both
@@ -380,7 +381,7 @@ typedef struct
 typedef struct
 {
   int8_t numframes;
-  spriteframe_t *spriteframes;
+  spriteframe_t __far* spriteframes;
 } spritedef_t;
 
 //
@@ -391,7 +392,7 @@ typedef struct
 
 typedef struct visplane
 {
-  struct visplane *next;        // Next visplane in hash chain -- killough
+  struct visplane __far* next;        // Next visplane in hash chain -- killough
   int16_t picnum, lightlevel;
   int16_t minx, maxx;
   fixed_t height;

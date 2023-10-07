@@ -108,21 +108,21 @@ extern fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // keep track of the line that lowers the ceiling,
 // so missiles don't explode against sky hack walls
 
-extern const line_t    *_g_ceilingline;
-extern const line_t        *_g_blockline;    /* killough 8/11/98: blocking linedef */
+extern const line_t    __far* _g_ceilingline;
+extern const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-extern const line_t *_g_spechit[4];
+extern const line_t __far* _g_spechit[4];
 
 extern int32_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
-extern msecnode_t* _g_sector_list;
+extern msecnode_t __far* _g_sector_list;
 
-extern mobj_t*   _g_linetarget; // who got hit (or NULL)
+extern mobj_t __far*   _g_linetarget; // who got hit (or NULL)
 
 extern fixed_t   _g_attackrange;
 
@@ -159,24 +159,24 @@ extern divline_t _g_trace;
 //
 
 extern int32_t      _g_numvertexes;
-extern const vertex_t *_g_vertexes;
+extern const vertex_t __far* _g_vertexes;
 
-extern const seg_t    *_g_segs;
+extern const seg_t    __far* _g_segs;
 
 extern int32_t      _g_numsectors;
-extern sector_t *_g_sectors;
+extern sector_t __far* _g_sectors;
 
 
-extern subsector_t *_g_subsectors;
+extern subsector_t __far* _g_subsectors;
 
 
 
 extern int32_t      _g_numlines;
-extern const line_t   *_g_lines;
-extern linedata_t* _g_linedata;
+extern const line_t   __far* _g_lines;
+extern linedata_t __far* _g_linedata;
 
 
-extern side_t   *_g_sides;
+extern side_t   __far* _g_sides;
 
 // BLOCKMAP
 // Created from axis aligned bounding box
@@ -190,14 +190,14 @@ extern side_t   *_g_sides;
 extern int16_t       _g_bmapwidth, _g_bmapheight;  // size in mapblocks
 
 // killough 3/1/98: remove blockmap limit internally:
-extern const int16_t      *_g_blockmap;
+extern const int16_t      __far* _g_blockmap;
 
 // offsets in blockmap are from here
-extern const int16_t      *_g_blockmaplump;
+extern const int16_t      __far* _g_blockmaplump;
 
 extern fixed_t   _g_bmaporgx, _g_bmaporgy;     // origin of block map
 
-extern mobj_t    **_g_blocklinks;           // for thing chains
+extern mobj_t    __far*__far* _g_blocklinks;           // for thing chains
 
 //
 // REJECT
@@ -208,12 +208,12 @@ extern mobj_t    **_g_blocklinks;           // for thing chains
 // be used as a PVS lookup as well.
 //
 
-extern const byte *_g_rejectmatrix;
+extern const byte __far* _g_rejectmatrix;
 
 // Maintain single and multi player starting spots.
 extern mapthing_t _g_playerstarts[MAXPLAYERS];
 
-extern mobj_t*      _g_thingPool;
+extern mobj_t __far*      _g_thingPool;
 extern uint32_t _g_thingPoolSize;
 
 
@@ -239,8 +239,8 @@ extern thinker_t _g_thinkerclasscap;
 //r_hotpatch_iwram.c
 //******************************************************************************
 
-extern visplane_t *_g_visplanes[MAXVISPLANES];
-extern visplane_t *_g_freetail;
+extern visplane_t __far* _g_visplanes[MAXVISPLANES];
+extern visplane_t __far* _g_freetail;
 
 
 //******************************************************************************
@@ -248,7 +248,7 @@ extern visplane_t *_g_freetail;
 //******************************************************************************
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-extern uint16_t *_g_screen;
+extern uint16_t __far* _g_screen;
 
 //******************************************************************************
 //wi_stuff.c
@@ -271,7 +271,7 @@ extern int16_t showMessages;    // Show messages has default, 0 = off, 1 = on
 
 
 extern uint16_t validcount;         // increment every time a check is made
-extern visplane_t **freehead;
+extern visplane_t __far*__far* freehead;
 
 
 //
@@ -281,7 +281,7 @@ extern int16_t skyflatnum;
 
 
 // variables used to look up and range check thing_t sprites patches
-extern spritedef_t *sprites;
+extern spritedef_t __far* sprites;
 
 
 // These are not used, but should be (menu).

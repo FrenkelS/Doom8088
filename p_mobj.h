@@ -227,8 +227,8 @@ typedef struct mobj_s
     fixed_t             z;
 
     // More list: links in sector (if needed)
-    struct mobj_s*      snext;
-    struct mobj_s**     sprev; // killough 8/10/98: change to ptr-to-ptr
+    struct mobj_s __far*      snext;
+    struct mobj_s __far*__far*     sprev; // killough 8/10/98: change to ptr-to-ptr
 
     //More drawing info: to determine current sprite.
     angle_t             angle;  // orientation
@@ -237,10 +237,10 @@ typedef struct mobj_s
 
     // Interaction info, by BLOCKMAP.
     // Links in blocks (if needed).
-    struct mobj_s*      bnext;
-    struct mobj_s**     bprev; // killough 8/11/98: change to ptr-to-ptr
+    struct mobj_s __far*      bnext;
+    struct mobj_s __far*__far*     bprev; // killough 8/11/98: change to ptr-to-ptr
 
-    struct subsector_s* subsector;
+    struct subsector_s __far* subsector;
 
     // The closest interval over all contacted Sectors.
     fixed_t             floorz;
@@ -268,7 +268,7 @@ typedef struct mobj_s
 
     // Thing being chased/attacked (or NULL),
     // also the originator for missiles.
-    struct mobj_s*      target;
+    struct mobj_s __far*      target;
 
     // Movement direction, movement generation (zig-zagging).
 
@@ -289,14 +289,14 @@ typedef struct mobj_s
     int16_t             reactiontime;
 
     // Thing being chased/attacked for tracers.
-    struct mobj_s*      tracer;
+    struct mobj_s __far*      tracer;
 
     // new field: last known enemy -- killough 2/15/98
-    struct mobj_s*      lastenemy;
+    struct mobj_s __far*      lastenemy;
 
                                        // phares 3/17/98
     // a linked list of sectors where this object appears
-    struct msecnode_s* touching_sectorlist;
+    struct msecnode_s __far* touching_sectorlist;
 
     // SEE WARNING ABOVE ABOUT POINTER FIELDS!!!
 } mobj_t;
@@ -314,19 +314,19 @@ typedef struct mobj_s
 
 
 void    P_RespawnSpecials(void);
-mobj_t  *P_SpawnMobj(fixed_t x, fixed_t y, fixed_t z, mobjtype_t type);
-void    P_RemoveMobj(mobj_t *th);
-boolean P_SetMobjState(mobj_t *mobj, statenum_t state);
+mobj_t __far* P_SpawnMobj(fixed_t x, fixed_t y, fixed_t z, mobjtype_t type);
+void    P_RemoveMobj(mobj_t __far* th);
+boolean P_SetMobjState(mobj_t __far* mobj, statenum_t state);
 
-void    P_MobjThinker(mobj_t *mobj);
+void    P_MobjThinker(mobj_t __far* mobj);
 
 void    P_SpawnPuff(fixed_t x, fixed_t y, fixed_t z);
 void    P_SpawnBlood(fixed_t x, fixed_t y, fixed_t z, int32_t damage);
-mobj_t  *P_SpawnMissile(mobj_t *source, mobj_t *dest, mobjtype_t type);
-void    P_SpawnPlayerMissile(mobj_t *source, mobjtype_t type);
-void    P_SpawnMapThing (const mapthing_t*  mthing);
+mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_t type);
+void    P_SpawnPlayerMissile(mobj_t __far* source, mobjtype_t type);
+void    P_SpawnMapThing (const mapthing_t __far* mthing);
 
-struct player_s* P_MobjIsPlayer(const mobj_t* mobj);
+struct player_s* P_MobjIsPlayer(const mobj_t __far* mobj);
 
 #endif
 

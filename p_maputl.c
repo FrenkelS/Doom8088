@@ -79,7 +79,7 @@ fixed_t CONSTFUNC P_AproxDistance(fixed_t dx, fixed_t dy)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-int32_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t *line)
+int32_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* line)
 {
   return
     !line->dx ? x <= line->v1.x ? line->dy > 0 : line->dy < 0 :
@@ -95,7 +95,7 @@ int32_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t *line)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-int32_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t *ld)
+int32_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
 {
     int32_t p;
     switch (ld->slopetype)
@@ -140,7 +140,7 @@ static int32_t PUREFUNC P_PointOnDivlineSide(fixed_t x, fixed_t y, const divline
 // P_MakeDivline
 //
 
-static void P_MakeDivline(const line_t *li, divline_t *dl)
+static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 {
   dl->x = li->v1.x;
   dl->y = li->v1.y;
@@ -174,13 +174,13 @@ fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
 // OPTIMIZE: keep this precalculated
 //
 
-void P_LineOpening(const line_t *linedef)
+void P_LineOpening(const line_t __far* linedef)
 {
     // moved front and back outside P-LineOpening and changed
     // them to these so we can pick up the new friction value
     // in PIT_CheckLine()
-    sector_t *openfrontsector;
-    sector_t *openbacksector;
+    sector_t __far* openfrontsector;
+    sector_t __far* openbacksector;
 
     if (linedef->sidenum[1] == NO_INDEX)      // single sided line
     {
@@ -221,7 +221,7 @@ void P_LineOpening(const line_t *linedef)
 // these structures need to be updated.
 //
 
-void P_UnsetThingPosition (mobj_t *thing)
+void P_UnsetThingPosition(mobj_t __far* thing)
 {
   if (!(thing->flags & MF_NOSECTOR))
     {
@@ -232,8 +232,8 @@ void P_UnsetThingPosition (mobj_t *thing)
        * pointers, allows head node pointers to be treated like everything else
        */
 
-      mobj_t **sprev = thing->sprev;
-      mobj_t  *snext = thing->snext;
+      mobj_t __far*__far* sprev = thing->sprev;
+      mobj_t __far* snext = thing->snext;
       if ((*sprev = snext))  // unlink from sector list
         snext->sprev = sprev;
 
@@ -267,7 +267,8 @@ void P_UnsetThingPosition (mobj_t *thing)
        * linking.
        */
 
-      mobj_t *bnext, **bprev = thing->bprev;
+      mobj_t __far* bnext;
+      mobj_t __far*__far* bprev = thing->bprev;
       if (bprev && (*bprev = bnext = thing->bnext))  // unlink from block map
         bnext->bprev = bprev;
     }
@@ -279,11 +280,10 @@ void P_UnsetThingPosition (mobj_t *thing)
 // based on it's x y.
 // Sets thing->subsector properly
 //
-// killough 5/3/98: reformatted, cleaned up
 
-void P_SetThingPosition(mobj_t *thing)
+void P_SetThingPosition(mobj_t __far* thing)
 {                                                      // link into subsector
-  subsector_t *ss = thing->subsector = R_PointInSubsector(thing->x, thing->y);
+  subsector_t __far* ss = thing->subsector = R_PointInSubsector(thing->x, thing->y);
   if (!(thing->flags & MF_NOSECTOR))
     {
       // invisible things don't go into the sector links
@@ -291,8 +291,8 @@ void P_SetThingPosition(mobj_t *thing)
       // killough 8/11/98: simpler scheme using pointer-to-pointer prev
       // pointers, allows head nodes to be treated like everything else
 
-      mobj_t **link = &ss->sector->thinglist;
-      mobj_t *snext = *link;
+      mobj_t __far*__far* link = &ss->sector->thinglist;
+      mobj_t __far* snext = *link;
       if ((thing->snext = snext))
         snext->sprev = &thing->snext;
       thing->sprev = link;
@@ -327,8 +327,8 @@ void P_SetThingPosition(mobj_t *thing)
         // killough 8/11/98: simpler scheme using pointer-to-pointer prev
         // pointers, allows head nodes to be treated like everything else
 
-        mobj_t **link = &_g_blocklinks[blocky*_g_bmapwidth+blockx];
-        mobj_t *bnext = *link;
+        mobj_t __far*__far* link = &_g_blocklinks[blocky*_g_bmapwidth+blockx];
+        mobj_t __far* bnext = *link;
         if ((thing->bnext = bnext))
           bnext->bprev = &thing->bnext;
         thing->bprev = link;
@@ -357,14 +357,14 @@ void P_SetThingPosition(mobj_t *thing)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
+boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t __far*))
 {
 
     if (!(0 <= x && x < _g_bmapwidth && 0 <= y && y <_g_bmapheight))
         return true;
 
     const int32_t offset = _g_blockmap[y*_g_bmapwidth+x];
-    const int16_t* list = _g_blockmaplump+offset;     // original was reading         // phares
+    const int16_t __far* list = _g_blockmaplump+offset;     // original was reading         // phares
 
 
     // delmiting 0 as linedef 0     // phares
@@ -381,14 +381,14 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
     {
         const int16_t lineno = *list;
 
-        linedata_t *lt = &_g_linedata[lineno];
+        linedata_t __far* lt = &_g_linedata[lineno];
 
         if (lt->validcount == vcount)
             continue;       // line has already been checked
 
         lt->validcount = vcount;
 
-        const line_t *ld = &_g_lines[lineno];
+        const line_t __far* ld = &_g_lines[lineno];
 
         if (!func(ld))
             return false;
@@ -402,9 +402,9 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t*))
 //
 // killough 5/3/98: reformatted, cleaned up
 
-boolean P_BlockThingsIterator(int32_t x, int32_t y, boolean func(mobj_t*))
+boolean P_BlockThingsIterator(int32_t x, int32_t y, boolean func(mobj_t __far*))
 {
-  mobj_t *mobj;
+  mobj_t __far* mobj;
   if (0 <= x && x < _g_bmapwidth && 0 <= y && y < _g_bmapheight)
     for (mobj = _g_blocklinks[y*_g_bmapwidth+x]; mobj; mobj = mobj->bnext)
       if (!func(mobj))
@@ -435,7 +435,7 @@ static boolean check_intercept(void)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-static boolean PIT_AddLineIntercepts(const line_t *ld)
+static boolean PIT_AddLineIntercepts(const line_t __far* ld)
 {
   int32_t       s1;
   int32_t       s2;
@@ -481,7 +481,7 @@ static boolean PIT_AddLineIntercepts(const line_t *ld)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-static boolean PIT_AddThingIntercepts(mobj_t *thing)
+static boolean PIT_AddThingIntercepts(mobj_t __far* thing)
 {
   fixed_t   x1, y1;
   fixed_t   x2, y2;

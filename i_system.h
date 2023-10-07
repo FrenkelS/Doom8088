@@ -45,7 +45,7 @@ void I_InitScreen();
 void I_InitGraphics();
 
 void I_FinishUpdate(void);
-void I_DrawBuffer(uint16_t* buffer);
+void I_DrawBuffer(uint16_t __far* buffer);
 
 void I_SetPalette(int8_t pal);
 
@@ -57,8 +57,8 @@ void I_SetPalette(int8_t pal);
  */
 void I_StartTic();
 
-uint16_t* I_GetBackBuffer();
+uint16_t __far* I_GetBackBuffer();
 
-void I_CopyBackBufferToBuffer(uint16_t* buffer);
+void I_CopyBackBufferToBuffer(uint16_t __far* buffer);
 
 #endif

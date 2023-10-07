@@ -35,10 +35,13 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include "compiler.h"
 #include "d_player.h"
 #include "w_wad.h"
 #include "r_main.h"
@@ -56,8 +59,8 @@
 #define FLAT_WALL
 
 
-visplane_t *_g_visplanes[MAXVISPLANES];
-visplane_t *_g_freetail;
+visplane_t __far* _g_visplanes[MAXVISPLANES];
+visplane_t __far* _g_freetail;
 
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
@@ -143,7 +146,7 @@ static int16_t negonearray[SCREENWIDTH] =
 //*****************************************
 
 int16_t numnodes;
-const mapnode_t *nodes;
+const mapnode_t __far* nodes;
 
 fixed_t  viewx, viewy, viewz;
 
@@ -151,14 +154,15 @@ angle_t  viewangle;
 
 static byte solidcol[SCREENWIDTH];
 
-static const seg_t     *curline;
-static side_t    *sidedef;
-static const line_t    *linedef;
-static sector_t  *frontsector;
-static sector_t  *backsector;
+static const seg_t     __far* curline;
+static side_t    __far* sidedef;
+static const line_t    __far* linedef;
+static sector_t  __far* frontsector;
+static sector_t  __far* backsector;
 static drawseg_t *ds_p;
 
-static visplane_t *floorplane, *ceilingplane;
+static visplane_t __far* floorplane;
+static visplane_t __far* ceilingplane;
 static int32_t             rw_angle1;
 
 static angle_t         rw_normalangle; // angle to line origin
@@ -187,10 +191,10 @@ static fixed_t  rw_midtexturemid;
 static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
-const lighttable_t *fullcolormap;
-const lighttable_t *colormaps;
+const lighttable_t __far* fullcolormap;
+const lighttable_t __far* colormaps;
 
-const lighttable_t* fixedcolormap;
+const lighttable_t __far* fixedcolormap;
 
 static int16_t extralight;                           // bumped light from gun blasts
 
@@ -206,9 +210,9 @@ static int16_t      rw_lightlevel;
 
 static int16_t      *maskedtexturecol; // dropoff overflow
 
-fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
+fixed_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
 
-int16_t       *texturetranslation;
+int16_t       __far* texturetranslation;
 
 fixed_t  viewcos, viewsin;
 
@@ -232,7 +236,7 @@ int16_t highDetail = 0;
 
 
 uint16_t validcount = 1;         // increment every time a check is made
-visplane_t **freehead;
+visplane_t __far*__far* freehead;
 
 //*****************************************
 // Constants
@@ -322,7 +326,7 @@ static CONSTFUNC int32_t SlopeDiv(uint32_t num, uint32_t den)
 // killough 5/2/98: reformatted
 //
 
-static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t *node)
+static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
 {
     fixed_t dx = (fixed_t)node->dx << FRACBITS;
     fixed_t dy = (fixed_t)node->dy << FRACBITS;
@@ -351,7 +355,7 @@ static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t *nod
 //
 // killough 5/2/98: reformatted, cleaned up
 
-subsector_t *R_PointInSubsector(fixed_t x, fixed_t y)
+subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y)
 {
     int16_t nodenum = numnodes-1;
 
@@ -494,7 +498,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
 #define NUMCOLORMAPS 32
 
 
-static const lighttable_t* R_ColourMap(int16_t lightlevel)
+static const lighttable_t __far* R_ColourMap(int16_t lightlevel)
 {
     if (fixedcolormap)
         return fixedcolormap;
@@ -524,13 +528,13 @@ static const lighttable_t* R_ColourMap(int16_t lightlevel)
 
 const lighttable_t* R_LoadColorMap(int16_t lightlevel)
 {
-    static const lighttable_t* current_colormap_ptr = NULL;
+    static const lighttable_t __far* current_colormap_ptr = NULL;
 
-    const lighttable_t* lm = R_ColourMap(lightlevel);
+    const lighttable_t __far* lm = R_ColourMap(lightlevel);
 
     if(current_colormap_ptr != lm)
     {
-        memcpy(current_colormap, lm, 256);
+        _fmemcpy(current_colormap, lm, 256);
         current_colormap_ptr = lm;
     }
 
@@ -548,7 +552,7 @@ const lighttable_t* R_LoadColorMap(int16_t lightlevel)
 #define COLEXTRABITS 9
 #define COLBITS (FRACBITS + COLEXTRABITS)
 
-inline static void R_DrawColumnPixel(uint16_t* dest, const byte* source, const byte* colormap, uint32_t frac)
+inline static void R_DrawColumnPixel(uint16_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t frac)
 {
 	uint16_t color = colormap[source[frac>>COLBITS]];
 
@@ -564,10 +568,10 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     if (count <= 0)
         return;
 
-    const byte *source   = dcvars->source;
-    const byte *colormap = dcvars->colormap;
+    const byte __far* source   = dcvars->source;
+    const byte __far* colormap = dcvars->colormap;
 
-    uint16_t* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+    uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery) * dcvars->iscale) << COLEXTRABITS;
@@ -632,7 +636,7 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 	const uint16_t color = (texture << 8) | texture;
 
-	uint16_t* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+	uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
 	uint16_t l = count >> 4;
 
@@ -688,10 +692,10 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
     if (count <= 0)
         return;
 
-    const byte *source = dcvars->source;
-    const byte *colormap = dcvars->colormap;
+    const byte __far* source   = dcvars->source;
+    const byte __far* colormap = dcvars->colormap;
 
-    volatile uint16_t* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+    volatile uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery)*dcvars->iscale) << COLEXTRABITS;
@@ -767,15 +771,15 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
     if (count <= 0)
         return;
 
-    const byte* colormap = &fullcolormap[6 * 256];
+    const byte __far* colormap = &fullcolormap[6 * 256];
 
-    uint16_t* dest = _g_screen + ScreenYToOffset(dc_yl) + dcvars->x;
+    uint16_t __far* dest = _g_screen + ScreenYToOffset(dc_yl) + dcvars->x;
 
     static int16_t fuzzpos = 0;
 
     do
     {        
-        R_DrawColumnPixel(dest, (const byte*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += SCREENWIDTH;
+        R_DrawColumnPixel(dest, (const byte __far*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += SCREENWIDTH;
 
         fuzzpos++;
         if (fuzzpos >= FUZZTABLE)
@@ -794,7 +798,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
 typedef void (*R_DrawColumn_f)(const draw_column_vars_t *dcvars);
 
-static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvars, const column_t *column)
+static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvars, const column_t __far* column)
 {
     const fixed_t basetexturemid = dcvars->texturemid;
 
@@ -819,7 +823,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
         // killough 3/2/98, 3/27/98: Failsafe against overflow/crash:
         if (yl <= yh && yh < viewheight)
         {
-            dcvars->source =  (const byte*)column + 3;
+            dcvars->source =  (const byte __far*)column + 3;
 
             dcvars->texturemid = basetexturemid - (((int32_t)column->topdelta)<<FRACBITS);
 
@@ -831,7 +835,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
             colfunc (dcvars);
         }
 
-        column = (const column_t *)((const byte *)column + column->length + 4);
+        column = (const column_t __far*)((const byte __far*)column + column->length + 4);
     }
 
     dcvars->texturemid = basetexturemid;
@@ -872,7 +876,7 @@ typedef struct vissprite_s
   uint32_t mobjflags;
 
   // for color translation and shadow draw, maxbright frames as well
-  const lighttable_t *colormap;
+  const lighttable_t __far* colormap;
 
 } vissprite_t;
 
@@ -916,7 +920,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
     sprtopscreen = centeryfrac - FixedMul(dcvars.texturemid, spryscale);
 
 
-    const patch_t *patch = W_GetLumpByNum(vis->lump_num);
+    const patch_t __far* patch = W_GetLumpByNum(vis->lump_num);
 
     fixed_t xiscale = vis->xiscale;
 
@@ -928,7 +932,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     while(dcvars.x < SCREENWIDTH)
     {
-        const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[frac >> FRACBITS]);
+        const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column);
 
         frac += xiscale;
@@ -944,7 +948,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
         if(dcvars.x >= SCREENWIDTH)
             break;
 
-        const column_t* column2 = (const column_t *) ((const byte *)patch + patch->columnofs[frac >> FRACBITS]);
+        const column_t __far* column2 = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column2);
 
         frac += xiscale;
@@ -960,7 +964,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 }
 
 
-void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c)
+void R_GetColumn(const texture_t __far* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c)
 {
     const uint8_t patchcount = texture->patchcount;
     const uint16_t widthmask = texture->widthmask;
@@ -973,7 +977,7 @@ void R_GetColumn(const texture_t* texture, int32_t texcolumn, int16_t* patch_num
 
         do
         {
-            const texpatch_t* patch = &texture->patches[i];
+            const texpatch_t __far* patch = &texture->patches[i];
 
             const int16_t x1 = patch->originx;
 
@@ -1049,7 +1053,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 
     dcvars.texturemid += (((int32_t)_g_sides[curline->sidenum].rowoffset) << FRACBITS);
 
-    const texture_t* texture = R_GetTexture(texnum);
+    const texture_t __far* texture = R_GetTexture(texnum);
 
     dcvars.colormap = R_LoadColorMap(rw_lightlevel);
 
@@ -1068,8 +1072,8 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
             int16_t patch_num;
             int16_t x_c;
             R_GetColumn(texture, xc, &patch_num, &x_c);
-            const patch_t* patch = W_GetLumpByNum(patch_num);
-            const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
+            const patch_t __far* patch = W_GetLumpByNum(patch_num);
+            const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
 
             R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
             Z_ChangeTagToCache(patch);
@@ -1083,7 +1087,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 
 // killough 5/2/98: reformatted
 
-static PUREFUNC boolean R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t *line)
+static PUREFUNC boolean R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t __far* line)
 {
     const fixed_t lx = line->v1.x;
     const fixed_t ly = line->v1.y;
@@ -1204,8 +1208,8 @@ static void R_DrawSprite (const vissprite_t* spr)
 static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 {
     int16_t           x1, x2;
-    spritedef_t   *sprdef;
-    spriteframe_t *sprframe;
+    spritedef_t   __far* sprdef;
+    spriteframe_t __far* sprframe;
     boolean       flip;
     vissprite_t   *vis;
     vissprite_t   avis;
@@ -1218,7 +1222,7 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 
     flip = (boolean) SPR_FLIPPED(sprframe, 0);
 
-    const patch_t* patch = W_GetLumpByNum(sprframe->lump[0]);
+    const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
     fixed_t       tx;
     tx = psp->sx-160*FRACUNIT;
@@ -1434,7 +1438,7 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 #define MINZ        (FRACUNIT*4)
 #define MAXZ        (FRACUNIT*1280)
 
-static void R_ProjectSprite (mobj_t* thing, int16_t lightlevel)
+static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
 {
     const fixed_t fx = thing->x;
     const fixed_t fy = thing->y;
@@ -1460,8 +1464,8 @@ static void R_ProjectSprite (mobj_t* thing, int16_t lightlevel)
         return;
 
     // decide which patch to use for sprite relative to player
-    const spritedef_t*   sprdef   = &sprites[thing->sprite];
-    const spriteframe_t* sprframe = &sprdef->spriteframes[thing->frame & FF_FRAMEMASK];
+    const spritedef_t __far*   sprdef   = &sprites[thing->sprite];
+    const spriteframe_t __far* sprframe = &sprdef->spriteframes[thing->frame & FF_FRAMEMASK];
 
     uint32_t rot = 0;
 
@@ -1473,7 +1477,7 @@ static void R_ProjectSprite (mobj_t* thing, int16_t lightlevel)
     }
 
     const boolean flip = (boolean)SPR_FLIPPED(sprframe, rot);
-    const patch_t* patch = W_GetLumpByNum(sprframe->lump[rot]);
+    const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[rot]);
 
     /* calculate edges of the shape
      * cph 2003/08/1 - fraggle points out that this offset must be flipped
@@ -1574,10 +1578,10 @@ static void R_ProjectSprite (mobj_t* thing, int16_t lightlevel)
 // During BSP traversal, this adds sprites by sector.
 //
 // killough 9/18/98: add lightlevel as parameter, fixing underwater lighting
-static void R_AddSprites(subsector_t* subsec, int16_t lightlevel)
+static void R_AddSprites(subsector_t __far* subsec, int16_t lightlevel)
 {
-  sector_t* sec=subsec->sector;
-  mobj_t *thing;
+  sector_t __far* sec=subsec->sector;
+  mobj_t __far* thing;
 
   // BSP is traversed by subsector.
   // A sector might have been split into several
@@ -1604,9 +1608,9 @@ static void R_AddSprites(subsector_t* subsec, int16_t lightlevel)
 
 // New function, by Lee Killough
 
-static visplane_t *new_visplane(uint16_t hash)
+static visplane_t __far* new_visplane(uint16_t hash)
 {
-    visplane_t *check = _g_freetail;
+    visplane_t __far* check = _g_freetail;
 
     if (!check)
         check = Z_CallocLevel(sizeof(visplane_t));
@@ -1630,9 +1634,9 @@ static visplane_t *new_visplane(uint16_t hash)
   ((uint16_t)((picnum)*3+(lightlevel)+(height)*7) & (MAXVISPLANES-1))
 
 
-static visplane_t *R_FindPlane(fixed_t height, int16_t picnum, int16_t lightlevel)
+static visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int16_t lightlevel)
 {
-    visplane_t *check;
+    visplane_t __far* check;
     uint16_t hash;
 
     if (picnum == skyflatnum)
@@ -1655,7 +1659,7 @@ static visplane_t *R_FindPlane(fixed_t height, int16_t picnum, int16_t lightleve
     check->minx = SCREENWIDTH; // Was SCREENWIDTH -- killough 11/98
     check->maxx = -1;
 
-    memset(check->top, -1, sizeof(check->top));
+    _fmemset(check->top, -1, sizeof(check->top));
 
     check->modified = false;
 
@@ -1667,10 +1671,10 @@ static visplane_t *R_FindPlane(fixed_t height, int16_t picnum, int16_t lightleve
  *
  * cph 2003/04/18 - create duplicate of existing visplane and set initial range
  */
-static visplane_t *R_DupPlane(const visplane_t *pl, int16_t start, int16_t stop)
+static visplane_t __far* R_DupPlane(const visplane_t __far* pl, int16_t start, int16_t stop)
 {
     uint16_t hash = visplane_hash(pl->picnum, pl->lightlevel, pl->height);
-    visplane_t *new_pl = new_visplane(hash);
+    visplane_t __far* new_pl = new_visplane(hash);
 
     new_pl->height = pl->height;
     new_pl->picnum = pl->picnum;
@@ -1678,7 +1682,7 @@ static visplane_t *R_DupPlane(const visplane_t *pl, int16_t start, int16_t stop)
     new_pl->minx = start;
     new_pl->maxx = stop;
 
-    memset(new_pl->top, -1, sizeof(new_pl->top));
+    _fmemset(new_pl->top, -1, sizeof(new_pl->top));
 
     new_pl->modified = false;
 
@@ -1689,7 +1693,7 @@ static visplane_t *R_DupPlane(const visplane_t *pl, int16_t start, int16_t stop)
 //
 // R_CheckPlane
 //
-static visplane_t *R_CheckPlane(visplane_t *pl, int16_t start, int16_t stop)
+static visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop)
 {
     int16_t intrl, intrh, unionl, unionh, x;
 
@@ -1834,7 +1838,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
         {
             const texpatch_t* patch = &tex->patches[i];
 
-            const patch_t* realpatch = W_GetLumpByNum(patch->patch_num);
+            const patch_t __far* realpatch = W_GetLumpByNum(patch->patch_num);
 
             const int16_t x1 = patch->originx;
 
@@ -1848,7 +1852,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
 
             if (xc < x2)
             {
-                const column_t* patchcol = (const column_t *)((const byte *)realpatch + realpatch->columnofs[xc - x1]);
+                const column_t __far* patchcol = (const column_t __far*)((const byte __far*)realpatch + realpatch->columnofs[xc - x1]);
 
                 R_DrawColumnInCache (patchcol, tmpCache, patch->originy, tex->height);
             }
@@ -1871,10 +1875,10 @@ static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_colu
         int16_t patch_num;
         int16_t x_c;
         R_GetColumn(tex, texcolumn, &patch_num, &x_c);
-        const patch_t* patch = W_GetLumpByNum(patch_num);
-        const column_t* column = (const column_t *) ((const byte *)patch + patch->columnofs[x_c]);
+        const patch_t __far* patch = W_GetLumpByNum(patch_num);
+        const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
 
-        dcvars->source = (const byte*)column + 3;
+        dcvars->source = (const byte __far*)column + 3;
         R_DrawColumn (dcvars);
         Z_ChangeTagToCache(patch);
     }
@@ -2129,7 +2133,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     }
 
 
-    linedata_t* linedata = &_g_linedata[curline->linenum];
+    linedata_t __far* linedata = &_g_linedata[curline->linenum];
 
     // mark the segment as visible for auto map
     linedata->r_flags |= ML_MAPPED;
@@ -2430,9 +2434,9 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 
 static void R_RecalcLineFlags(void)
 {
-    linedata_t* linedata = &_g_linedata[linedef->lineno];
+    linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
-    const side_t* side = &_g_sides[curline->sidenum];
+    const side_t __far* side = &_g_sides[curline->sidenum];
 
     linedata->r_validcount = _g_gametic;
 
@@ -2527,7 +2531,7 @@ static void R_ClipWallSegment(int8_t first, int8_t last, boolean solid)
 // and adds any visible pieces to the line list.
 //
 
-static void R_AddLine (const seg_t *line)
+static void R_AddLine(const seg_t __far* line)
 {
     int8_t      x1;
     int8_t      x2;
@@ -2594,7 +2598,7 @@ static void R_AddLine (const seg_t *line)
 
     /* cph - roll up linedef properties in flags */
     linedef = &_g_lines[curline->linenum];
-    linedata_t* linedata = &_g_linedata[linedef->lineno];
+    linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
     if (linedata->r_validcount != _g_gametic)
         R_RecalcLineFlags();
@@ -2617,8 +2621,8 @@ static void R_AddLine (const seg_t *line)
 static void R_Subsector(int16_t num)
 {
     int16_t         count;
-    const seg_t       *line;
-    subsector_t *sub;
+    const seg_t       __far* line;
+    subsector_t __far* sub;
 
     sub = &_g_subsectors[num];
     frontsector = sub->sector;
@@ -2682,7 +2686,7 @@ static const byte checkcoord[12][4] = // killough -- static const
 };
 
 // killough 1/28/98: static // CPhipps - const parameter, reformatted
-static boolean R_CheckBBox(const int16_t *bspcoord)
+static boolean R_CheckBBox(const int16_t __far* bspcoord)
 {
     angle_t angle1, angle2;
 
@@ -2780,7 +2784,7 @@ static void R_RenderBSPNode(int16_t bspnum)
     int16_t stack[MAX_BSP_DEPTH];
     int16_t sp = 0;
 
-    const mapnode_t* bsp;
+    const mapnode_t __far* bsp;
     int16_t side = 0;
 
     while(true)

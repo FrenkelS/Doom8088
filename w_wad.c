@@ -43,7 +43,9 @@
 #endif
 
 #include <fcntl.h>
+#include <stdint.h>
 
+#include "compiler.h"
 #include "d_player.h"
 #include "doomtype.h"
 #include "i_system.h"
@@ -75,13 +77,35 @@ static FILE* fileWAD;
 
 static int16_t numlumps;
 
-static filelump_t *fileinfo;
+static filelump_t __far* fileinfo;
 
-static void **lumpcache;
+static void __far*__far* lumpcache;
 
 //
 // LUMP BASED ROUTINES.
 //
+
+#define BUFFERSIZE 512
+
+static void _ffread(void __far* ptr, uint16_t size, FILE* fp)
+{
+	uint8_t __far* dest = ptr;
+	uint8_t* buffer = alloca(BUFFERSIZE);
+
+	while (size >= BUFFERSIZE)
+	{
+		fread(buffer, BUFFERSIZE, 1, fp);
+		_fmemcpy(dest, buffer, BUFFERSIZE);
+		dest += BUFFERSIZE;
+		size -= BUFFERSIZE;
+	}
+
+	if (size > 0)
+	{
+		fread(buffer, size, 1, fp);
+		_fmemcpy(dest, buffer, size);
+	}
+}
 
 typedef struct
 {
@@ -106,16 +130,16 @@ void W_Init(void)
 
 	fileinfo = Z_MallocStatic(header.numlumps * sizeof(filelump_t));
 	fseek(fileWAD, header.infotableofs, SEEK_SET);
-	fread(fileinfo, sizeof(filelump_t), header.numlumps, fileWAD);
+	_ffread(fileinfo, sizeof(filelump_t) * header.numlumps, fileWAD);
 
 	lumpcache = Z_MallocStatic(header.numlumps * sizeof(*lumpcache));
-	memset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
+	_fmemset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
 
 	numlumps = header.numlumps;
 }
 
 
-const char* PUREFUNC W_GetNameForNum(int16_t num)
+const char __far* PUREFUNC W_GetNameForNum(int16_t num)
 {
 	return fileinfo[num].name;
 }
@@ -146,7 +170,7 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 	for (int16_t i = 0; i < numlumps; i++)
 #endif
 	{
-		if (nameint == *(int64_t*)(fileinfo[i].name))
+		if (nameint == *(int64_t __far*)(fileinfo[i].name))
 		{
 			return i;
 		}
@@ -157,40 +181,40 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 }
 
 
-void W_ReadLumpByName(const char *name, void *ptr)
+void W_ReadLumpByName(const char *name, void __far* ptr)
 {
 	int16_t num = W_GetNumForName(name);
-	const filelump_t* lump = &fileinfo[num];
+	const filelump_t __far* lump = &fileinfo[num];
 	fseek(fileWAD, lump->filepos, SEEK_SET);
-	fread(ptr, lump->size, 1, fileWAD);
+	_ffread(ptr, lump->size, fileWAD);
 }
 
 
-const void* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
+const void __far* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 {
-	const filelump_t* lump = &fileinfo[num];
+	const filelump_t __far* lump = &fileinfo[num];
 
-	void* ptr = Z_MallocLevel(lump->size, NULL);
+	void __far* ptr = Z_MallocLevel(lump->size, NULL);
 
 	fseek(fileWAD, lump->filepos, SEEK_SET);
-	fread(ptr, lump->size, 1, fileWAD);
+	_ffread(ptr, lump->size, fileWAD);
 	return ptr;
 }
 
 
-static void* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void **user)
+static void __far* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void __far*__far* user)
 {
-	const filelump_t* lump = &fileinfo[num];
+	const filelump_t __far* lump = &fileinfo[num];
 
-	void* ptr = Z_MallocStaticWithUser(lump->size, user);
+	void __far* ptr = Z_MallocStaticWithUser(lump->size, user);
 
 	fseek(fileWAD, lump->filepos, SEEK_SET);
-	fread(ptr, lump->size, 1, fileWAD);
+	_ffread(ptr, lump->size, fileWAD);
 	return ptr;
 }
 
 
-const void* PUREFUNC W_GetLumpByNum(int16_t num)
+const void __far* PUREFUNC W_GetLumpByNum(int16_t num)
 {
 	if (lumpcache[num])
 		Z_ChangeTagToStatic(lumpcache[num]);

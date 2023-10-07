@@ -51,8 +51,8 @@
 #include "i_system.h"
 
 
-static uint16_t* frontbuffer;
-static  int16_t* wipe_y_lookup;
+static uint16_t __far* frontbuffer;
+static  int16_t __far* wipe_y_lookup;
 
 
 void wipe_StartScreen(void)
@@ -67,7 +67,7 @@ static boolean wipe_ScreenWipe(int32_t ticks)
 {
     boolean done = true;
 
-    uint16_t* backbuffer = I_GetBackBuffer();
+    uint16_t __far* backbuffer = I_GetBackBuffer();
 
     while (ticks--)
     {
@@ -95,9 +95,9 @@ static boolean wipe_ScreenWipe(int32_t ticks)
                 if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
                     dy = SCREENHEIGHT - wipe_y_lookup[i];
 
-                uint16_t* s = &frontbuffer[i] + ((SCREENHEIGHT - dy - 1) * SCREENPITCH);
+                uint16_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - dy - 1) * SCREENPITCH);
 
-                uint16_t* d = &frontbuffer[i] + ((SCREENHEIGHT - 1) * SCREENPITCH);
+                uint16_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1) * SCREENPITCH);
 
                 // scroll down the column. Of course we need to copy from the bottom... up to
                 // SCREENHEIGHT - yLookup - dy

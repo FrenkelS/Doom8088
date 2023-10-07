@@ -59,7 +59,7 @@
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
 
-void T_VerticalDoor (vldoor_t* door)
+void T_VerticalDoor(vldoor_t __far* door)
 {
   result_e  res;
 
@@ -278,10 +278,7 @@ void T_VerticalDoor (vldoor_t* door)
 // and the thing that activated the line
 // Returns true if a thinker created
 //
-boolean EV_DoLockedDoor
-( const line_t* line,
-  vldoor_e  type,
-  mobj_t* thing )
+boolean EV_DoLockedDoor(const line_t __far* line, vldoor_e type, mobj_t __far* thing)
 {
   player_t* p;
 
@@ -338,14 +335,12 @@ boolean EV_DoLockedDoor
 // Passed the line activating the door and the type of door
 // Returns true if a thinker created
 //
-boolean EV_DoDoor
-( const line_t* line,
-  vldoor_e  type )
+boolean EV_DoDoor(const line_t __far* line, vldoor_e type)
 {
   int32_t   secnum;
   boolean   rtn;
-  sector_t* sec;
-  vldoor_t* door;
+  sector_t __far* sec;
+  vldoor_t __far* door;
 
   secnum = -1;
   rtn = false;
@@ -430,13 +425,11 @@ boolean EV_DoDoor
 //
 // Passed the line activating the door and the thing activating it
 //
-void EV_VerticalDoor
-( const line_t* line,
-  mobj_t* thing )
+void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
 {
   player_t* player;
-  sector_t* sec;
-  vldoor_t* door;
+  sector_t __far* sec;
+  vldoor_t __far* door;
 
   //  Check for locks
   player = P_MobjIsPlayer(thing);
@@ -536,7 +529,7 @@ void EV_VerticalDoor
         if (door->thinker.function == T_VerticalDoor) {
           door->direction = outval;
         } else if (door->thinker.function == T_PlatRaise) {
-          plat_t* p = (plat_t*)door;
+          plat_t __far* p = (plat_t __far*)door;
           p->wait = outval;
         } else {
           printf("EV_VerticalDoor: unknown thinker.function in thinker corruption emulation\n");
@@ -631,9 +624,9 @@ void EV_VerticalDoor
 // Passed the sector of the door, whose type specified the door action
 // Returns nothing
 //
-void P_SpawnDoorCloseIn30 (sector_t* sec)
+void P_SpawnDoorCloseIn30(sector_t __far* sec)
 {
-  vldoor_t* door;
+  vldoor_t __far* door;
 
   door = Z_CallocLevSpec(sizeof(*door));
 
@@ -660,9 +653,9 @@ void P_SpawnDoorCloseIn30 (sector_t* sec)
 // Passed the sector of the door, whose type specified the door action
 // Returns nothing
 //
-void P_SpawnDoorRaiseIn5Mins(sector_t* sec)
+void P_SpawnDoorRaiseIn5Mins(sector_t __far* sec)
 {
-  vldoor_t* door;
+  vldoor_t __far* door;
 
   door = Z_CallocLevSpec(sizeof(*door));
 

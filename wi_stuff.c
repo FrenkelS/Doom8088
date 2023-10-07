@@ -188,7 +188,7 @@ static const char total[] = {"WIMSTT"};
  */
 int16_t V_NumPatchWidth(int16_t num)
 {
-	const patch_t* patch = W_GetLumpByNum(num);
+	const patch_t __far* patch = W_GetLumpByNum(num);
 	int16_t width = patch->width;
 	Z_ChangeTagToCache(patch);
 	return width;
@@ -196,7 +196,7 @@ int16_t V_NumPatchWidth(int16_t num)
 
 static int16_t V_NamePatchWidth(const char *name)
 {
-	const patch_t* patch = W_GetLumpByName(name);
+	const patch_t __far* patch = W_GetLumpByName(name);
 	int16_t width = patch->width;
 	Z_ChangeTagToCache(patch);
 	return width;
@@ -204,7 +204,7 @@ static int16_t V_NamePatchWidth(const char *name)
 
 static int16_t V_NamePatchHeight(const char *name)
 {
-	const patch_t* patch = W_GetLumpByName(name);
+	const patch_t __far* patch = W_GetLumpByName(name);
 	int16_t height = patch->height;
 	Z_ChangeTagToCache(patch);
 	return height;
@@ -306,7 +306,7 @@ static void WI_drawOnLnode(int8_t n, const char* const c[])
 		int16_t            top;
 		int16_t            right;
 		int16_t            bottom;
-		const patch_t* patch = W_GetLumpByName(c[i]);
+		const patch_t __far* patch = W_GetLumpByName(c[i]);
 
 		left = lnodes[n].x - patch->leftoffset;
 		top = lnodes[n].y - patch->topoffset;

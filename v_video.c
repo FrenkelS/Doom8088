@@ -50,7 +50,7 @@
  * so the st bar and menus don't look like garbage.
  */
 
-static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
+static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 {
     y -= patch->topoffset;
     x -= patch->leftoffset;
@@ -62,7 +62,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
     const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / 200;
     const int32_t   DYI = (((int32_t)200)<<FRACBITS) / SCREENHEIGHT;
 
-    byte* byte_topleft = (byte*)_g_screen;
+    byte __far* byte_topleft = (byte __far*)_g_screen;
     const int32_t byte_pitch = (SCREENPITCH * 2);
 
     const int32_t left = ( x * DX ) >> FRACBITS;
@@ -76,7 +76,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
         if(dc_x < 0)
             continue;
 
-        const column_t* column = (const column_t *)((const byte*)patch + patch->columnofs[colindex]);
+        const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[colindex]);
 
         if (dc_x >= 240)
             break;
@@ -84,7 +84,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
         // step through the posts in a column
         while (column->topdelta != 0xff)
         {
-            const byte* source = (const byte*)column + 3;
+            const byte __far* source = (const byte __far*)column + 3;
             const int32_t topdelta = column->topdelta;
 
             int32_t dc_yl = (((y + topdelta) * DY) >> FRACBITS);
@@ -95,7 +95,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
 
             int32_t count = (dc_yh - dc_yl);
 
-            byte* dest = byte_topleft + (dc_yl*byte_pitch) + dc_x;
+            byte __far* dest = byte_topleft + (dc_yl*byte_pitch) + dc_x;
 
             const fixed_t fracstep = DYI;
             fixed_t frac = 0;
@@ -111,7 +111,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
                 if((uint32_t)dest & 1)
                 {
                     //Odd addreses, we combine existing pixel with new one.
-                    uint16_t* dest16 = (uint16_t*)(dest - 1);
+                    uint16_t __far* dest16 = (uint16_t __far*)(dest - 1);
 
 
                     uint16_t old = *dest16;
@@ -120,7 +120,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
                 }
                 else
                 {
-                    uint16_t* dest16 = (uint16_t*)dest;
+                    uint16_t __far* dest16 = (uint16_t __far*)dest;
 
                     uint16_t old = *dest16;
 
@@ -131,31 +131,31 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t* patch)
                 frac += fracstep;
             }
 
-            column = (const column_t *)((const byte *)column + column->length + 4 );
+            column = (const column_t __far*)((const byte __far*)column + column->length + 4 );
         }
     }
 }
 
 
-void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch)
+void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
 {
     y -= patch->topoffset;
     x -= patch->leftoffset;
 
-    byte* desttop = (byte*)_g_screen;
+    byte __far* desttop = (byte __far*)_g_screen;
     desttop += (ScreenYToOffset(y) << 1) + x;
 
     int16_t width = patch->width;
 
     for (int16_t col = 0; col < width; col++, desttop++)
     {
-        const column_t* column = (const column_t*)((const byte*)patch + patch->columnofs[col]);
+        const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
 
         // step through the posts in a column
         while (column->topdelta != 0xff)
         {
-            const byte* source = (const byte*)column + 3;
-            byte* dest = desttop + (ScreenYToOffset(column->topdelta) << 1);
+            const byte __far* source = (const byte __far*)column + 3;
+            byte __far* dest = desttop + (ScreenYToOffset(column->topdelta) << 1);
 
             uint16_t count = column->length;
 
@@ -165,7 +165,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch)
                 dest += (SCREENWIDTH * 2);
             }
 
-            column = (const column_t*)((const byte*)column + column->length + 4);
+            column = (const column_t __far*)((const byte __far*)column + column->length + 4);
         }
     }
 }
@@ -173,7 +173,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t* patch)
 
 void V_DrawNumPatch(int16_t x, int16_t y, int16_t num)
 {
-	const patch_t* patch = W_GetLumpByNum(num);
+	const patch_t __far* patch = W_GetLumpByNum(num);
 	V_DrawPatch(x, y, patch);
 	Z_ChangeTagToCache(patch);
 }
@@ -181,7 +181,7 @@ void V_DrawNumPatch(int16_t x, int16_t y, int16_t num)
 
 void V_DrawNamePatch(int16_t x, int16_t y, const char *name)
 {
-	const patch_t* patch = W_GetLumpByName(name);
+	const patch_t __far* patch = W_GetLumpByName(name);
 	V_DrawPatch(x, y, patch);
 	Z_ChangeTagToCache(patch);
 }
@@ -189,7 +189,7 @@ void V_DrawNamePatch(int16_t x, int16_t y, const char *name)
 
 void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
 {
-	const patch_t* patch = W_GetLumpByNum(num);
+	const patch_t __far* patch = W_GetLumpByNum(num);
 	V_DrawPatchNoScale(x, y, patch);
 	Z_ChangeTagToCache(patch);
 }

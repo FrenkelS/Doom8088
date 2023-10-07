@@ -58,7 +58,7 @@
 // Passed a fireflicker_t structure containing light levels and timing
 // Returns nothing
 //
-static void T_FireFlicker (fireflicker_t* flick)
+static void T_FireFlicker (fireflicker_t __far* flick)
 {
   int32_t amount;
 
@@ -87,7 +87,7 @@ static void T_FireFlicker (fireflicker_t* flick)
 typedef struct
 {
   thinker_t thinker;
-  sector_t* sector;
+  sector_t __far* sector;
   int32_t count;
   int32_t maxlight;
   int32_t minlight;
@@ -96,7 +96,7 @@ typedef struct
 
 } lightflash_t;
 
-static void T_LightFlash (lightflash_t* flash)
+static void T_LightFlash (lightflash_t __far* flash)
 {
   if (--flash->count)
     return;
@@ -126,7 +126,7 @@ static void T_LightFlash (lightflash_t* flash)
 typedef struct
 {
   thinker_t thinker;
-  sector_t* sector;
+  sector_t __far* sector;
   int32_t count;
   int32_t minlight;
   int32_t maxlight;
@@ -135,7 +135,7 @@ typedef struct
 
 } strobe_t;
 
-static void T_StrobeFlash (strobe_t*   flash)
+static void T_StrobeFlash (strobe_t __far*   flash)
 {
   if (--flash->count)
     return;
@@ -161,7 +161,7 @@ static void T_StrobeFlash (strobe_t*   flash)
 // Returns nothing
 //
 
-static void T_Glow(glow_t* g)
+static void T_Glow(glow_t __far* g)
 {
   switch(g->direction)
   {
@@ -204,9 +204,9 @@ static void T_Glow(glow_t* g)
 // Passed the sector that spawned the thinker
 // Returns nothing
 //
-void P_SpawnFireFlicker (sector_t*  sector)
+void P_SpawnFireFlicker(sector_t __far* sector)
 {
-  fireflicker_t*  flick;
+  fireflicker_t __far*  flick;
 
   // Note that we are resetting sector attributes.
   // Nothing special about it during gameplay.
@@ -231,9 +231,9 @@ void P_SpawnFireFlicker (sector_t*  sector)
 // Passed the sector that spawned the thinker
 // Returns nothing
 //
-void P_SpawnLightFlash (sector_t* sector)
+void P_SpawnLightFlash (sector_t __far* sector)
 {
-  lightflash_t* flash;
+  lightflash_t __far* flash;
 
   // nothing special about it during gameplay
   sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
@@ -262,12 +262,9 @@ void P_SpawnLightFlash (sector_t* sector)
 //
 // Returns nothing
 //
-void P_SpawnStrobeFlash
-( sector_t* sector,
-  int32_t   fastOrSlow,
-  int32_t   inSync )
+void P_SpawnStrobeFlash(sector_t __far* sector, int32_t fastOrSlow, int32_t inSync)
 {
-  strobe_t* flash;
+  strobe_t __far* flash;
 
   flash = Z_CallocLevSpec(sizeof(*flash));
 
@@ -300,9 +297,9 @@ void P_SpawnStrobeFlash
 // Passed the sector that spawned the thinker
 // Returns nothing
 //
-void P_SpawnGlowingLight(sector_t*  sector)
+void P_SpawnGlowingLight(sector_t __far* sector)
 {
-  glow_t* g;
+  glow_t __far* g;
 
   g = Z_CallocLevSpec(sizeof(*g));
 
@@ -330,10 +327,10 @@ void P_SpawnGlowingLight(sector_t*  sector)
 //
 // Passed the line that activated the strobing
 //
-void EV_StartLightStrobing(const line_t* line)
+void EV_StartLightStrobing(const line_t __far* line)
 {
   int32_t   secnum;
-  sector_t* sec;
+  sector_t __far* sec;
 
   secnum = -1;
   // start lights strobing in all sectors tagged same as line
@@ -355,7 +352,7 @@ void EV_StartLightStrobing(const line_t* line)
 //
 // Passed the line that activated the lights being turned off
 //
-void EV_TurnTagLightsOff(const line_t* line)
+void EV_TurnTagLightsOff(const line_t __far* line)
 {
   int32_t j;
 
@@ -364,7 +361,8 @@ void EV_TurnTagLightsOff(const line_t* line)
   // killough 10/98: replaced inefficient search with fast search
   for (j = -1; (j = P_FindSectorFromLineTag(line,j)) >= 0;)
     {
-      sector_t *sector = _g_sectors + j, *tsec;
+      sector_t __far* sector = _g_sectors + j;
+      sector_t __far* tsec;
       int32_t i, min = sector->lightlevel;
       // find min neighbor light level
       for (i = 0;i < sector->linecount; i++)
@@ -383,7 +381,7 @@ void EV_TurnTagLightsOff(const line_t* line)
 // Passed the activating line, and a level to set the light to
 // If level passed is 0, the maximum neighbor lighting is used
 //
-void EV_LightTurnOn(const line_t *line, int32_t bright)
+void EV_LightTurnOn(const line_t __far* line, int32_t bright)
 {
   int32_t i;
 
@@ -392,7 +390,8 @@ void EV_LightTurnOn(const line_t *line, int32_t bright)
   // killough 10/98: replace inefficient search with fast search
   for (i = -1; (i = P_FindSectorFromLineTag(line,i)) >= 0;)
     {
-      sector_t *temp, *sector = _g_sectors+i;
+      sector_t __far* temp;
+      sector_t __far* sector = _g_sectors+i;
       int32_t j, tbright = bright; //jff 5/17/98 search for maximum PER sector
 
       // bright = 0 means to search for highest light level surrounding sector
@@ -419,7 +418,7 @@ void EV_LightTurnOn(const line_t *line, int32_t bright)
  *
  */
 
-void EV_LightTurnOnPartway(const line_t *line, fixed_t level)
+void EV_LightTurnOnPartway(const line_t __far* line, fixed_t level)
 {
   int32_t i;
 
@@ -431,7 +430,8 @@ void EV_LightTurnOnPartway(const line_t *line, fixed_t level)
   // search all sectors for ones with same tag as activating line
   for (i = -1; (i = P_FindSectorFromLineTag(line,i)) >= 0;)
     {
-      sector_t *temp, *sector = _g_sectors+i;
+      sector_t __far* temp;
+      sector_t __far* sector = _g_sectors+i;
       int32_t j, bright = 0, min = sector->lightlevel;
 
       for (j = 0; j < sector->linecount; j++)

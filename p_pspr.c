@@ -675,7 +675,7 @@ static fixed_t bulletslope;
 // Sets a slope so a near miss is at aproximately
 // the height of the intended target
 //
-static void P_BulletSlope(mobj_t *mo)
+static void P_BulletSlope(mobj_t __far* mo)
 {
 	angle_t an = mo->angle;    // see which target is to be aimed at
 
@@ -698,7 +698,7 @@ static void P_BulletSlope(mobj_t *mo)
 // P_GunShot
 //
 
-static void P_GunShot(mobj_t *mo, boolean accurate)
+static void P_GunShot(mobj_t __far* mo, boolean accurate)
 {
   int32_t damage = 5*(P_Random()%3+1);
   angle_t angle = mo->angle;

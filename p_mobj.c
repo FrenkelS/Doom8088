@@ -33,6 +33,9 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
+#include "compiler.h"
 #include "doomdef.h"
 #include "d_player.h"
 #include "m_random.h"
@@ -52,7 +55,7 @@
 #include "globdata.h"
 
 
-void A_CyberAttack(mobj_t *actor);
+void A_CyberAttack(mobj_t __far* actor);
 
 
 //
@@ -60,7 +63,7 @@ void A_CyberAttack(mobj_t *actor);
 // Returns true if the mobj is still present.
 //
 
-boolean P_SetMobjState(mobj_t* mobj, statenum_t state)
+boolean P_SetMobjState(mobj_t __far* mobj, statenum_t state)
 {
     const state_t*	st;
 
@@ -108,7 +111,7 @@ boolean P_SetMobjState(mobj_t* mobj, statenum_t state)
 // P_ExplodeMissile
 //
 
-static void P_ExplodeMissile (mobj_t* mo)
+static void P_ExplodeMissile(mobj_t __far* mo)
   {
   mo->momx = mo->momy = mo->momz = 0;
 
@@ -135,7 +138,7 @@ static void P_ExplodeMissile (mobj_t* mo)
 #define MAXMOVE         (30*FRACUNIT)
 #define STOPSPEED       (FRACUNIT/16)
 
-static void P_XYMovement (mobj_t* mo)
+static void P_XYMovement(mobj_t __far* mo)
 {
     player_t *player;
     fixed_t xmove, ymove;
@@ -207,7 +210,7 @@ static void P_XYMovement (mobj_t* mo)
 
                     if (_g_ceilingline)
                     {
-                        const sector_t* ceilingBackSector = LN_BACKSECTOR(_g_ceilingline);
+                        const sector_t __far* ceilingBackSector = LN_BACKSECTOR(_g_ceilingline);
 
                         if(ceilingBackSector && ceilingBackSector->ceilingpic == skyflatnum)
                         {
@@ -323,7 +326,7 @@ static void P_XYMovement (mobj_t* mo)
 
 #define GRAVITY         FRACUNIT
 
-static void P_ZMovement (mobj_t* mo)
+static void P_ZMovement(mobj_t __far* mo)
 {
 
     // check for smooth step up
@@ -442,13 +445,13 @@ static void P_ZMovement (mobj_t* mo)
 // P_NightmareRespawn
 //
 
-static void P_NightmareRespawn(mobj_t* mobj)
+static void P_NightmareRespawn(mobj_t __far* mobj)
 {
     fixed_t      x;
     fixed_t      y;
     fixed_t      z;
-    subsector_t* ss;
-    mobj_t*      mo;
+    subsector_t __far* ss;
+    mobj_t __far*      mo;
 
     /* haleyjd: stupid nightmare respawning bug fix
    *
@@ -523,7 +526,7 @@ static void P_NightmareRespawn(mobj_t* mobj)
 }
 
 
-void P_MobjThinker (mobj_t* mobj)
+void P_MobjThinker (mobj_t __far* mobj)
 {
     // killough 11/98:
     // removed old code which looked at target references
@@ -588,7 +591,7 @@ void P_MobjThinker (mobj_t* mobj)
 //Thinker function for stuff that doesn't need to do anything
 //interesting.
 //Just cycles through the states. Allows sprite animation to work.
-static void P_MobjBrainlessThinker(mobj_t* mobj)
+static void P_MobjBrainlessThinker(mobj_t __far* mobj)
 {
     // cycle through states,
     // calling action functions at transitions
@@ -606,7 +609,7 @@ static void P_MobjBrainlessThinker(mobj_t* mobj)
 
 
 
-static think_t P_ThinkerFunctionForType(mobjtype_t type, mobj_t* mobj)
+static think_t P_ThinkerFunctionForType(mobjtype_t type, mobj_t __far* mobj)
 {
     //Full thinking ability.
     if(type < MT_MISC0)
@@ -624,16 +627,16 @@ static think_t P_ThinkerFunctionForType(mobjtype_t type, mobj_t* mobj)
 // P_SpawnMobj
 //
 
-static mobj_t* P_NewMobj()
+static mobj_t __far* P_NewMobj()
 {
-    mobj_t* mobj = NULL;
+    mobj_t __far* mobj = NULL;
 
     for(int32_t i = _g_thingPoolSize-1; i >= 0; i--)
     {
         if(_g_thingPool[i].type == MT_NOTHING)
         {
             mobj = &_g_thingPool[i];
-            memset (mobj, 0, sizeof (*mobj));
+            _fmemset (mobj, 0, sizeof (*mobj));
 
             mobj->flags = MF_POOLED;
             return mobj;
@@ -643,18 +646,18 @@ static mobj_t* P_NewMobj()
     if(mobj == NULL)
     {
         mobj = Z_MallocLevel(sizeof(*mobj), NULL);
-        memset (mobj, 0, sizeof (*mobj));
+        _fmemset (mobj, 0, sizeof (*mobj));
     }
 
     return mobj;
 }
 
-mobj_t* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
+mobj_t __far* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
 {
     const state_t*    st;
     const mobjinfo_t* info;
 
-    mobj_t*     mobj = P_NewMobj();
+    mobj_t __far*     mobj = P_NewMobj();
 
     info = &mobjinfo[type];
     mobj->type = type;
@@ -708,7 +711,7 @@ mobj_t* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
 // P_RemoveMobj
 //
 
-void P_RemoveMobj (mobj_t* mobj)
+void P_RemoveMobj(mobj_t __far* mobj)
 {
   P_UnsetThingPosition (mobj);
 
@@ -782,7 +785,7 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
   fixed_t   x;
   fixed_t   y;
   fixed_t   z;
-  mobj_t*   mobj;
+  mobj_t __far*   mobj;
 
   // not playing?
 
@@ -841,10 +844,10 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 // already be in host byte order.
 //
 
-void P_SpawnMapThing (const mapthing_t* mthing)
+void P_SpawnMapThing(const mapthing_t __far* mthing)
 {
     int32_t     i;
-    mobj_t* mobj;
+    mobj_t __far* mobj;
     fixed_t x;
     fixed_t y;
     fixed_t z;
@@ -954,7 +957,7 @@ void P_SpawnMapThing (const mapthing_t* mthing)
 //
 void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
   {
-  mobj_t* th;
+  mobj_t __far* th;
   // killough 5/5/98: remove dependence on order of evaluation:
   int32_t t = P_Random();
   z += (t - P_Random())<<10;
@@ -978,7 +981,7 @@ void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
 //
 void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int32_t damage)
   {
-  mobj_t* th;
+  mobj_t __far* th;
   // killough 5/5/98: remove dependence on order of evaluation:
   int32_t t = P_Random();
   z += (t - P_Random())<<10;
@@ -1002,7 +1005,7 @@ void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int32_t damage)
 //  and possibly explodes it right there.
 //
 
-static void P_CheckMissileSpawn (mobj_t* th)
+static void P_CheckMissileSpawn(mobj_t __far* th)
   {
   th->tics -= P_Random()&3;
   if (th->tics < 1)
@@ -1028,9 +1031,9 @@ static void P_CheckMissileSpawn (mobj_t* th)
 // P_SpawnMissile
 //
 
-mobj_t* P_SpawnMissile(mobj_t* source,mobj_t* dest,mobjtype_t type)
+mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_t type)
   {
-  mobj_t* th;
+  mobj_t __far* th;
   angle_t an;
   int32_t     dist;
 
@@ -1073,9 +1076,9 @@ mobj_t* P_SpawnMissile(mobj_t* source,mobj_t* dest,mobjtype_t type)
 // Tries to aim at a nearby monster
 //
 
-void P_SpawnPlayerMissile(mobj_t* source,mobjtype_t type)
+void P_SpawnPlayerMissile(mobj_t __far* source, mobjtype_t type)
 {
-	mobj_t *th;
+	mobj_t __far* th;
 	fixed_t x, y, z, slope = 0;
 
 	// see which target is to be aimed at
@@ -1119,7 +1122,7 @@ void P_SpawnPlayerMissile(mobj_t* source,mobjtype_t type)
 }
 
 
-struct player_s* P_MobjIsPlayer(const mobj_t* mobj)
+struct player_s* P_MobjIsPlayer(const mobj_t __far* mobj)
 {
     if(mobj == _g_player.mo)
     {

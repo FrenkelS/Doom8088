@@ -12,6 +12,7 @@
 #      d2  include full sybolic debugging information
 #      ei  force enums to be of type int
 #       j  change char default from unsigned to signed
+#      mm  medium memory model
 #      ml  large memory model
 #      mh  huge memory model
 #      oa  relax aliasing checking
@@ -31,12 +32,12 @@
 #
 # --------------------------------------------------------------------------
 
-#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -ml -wx -za99
-CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -ml -wx -za99
-#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -ml -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
+#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
+CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -mm -wx -za99
+#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -mm -wx -za99
 
 GLOBOBJS = &
  am_map.obj &

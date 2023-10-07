@@ -37,9 +37,11 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include <stdio.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdint.h>
 
+#include "compiler.h"
 #include "doomdef.h"
 #include "d_player.h"
 #include "d_englsh.h"
@@ -85,7 +87,6 @@ typedef struct menu_s
   const struct menu_s*	prevMenu;	// previous menu
   int16_t previtemOn;
 } menu_t;
-
 
 
 //
@@ -165,8 +166,8 @@ static void M_DrawSave(void);
 
 static void M_SetupNextMenu(const menu_t *menudef);
 static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot);
-static void M_WriteText(int16_t x, int16_t y, const char *string);
-static int16_t M_StringWidth(const char *string);
+static void M_WriteText(int16_t x, int16_t y, const char __far* string);
+static int16_t M_StringWidth(const char __far* string);
 static int16_t M_StringHeight(const char *string);
 static void M_StartMessage(const char *string,void (*routine)(int16_t),boolean input);
 static void M_ClearMenus (void);
@@ -361,9 +362,9 @@ static void M_DrawSaveLoad(const char* name)
 
 	V_DrawNamePatch(72 ,LOADGRAPHIC_Y, name);
 
-	const patch_t* lpatch = W_GetLumpByName("M_LSLEFT");
-	const patch_t* mpatch = W_GetLumpByName("M_LSCNTR");
-	const patch_t* rpatch = W_GetLumpByName("M_LSRGHT");
+	const patch_t __far* lpatch = W_GetLumpByName("M_LSLEFT");
+	const patch_t __far* mpatch = W_GetLumpByName("M_LSCNTR");
+	const patch_t __far* rpatch = W_GetLumpByName("M_LSRGHT");
 
 	for (i = 0; i < load_end; i++)
 	{
@@ -983,17 +984,17 @@ void M_StartControlPanel (void)
 }
 
 
-static char* Z_Strdup(const char* s)
+static char __far* Z_Strdup(const char* s)
 {
     const size_t len = strlen(s);
 
     if(!len)
         return NULL;
 
-    char* ptr = Z_MallocStatic(len+1);
+    char __far* ptr = Z_MallocStatic(len+1);
 
     if(ptr)
-        strcpy(ptr, s);
+        _fstrcpy(ptr, s);
 
     return ptr;
 }
@@ -1014,13 +1015,14 @@ void M_Drawer (void)
     if (messageToPrint)
     {
         /* cph - strdup string to writable memory */
-        char *ms = Z_Strdup(messageString);
-        char *p = ms;
+        char __far* ms = Z_Strdup(messageString);
+        char __far* p = ms;
 
         int16_t y = 80 - M_StringHeight(messageString)/2;
         while (*p)
         {
-            char *string = p, c;
+            char __far* string = p;
+            char c;
             while ((c = *p) && *p != '\n')
                 p++;
             *p = 0;
@@ -1165,16 +1167,16 @@ static int16_t font_lump_offset;
 // Find string width from hu_font chars
 //
 
-static int16_t M_StringWidth(const char* string)
+static int16_t M_StringWidth(const char __far* string)
 {
 	int16_t	w = 0;
 
-	for (size_t i = 0; i < strlen(string); i++)
+	for (size_t i = 0; i < _fstrlen(string); i++)
 	{
 		char c = toupper(string[i]);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
-			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
 			w += patch->width;
 			Z_ChangeTagToCache(patch);
 		} else
@@ -1200,9 +1202,9 @@ static int16_t M_StringHeight(const char* string)
 //
 //    Write a string using the hu_font
 //
-static void M_WriteText (int16_t x, int16_t y, const char* string)
+static void M_WriteText (int16_t x, int16_t y, const char __far* string)
 {
-	const char* ch = string;
+	const char __far* ch = string;
 	int16_t cx = x;
 	int16_t cy = y;
 
@@ -1220,7 +1222,7 @@ static void M_WriteText (int16_t x, int16_t y, const char* string)
 		c = toupper(c);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
-			const patch_t* patch = W_GetLumpByNum(c + font_lump_offset);
+			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
 			V_DrawPatchNoScale(cx, cy, patch);
 			cx += patch->width;
 			Z_ChangeTagToCache(patch);

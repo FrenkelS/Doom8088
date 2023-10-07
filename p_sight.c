@@ -79,16 +79,17 @@ static int16_t P_DivlineSide(fixed_t x, fixed_t y, const divline_t *node)
 
 static boolean P_CrossSubsector(int16_t num)
 {
-    const seg_t *seg = _g_segs + _g_subsectors[num].firstline;
+    const seg_t __far* seg = _g_segs + _g_subsectors[num].firstline;
     int16_t count;
     fixed_t opentop = 0, openbottom = 0;
-    const sector_t *front = NULL, *back = NULL;
+    const sector_t __far* front = NULL;
+    const sector_t __far* back  = NULL;
 
     for (count = _g_subsectors[num].numlines; --count >= 0; seg++)
     { // check lines
         int16_t linenum = seg->linenum;
 
-        const line_t *line = &_g_lines[linenum];
+        const line_t __far* line = &_g_lines[linenum];
         divline_t divl;
 
         // allready checked other side?
@@ -126,7 +127,8 @@ static boolean P_CrossSubsector(int16_t num)
         }
 
         // Forget this line if it doesn't cross the line of sight
-        const vertex_t *v1,*v2;
+        const vertex_t __far* v1;
+        const vertex_t __far* v2;
 
         v1 = &line->v1;
         v2 = &line->v2;
@@ -180,7 +182,7 @@ static boolean P_CrossBSPNode(int16_t bspnum)
 {
     while (!(bspnum & NF_SUBSECTOR))
     {
-        const mapnode_t *bsp = nodes + bspnum;
+        const mapnode_t __far* bsp = nodes + bspnum;
 
         divline_t dl;
         dl.x = ((fixed_t)bsp->x << FRACBITS);
@@ -212,10 +214,10 @@ static boolean P_CrossBSPNode(int16_t bspnum)
 //
 // killough 4/20/98: cleaned up, made to use new LOS struct
 
-boolean P_CheckSight(mobj_t *t1, mobj_t *t2)
+boolean P_CheckSight(mobj_t __far* t1, mobj_t __far* t2)
 {
-  const sector_t *s1 = t1->subsector->sector;
-  const sector_t *s2 = t2->subsector->sector;
+  const sector_t __far* s1 = t1->subsector->sector;
+  const sector_t __far* s2 = t2->subsector->sector;
   int32_t pnum = (s1-_g_sectors)*_g_numsectors + (s2-_g_sectors);
 
   // First check for trivial rejection.

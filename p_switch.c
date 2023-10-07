@@ -114,11 +114,7 @@ void P_InitSwitchList(void)
 // to remain active in gametics.
 // No return.
 //
-static void P_StartButton
-( const line_t*       line,
-  bwhere_e      w,
-  int32_t           texture,
-  int32_t           time )
+static void P_StartButton(const line_t __far* line, bwhere_e w, int32_t texture, int32_t time)
 {
   int32_t           i;
 
@@ -153,7 +149,7 @@ static void P_StartButton
 //
 // No return
 //
-void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
+void P_ChangeSwitchTexture(const line_t __far* line, int32_t useAgain)
 {
     /* Rearranged a bit to avoid too much code duplication */
     int16_t     i, sound;
@@ -234,11 +230,7 @@ void P_ChangeSwitchTexture (const line_t* line, int32_t useAgain)
 // Passed the thing using the line, the line being used, and the side used
 // Returns true if a thinker was created
 //
-boolean
-P_UseSpecialLine
-( mobj_t*       thing,
-  const line_t*       line,
-  int32_t           side )
+boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int32_t side)
 {
 
   // e6y
@@ -250,7 +242,7 @@ P_UseSpecialLine
   {
     // pointer to line function is NULL by default, set non-null if
     // line special is push or switch generalized linedef type
-    boolean (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)

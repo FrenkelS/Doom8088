@@ -35,7 +35,9 @@
  *-----------------------------------------------------------------------------*/
 
 #include <math.h>
+#include <stdint.h>
 
+#include "compiler.h"
 #include "d_player.h"
 #include "g_game.h"
 #include "w_wad.h"
@@ -60,26 +62,26 @@
 //
 
 int32_t      _g_numvertexes;
-const vertex_t *_g_vertexes;
+const vertex_t __far* _g_vertexes;
 
-const seg_t    *_g_segs;
+const seg_t    __far* _g_segs;
 
 int32_t      _g_numsectors;
-sector_t *_g_sectors;
+sector_t __far* _g_sectors;
 
 
 static int32_t      numsubsectors;
-subsector_t *_g_subsectors;
+subsector_t __far* _g_subsectors;
 
 
 
 int32_t      _g_numlines;
-const line_t   *_g_lines;
-linedata_t* _g_linedata;
+const line_t   __far* _g_lines;
+linedata_t __far* _g_linedata;
 
 
 static int32_t      numsides;
-side_t   *_g_sides;
+side_t   __far* _g_sides;
 
 // BLOCKMAP
 // Created from axis aligned bounding box
@@ -93,14 +95,14 @@ side_t   *_g_sides;
 int16_t       _g_bmapwidth, _g_bmapheight;  // size in mapblocks
 
 // killough 3/1/98: remove blockmap limit internally:
-const int16_t      *_g_blockmap;
+const int16_t      __far* _g_blockmap;
 
 // offsets in blockmap are from here
-const int16_t      *_g_blockmaplump;
+const int16_t      __far* _g_blockmaplump;
 
 fixed_t   _g_bmaporgx, _g_bmaporgy;     // origin of block map
 
-mobj_t    **_g_blocklinks;           // for thing chains
+mobj_t    __far*__far* _g_blocklinks;           // for thing chains
 
 //
 // REJECT
@@ -111,12 +113,12 @@ mobj_t    **_g_blocklinks;           // for thing chains
 // be used as a PVS lookup as well.
 //
 
-const byte *_g_rejectmatrix;
+const byte __far* _g_rejectmatrix;
 
 // Maintain single and multi player starting spots.
 mapthing_t _g_playerstarts[MAXPLAYERS];
 
-mobj_t*      _g_thingPool;
+mobj_t __far*      _g_thingPool;
 uint32_t _g_thingPoolSize;
 
 
@@ -161,7 +163,7 @@ static void P_LoadVertexes (int16_t lump)
 static void P_LoadSegs (int16_t lump)
 {
     int32_t numsegs = W_LumpLength(lump) / sizeof(seg_t);
-    _g_segs = (const seg_t *)W_GetLumpByNumAutoFree(lump);
+    _g_segs = (const seg_t __far*)W_GetLumpByNumAutoFree(lump);
 
     if (!numsegs)
       I_Error("P_LoadSegs: no segs in level");
@@ -181,12 +183,12 @@ typedef PACKEDATTR_PRE struct {
 static void P_LoadSubsectors (int16_t lump)
 {
   /* cph 2006/07/29 - make data a const mapsubsector_t *, so the loop below is simpler & gives no constness warnings */
-  const mapsubsector_t *data;
+  const mapsubsector_t __far* data;
   int32_t  i;
 
   numsubsectors = W_LumpLength (lump) / sizeof(mapsubsector_t);
   _g_subsectors = Z_CallocLevel(numsubsectors * sizeof(subsector_t));
-  data = (const mapsubsector_t *)W_GetLumpByNumAutoFree(lump);
+  data = (const mapsubsector_t __far*)W_GetLumpByNumAutoFree(lump);
 
   if ((!data) || (!numsubsectors))
     I_Error("P_LoadSubsectors: no subsectors in level");
@@ -214,9 +216,16 @@ typedef PACKEDATTR_PRE struct {
   int16_t tag;
 } PACKEDATTR_POST mapsector_t;
 
+static int16_t R_FlatNumForFarName(const char __far* far_name)
+{
+	uint64_t nameint = *(uint64_t __far*)far_name;
+	char* near_name = (char*)&nameint;
+	return R_FlatNumForName(near_name);
+}
+
 static void P_LoadSectors (int16_t lump)
 {
-  const byte *data;
+  const byte __far* data;
   int32_t  i;
 
   _g_numsectors = W_LumpLength (lump) / sizeof(mapsector_t);
@@ -225,13 +234,13 @@ static void P_LoadSectors (int16_t lump)
 
   for (i=0; i<_g_numsectors; i++)
     {
-      sector_t *ss = _g_sectors + i;
-      const mapsector_t *ms = (const mapsector_t *) data + i;
+      sector_t __far* ss = _g_sectors + i;
+      const mapsector_t __far* ms = (const mapsector_t __far*) data + i;
 
       ss->floorheight = ((int32_t)SHORT(ms->floorheight))<<FRACBITS;
       ss->ceilingheight = ((int32_t)SHORT(ms->ceilingheight))<<FRACBITS;
-      ss->floorpic = R_FlatNumForName(ms->floorpic);
-      ss->ceilingpic = R_FlatNumForName(ms->ceilingpic);
+      ss->floorpic   = R_FlatNumForFarName(ms->floorpic);
+      ss->ceilingpic = R_FlatNumForFarName(ms->ceilingpic);
 
       ss->lightlevel = SHORT(ms->lightlevel);
       ss->special = SHORT(ms->special);
@@ -319,7 +328,7 @@ static boolean P_IsDoomnumAllowed(int16_t doomnum)
 static void P_LoadThings (int16_t lump)
 {
     int32_t  i, numthings = W_LumpLength (lump) / sizeof(mapthing_t);
-    const mapthing_t *data = W_GetLumpByNumAutoFree (lump);
+    const mapthing_t __far* data = W_GetLumpByNumAutoFree (lump);
 
     if ((!data) || (!numthings))
         I_Error("P_LoadThings: no things in level");
@@ -334,7 +343,7 @@ static void P_LoadThings (int16_t lump)
 
     for (i=0; i<numthings; i++)
     {
-        const mapthing_t* mt = &data[i];
+        const mapthing_t __far* mt = &data[i];
 
         if (!P_IsDoomnumAllowed(mt->type))
             continue;
@@ -400,13 +409,13 @@ static void P_LoadSideDefs (int16_t lump)
 
 static void P_LoadSideDefs2(int16_t lump)
 {
-    const byte *data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
+    const byte __far* data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
 
     for (int32_t i = 0; i < numsides; i++)
     {
-        register const mapsidedef_t *msd = (const mapsidedef_t *) data + i;
-        register side_t *sd = _g_sides + i;
-        register sector_t *sec;
+        register const mapsidedef_t __far* msd = (const mapsidedef_t __far*) data + i;
+        register side_t __far* sd = _g_sides + i;
+        register sector_t __far* sec;
 
         sd->textureoffset = msd->textureoffset;
         sd->rowoffset     = msd->rowoffset;
@@ -494,7 +503,7 @@ static void P_LoadReject(int16_t lump)
 // figgi 09/18/00 -- adapted for gl-nodes
 
 // cph - convenient sub-function
-static void P_AddLineToSector(const line_t* li, sector_t* sector)
+static void P_AddLineToSector(const line_t __far* li, sector_t __far* sector)
 {
   sector->lines[sector->linecount++] = li;
 }
@@ -520,14 +529,14 @@ static void M_AddToBox(fixed_t* box,fixed_t x,fixed_t y)
 
 static void P_GroupLines (void)
 {
-    register const line_t *li;
-    register sector_t *sector;
+    register const line_t __far* li;
+    register sector_t __far* sector;
     int32_t i,j, total = _g_numlines;
 
     // figgi
     for (i=0 ; i<numsubsectors ; i++)
     {
-        const seg_t *seg = &_g_segs[_g_subsectors[i].firstline];
+        const seg_t __far* seg = &_g_segs[_g_subsectors[i].firstline];
         _g_subsectors[i].sector = NULL;
         for(j=0; j<_g_subsectors[i].numlines; j++)
         {
@@ -554,7 +563,7 @@ static void P_GroupLines (void)
     }
 
     {  // allocate line tables for each sector
-        const line_t **linebuffer = Z_MallocLevel(total*sizeof(line_t *), NULL);
+        const line_t __far*__far*linebuffer = Z_MallocLevel(total*sizeof(line_t __far*), NULL);
 
         for (i=0, sector = _g_sectors; i<_g_numsectors; i++, sector++)
         {

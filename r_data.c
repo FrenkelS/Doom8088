@@ -34,6 +34,9 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
+#include "compiler.h"
 #include "d_player.h"
 #include "w_wad.h"
 #include "r_main.h"
@@ -86,17 +89,17 @@ typedef PACKEDATTR_PRE struct
 // A maptexture_t describes a rectangular texture, which is composed
 // of one or more mappatch_t structures that arrange graphic patches.
 
-static const texture_t **textures;
+static const texture_t __far*__far* textures;
 
 static void R_LoadTexture(int16_t texture_num)
 {
-    const byte    *pnames = W_GetLumpByName("PNAMES");
-    const int32_t *maptex = W_GetLumpByName("TEXTURE1");
-    const int32_t *directory = maptex+1;
+    const byte    __far* pnames = W_GetLumpByName("PNAMES");
+    const int32_t __far* maptex = W_GetLumpByName("TEXTURE1");
+    const int32_t __far* directory = maptex+1;
 
-    const maptexture_t *mtexture = (const maptexture_t *) ((const byte *)maptex + directory[texture_num]);
+    const maptexture_t __far* mtexture = (const maptexture_t __far*) ((const byte __far*)maptex + directory[texture_num]);
 
-    texture_t* texture = Z_MallocLevel(sizeof(const texture_t) + sizeof(const texpatch_t)*(mtexture->patchcount-1), (void**)&textures[texture_num]);
+    texture_t __far* texture = Z_MallocLevel(sizeof(const texture_t) + sizeof(const texpatch_t)*(mtexture->patchcount-1), (void __far*__far*)&textures[texture_num]);
 
     texture->width      = mtexture->width;
     texture->height     = mtexture->height;
@@ -108,8 +111,8 @@ static void R_LoadTexture(int16_t texture_num)
     texture->widthmask  = w - 1;
 
 
-    texpatch_t* patch = texture->patches;
-    const mappatch_t* mpatch = mtexture->patches;
+    texpatch_t __far* patch = texture->patches;
+    const mappatch_t __far* mpatch = mtexture->patches;
 
     texture->overlapped = false;
 
@@ -121,8 +124,8 @@ static void R_LoadTexture(int16_t texture_num)
         patch->originx = mpatch->originx;
         patch->originy = mpatch->originy;
 
-        char pname[8];
-        strncpy(pname, (const char*)&pnames[mpatch->patch * 8], 8);
+        uint64_t pnameint = *(uint64_t __far*)&pnames[mpatch->patch * 8];
+        char* pname = (char*)&pnameint;
 
         patch->patch_num = W_GetNumForName(pname);
     }
@@ -133,7 +136,7 @@ static void R_LoadTexture(int16_t texture_num)
 
     for (uint8_t j = 0; j < texture->patchcount; j++)
     {
-        const texpatch_t* patch = &texture->patches[j];
+        const texpatch_t __far* patch = &texture->patches[j];
 
         //Check for patch overlaps.
         int16_t l1 = patch->originx;
@@ -144,7 +147,7 @@ static void R_LoadTexture(int16_t texture_num)
             if (k == j)
                 continue;
 
-            const texpatch_t* p2 = &texture->patches[k];
+            const texpatch_t __far* p2 = &texture->patches[k];
 
             //Check for patch overlaps.
             int16_t l2 = p2->originx;
@@ -170,7 +173,7 @@ static void R_LoadTexture(int16_t texture_num)
 
 static int16_t numtextures;
 
-const texture_t* R_GetTexture(int16_t texture)
+const texture_t __far* R_GetTexture(int16_t texture)
 {
 #ifdef RANGECHECK
     if (texture >= numtextures)
@@ -185,24 +188,20 @@ texture = 46; //FIXME not everything has to be the same texture
 
 static int16_t R_GetTextureNumForName(const char* tex_name)
 {
-    //Convert name to uppercase for comparison.
-    char tex_name_upper[9];
+    char tex_name_temp[8];
+    strncpy(tex_name_temp, tex_name, 8);
+    int64_t tex_name_int = *(int64_t*)tex_name_temp;
 
-    strncpy(tex_name_upper, tex_name, 8);
-    tex_name_upper[8] = 0; //Ensure null terminated.
-
-    strupr(tex_name_upper);
-
-    const int32_t *maptex = W_GetLumpByName("TEXTURE1");
-    const int32_t *directory = maptex+1;
+    const int32_t __far* maptex = W_GetLumpByName("TEXTURE1");
+    const int32_t __far* directory = maptex+1;
 
     for (int16_t i = 0; i < numtextures; i++)
     {
         int32_t offset = *directory++;
 
-        const maptexture_t* mtexture = (const maptexture_t *) ( (const byte *)maptex + offset);
+        const maptexture_t __far* mtexture = (const maptexture_t __far*) ( (const byte __far*)maptex + offset);
 
-        if (!strncmp(tex_name_upper, mtexture->name, 8))
+        if (tex_name_int == *(int64_t __far*)mtexture->name)
         {
             Z_ChangeTagToCache(maptex);
             return i;
@@ -248,15 +247,15 @@ int16_t PUREFUNC R_CheckTextureNumForName (const char *tex_name)
 
 static void R_InitTextures()
 {
-	const int32_t* mtex1 = W_GetLumpByName("TEXTURE1");
+	const int32_t __far* mtex1 = W_GetLumpByName("TEXTURE1");
 	numtextures = *mtex1;
 	Z_ChangeTagToCache(mtex1);
 
 	textures = Z_MallocStatic(numtextures*sizeof*textures);
-	memset(textures, 0, numtextures*sizeof*textures);
+	_fmemset(textures, 0, numtextures*sizeof*textures);
 
 	textureheight = Z_MallocStatic(numtextures*sizeof*textureheight);
-	memset(textureheight, 0, numtextures*sizeof*textureheight);
+	_fmemset(textureheight, 0, numtextures*sizeof*textureheight);
 
 	texturetranslation = Z_MallocStatic((numtextures + 1)*sizeof*texturetranslation);
 

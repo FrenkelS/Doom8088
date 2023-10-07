@@ -100,10 +100,7 @@ void P_InitPicAnims (void)
 //
 // Note: if side=1 is specified, it must exist or results undefined
 //
-side_t* getSide
-( int32_t           currentSector,
-  int32_t           line,
-  int32_t           side )
+side_t __far* getSide(int32_t currentSector, int32_t line, int32_t side)
 {
   return &_g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ];
 }
@@ -118,10 +115,7 @@ side_t* getSide
 //
 // Note: if side=1 is specified, it must exist or results undefined
 //
-static sector_t* getSector
-( int32_t           currentSector,
-  int32_t           line,
-  int32_t           side )
+static sector_t __far* getSector(int32_t currentSector, int32_t line, int32_t side)
 {
   return _g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ].sector;
 }
@@ -154,9 +148,7 @@ boolean twoSided
 //
 // Note: returns NULL if not two-sided line, or both sides refer to sector
 //
-sector_t* getNextSector
-( const line_t*       line,
-  sector_t*     sec )
+sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec)
 {
 
 
@@ -177,11 +169,11 @@ sector_t* getNextSector
 // Returns the fixed point value of the lowest floor height
 // in the sector passed or its surrounding sectors.
 //
-fixed_t P_FindLowestFloorSurrounding(sector_t* sec)
+fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec)
 {
   int32_t                 i;
-  const line_t*             check;
-  sector_t*           other;
+  const line_t __far*             check;
+  sector_t __far*           other;
   fixed_t             floor = sec->floorheight;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -205,11 +197,11 @@ fixed_t P_FindLowestFloorSurrounding(sector_t* sec)
 // Passed a sector, returns the fixed point value of the largest
 // floor height in the surrounding sectors, not including that passed
 //
-fixed_t P_FindHighestFloorSurrounding(sector_t *sec)
+fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 {
   int32_t i;
-  const line_t* check;
-  sector_t* other;
+  const line_t __far* check;
+  sector_t __far* other;
   fixed_t floor = -32000*FRACUNIT;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -237,10 +229,10 @@ fixed_t P_FindHighestFloorSurrounding(sector_t *sec)
 //
 // Rewritten by Lee Killough to avoid fixed array and to be faster
 //
-fixed_t P_FindNextHighestFloor(sector_t *sec)
+fixed_t P_FindNextHighestFloor(sector_t __far* sec)
 {
   int32_t currentheight = sec->floorheight;
-  sector_t *other;
+  sector_t __far* other;
   int32_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -273,9 +265,9 @@ fixed_t P_FindNextHighestFloor(sector_t *sec)
 //
 // jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
 //
-fixed_t P_FindNextLowestFloor(sector_t *sec, int32_t currentheight)
+fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight)
 {
-  sector_t *other;
+  sector_t __far* other;
   int32_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -304,10 +296,10 @@ fixed_t P_FindNextLowestFloor(sector_t *sec, int32_t currentheight)
 //
 // jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
 //
-fixed_t P_FindNextLowestCeiling(sector_t *sec)
+fixed_t P_FindNextLowestCeiling(sector_t __far* sec)
 {
   int32_t currentheight = sec->ceilingheight;
-  sector_t *other;
+  sector_t __far* other;
   int32_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -336,10 +328,10 @@ fixed_t P_FindNextLowestCeiling(sector_t *sec)
 //
 // jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
 //
-fixed_t P_FindNextHighestCeiling(sector_t *sec)
+fixed_t P_FindNextHighestCeiling(sector_t __far* sec)
 {
   int32_t currentheight = sec->ceilingheight;
-  sector_t *other;
+  sector_t __far* other;
   int32_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -364,11 +356,11 @@ fixed_t P_FindNextHighestCeiling(sector_t *sec)
 // Passed a sector, returns the fixed point value of the smallest
 // ceiling height in the surrounding sectors, not including that passed
 //
-fixed_t P_FindLowestCeilingSurrounding(sector_t* sec)
+fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 {
   int32_t                 i;
-  const line_t*             check;
-  sector_t*           other;
+  const line_t __far*             check;
+  sector_t __far*           other;
   fixed_t             height = 32000*FRACUNIT;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -392,11 +384,11 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t* sec)
 // Passed a sector, returns the fixed point value of the largest
 // ceiling height in the surrounding sectors, not including that passed
 //
-fixed_t P_FindHighestCeilingSurrounding(sector_t* sec)
+fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
 {
   int32_t             i;
-  const line_t* check;
-  sector_t*       other;
+  const line_t __far* check;
+  sector_t __far*       other;
   fixed_t height = -32000*FRACUNIT;
 
   for (i=0 ;i < sec->linecount ; i++)
@@ -425,9 +417,9 @@ fixed_t P_FindHighestCeilingSurrounding(sector_t* sec)
 fixed_t P_FindShortestTextureAround(int32_t secnum)
 {
   int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
-  side_t*     side;
+  side_t __far*     side;
   int32_t i;
-  sector_t *sec = &_g_sectors[secnum];
+  sector_t __far* sec = &_g_sectors[secnum];
 
   for (i = 0; i < sec->linecount; i++)
   {
@@ -458,9 +450,9 @@ fixed_t P_FindShortestTextureAround(int32_t secnum)
 fixed_t P_FindShortestUpperAround(int32_t secnum)
 {
   int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
-  side_t*     side;
+  side_t __far*     side;
   int32_t i;
-  sector_t *sec = &_g_sectors[secnum];
+  sector_t __far* sec = &_g_sectors[secnum];
 
   for (i = 0; i < sec->linecount; i++)
   {
@@ -494,10 +486,10 @@ fixed_t P_FindShortestUpperAround(int32_t secnum)
 // jff 3/14/98 change first parameter to plain height to allow call
 //  from routine not using floormove_t
 //
-sector_t *P_FindModelFloorSector(fixed_t floordestheight,int32_t secnum)
+sector_t __far* P_FindModelFloorSector(fixed_t floordestheight,int32_t secnum)
 {
   int32_t i;
-  sector_t *sec=NULL;
+  sector_t __far* sec;
   int32_t linecount;
 
   sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
@@ -536,10 +528,10 @@ sector_t *P_FindModelFloorSector(fixed_t floordestheight,int32_t secnum)
 // jff 3/14/98 change first parameter to plain height to allow call
 //  from routine not using ceiling_t
 //
-sector_t *P_FindModelCeilingSector(fixed_t ceildestheight,int32_t secnum)
+sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight,int32_t secnum)
 {
   int32_t i;
-  sector_t *sec;
+  sector_t __far* sec;
   int32_t linecount;
 
   sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
@@ -565,7 +557,7 @@ sector_t *P_FindModelCeilingSector(fixed_t ceildestheight,int32_t secnum)
 //
 // RETURN NEXT SECTOR # THAT LINE TAG REFERS TO
 //
-int32_t P_FindSectorFromLineTag(const line_t* line, int32_t start)
+int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start)
 {
     int32_t	i;
 
@@ -581,7 +573,7 @@ int32_t P_FindSectorFromLineTag(const line_t* line, int32_t start)
 
 // killough 4/16/98: Same thing, only for linedefs
 
-int32_t P_FindLineFromLineTag(const line_t *line, int32_t start)
+int32_t P_FindLineFromLineTag(const line_t __far* line, int32_t start)
 {
 
     int32_t	i;
@@ -608,14 +600,12 @@ static void P_InitTagLists(void)
 // in a surrounding sector less than that passed. If no smaller light
 // level exists, the light level passed is returned.
 //
-int32_t P_FindMinSurroundingLight
-( sector_t*     sector,
-  int32_t           max )
+int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
 {
   int32_t         i;
   int32_t         min;
-  const line_t*     line;
-  sector_t*   check;
+  const line_t __far*     line;
+  sector_t __far*   check;
 
   min = max;
   for (i=0 ; i < sector->linecount ; i++)
@@ -645,9 +635,7 @@ int32_t P_FindMinSurroundingLight
 // jff 02/05/98 routine added to test for unlockability of
 //  generalized locked doors
 //
-boolean P_CanUnlockGenDoor
-( const line_t* line,
-  player_t* player)
+boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player)
 {
   // does this line special distinguish between skulls and keys?
   int32_t skulliscard = (LN_SPECIAL(line) & LockedNKeys)>>LockedNKeysShift;
@@ -795,7 +783,7 @@ boolean P_CanUnlockGenDoor
 // jff 2/23/98 added to prevent old demos from
 //  succeeding in starting multiple specials on one sector
 //
-boolean PUREFUNC P_SectorActive(special_e t, const sector_t *sec)
+boolean PUREFUNC P_SectorActive(special_e t, const sector_t __far* sec)
 {
     switch (t)             // return whether thinker of same type is active
     {
@@ -822,7 +810,7 @@ boolean PUREFUNC P_SectorActive(special_e t, const sector_t *sec)
 //
 // jff 2/27/98 Added to check for zero tag allowed for regular special types
 //
-boolean P_CheckTag(const line_t *line)
+boolean P_CheckTag(const line_t __far* line)
 {
   /* tag not zero, allowed, or
    * killough 11/98: compatibility option */
@@ -913,7 +901,7 @@ boolean P_CheckTag(const line_t *line)
 //  crossed. Change is qualified by demo_compatibility.
 //
 // CPhipps - take a line_t pointer instead of a line number, as in MBF
-void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
+void P_CrossSpecialLine(const line_t __far* line, int32_t side, mobj_t __far* thing)
 {
   int32_t         ok;
 
@@ -935,7 +923,7 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
 
     // pointer to line function is NULL by default, set non-null if
     // line special is walkover generalized linedef type
-    boolean (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
@@ -1791,13 +1779,11 @@ void P_CrossSpecialLine(const line_t *line, int32_t side, mobj_t *thing)
 // of the line, should the sector already be in motion when the line is
 // impacted. Change is qualified by demo_compatibility.
 //
-void P_ShootSpecialLine
-( mobj_t*       thing,
-  const line_t*       line )
+void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 {
     // pointer to line function is NULL by default, set non-null if
     // line special is gun triggered generalized linedef type
-    boolean (*linefunc)(const line_t *line)=NULL;
+    boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
     if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
@@ -1971,7 +1957,7 @@ void P_ShootSpecialLine
 //
 void P_PlayerInSpecialSector (player_t* player)
 {
-  sector_t*   sector;
+  sector_t __far*   sector;
 
   sector = player->mo->subsector->sector;
 
@@ -2155,7 +2141,7 @@ static void P_SpawnScrollers(void);
 // Parses command line parameters.
 void P_SpawnSpecials (void)
 {
-  sector_t*   sector;
+  sector_t __far*   sector;
   int32_t         i;
 
   //  Init special sectors.
@@ -2262,9 +2248,9 @@ void P_SpawnSpecials (void)
 // This is the main scrolling code
 // killough 3/7/98
 
-static void T_Scroll(scroll_t *s)
+static void T_Scroll(scroll_t __far* s)
 {
-    side_t *side  =_g_sides + s->affectee;
+    side_t __far* side  =_g_sides + s->affectee;
     side->textureoffset++;
 }
 
@@ -2288,7 +2274,7 @@ static void T_Scroll(scroll_t *s)
 
 static void Add_Scroller(int32_t affectee)
 {
-  scroll_t *s = Z_CallocLevSpec(sizeof *s);
+  scroll_t __far* s = Z_CallocLevSpec(sizeof *s);
   s->thinker.function = T_Scroll;
   s->affectee = affectee;
   P_AddThinker(&s->thinker);
@@ -2298,7 +2284,7 @@ static void Add_Scroller(int32_t affectee)
 static void P_SpawnScrollers(void)
 {
     int32_t i;
-    const line_t *l = _g_lines;
+    const line_t __far* l = _g_lines;
 
     for (i=0;i<_g_numlines;i++,l++)
     {

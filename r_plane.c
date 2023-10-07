@@ -51,7 +51,7 @@ static int16_t firstflat;
 #if defined FLAT_SPAN
 static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint16_t color)
 {
-	uint16_t* dest = _g_screen + ScreenYToOffset(y) + x1;
+	uint16_t __far* dest = _g_screen + ScreenYToOffset(y) + x1;
 
 	uint16_t count = x2 - x1;
 	uint16_t l = count >> 4;
@@ -125,7 +125,7 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
 #else
 
 
-inline static void R_DrawSpanPixel(uint16_t* dest, const byte* source, const byte* colormap, uint32_t position)
+inline static void R_DrawSpanPixel(uint16_t __far* dest, const byte __far* source, const byte* colormap, uint32_t position)
 {
     uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
 
@@ -136,7 +136,7 @@ inline static void R_DrawSpanPixel(uint16_t* dest, const byte* source, const byt
 typedef struct {
   uint32_t            position;
   uint32_t            step;
-  const byte          *source; // start of a 64*64 tile image
+  const byte          __far* source; // start of a 64*64 tile image
   const lighttable_t  *colormap;
 } draw_span_vars_t;
 
@@ -145,10 +145,10 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_var
 {
     uint16_t count = (x2 - x1);
 
-    const byte *source = dsvars->source;
+    const byte __far* source = dsvars->source;
     const byte *colormap = dsvars->colormap;
 
-    uint16_t* dest = _g_screen + ScreenYToOffset(y) + x1;
+    uint16_t __far* dest = _g_screen + ScreenYToOffset(y) + x1;
 
     const uint32_t step = dsvars->step;
     uint32_t position = dsvars->position;
@@ -234,7 +234,7 @@ static fixed_t distscale(uint8_t x)
 }
 
 
-static int16_t *flattranslation;             // for global animation
+static int16_t __far* flattranslation;             // for global animation
 
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
@@ -280,10 +280,10 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
 #endif
 
 
-#define LOBYTE(w)	(((uint8_t *)&w)[0])
+#define LOBYTE(w)	(((uint8_t __far*)&w)[0])
 
 
-static void R_DoDrawPlane(visplane_t *pl)
+static void R_DoDrawPlane(visplane_t __far* pl)
 {
     if (pl->minx <= pl->maxx)
     {
@@ -336,7 +336,7 @@ void R_DrawPlanes (void)
 {
     for (int8_t i = 0; i < MAXVISPLANES; i++)
     {
-        visplane_t *pl = _g_visplanes[i];
+        visplane_t __far* pl = _g_visplanes[i];
 
         while(pl)
         {

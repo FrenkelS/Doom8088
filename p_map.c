@@ -50,7 +50,7 @@
 #include "globdata.h"
 
 
-static mobj_t    *tmthing;
+static mobj_t    __far* tmthing;
 static fixed_t   tmx;
 static fixed_t   tmy;
 
@@ -66,29 +66,29 @@ fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // keep track of the line that lowers the ceiling,
 // so missiles don't explode against sky hack walls
 
-const line_t    *_g_ceilingline;
-const line_t        *_g_blockline;    /* killough 8/11/98: blocking linedef */
+const line_t    __far* _g_ceilingline;
+const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
 static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-const line_t *_g_spechit[4];
+const line_t __far* _g_spechit[4];
 
 int32_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
-msecnode_t* _g_sector_list;
+msecnode_t __far* _g_sector_list;
 
 static fixed_t   bestslidefrac;
-static const line_t*   bestslideline;
-static mobj_t*   slidemo;
+static const line_t __far*   bestslideline;
+static mobj_t __far*   slidemo;
 static fixed_t   tmxmove;
 static fixed_t   tmymove;
 
-mobj_t*   _g_linetarget; // who got hit (or NULL)
-static mobj_t*   shootthing;
+mobj_t __far*   _g_linetarget; // who got hit (or NULL)
+static mobj_t __far*   shootthing;
 
 // Height if not aiming up or down
 static fixed_t   shootz;
@@ -101,10 +101,11 @@ fixed_t   _g_attackrange;
 static fixed_t  topslope;
 static fixed_t  bottomslope;
 
-static mobj_t *bombsource, *bombspot;
+static mobj_t __far* bombsource;
+static mobj_t __far* bombspot;
 static int32_t bombdamage;
 
-static mobj_t*   usething;
+static mobj_t __far*   usething;
 
 // If "floatok" true, move would be ok
 // if within "tmfloorz - tmceilingz".
@@ -131,7 +132,7 @@ static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 //
 
 
-static boolean PIT_StompThing (mobj_t* thing)
+static boolean PIT_StompThing(mobj_t __far* thing)
   {
   fixed_t blockdist;
 
@@ -164,7 +165,7 @@ static boolean PIT_StompThing (mobj_t* thing)
 // P_TeleportMove
 //
 
-boolean P_TeleportMove (mobj_t* thing,fixed_t x,fixed_t y, boolean boss)
+boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss)
   {
   int32_t     xl;
   int32_t     xh;
@@ -173,7 +174,7 @@ boolean P_TeleportMove (mobj_t* thing,fixed_t x,fixed_t y, boolean boss)
   int32_t     bx;
   int32_t     by;
 
-  subsector_t*  newsubsec;
+  subsector_t __far*  newsubsec;
 
   /* killough 8/9/98: make telefragging more consistent, preserve compatibility */
   telefrag = P_MobjIsPlayer(thing) || boss;
@@ -247,7 +248,7 @@ boolean P_TeleportMove (mobj_t* thing,fixed_t x,fixed_t y, boolean boss)
  * assuming NO movement occurs -- used to avoid sticky situations.
  */
 
-static boolean untouched(const line_t *ld)
+static boolean untouched(const line_t __far* ld)
 {
   fixed_t x, y, tmbbox[4];
   return
@@ -263,7 +264,7 @@ static boolean untouched(const line_t *ld)
 // Adjusts tmfloorz and tmceilingz as lines are contacted
 //
 
-static boolean PIT_CheckLine (const line_t* ld)
+static boolean PIT_CheckLine (const line_t __far* ld)
 {
   if (_g_tmbbox[BOXRIGHT] <= ld->bbox[BOXLEFT]
    || _g_tmbbox[BOXLEFT] >= ld->bbox[BOXRIGHT]
@@ -345,7 +346,7 @@ static boolean PIT_CheckLine (const line_t* ld)
 // PIT_CheckThing
 //
 
-static boolean PIT_CheckThing(mobj_t *thing)
+static boolean PIT_CheckThing(mobj_t __far* thing)
 {
   fixed_t blockdist;
   int32_t damage;
@@ -483,7 +484,7 @@ static boolean PIT_CheckThing(mobj_t *thing)
 //  numspeciallines
 //
 
-boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
+boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   {
   int32_t     xl;
   int32_t     xh;
@@ -491,7 +492,7 @@ boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
   int32_t     yh;
   int32_t     bx;
   int32_t     by;
-  subsector_t*  newsubsec;
+  subsector_t __far*  newsubsec;
 
   tmthing = thing;
 
@@ -561,7 +562,7 @@ boolean P_CheckPosition (mobj_t* thing,fixed_t x,fixed_t y)
 // Attempt to move to a new position,
 // crossing special lines unless MF_TELEPORT is set.
 //
-boolean P_TryMove(mobj_t* thing,fixed_t x,fixed_t y)
+boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
 {
     fixed_t oldx;
     fixed_t oldy;
@@ -636,7 +637,7 @@ boolean P_TryMove(mobj_t* thing,fixed_t x,fixed_t y)
 // If the floor is icy, then you can bounce off a wall.             // phares
 //
 
-static void P_HitSlideLine (const line_t* ld)
+static void P_HitSlideLine(const line_t __far* ld)
 {
     int32_t     side;
     angle_t lineangle;
@@ -708,7 +709,7 @@ static void P_HitSlideLine (const line_t* ld)
 
 static boolean PTR_SlideTraverse (intercept_t* in)
   {
-  const line_t* li;
+  const line_t __far* li;
 
   if (!in->isaline)
     I_Error ("PTR_SlideTraverse: not a line?");
@@ -766,7 +767,7 @@ isblocking:
 //
 // killough 11/98: reformatted
 
-void P_SlideMove(mobj_t *mo)
+void P_SlideMove(mobj_t __far* mo)
 {
   int8_t hitcount = 3;
 
@@ -880,8 +881,8 @@ static fixed_t  aimslope;
 //
 static boolean PTR_AimTraverse (intercept_t* in)
 {
-    const line_t* li;
-    mobj_t* th;
+    const line_t __far* li;
+    mobj_t __far* th;
     fixed_t slope;
     fixed_t thingtopslope;
     fixed_t thingbottomslope;
@@ -979,7 +980,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   fixed_t z;
   fixed_t frac;
 
-  mobj_t* th;
+  mobj_t __far* th;
 
   fixed_t slope;
   fixed_t dist;
@@ -988,7 +989,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   if (in->isaline)
     {
-    const line_t *li = in->d.line;
+    const line_t __far* li = in->d.line;
 
     if (LN_SPECIAL(li))
       P_ShootSpecialLine (shootthing, li);
@@ -1091,7 +1092,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 //
 // P_AimLineAttack
 //
-fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, boolean friend)
+fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boolean friend)
   {
   fixed_t x2;
   fixed_t y2;
@@ -1129,7 +1130,7 @@ fixed_t P_AimLineAttack(mobj_t* t1,angle_t angle,fixed_t distance, boolean frien
 // that will leave linetarget set.
 //
 
-void P_LineAttack(mobj_t* t1, angle_t angle, fixed_t distance, fixed_t slope, int32_t damage)
+void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int32_t damage)
 {
   fixed_t x2;
   fixed_t y2;
@@ -1201,7 +1202,7 @@ static boolean PTR_UseTraverse (intercept_t* in)
 
 static boolean PTR_NoWayTraverse(intercept_t* in)
   {
-  const line_t *ld = in->d.line;
+  const line_t __far* ld = in->d.line;
                                            // This linedef
   return LN_SPECIAL(ld) || !(                 // Ignore specials
    ld->flags & ML_BLOCKING || (            // Always blocking
@@ -1259,7 +1260,7 @@ void P_UseLines (player_t*  player)
 // that caused the explosion at "bombspot".
 //
 
-static boolean PIT_RadiusAttack (mobj_t* thing)
+static boolean PIT_RadiusAttack (mobj_t __far* thing)
   {
   fixed_t dx;
   fixed_t dy;
@@ -1298,7 +1299,7 @@ static boolean PIT_RadiusAttack (mobj_t* thing)
 // P_RadiusAttack
 // Source is the creature that caused the explosion at spot.
 //
-void P_RadiusAttack(mobj_t* spot,mobj_t* source,int32_t damage)
+void P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int32_t damage)
   {
   int32_t x;
   int32_t y;
@@ -1338,14 +1339,14 @@ void P_SetSecnodeFirstpoolToNull(void)
 }
 
 
-inline static msecnode_t* P_GetSecnode(void)
+inline static msecnode_t __far* P_GetSecnode(void)
 {
-  return (msecnode_t*)Z_BMalloc(&secnodezone);
+  return (msecnode_t __far*)Z_BMalloc(&secnodezone);
 }
 
 // P_PutSecnode() returns a node to the freelist.
 
-inline static void P_PutSecnode(msecnode_t* node)
+inline static void P_PutSecnode(msecnode_t __far* node)
 {
   Z_BFree(&secnodezone, node);
 }
@@ -1357,9 +1358,9 @@ inline static void P_PutSecnode(msecnode_t* node)
 // sectors this object appears in. This is called when creating a list of
 // nodes that will get linked in later.
 
-static void P_AddSecnode(sector_t* s, mobj_t* thing)
+static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   {
-  msecnode_t* node;
+  msecnode_t __far* node;
 
   node = _g_sector_list;
   while (node)
@@ -1402,12 +1403,12 @@ static void P_AddSecnode(sector_t* s, mobj_t* thing)
 // sectors this object appears in. Returns a pointer to the next node
 // on the linked list, or NULL.
 
-static msecnode_t* P_DelSecnode(msecnode_t* node)
+static msecnode_t __far* P_DelSecnode(msecnode_t __far* node)
   {
-  msecnode_t* tp;  // prev node on thing thread
-  msecnode_t* tn;  // next node on thing thread
-  msecnode_t* sp;  // prev node on sector thread
-  msecnode_t* sn;  // next node on sector thread
+  msecnode_t __far* tp;  // prev node on thing thread
+  msecnode_t __far* tn;  // next node on thing thread
+  msecnode_t __far* sp;  // prev node on sector thread
+  msecnode_t __far* sn;  // next node on sector thread
 
   if (node)
     {
@@ -1448,7 +1449,7 @@ void P_DelSeclist(void)
 {
 	if (_g_sector_list)
 	{
-		msecnode_t* node = _g_sector_list;
+		msecnode_t __far* node = _g_sector_list;
 		while (node)
 			node = P_DelSecnode(node);
 
@@ -1465,7 +1466,7 @@ void P_DelSeclist(void)
 // at this location, so don't bother with checking impassable or
 // blocking lines.
 
-static boolean PIT_GetSectors(const line_t* ld)
+static boolean PIT_GetSectors(const line_t __far* ld)
   {
   if (_g_tmbbox[BOXRIGHT]  <= ld->bbox[BOXLEFT]   ||
       _g_tmbbox[BOXLEFT]   >= ld->bbox[BOXRIGHT]  ||
@@ -1506,16 +1507,16 @@ static boolean PIT_GetSectors(const line_t* ld)
 // P_CreateSecNodeList alters/creates the sector_list that shows what sectors
 // the object resides in.
 
-void P_CreateSecNodeList(mobj_t* thing)
+void P_CreateSecNodeList(mobj_t __far* thing)
 {
-  mobj_t* saved_tmthing = tmthing; /* cph - see comment at func end */
+  mobj_t __far* saved_tmthing = tmthing; /* cph - see comment at func end */
 
   // First, clear out the existing m_thing fields. As each node is
   // added or verified as needed, m_thing will be set properly. When
   // finished, delete all nodes where m_thing is still NULL. These
   // represent the sectors the Thing has vacated.
 
-  msecnode_t* node = _g_sector_list;
+  msecnode_t __far* node = _g_sector_list;
   while (node)
     {
     node->m_thing = NULL;

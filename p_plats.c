@@ -33,6 +33,9 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
+#include "compiler.h"
 #include "d_player.h"
 #include "m_random.h"
 #include "r_main.h"
@@ -47,15 +50,16 @@
 // New limit-free plat structure -- killough
 
 typedef struct platlist {
-  plat_t *plat;
-  struct platlist *next,**prev;
+  plat_t __far* plat;
+  struct platlist __far* next;
+  struct platlist __far*__far* prev;
 } platlist_t;
 
 
-static platlist_t *activeplats;
+static platlist_t __far* activeplats;
 
 
-static void P_RemoveActivePlat(plat_t* plat);
+static void P_RemoveActivePlat(plat_t __far* plat);
 
 //
 // T_PlatRaise()
@@ -68,7 +72,7 @@ static void P_RemoveActivePlat(plat_t* plat);
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
 
-void T_PlatRaise(plat_t* plat)
+void T_PlatRaise(plat_t __far* plat)
 {
   result_e      res;
 
@@ -190,15 +194,12 @@ void T_PlatRaise(plat_t* plat)
 // and for some plat types, an amount to raise
 // Returns true if a thinker is started, or restarted from stasis
 //
-boolean EV_DoPlat
-( const line_t*       line,
-  plattype_e    type,
-  int32_t           amount )
+boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount)
 {
-  plat_t* plat;
+  plat_t __far* plat;
   int32_t             secnum;
   boolean             rtn;
-  sector_t*       sec;
+  sector_t __far*       sec;
 
   secnum = -1;
   rtn = false;
@@ -353,10 +354,10 @@ boolean EV_DoPlat
 //
 void P_ActivateInStasis(int32_t tag)
 {
-  platlist_t *pl;
+  platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)   // search the active plats
   {
-    plat_t *plat = pl->plat;              // for one in stasis with right tag
+    plat_t __far* plat = pl->plat;              // for one in stasis with right tag
     if (plat->tag == tag && plat->status == in_stasis)
     {
       if (plat->type==toggleUpDn) //jff 3/14/98 reactivate toggle type
@@ -375,12 +376,12 @@ void P_ActivateInStasis(int32_t tag)
 //
 // Passed the linedef that stopped the plat
 //
-void EV_StopPlat(const line_t* line)
+void EV_StopPlat(const line_t __far* line)
 {
-  platlist_t *pl;
+  platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)  // search the active plats
   {
-    plat_t *plat = pl->plat;             // for one with the tag not in stasis
+    plat_t __far* plat = pl->plat;             // for one with the tag not in stasis
     if (plat->status != in_stasis && plat->tag == line->tag)
     {
       plat->oldstatus = plat->status;    // put it in stasis
@@ -398,11 +399,11 @@ void EV_StopPlat(const line_t* line)
 // Passed a pointer to the plat to add
 // Returns nothing
 //
-void P_AddActivePlat(plat_t* plat)
+void P_AddActivePlat(plat_t __far* plat)
 {
-    platlist_t* old_head = activeplats;
+    platlist_t __far* old_head = activeplats;
 
-    platlist_t *list = activeplats = Z_MallocLevel(sizeof *list, (void **)&activeplats);
+    platlist_t __far* list = activeplats = Z_MallocLevel(sizeof *list, (void __far*__far*)&activeplats);
     list->plat = plat;
     plat->list = list;
     if ((list->next = old_head))
@@ -419,9 +420,9 @@ void P_AddActivePlat(plat_t* plat)
 // Passed a pointer to the plat to remove
 // Returns nothing
 //
-static void P_RemoveActivePlat(plat_t* plat)
+static void P_RemoveActivePlat(plat_t __far* plat)
 {
-  platlist_t *list = plat->list;
+  platlist_t __far* list = plat->list;
   plat->sector->floordata = NULL; //jff 2/23/98 multiple thinkers
 
   P_RemoveThinker(&plat->thinker);
@@ -443,7 +444,7 @@ void P_RemoveAllActivePlats(void)
 {
   while (activeplats)
   {
-    platlist_t *next = activeplats->next;
+    platlist_t __far* next = activeplats->next;
     Z_Free(activeplats);
     activeplats = next;
   }

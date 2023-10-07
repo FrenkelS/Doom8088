@@ -44,15 +44,15 @@
 void P_Ticker(void);
 
 void P_InitThinkers(void);
-void P_AddThinker(thinker_t *thinker);
-void P_RemoveThinker(thinker_t *thinker);
-void P_RemoveThing(mobj_t *thing);
+void P_AddThinker(thinker_t __far* thinker);
+void P_RemoveThinker(thinker_t __far* thinker);
+void P_RemoveThing(mobj_t __far* thing);
 
 
-void P_SetTarget(mobj_t **mo, mobj_t *target);
+void P_SetTarget(mobj_t __far*__far* mo, mobj_t __far* target);
 
 
 /* cph 2002/01/13 - iterator for thinker lists */
-thinker_t* P_NextThinker(thinker_t*);
+thinker_t __far* P_NextThinker(thinker_t __far*);
 
 #endif

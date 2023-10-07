@@ -86,8 +86,7 @@ typedef enum {
 //
 // killough 5/5/98: reformatted, cleaned up
 
-static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
-           mobj_t *soundtarget)
+static void P_RecursiveSound(sector_t __far* sec, int32_t soundblocks, mobj_t __far* soundtarget)
 {
   int32_t i;
 
@@ -101,8 +100,8 @@ static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
 
   for (i=0; i<sec->linecount; i++)
     {
-      sector_t *other;
-      const line_t *check = sec->lines[i];
+      sector_t __far* other;
+      const line_t __far* check = sec->lines[i];
 
       if (!(check->flags & ML_TWOSIDED))
         continue;
@@ -127,7 +126,7 @@ static void P_RecursiveSound(sector_t *sec, int32_t soundblocks,
 // If a monster yells at a player,
 // it will alert other monsters to the player.
 //
-void P_NoiseAlert(mobj_t *emitter)
+void P_NoiseAlert(mobj_t __far* emitter)
 {
   validcount++;
   P_RecursiveSound(emitter->subsector->sector, 0, emitter);
@@ -137,9 +136,9 @@ void P_NoiseAlert(mobj_t *emitter)
 // P_CheckMeleeRange
 //
 
-static boolean P_CheckMeleeRange(mobj_t *actor)
+static boolean P_CheckMeleeRange(mobj_t __far* actor)
 {
-  mobj_t *pl = actor->target;
+  mobj_t __far* pl = actor->target;
 
   return  // killough 7/18/98: friendly monsters don't attack other friends
     pl && !(actor->flags & pl->flags & MF_FRIEND) &&
@@ -154,7 +153,7 @@ static boolean P_CheckMeleeRange(mobj_t *actor)
 // killough 12/98
 // This function tries to prevent shooting at friends
 
-static boolean P_HitFriend(mobj_t *actor)
+static boolean P_HitFriend(mobj_t __far* actor)
 {
   return actor->flags & MF_FRIEND && actor->target &&
     (P_AimLineAttack(actor,
@@ -169,7 +168,7 @@ static boolean P_HitFriend(mobj_t *actor)
 //
 // P_CheckMissileRange
 //
-static boolean P_CheckMissileRange(mobj_t *actor)
+static boolean P_CheckMissileRange(mobj_t __far* actor)
 {
   fixed_t dist;
 
@@ -233,12 +232,12 @@ static boolean P_CheckMissileRange(mobj_t *actor)
  * while it goes up or down.
  */
 
-static boolean P_IsOnLift(const mobj_t *actor)
+static boolean P_IsOnLift(const mobj_t __far* actor)
 {
-  const sector_t *sec = actor->subsector->sector;
+  const sector_t __far* sec = actor->subsector->sector;
 
   // Short-circuit: it's on a lift which is active.
-  if (sec->floordata && ((thinker_t *) sec->floordata)->function==T_PlatRaise)
+  if (sec->floordata && ((thinker_t __far*) sec->floordata)->function==T_PlatRaise)
     return true;
 
   return false;
@@ -254,10 +253,10 @@ static boolean P_IsOnLift(const mobj_t *actor)
  * -1 if it is serious. Used for AI.
  */
 
-static int32_t P_IsUnderDamage(mobj_t *actor)
+static int32_t P_IsUnderDamage(mobj_t __far* actor)
 {
-  const struct msecnode_s *seclist;
-  const ceiling_t *cl;             // Crushing ceiling
+  const struct msecnode_s __far* seclist;
+  const ceiling_t __far* cl;             // Crushing ceiling
   int32_t dir = 0;
   for (seclist=actor->touching_sectorlist; seclist; seclist=seclist->m_tnext)
     if ((cl = seclist->m_sector->ceilingdata) &&
@@ -275,7 +274,7 @@ static int32_t P_IsUnderDamage(mobj_t *actor)
 static const fixed_t xspeed[8] = {FRACUNIT,47000,0,-47000,-FRACUNIT,-47000,0,47000};
 static const fixed_t yspeed[8] = {0,47000,FRACUNIT,47000,0,-47000,-FRACUNIT,-47000};
 
-static boolean P_Move(mobj_t *actor)
+static boolean P_Move(mobj_t __far* actor)
 {
   fixed_t tryx, tryy, deltax, deltay, origx, origy;
   boolean try_ok;
@@ -369,7 +368,7 @@ static boolean P_Move(mobj_t *actor)
 // an OpenDoor call is made to start it opening.
 //
 
-static boolean P_TryWalk(mobj_t *actor)
+static boolean P_TryWalk(mobj_t __far* actor)
 {
   if (!P_Move(actor))
     return false;
@@ -386,7 +385,7 @@ static boolean P_TryWalk(mobj_t *actor)
 // determines the new direction to take
 //
 
-static void P_DoNewChaseDir(mobj_t *actor, fixed_t deltax, fixed_t deltay)
+static void P_DoNewChaseDir(mobj_t __far* actor, fixed_t deltax, fixed_t deltay)
 {
   int32_t xdir, ydir, tdir;
   int32_t olddir = actor->movedir;
@@ -454,7 +453,7 @@ static void P_DoNewChaseDir(mobj_t *actor, fixed_t deltax, fixed_t deltay)
 // monsters to free themselves without making them tend to
 // hang over dropoffs.
 
-static boolean PIT_AvoidDropoff(const line_t *line)
+static boolean PIT_AvoidDropoff(const line_t __far* line)
 {
   if (LN_BACKSECTOR(line)                          && // Ignore one-sided linedefs
       _g_tmbbox[BOXRIGHT]  > line->bbox[BOXLEFT]   &&
@@ -490,7 +489,7 @@ static boolean PIT_AvoidDropoff(const line_t *line)
 // Driver for above
 //
 
-static fixed_t P_AvoidDropoff(mobj_t *actor)
+static fixed_t P_AvoidDropoff(mobj_t __far* actor)
 {
   int32_t yh=((_g_tmbbox[BOXTOP]   = actor->y+actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
   int32_t yl=((_g_tmbbox[BOXBOTTOM]= actor->y-actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
@@ -519,9 +518,9 @@ static fixed_t P_AvoidDropoff(mobj_t *actor)
 // killough 9/8/98: Split into two functions
 //
 
-static void P_NewChaseDir(mobj_t *actor)
+static void P_NewChaseDir(mobj_t __far* actor)
 {
-    mobj_t *target = actor->target;
+    mobj_t __far* target = actor->target;
     fixed_t deltax = target->x - actor->x;
     fixed_t deltay = target->y - actor->y;
 
@@ -568,7 +567,7 @@ static void P_NewChaseDir(mobj_t *actor)
 // killough 9/9/98: whether a target is visible to a monster
 //
 
-static boolean P_IsVisible(mobj_t *actor, mobj_t *mo, boolean allaround)
+static boolean P_IsVisible(mobj_t __far* actor, mobj_t __far* mo, boolean allaround)
 {
     if (!allaround)
     {
@@ -586,7 +585,7 @@ static boolean P_IsVisible(mobj_t *actor, mobj_t *mo, boolean allaround)
 // Returns true if a player is targeted.
 //
 
-static boolean P_LookForPlayers(mobj_t *actor, boolean allaround)
+static boolean P_LookForPlayers(mobj_t __far* actor, boolean allaround)
 {
     player_t *player;
 
@@ -619,7 +618,7 @@ static boolean P_LookForPlayers(mobj_t *actor, boolean allaround)
 // killough 9/5/98: look for targets to go after, depending on kind of monster
 //
 
-static boolean P_LookForTargets(mobj_t *actor, int32_t allaround)
+static boolean P_LookForTargets(mobj_t __far* actor, int32_t allaround)
 {
     return P_LookForPlayers (actor, allaround);
 }
@@ -635,9 +634,9 @@ static boolean P_LookForTargets(mobj_t *actor, int32_t allaround)
 // Stay in state until a player is sighted.
 //
 
-void A_Look(mobj_t *actor)
+void A_Look(mobj_t __far* actor)
 {
-    mobj_t *targ = actor->subsector->sector->soundtarget;
+    mobj_t __far* targ = actor->subsector->sector->soundtarget;
     actor->threshold = 0; // any shot will wake up
 
     /* killough 7/18/98:
@@ -701,7 +700,7 @@ void A_Look(mobj_t *actor)
 // so it tries to close as fast as possible
 //
 
-void A_Chase(mobj_t *actor)
+void A_Chase(mobj_t __far* actor)
 {
     if (actor->reactiontime)
         actor->reactiontime--;
@@ -824,7 +823,7 @@ void A_Chase(mobj_t *actor)
 //
 // A_FaceTarget
 //
-void A_FaceTarget(mobj_t *actor)
+void A_FaceTarget(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
@@ -842,7 +841,7 @@ void A_FaceTarget(mobj_t *actor)
 // A_PosAttack
 //
 
-void A_PosAttack(mobj_t *actor)
+void A_PosAttack(mobj_t __far* actor)
 {
   int32_t angle, damage, slope, t;
 
@@ -860,7 +859,7 @@ void A_PosAttack(mobj_t *actor)
   P_LineAttack(actor, angle, MISSILERANGE, slope, damage);
 }
 
-void A_SPosAttack(mobj_t* actor)
+void A_SPosAttack(mobj_t __far* actor)
 {
   int32_t i, bangle, slope;
 
@@ -884,7 +883,7 @@ void A_SPosAttack(mobj_t* actor)
 // A_TroopAttack
 //
 
-void A_TroopAttack(mobj_t *actor)
+void A_TroopAttack(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
@@ -900,7 +899,7 @@ void A_TroopAttack(mobj_t *actor)
   P_SpawnMissile(actor, actor->target, MT_TROOPSHOT);  // launch a missile
 }
 
-void A_SargAttack(mobj_t *actor)
+void A_SargAttack(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
@@ -913,7 +912,7 @@ void A_SargAttack(mobj_t *actor)
 }
 
 
-void A_CyberAttack(mobj_t *actor)
+void A_CyberAttack(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
@@ -922,7 +921,7 @@ void A_CyberAttack(mobj_t *actor)
   P_SpawnMissile(actor, actor->target, MT_ROCKET);
 }
 
-void A_BruisAttack(mobj_t *actor)
+void A_BruisAttack(mobj_t __far* actor)
 {
   if (!actor->target)
     return;
@@ -938,7 +937,7 @@ void A_BruisAttack(mobj_t *actor)
 }
 
 
-void A_Scream(mobj_t *actor)
+void A_Scream(mobj_t __far* actor)
 {
   int32_t sound;
 
@@ -966,18 +965,18 @@ void A_Scream(mobj_t *actor)
   S_StartSound(actor, sound);
 }
 
-void A_XScream(mobj_t *actor)
+void A_XScream(mobj_t __far* actor)
 {
   S_StartSound(actor, sfx_slop);
 }
 
-void A_Pain(mobj_t *actor)
+void A_Pain(mobj_t __far* actor)
 {
   if (mobjinfo[actor->type].painsound)
     S_StartSound(actor, mobjinfo[actor->type].painsound);
 }
 
-void A_Fall(mobj_t *actor)
+void A_Fall(mobj_t __far* actor)
 {
   // actor is on ground, it can be walked over
   actor->flags &= ~MF_SOLID;
@@ -986,7 +985,7 @@ void A_Fall(mobj_t *actor)
 //
 // A_Explode
 //
-void A_Explode(mobj_t *thingy)
+void A_Explode(mobj_t __far* thingy)
 {
   P_RadiusAttack( thingy, thingy->target, 128 );
 }
@@ -997,9 +996,9 @@ void A_Explode(mobj_t *thingy)
 // if on first boss level
 //
 
-void A_BossDeath(mobj_t *mo)
+void A_BossDeath(mobj_t __far* mo)
 {
-    thinker_t *th;
+    thinker_t __far* th;
     line_t    junk;
 
     if (_g_gamemap != 8)
@@ -1016,7 +1015,7 @@ void A_BossDeath(mobj_t *mo)
     for (th = _g_thinkerclasscap.next; th != &_g_thinkerclasscap; th = th->next)
         if (th->function == P_MobjThinker)
         {
-            mobj_t *mo2 = (mobj_t *) th;
+            mobj_t __far* mo2 = (mobj_t __far*) th;
             if (mo2 != mo && mo2->type == mo->type && mo2->health > 0)
                 return;         // other boss not dead
         }
@@ -1027,7 +1026,7 @@ void A_BossDeath(mobj_t *mo)
 }
 
 
-void A_PlayerScream(mobj_t *mo)
+void A_PlayerScream(mobj_t __far* mo)
 {
   int32_t sound = sfx_pldeth;  // Default death sound.
   S_StartSound(mo, sound);
