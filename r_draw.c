@@ -228,7 +228,7 @@ static int32_t      worldlow;
 
 static lighttable_t current_colormap[256];
 
-boolean highDetail = false;
+int16_t highDetail = 0;
 
 
 uint16_t validcount = 1;         // increment every time a check is made

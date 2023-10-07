@@ -281,8 +281,6 @@ static void AM_changeWindowLoc(void)
 //
 static void AM_initVariables(void)
 {
-    static const event_t st_notify = { ev_keyup, AM_MSGENTERED, 0, 0 };
-
     automapmode |= am_active;
 
     f_oldloc.x = INT32_MAX;
@@ -296,9 +294,6 @@ static void AM_initVariables(void)
     m_x = (_g_player.mo->x >> FRACTOMAPBITS) - m_w/2;//e6y
     m_y = (_g_player.mo->y >> FRACTOMAPBITS) - m_h/2;//e6y
     AM_changeWindowLoc();
-
-    // inform the status bar of the change
-    ST_Responder(&st_notify);
 }
 
 //
@@ -329,10 +324,7 @@ static void AM_LevelInit(void)
 //
 void AM_Stop (void)
 {
-    static const event_t st_notify = { 0, ev_keyup, AM_MSGEXITED, 0 };
-
     automapmode  = 0;
-    ST_Responder(&st_notify);
     stopped = true;
 }
 
@@ -402,8 +394,8 @@ static void AM_maxOutWindowScale(void)
 boolean AM_Responder
 ( event_t*  ev )
 {
-    int32_t rc;
-    int32_t ch;                                                       // phares
+    boolean rc;
+    int16_t ch;
 
     rc = false;
 

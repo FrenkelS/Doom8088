@@ -81,7 +81,7 @@ extern int16_t       *texturetranslation;
 
 extern fixed_t  viewcos, viewsin;
 
-extern boolean highDetail;
+extern int16_t highDetail;
 
 //
 // Utility functions.

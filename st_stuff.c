@@ -260,25 +260,6 @@ static int32_t      st_oldhealth = -1;
 
 static void ST_Stop(void);
 
-// Respond to keyboard input events,
-//  intercept cheats.
-boolean ST_Responder(const event_t *ev)
-{
-  // Filter automap on/off.
-  if (ev->type == ev_keyup && (ev->data1 & 0xffff0000) == AM_MSGHEADER)
-    {
-      switch(ev->data1)
-        {
-        case AM_MSGENTERED:
-          break;
-
-        case AM_MSGEXITED:
-          break;
-        }
-    }
-
-  return false;
-}
 
 static int16_t ST_calcPainOffset(void)
 {

@@ -776,7 +776,7 @@ void G_UpdateSaveGameStrings()
 }
 
 // killough 3/16/98: add slot info
-void G_LoadGame(int32_t slot)
+void G_LoadGame(int16_t slot)
 {
     savegameslot = slot;
     _g_demoplayback = false;
@@ -822,7 +822,7 @@ static void G_DoLoadGame(void)
 // Called by the menu task.
 //
 
-void G_SaveGame(int32_t slot)
+void G_SaveGame(int16_t slot)
 {
     savegameslot = slot;
     G_DoSaveGame();
