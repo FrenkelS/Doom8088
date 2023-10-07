@@ -35,6 +35,9 @@
 #include "globdata.h"
 
 
+#define DISABLE_STATUS_BAR
+
+
 static void I_SetScreenMode(uint16_t mode);
 static void NORETURN_PRE I_Quit(void) NORETURN_POST;
 
@@ -238,7 +241,11 @@ void I_DrawBuffer(uint16_t __far* buffer)
 {
 	uint16_t __far* src = buffer;
 	uint16_t __far* dst = screen;
+#if defined DISABLE_STATUS_BAR
+	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
+#else
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
+#endif
 		for (uint_fast8_t x = 0; x < (SCREENWIDTH * 2) / 2; x++) {
 			*dst++ = *src++;
 		}
