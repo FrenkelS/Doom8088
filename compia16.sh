@@ -3,6 +3,7 @@ mkdir GCCIA16
 unset CFLAGS
 
 ia16-elf-gcc -c i_main.c   -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
+ia16-elf-gcc -c i_system.c -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c p_map.c    -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
 ia16-elf-gcc -c p_mobj.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program
 ia16-elf-gcc -c p_spec.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program
@@ -25,7 +26,8 @@ export GLOBOBJS+=" hu_stuff.c"
 export GLOBOBJS+=" i_audio.c"
 #export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_main.o"
-export GLOBOBJS+=" i_system.c"
+#export GLOBOBJS+=" i_system.c"
+export GLOBOBJS+=" i_system.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_menu.c"
@@ -74,6 +76,7 @@ export GLOBOBJS+=" z_zone.o"
 ia16-elf-gcc $GLOBOBJS $CFLAGS -o GCCIA16/DOOMIA16.EXE
 
 rm i_main.o
+rm i_system.o
 rm p_map.o
 rm p_mobj.o
 rm p_spec.o
