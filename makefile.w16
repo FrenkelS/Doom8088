@@ -1,5 +1,5 @@
 
-# DOOM8088.EXE makefile
+# DOOM16WC.EXE makefile
 
 # --------------------------------------------------------------------------
 #
@@ -88,7 +88,7 @@ GLOBOBJS = &
  z_bmallo.obj &
  z_zone.obj
 
-WC16\DOOM8088.EXE : $(GLOBOBJS)
+WC16\DOOM16WC.EXE : $(GLOBOBJS)
  cd WC16
  wlink @..\wc16doom.lnk
  cd..

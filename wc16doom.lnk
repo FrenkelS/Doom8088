@@ -1,5 +1,5 @@
 
-# DOOM8088.EXE Linker directive file
+# DOOM16WC.EXE Linker directive file
 
 #option quiet
 option map
@@ -11,7 +11,7 @@ libpath %WATCOM%\lib286
 libpath %WATCOM%\lib286\dos
 lib noemu87.lib
 format dos
-name DOOM8088
+name DOOM16WC
 
 file am_map.obj
 file d_items.obj
