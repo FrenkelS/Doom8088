@@ -48,5 +48,8 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=JPz
 4) Doom8088 needs an IWAD file that has been processed by [GbaWadUtil](https://github.com/doomhack/GbaWadUtil).
    Some lumps in the WAD need to be replaced by the raw pictures from the WAD directory of this repository.
 
-It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2). Run `setenvdj.bat` and `compdj.bat` for DJGPP, and `setenvwc.bat` and `compwc32.bat` for Watcom. For debugging purposes, the Zone memory can be increased significantly this way.
-It's also possible to build a 16-bit version with Watcom: Run `setenvwc.bat` and `compwc16.bat`.
+It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2).
+First run `setenvdj.bat` once and then `compdj.bat` for DJGPP, and `setenvwc.bat` followed by `compwc32.bat` for Watcom.
+For debugging purposes, the Zone memory can be increased significantly this way.
+
+It's also possible to build a 16-bit version with Watcom: Run `setenvwc.bat` followed by `compwc16.bat`.
