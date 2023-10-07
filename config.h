@@ -146,6 +146,15 @@
 #endif
 
 
+#if defined __WATCOMC__
+	#define NORETURN_PRE  __declspec(noreturn)
+	#define NORETURN_POST
+#else
+	#define NORETURN_PRE
+	#define NORETURN_POST __attribute__((__noreturn__))
+#endif
+
+
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 

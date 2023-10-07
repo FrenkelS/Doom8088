@@ -91,7 +91,7 @@ static const angle_t tantoangleTable[2049];
 
 
 static const uint16_t finetangentTable_part_3[1024];
-static const fixed_t  finetangentTable_part_4[1024];
+static const fixed_t  __far finetangentTable_part_4[1024];
 
 static fixed_t finetangent(int16_t x)
 {
@@ -3437,7 +3437,7 @@ static const uint16_t finetangentTable_part_3[1024] =
     64786,64885,64985,65085,65185,65285,65385,65485
 };
 
-static const fixed_t finetangentTable_part_4[1024] =
+static const fixed_t __far finetangentTable_part_4[1024] =
 {
     65586,65686,65787,65888,65989,66091,66192,66294,
     66396,66498,66600,66702,66804,66907,67010,67113,

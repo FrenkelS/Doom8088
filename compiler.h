@@ -33,8 +33,6 @@ typedef uint16_t segment_t;
 
 typedef uint32_t segment_t;
 
-#define halloc(numb,size) malloc(numb*size)
-
 #define __far
 
 #define _fmemchr	memchr
@@ -74,8 +72,8 @@ _go32_dpmi_free_iret_wrapper(&NewInt);
 
 
 
-#elif defined __WATCOMC__
-//Watcom
+#else
+//Watcom and gcc-ia16
 #define __djgpp_nearptr_enable()
 #define __djgpp_conventional_base 0
 

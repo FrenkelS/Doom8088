@@ -119,8 +119,9 @@ static segment_t Z_InitExpandedMemory(void)
 {
 #if defined _M_I86
 	void __far* emsInterruptVector = _dos_getvect(EMS_INT);
-	char __far* emsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
-	if (_fstrncmp(emsDeviceName, "EMMXXXX0", 8))
+	uint64_t __far* actualEmsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
+	uint64_t expectedEmsDeviceName = *(uint64_t*)"EMMXXXX0";
+	if (*actualEmsDeviceName != expectedEmsDeviceName)
 		return 0;
 
 	// EMS detected
@@ -197,33 +198,48 @@ void Z_Shutdown(void)
 }
 
 
+#if defined __DJGPP__ || defined _M_I386
+static unsigned int _dos_allocmem(unsigned int __size, unsigned int *__seg)
+{
+	static uint8_t* ptr;
+
+	if (__size == 0xffff)
+	{
+		int32_t paragraphs = 640 * 1024L / PARAGRAPH_SIZE;
+		ptr = malloc(paragraphs * PARAGRAPH_SIZE);
+
+		// align ptr
+		uint32_t m = (uint32_t) ptr;
+		if ((m & (PARAGRAPH_SIZE - 1)) != 0)
+		{
+			paragraphs--;
+			while ((m & (PARAGRAPH_SIZE - 1)) != 0)
+				m = (uint32_t) ++ptr;
+		}
+
+
+		*__seg = paragraphs;
+	}
+	else
+		*__seg = FP_SEG(ptr);
+
+	return 0;
+}
+#endif
+
+
 //
 // Z_Init
 //
 void Z_Init (void)
 {
-	uint32_t heapSize;
-	int32_t hallocNumb = 640 * 1024L / PARAGRAPH_SIZE;
-	static uint8_t __far* mainzone;
+	// allocate all available conventional memory.
+	unsigned int max, segment;
+	_dos_allocmem(0xffff, &max);
+	_dos_allocmem(max, &segment);
+	static uint8_t __far* mainzone; mainzone = MK_FP(segment, 0);
 
-	// Try to allocate memory.
-	do
-	{
-		mainzone = halloc(hallocNumb, PARAGRAPH_SIZE);
-		hallocNumb--;
-	} while (mainzone == NULL);
-
-	hallocNumb++;
-	heapSize = hallocNumb * PARAGRAPH_SIZE;
-
-	// align mainzone
-	uint32_t m = (uint32_t) mainzone;
-	if ((m & (PARAGRAPH_SIZE - 1)) != 0)
-	{
-		heapSize -= PARAGRAPH_SIZE;
-		while ((m & (PARAGRAPH_SIZE - 1)) != 0)
-			m = (uint32_t) ++mainzone;
-	}
+	uint32_t heapSize = (uint32_t)max * PARAGRAPH_SIZE;
 
 	printf("Standard: %ld bytes\n", heapSize);
 
