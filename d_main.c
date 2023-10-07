@@ -119,7 +119,6 @@ void D_PostEvent(event_t *ev)
     M_Responder(ev) ||
             (_g_gamestate == GS_LEVEL && (
                  C_Responder(ev) ||
-                 ST_Responder(ev) ||
                  AM_Responder(ev)
                  )
              ) ||
@@ -507,7 +506,7 @@ static void D_DoomMainSetup(void)
     printf("ST_Init: Init status bar.\n");
     ST_Init();
 
-    _g_highDetail = false;
+    _g_highDetail = 0;
 
     G_LoadSettings();
 
