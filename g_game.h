@@ -46,8 +46,8 @@ boolean G_Responder(event_t *ev);
 void G_CheckDemoStatus(void);
 void G_DeferedInitNew(skill_t skill);
 void G_DeferedPlayDemo(const char *demo); // CPhipps - const
-void G_LoadGame(int32_t slot); // killough 5/15/98
-void G_SaveGame(int32_t slot); // Called by M_Responder.
+void G_LoadGame(int16_t slot); // killough 5/15/98
+void G_SaveGame(int16_t slot); // Called by M_Responder.
 void G_ExitLevel(void);
 void G_SecretExitLevel(void);
 void G_WorldDone(void);

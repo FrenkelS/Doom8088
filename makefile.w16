@@ -34,8 +34,8 @@
 
 #CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
 #CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
-CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
-#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
+#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
+CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
 #CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -mm -wx -za99
 #CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -mm -wx -za99
 

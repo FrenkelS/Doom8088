@@ -84,9 +84,9 @@ extern boolean    _g_message_dontfuckwithme;
 //
 // defaulted values
 //
-extern int32_t _g_alwaysRun;
+extern int16_t _g_alwaysRun;
 
-extern int32_t _g_highDetail;
+extern int16_t _g_highDetail;
 
 extern boolean _g_menuactive;    // The menus are up
 
@@ -267,7 +267,7 @@ extern enum automapmode_e automapmode;
 extern gamestate_t wipegamestate;
 
 
-extern int32_t showMessages;    // Show messages has default, 0 = off, 1 = on
+extern int16_t showMessages;    // Show messages has default, 0 = off, 1 = on
 
 
 extern uint16_t validcount;         // increment every time a check is made

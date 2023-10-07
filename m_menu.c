@@ -74,7 +74,7 @@ typedef struct
   // choice = menu item #.
   // if status = 2,
   //   choice=0:leftarrow,1:rightarrow
-  void  (*routine)(int32_t choice);
+  void  (*routine)(int16_t choice);
 } menuitem_t;
 
 typedef struct menu_s
@@ -92,9 +92,9 @@ typedef struct menu_s
 //
 // defaulted values
 //
-int32_t _g_alwaysRun;
+int16_t _g_alwaysRun;
 
-int32_t _g_highDetail;
+int16_t _g_highDetail;
 
 static boolean messageToPrint;  // true = message to be printed
 
@@ -115,10 +115,10 @@ static boolean messageNeedsInput; // timed message = no input from user
 char _g_savegamestrings[8][8];
 
 
-int32_t showMessages;
+int16_t showMessages;
 
 
-static void (*messageRoutine)(int32_t response);
+static void (*messageRoutine)(int16_t response);
 
 // we are going to be entering a savegame string
 
@@ -135,25 +135,24 @@ static const char skullName[2][9] = {"M_SKULL1","M_SKULL2"};
 //
 // PROTOTYPES
 //
-static void M_NewGame(int32_t choice);
-static void M_ChooseSkill(int32_t choice);
-static void M_LoadGame(int32_t choice);
-static void M_SaveGame(int32_t choice);
-static void M_Options(int32_t choice);
-static void M_EndGame(int32_t choice);
+static void M_NewGame(int16_t choice);
+static void M_ChooseSkill(int16_t choice);
+static void M_LoadGame(int16_t choice);
+static void M_SaveGame(int16_t choice);
+static void M_Options(int16_t choice);
+static void M_EndGame(int16_t choice);
 
 
-static void M_ChangeMessages(int32_t choice);
-static void M_ChangeAlwaysRun(int32_t choice);
-static void M_ChangeDetail(int32_t choice);
-static void M_ChangeGamma(int32_t choice);
-static void M_SfxVol(int32_t choice);
-static void M_MusicVol(int32_t choice);
-void M_StartGame(int32_t choice);
-static void M_Sound(int32_t choice);
+static void M_ChangeMessages(int16_t choice);
+static void M_ChangeAlwaysRun(int16_t choice);
+static void M_ChangeDetail(int16_t choice);
+static void M_ChangeGamma(int16_t choice);
+static void M_SfxVol(int16_t choice);
+static void M_MusicVol(int16_t choice);
+static void M_Sound(int16_t choice);
 
-static void M_LoadSelect(int32_t choice);
-static void M_SaveSelect(int32_t choice);
+static void M_LoadSelect(int16_t choice);
+static void M_SaveSelect(int16_t choice);
 static void M_ReadSaveStrings(void);
 void M_QuickSave(void);
 void M_QuickLoad(void);
@@ -170,13 +169,8 @@ static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t therm
 static void M_WriteText(int16_t x, int16_t y, const char __far* string);
 static int16_t M_StringWidth(const char __far* string);
 static int16_t M_StringHeight(const char *string);
-static void M_StartMessage(const char *string,void (*routine)(int32_t),boolean input);
+static void M_StartMessage(const char *string,void (*routine)(int16_t),boolean input);
 static void M_ClearMenus (void);
-
-// phares 3/30/98
-// prototypes added to support Setup Menus and Extended HELP screens
-
-void M_Setup(int32_t choice);
 
 
 // end of prototypes added to support Setup Menus and Extended HELP screens
@@ -282,7 +276,7 @@ static void M_DrawNewGame(void)
   V_DrawNamePatch(54, 38, "M_SKILL");
 }
 
-static void M_NewGame(int32_t choice)
+static void M_NewGame(int16_t choice)
 {
 	UNUSED(choice);
 
@@ -291,7 +285,7 @@ static void M_NewGame(int32_t choice)
 }
 
 // CPhipps - static
-static void M_VerifyNightmare(int32_t ch)
+static void M_VerifyNightmare(int16_t ch)
 {
     if (ch != key_enter)
         return;
@@ -299,7 +293,7 @@ static void M_VerifyNightmare(int32_t ch)
     G_DeferedInitNew(nightmare);
 }
 
-static void M_ChooseSkill(int32_t choice)
+static void M_ChooseSkill(int16_t choice)
 {
     if (choice == nightmare)
     {   // Ty 03/27/98 - externalized
@@ -405,7 +399,7 @@ static void M_DrawLoad(void)
 // User wants to load this game
 //
 
-static void M_LoadSelect(int32_t choice)
+static void M_LoadSelect(int16_t choice)
 {
   // CPhipps - Modified so savegame filename is worked out only internal
   //  to g_game.c, this only passes the slot.
@@ -419,7 +413,7 @@ static void M_LoadSelect(int32_t choice)
 // Selected from DOOM menu
 //
 
-static void M_LoadGame (int32_t choice)
+static void M_LoadGame (int16_t choice)
 {
 	UNUSED(choice);
 
@@ -478,7 +472,7 @@ static void M_DrawSave(void)
 //
 // M_Responder calls this when user is finished
 //
-static void M_DoSave(int32_t slot)
+static void M_DoSave(int16_t slot)
 {
   G_SaveGame (slot);
   M_ClearMenus ();
@@ -487,7 +481,7 @@ static void M_DoSave(int32_t slot)
 //
 // User wants to save. Start string input for M_Responder
 //
-static void M_SaveSelect(int32_t choice)
+static void M_SaveSelect(int16_t choice)
 {
     M_DoSave(choice);
 }
@@ -495,7 +489,7 @@ static void M_SaveSelect(int32_t choice)
 //
 // Selected from DOOM menu
 //
-static void M_SaveGame (int32_t choice)
+static void M_SaveGame (int16_t choice)
 {
 	UNUSED(choice);
 
@@ -575,7 +569,7 @@ static void M_DrawOptions(void)
   M_DrawThermo(OptionsDef.x + 158, OptionsDef.y+LINEHEIGHT*gamma+2,6,_g_gamma);
 }
 
-static void M_Options(int32_t choice)
+static void M_Options(int16_t choice)
 {
 	UNUSED(choice);
 
@@ -632,14 +626,14 @@ static void M_DrawSound(void)
   M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (music_vol + 1), 16, snd_MusicVolume);
 }
 
-static void M_Sound(int32_t choice)
+static void M_Sound(int16_t choice)
 {
 	UNUSED(choice);
 
 	M_SetupNextMenu(&SoundDef);
 }
 
-static void M_SfxVol(int32_t choice)
+static void M_SfxVol(int16_t choice)
 {
   switch(choice)
     {
@@ -658,7 +652,7 @@ static void M_SfxVol(int32_t choice)
   S_SetSfxVolume(snd_SfxVolume /* *8 */);
 }
 
-static void M_MusicVol(int32_t choice)
+static void M_MusicVol(int16_t choice)
 {
   switch(choice)
     {
@@ -682,7 +676,7 @@ static void M_MusicVol(int32_t choice)
 // M_EndGame
 //
 
-static void M_EndGameResponse(int32_t ch)
+static void M_EndGameResponse(int16_t ch)
 {
   if (ch != key_enter)
     return;
@@ -695,7 +689,7 @@ static void M_EndGameResponse(int32_t ch)
   D_StartTitle ();
 }
 
-static void M_EndGame(int32_t choice)
+static void M_EndGame(int16_t choice)
 {
 	UNUSED(choice);
 
@@ -707,7 +701,7 @@ static void M_EndGame(int32_t choice)
 //    Toggle messages on/off
 //
 
-static void M_ChangeMessages(int32_t choice)
+static void M_ChangeMessages(int16_t choice)
 {
   UNUSED(choice);
 
@@ -721,7 +715,7 @@ static void M_ChangeMessages(int32_t choice)
 }
 
 
-static void M_ChangeAlwaysRun(int32_t choice)
+static void M_ChangeAlwaysRun(int16_t choice)
 {
     UNUSED(choice);
 
@@ -735,7 +729,7 @@ static void M_ChangeAlwaysRun(int32_t choice)
     G_SaveSettings();
 }
 
-static void M_ChangeDetail(int32_t choice)
+static void M_ChangeDetail(int16_t choice)
 {
     UNUSED(choice);
 
@@ -749,7 +743,7 @@ static void M_ChangeDetail(int32_t choice)
     G_SaveSettings();
 }
 
-static void M_ChangeGamma(int32_t choice)
+static void M_ChangeGamma(int16_t choice)
 {
 	switch(choice)
     {
@@ -808,7 +802,7 @@ static void M_InitDefaults(void)
 
 boolean M_Responder (event_t* ev)
 {
-    int32_t    ch;
+    int16_t    ch;
 
     ch = -1; // will be changed to a legit char if we're going to use it here
 
@@ -992,7 +986,7 @@ void M_StartControlPanel (void)
 
 static char __far* Z_Strdup(const char* s)
 {
-    const uint32_t len = strlen(s);
+    const size_t len = strlen(s);
 
     if(!len)
         return NULL;
@@ -1042,7 +1036,7 @@ void M_Drawer (void)
     else
         if (_g_menuactive)
         {
-            int32_t x,y,max,i;
+            int16_t x,y,max,i;
 
             if (currentMenu->routine)
                 currentMenu->routine();     // call Draw routine
@@ -1105,7 +1099,7 @@ void M_Ticker (void)
 // Message Routines
 //
 
-static void M_StartMessage (const char* string, void (*routine)(int32_t), boolean input)
+static void M_StartMessage (const char* string, void (*routine)(int16_t), boolean input)
 {
 	messageLastMenuActive = _g_menuactive;
 	messageToPrint        = true;
