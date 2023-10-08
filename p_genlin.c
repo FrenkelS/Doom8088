@@ -449,6 +449,70 @@ static fixed_t P_FindShortestUpperAround(int16_t secnum)
 
 
 //
+// P_FindNextLowestCeiling()
+//
+// Passed a sector, returns the fixed point value
+// of the largest ceiling height in a surrounding sector smaller than
+// the ceiling height passed. If no such height exists the ceiling height
+// of the passed sector is returned.
+//
+// jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
+//
+static fixed_t P_FindNextLowestCeiling(sector_t __far* sec)
+{
+  fixed_t currentheight = sec->ceilingheight;
+  sector_t __far* other;
+  int16_t i;
+
+  for (i=0 ;i < sec->linecount ; i++)
+    if ((other = getNextSector(sec->lines[i],sec)) &&
+        other->ceilingheight < currentheight)
+    {
+      fixed_t height = other->ceilingheight;
+      while (++i < sec->linecount)
+        if ((other = getNextSector(sec->lines[i],sec)) &&
+            other->ceilingheight > height &&
+            other->ceilingheight < currentheight)
+          height = other->ceilingheight;
+      return height;
+    }
+  return currentheight;
+}
+
+
+//
+// P_FindNextHighestCeiling()
+//
+// Passed a sector, returns the fixed point value
+// of the smallest ceiling height in a surrounding sector larger than
+// the ceiling height passed. If no such height exists the ceiling height
+// of the passed sector is returned.
+//
+// jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
+//
+static fixed_t P_FindNextHighestCeiling(sector_t __far* sec)
+{
+  fixed_t currentheight = sec->ceilingheight;
+  sector_t __far* other;
+  int16_t i;
+
+  for (i=0 ;i < sec->linecount ; i++)
+    if ((other = getNextSector(sec->lines[i],sec)) &&
+         other->ceilingheight > currentheight)
+    {
+      fixed_t height = other->ceilingheight;
+      while (++i < sec->linecount)
+        if ((other = getNextSector(sec->lines[i],sec)) &&
+            other->ceilingheight < height &&
+            other->ceilingheight > currentheight)
+          height = other->ceilingheight;
+      return height;
+    }
+  return currentheight;
+}
+
+
+//
 // EV_DoGenCeiling()
 //
 // Handle generalized ceiling types

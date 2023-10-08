@@ -215,85 +215,21 @@ fixed_t P_FindNextHighestFloor(sector_t __far* sec)
 //
 // jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
 //
-fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight)
+fixed_t P_FindNextLowestFloor(sector_t __far* sec, fixed_t currentheight)
 {
   sector_t __far* other;
-  int32_t i;
+  int16_t i;
 
   for (i=0 ;i < sec->linecount ; i++)
     if ((other = getNextSector(sec->lines[i],sec)) &&
          other->floorheight < currentheight)
     {
-      int32_t height = other->floorheight;
+      fixed_t height = other->floorheight;
       while (++i < sec->linecount)
         if ((other = getNextSector(sec->lines[i],sec)) &&
             other->floorheight > height &&
             other->floorheight < currentheight)
           height = other->floorheight;
-      return height;
-    }
-  return currentheight;
-}
-
-
-//
-// P_FindNextLowestCeiling()
-//
-// Passed a sector, returns the fixed point value
-// of the largest ceiling height in a surrounding sector smaller than
-// the ceiling height passed. If no such height exists the ceiling height
-// of the passed sector is returned.
-//
-// jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
-//
-fixed_t P_FindNextLowestCeiling(sector_t __far* sec)
-{
-  int32_t currentheight = sec->ceilingheight;
-  sector_t __far* other;
-  int32_t i;
-
-  for (i=0 ;i < sec->linecount ; i++)
-    if ((other = getNextSector(sec->lines[i],sec)) &&
-        other->ceilingheight < currentheight)
-    {
-      int32_t height = other->ceilingheight;
-      while (++i < sec->linecount)
-        if ((other = getNextSector(sec->lines[i],sec)) &&
-            other->ceilingheight > height &&
-            other->ceilingheight < currentheight)
-          height = other->ceilingheight;
-      return height;
-    }
-  return currentheight;
-}
-
-
-//
-// P_FindNextHighestCeiling()
-//
-// Passed a sector, returns the fixed point value
-// of the smallest ceiling height in a surrounding sector larger than
-// the ceiling height passed. If no such height exists the ceiling height
-// of the passed sector is returned.
-//
-// jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
-//
-fixed_t P_FindNextHighestCeiling(sector_t __far* sec)
-{
-  int32_t currentheight = sec->ceilingheight;
-  sector_t __far* other;
-  int32_t i;
-
-  for (i=0 ;i < sec->linecount ; i++)
-    if ((other = getNextSector(sec->lines[i],sec)) &&
-         other->ceilingheight > currentheight)
-    {
-      int32_t height = other->ceilingheight;
-      while (++i < sec->linecount)
-        if ((other = getNextSector(sec->lines[i],sec)) &&
-            other->ceilingheight < height &&
-            other->ceilingheight > currentheight)
-          height = other->ceilingheight;
       return height;
     }
   return currentheight;
@@ -308,7 +244,7 @@ fixed_t P_FindNextHighestCeiling(sector_t __far* sec)
 //
 fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 {
-  int32_t                 i;
+  int16_t                 i;
   const line_t __far*             check;
   sector_t __far*           other;
   fixed_t             height = 32000*FRACUNIT;
@@ -370,58 +306,6 @@ int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
     }
 
     return -1;
-}
-
-
-// killough 4/16/98: Same thing, only for linedefs
-
-int16_t P_FindLineFromLineTag(const line_t __far* line, int16_t start)
-{
-
-    int16_t	i;
-
-    for (i=start+1; i<_g_numlines; i++)
-    {
-        if (_g_lines[i].tag == line->tag)
-            return i;
-    }
-
-    return -1;
-}
-
-// Hash the sector tags across the sectors and linedefs.
-static void P_InitTagLists(void)
-{
-
-}
-
-//
-// P_FindMinSurroundingLight()
-//
-// Passed a sector and a light level, returns the smallest light level
-// in a surrounding sector less than that passed. If no smaller light
-// level exists, the light level passed is returned.
-//
-int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
-{
-  int32_t         i;
-  int32_t         min;
-  const line_t __far*     line;
-  sector_t __far*   check;
-
-  min = max;
-  for (i=0 ; i < sector->linecount ; i++)
-  {
-    line = sector->lines[i];
-    check = getNextSector(line,sector);
-
-    if (!check)
-      continue;
-
-    if (check->lightlevel < min)
-      min = check->lightlevel;
-  }
-  return min;
 }
 
 
@@ -2022,11 +1906,6 @@ void P_SpawnSpecials (void)
 
   for (i = 0;i < MAXBUTTONS;i++)
     memset(&_g_buttonlist[i],0,sizeof(button_t));
-
-  // P_InitTagLists() must be called before P_FindSectorFromLineTag()
-  // or P_FindLineFromLineTag() can be called.
-
-  P_InitTagLists();   // killough 1/30/98: Create xref tables for tags
 
   P_SpawnScrollers(); // killough 3/7/98: Add generalized scrollers
 }

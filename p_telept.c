@@ -201,6 +201,24 @@ boolean EV_SilentTeleport(const line_t __far* line, int16_t side, mobj_t __far* 
   return false;
 }
 
+
+// killough 4/16/98: Same thing, only for linedefs
+
+static int16_t P_FindLineFromLineTag(const line_t __far* line, int16_t start)
+{
+
+    int16_t	i;
+
+    for (i=start+1; i<_g_numlines; i++)
+    {
+        if (_g_lines[i].tag == line->tag)
+            return i;
+    }
+
+    return -1;
+}
+
+
 //
 // Silent linedef-based TELEPORTATION, by Lee Killough
 // Primarily for rooms-over-rooms etc.

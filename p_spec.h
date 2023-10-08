@@ -723,23 +723,15 @@ fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec);
 
 fixed_t P_FindNextHighestFloor(sector_t __far* sec);
 
-fixed_t P_FindNextLowestFloor(sector_t __far* sec, int32_t currentheight);
+fixed_t P_FindNextLowestFloor(sector_t __far* sec, fixed_t currentheight);
 
 fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec);
 
 fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec);
 
-fixed_t P_FindNextLowestCeiling(sector_t __far* sec);
-
-fixed_t P_FindNextHighestCeiling(sector_t __far* sec);
-
 sector_t __far* P_FindModelFloorSector(fixed_t floordestheight, int16_t secnum);
 
 int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start);
-
-int16_t P_FindLineFromLineTag(const line_t __far* line, int16_t start);
-
-int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max);
 
 sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec);
 

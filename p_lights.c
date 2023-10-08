@@ -187,6 +187,37 @@ static void T_Glow(glow_t __far* g)
   }
 }
 
+
+//
+// P_FindMinSurroundingLight()
+//
+// Passed a sector and a light level, returns the smallest light level
+// in a surrounding sector less than that passed. If no smaller light
+// level exists, the light level passed is returned.
+//
+static int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
+{
+  int16_t         i;
+  int32_t         min;
+  const line_t __far*     line;
+  sector_t __far*   check;
+
+  min = max;
+  for (i=0 ; i < sector->linecount ; i++)
+  {
+    line = sector->lines[i];
+    check = getNextSector(line,sector);
+
+    if (!check)
+      continue;
+
+    if (check->lightlevel < min)
+      min = check->lightlevel;
+  }
+  return min;
+}
+
+
 //////////////////////////////////////////////////////////
 //
 // Sector lighting type spawners
