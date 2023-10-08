@@ -213,5 +213,5 @@ void F_Drawer (void)
     if (!finalestage)
         F_TextWrite ();
     else
-        W_ReadLumpByName("HELP2", _g_screen);
+        V_DrawRaw("HELP2", 0);
 }

@@ -649,7 +649,7 @@ static void ST_drawWidgets(void)
 static void ST_refreshBackground(void)
 {
 	const uint16_t st_offset = (SCREENHEIGHT - ST_SCALED_HEIGHT) * SCREENWIDTH;
-	W_ReadLumpByName("STBAR", &_g_screen[st_offset]);
+	V_DrawRaw("STBAR", st_offset);
 }
 
 

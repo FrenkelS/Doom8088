@@ -357,7 +357,7 @@ void D_PageTicker(void)
 
 static void D_PageDrawer(void)
 {
-	W_ReadLumpByName("TITLEPIC", _g_screen);
+	V_DrawRaw("TITLEPIC", 0);
 }
 
 //

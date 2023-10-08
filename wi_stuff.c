@@ -232,7 +232,7 @@ static void WI_levelNameLump(int16_t map, char* buf)
 static void WI_slamBackground(void)
 {
   // background
-  W_ReadLumpByName("WIMAP0", _g_screen);
+  V_DrawRaw("WIMAP0", 0);
 }
 
 

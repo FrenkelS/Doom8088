@@ -77,6 +77,12 @@ void V_DrawBackground(void)
 }
 
 
+void V_DrawRaw(const char *name, uint16_t offset)
+{
+	W_ReadLumpByName(name, &_g_screen[offset]);
+}
+
+
 /*
  * This function draws at GBA resolution (ie. not pixel doubled)
  * so the st bar and menus don't look like garbage.
