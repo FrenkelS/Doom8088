@@ -550,9 +550,9 @@ static void T_MoveElevator(elevator_t __far* elevator)
 //
 boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 {
-  int32_t           secnum;
+  int16_t           secnum;
   boolean           rtn;
-  int32_t           i;
+  int16_t           i;
   sector_t __far*     sec;
   floormove_t __far*  floor;
 

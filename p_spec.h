@@ -713,11 +713,9 @@ typedef struct {
 //
 ////////////////////////////////////////////////////////////////
 
-boolean twoSided
-( int32_t sector,
-  int32_t line );
+boolean twoSided(int16_t sector, int16_t line);
 
-side_t __far* getSide(int32_t currentSector, int32_t line, int32_t side);
+side_t __far* getSide(int16_t currentSector, int16_t line, int16_t side);
 
 fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec);
 
@@ -735,15 +733,7 @@ fixed_t P_FindNextLowestCeiling(sector_t __far* sec);
 
 fixed_t P_FindNextHighestCeiling(sector_t __far* sec);
 
-fixed_t P_FindShortestTextureAround
-( int32_t secnum ); // jff 2/04/98
-
-fixed_t P_FindShortestUpperAround
-( int32_t secnum ); // jff 2/04/98
-
-sector_t __far* P_FindModelFloorSector(fixed_t floordestheight, int32_t secnum);
-
-sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight, int32_t secnum);
+sector_t __far* P_FindModelFloorSector(fixed_t floordestheight, int16_t secnum);
 
 int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start);
 

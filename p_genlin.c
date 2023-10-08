@@ -51,6 +51,170 @@
 //////////////////////////////////////////////////////////
 
 //
+// getSide()
+//
+// Will return a side_t*
+//  given the number of the current sector,
+//  the line number, and the side (0/1) that you want.
+//
+// Note: if side=1 is specified, it must exist or results undefined
+//
+side_t __far* getSide(int16_t currentSector, int16_t line, int16_t side)
+{
+  return &_g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ];
+}
+
+
+//
+// getSector()
+//
+// Will return a sector_t*
+//  given the number of the current sector,
+//  the line number and the side (0/1) that you want.
+//
+// Note: if side=1 is specified, it must exist or results undefined
+//
+static sector_t __far* getSector(int16_t currentSector, int16_t line, int16_t side)
+{
+  return _g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ].sector;
+}
+
+
+//
+// twoSided()
+//
+// Given the sector number and the line number,
+//  it will tell you whether the line is two-sided or not.
+//
+// modified to return actual two-sidedness rather than presence
+// of 2S flag unless compatibility optioned
+//
+boolean twoSided(int16_t sector, int16_t line)
+{
+  //jff 1/26/98 return what is actually needed, whether the line
+  //has two sidedefs, rather than whether the 2S flag is set
+
+  return (_g_sectors[sector].lines[line])->sidenum[1] != NO_INDEX;
+}
+
+
+//
+// P_FindShortestTextureAround()
+//
+// Passed a sector number, returns the shortest lower texture on a
+// linedef bounding the sector.
+//
+// jff 02/03/98 Add routine to find shortest lower texture
+//
+static fixed_t P_FindShortestTextureAround(int16_t secnum)
+{
+  int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
+  side_t __far*     side;
+  int16_t i;
+  sector_t __far* sec = &_g_sectors[secnum];
+
+  for (i = 0; i < sec->linecount; i++)
+  {
+    if (twoSided(secnum, i))
+    {
+      side = getSide(secnum,i,0);
+      if (side->bottomtexture > 0)  //jff 8/14/98 texture 0 is a placeholder
+        if (textureheight[side->bottomtexture] < minsize)
+          minsize = textureheight[side->bottomtexture];
+      side = getSide(secnum,i,1);
+      if (side->bottomtexture > 0)  //jff 8/14/98 texture 0 is a placeholder
+        if (textureheight[side->bottomtexture] < minsize)
+          minsize = textureheight[side->bottomtexture];
+    }
+  }
+  return minsize;
+}
+
+
+//
+// P_FindModelFloorSector()
+//
+// Passed a floor height and a sector number, return a pointer to a
+// a sector with that floor height across the lowest numbered two sided
+// line surrounding the sector.
+//
+// Note: If no sector at that height bounds the sector passed, return NULL
+//
+// jff 02/03/98 Add routine to find numeric model floor
+//  around a sector specified by sector number
+// jff 3/14/98 change first parameter to plain height to allow call
+//  from routine not using floormove_t
+//
+sector_t __far* P_FindModelFloorSector(fixed_t floordestheight,int16_t secnum)
+{
+  int16_t i;
+  sector_t __far* sec;
+  int16_t linecount;
+
+  sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
+  //jff 5/23/98 don't disturb sec->linecount while searching
+  // but allow early exit in old demos
+  linecount = sec->linecount;
+  for (i = 0; i < (linecount); i++)
+  {
+    if ( twoSided(secnum, i) )
+    {
+      if (getSide(secnum,i,0)->sector-_g_sectors == secnum)
+          sec = getSector(secnum,i,1);
+      else
+          sec = getSector(secnum,i,0);
+
+      if (sec->floorheight == floordestheight)
+        return sec;
+    }
+  }
+  return NULL;
+}
+
+
+//
+// P_FindModelCeilingSector()
+//
+// Passed a ceiling height and a sector number, return a pointer to a
+// a sector with that ceiling height across the lowest numbered two sided
+// line surrounding the sector.
+//
+// Note: If no sector at that height bounds the sector passed, return NULL
+//
+// jff 02/03/98 Add routine to find numeric model ceiling
+//  around a sector specified by sector number
+//  used only from generalized ceiling types
+// jff 3/14/98 change first parameter to plain height to allow call
+//  from routine not using ceiling_t
+//
+static sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight,int16_t secnum)
+{
+  int16_t i;
+  sector_t __far* sec;
+  int16_t linecount;
+
+  sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
+  //jff 5/23/98 don't disturb sec->linecount while searching
+  // but allow early exit in old demos
+  linecount = sec->linecount;
+  for (i = 0; i < (linecount); i++)
+  {
+    if ( twoSided(secnum, i) )
+    {
+      if (getSide(secnum,i,0)->sector-_g_sectors == secnum)
+          sec = getSector(secnum,i,1);
+      else
+          sec = getSector(secnum,i,0);
+
+      if (sec->ceilingheight == ceildestheight)
+        return sec;
+    }
+  }
+  return NULL;
+}
+
+
+//
 // EV_DoGenFloor()
 //
 // Handle generalized floor types
@@ -63,7 +227,7 @@
 //
 boolean EV_DoGenFloor(const line_t __far* line)
 {
-  int32_t                   secnum;
+  int16_t                   secnum;
   boolean                   rtn;
   boolean               manual;
   sector_t __far*             sec;
@@ -248,6 +412,39 @@ manual_floor:
     if (manual) return rtn;
   }
   return rtn;
+}
+
+
+//
+// P_FindShortestUpperAround()
+//
+// Passed a sector number, returns the shortest upper texture on a
+// linedef bounding the sector.
+//
+// jff 03/20/98 Add routine to find shortest upper texture
+//
+static fixed_t P_FindShortestUpperAround(int16_t secnum)
+{
+  int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
+  side_t __far*     side;
+  int16_t i;
+  sector_t __far* sec = &_g_sectors[secnum];
+
+  for (i = 0; i < sec->linecount; i++)
+  {
+    if (twoSided(secnum, i))
+    {
+      side = getSide(secnum,i,0);
+      if (side->toptexture > 0)     //jff 8/14/98 texture 0 is a placeholder
+        if (textureheight[side->toptexture] < minsize)
+          minsize = textureheight[side->toptexture];
+      side = getSide(secnum,i,1);
+      if (side->toptexture > 0)     //jff 8/14/98 texture 0 is a placeholder
+        if (textureheight[side->toptexture] < minsize)
+          minsize = textureheight[side->toptexture];
+    }
+  }
+  return minsize;
 }
 
 
