@@ -116,7 +116,7 @@ void P_InitSwitchList(void)
 //
 static void P_StartButton(const line_t __far* line, bwhere_e w, int32_t texture, int32_t time)
 {
-  int32_t           i;
+  int16_t           i;
 
   // See if button is already pressed
   for (i = 0;i < MAXBUTTONS;i++)
@@ -230,7 +230,7 @@ void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
 // Passed the thing using the line, the line being used, and the side used
 // Returns true if a thinker was created
 //
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int32_t side)
+boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t side)
 {
 
   // e6y

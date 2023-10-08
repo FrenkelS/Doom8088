@@ -79,7 +79,7 @@ fixed_t CONSTFUNC P_AproxDistance(fixed_t dx, fixed_t dy)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-int32_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* line)
+int16_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* line)
 {
   return
     !line->dx ? x <= line->v1.x ? line->dy > 0 : line->dy < 0 :
@@ -95,9 +95,9 @@ int32_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* lin
 //
 // killough 5/3/98: reformatted, cleaned up
 
-int32_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
+int16_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
 {
-    int32_t p;
+    int16_t p;
     switch (ld->slopetype)
     {
 
@@ -363,7 +363,7 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t __f
     if (!(0 <= x && x < _g_bmapwidth && 0 <= y && y <_g_bmapheight))
         return true;
 
-    const int32_t offset = _g_blockmap[y*_g_bmapwidth+x];
+    const int16_t offset = _g_blockmap[y*_g_bmapwidth+x];
     const int16_t __far* list = _g_blockmaplump+offset;     // original was reading         // phares
 
 
@@ -437,8 +437,8 @@ static boolean check_intercept(void)
 
 static boolean PIT_AddLineIntercepts(const line_t __far* ld)
 {
-  int32_t       s1;
-  int32_t       s2;
+  int16_t       s1;
+  int16_t       s2;
   fixed_t   frac;
   divline_t dl;
 
@@ -485,7 +485,7 @@ static boolean PIT_AddThingIntercepts(mobj_t __far* thing)
 {
   fixed_t   x1, y1;
   fixed_t   x2, y2;
-  int32_t       s1, s2;
+  int16_t       s1, s2;
   divline_t dl;
   fixed_t   frac;
 
@@ -578,7 +578,7 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
   fixed_t xintercept, yintercept;
   int32_t     mapx, mapy;
   int32_t     mapxstep, mapystep;
-  int32_t     count;
+  int16_t     count;
 
   validcount++;
   intercept_p = intercepts;

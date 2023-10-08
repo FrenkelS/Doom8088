@@ -273,7 +273,7 @@ boolean P_GivePower(player_t *player, int32_t power)
 void P_TouchSpecialThing(mobj_t __far* special, mobj_t __far* toucher)
 {
   player_t *player;
-  int32_t      i;
+  int16_t      i;
   int32_t      sound;
   fixed_t  delta = special->z - toucher->z;
 

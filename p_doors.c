@@ -337,7 +337,7 @@ boolean EV_DoLockedDoor(const line_t __far* line, vldoor_e type, mobj_t __far* t
 //
 boolean EV_DoDoor(const line_t __far* line, vldoor_e type)
 {
-  int32_t   secnum;
+  int16_t   secnum;
   boolean   rtn;
   sector_t __far* sec;
   vldoor_t __far* door;
@@ -508,7 +508,7 @@ void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
     if (door->thinker.function == T_VerticalDoor)
     {
       /* cph - we are writing outval to door->direction iff it is non-zero */
-      int32_t outval = 0;
+      int16_t outval = 0;
 
       /* An already moving repeatable door which is being re-pressed, or a
        * monster is trying to open a closing door - so change direction

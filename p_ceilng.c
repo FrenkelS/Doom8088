@@ -255,7 +255,7 @@ void T_MoveCeiling (ceiling_t __far* ceiling)
 //
 boolean EV_DoCeiling(const line_t __far* line, ceiling_e type)
 {
-  int32_t   secnum;
+  int16_t   secnum;
   boolean   rtn;
   sector_t __far* sec;
   ceiling_t __far* ceiling;

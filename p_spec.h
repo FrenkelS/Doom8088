@@ -735,9 +735,9 @@ fixed_t P_FindNextHighestCeiling(sector_t __far* sec);
 
 sector_t __far* P_FindModelFloorSector(fixed_t floordestheight, int16_t secnum);
 
-int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start);
+int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start);
 
-int32_t P_FindLineFromLineTag(const line_t __far* line, int32_t start);
+int16_t P_FindLineFromLineTag(const line_t __far* line, int16_t start);
 
 int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max);
 
@@ -772,7 +772,7 @@ void T_MoveCeiling(ceiling_t __far* ceiling);
 
 // p_floor
 
-result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int32_t floorOrCeiling, int32_t direction);
+result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int16_t floorOrCeiling, int16_t direction);
 
 void T_MoveFloor(floormove_t __far* floor);
 
@@ -784,13 +784,13 @@ void T_MoveFloor(floormove_t __far* floor);
 
 // p_telept
 
-boolean EV_Teleport(const line_t __far* line, int32_t side, mobj_t __far* thing);
+boolean EV_Teleport(const line_t __far* line, int16_t side, mobj_t __far* thing);
 
 // killough 2/14/98: Add silent teleporter
-boolean EV_SilentTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing);
+boolean EV_SilentTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing);
 
 // killough 1/31/98: Add silent line teleporter
-boolean EV_SilentLineTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing, boolean reverse);
+boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing, boolean reverse);
 
 // p_floor
 
@@ -874,11 +874,11 @@ void P_UpdateSpecials(void);
 void P_UpdateAnimatedFlat(void);
 
 // when needed
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int32_t side);
+boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t side);
 
 void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line);
 
-void P_CrossSpecialLine(const line_t __far* line, int32_t side, mobj_t __far* thing);
+void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __far* thing);
 
 void P_PlayerInSpecialSector
 ( player_t* player );
@@ -889,7 +889,7 @@ void P_SpawnFireFlicker(sector_t __far* sector);
 
 void P_SpawnLightFlash(sector_t __far* sector);
 
-void P_SpawnStrobeFlash(sector_t __far* sector, int32_t fastOrSlow, int32_t inSync);
+void P_SpawnStrobeFlash(sector_t __far* sector, int16_t fastOrSlow, boolean inSync);
 
 void P_SpawnGlowingLight(sector_t __far* sector);
 

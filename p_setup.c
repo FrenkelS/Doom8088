@@ -335,7 +335,7 @@ static void P_LoadThings (int16_t lump)
     _g_thingPool = Z_CallocLevel(numthings * sizeof(mobj_t));
     _g_thingPoolSize = numthings;
 
-    for(int32_t i = 0; i < numthings; i++)
+    for(int16_t i = 0; i < numthings; i++)
     {
         _g_thingPool[i].type = MT_NOTHING;
     }
@@ -410,7 +410,7 @@ static void P_LoadSideDefs2(int16_t lump)
 {
     const byte __far* data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
 
-    for (int32_t i = 0; i < numsides; i++)
+    for (int16_t i = 0; i < numsides; i++)
     {
         register const mapsidedef_t __far* msd = (const mapsidedef_t __far*) data + i;
         register side_t __far* sd = _g_sides + i;
@@ -423,7 +423,7 @@ static void P_LoadSideDefs2(int16_t lump)
         uint16_t sector_num = SHORT(msd->sector);
         if (sector_num >= _g_numsectors)
         {
-            printf("P_LoadSideDefs2: sidedef %li has out-of-range sector num %u\n", i, sector_num);
+            printf("P_LoadSideDefs2: sidedef %i has out-of-range sector num %u\n", i, sector_num);
             sector_num = 0;
         }
         sd->sector = sec = &_g_sectors[sector_num];
@@ -530,7 +530,7 @@ static void P_GroupLines (void)
 {
     register const line_t __far* li;
     register sector_t __far* sector;
-    int32_t i,j, total = _g_numlines;
+    int16_t i,j, total = _g_numlines;
 
     // figgi
     for (i=0 ; i<numsubsectors ; i++)
@@ -585,7 +585,7 @@ static void P_GroupLines (void)
         fixed_t bbox[4];
         M_ClearBox(bbox);
 
-        for(int32_t l = 0; l < sector->linecount; l++)
+        for(int16_t l = 0; l < sector->linecount; l++)
         {
             M_AddToBox (bbox, sector->lines[l]->v1.x, sector->lines[l]->v1.y);
             M_AddToBox (bbox, sector->lines[l]->v2.x, sector->lines[l]->v2.y);

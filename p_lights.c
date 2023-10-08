@@ -127,11 +127,11 @@ typedef struct
 {
   thinker_t thinker;
   sector_t __far* sector;
-  int32_t count;
+  int16_t count;
   int32_t minlight;
   int32_t maxlight;
-  int32_t darktime;
-  int32_t brighttime;
+  int16_t darktime;
+  int16_t brighttime;
 
 } strobe_t;
 
@@ -262,7 +262,7 @@ void P_SpawnLightFlash (sector_t __far* sector)
 //
 // Returns nothing
 //
-void P_SpawnStrobeFlash(sector_t __far* sector, int32_t fastOrSlow, int32_t inSync)
+void P_SpawnStrobeFlash(sector_t __far* sector, int16_t fastOrSlow, boolean inSync)
 {
   strobe_t __far* flash;
 
@@ -329,7 +329,7 @@ void P_SpawnGlowingLight(sector_t __far* sector)
 //
 void EV_StartLightStrobing(const line_t __far* line)
 {
-  int32_t   secnum;
+  int16_t   secnum;
   sector_t __far* sec;
 
   secnum = -1;
@@ -341,7 +341,7 @@ void EV_StartLightStrobing(const line_t __far* line)
     if (P_SectorActive(lighting_special,sec)) //jff 2/22/98
       continue;
 
-    P_SpawnStrobeFlash (sec,SLOWDARK, 0);
+    P_SpawnStrobeFlash (sec,SLOWDARK, false);
   }
 }
 
@@ -354,7 +354,7 @@ void EV_StartLightStrobing(const line_t __far* line)
 //
 void EV_TurnTagLightsOff(const line_t __far* line)
 {
-  int32_t j;
+  int16_t j;
 
   // search sectors for those with same tag as activating line
 
@@ -363,7 +363,7 @@ void EV_TurnTagLightsOff(const line_t __far* line)
     {
       sector_t __far* sector = _g_sectors + j;
       sector_t __far* tsec;
-      int32_t i, min = sector->lightlevel;
+      int16_t i, min = sector->lightlevel;
       // find min neighbor light level
       for (i = 0;i < sector->linecount; i++)
   if ((tsec = getNextSector(sector->lines[i], sector)) &&
@@ -383,7 +383,7 @@ void EV_TurnTagLightsOff(const line_t __far* line)
 //
 void EV_LightTurnOn(const line_t __far* line, int32_t bright)
 {
-  int32_t i;
+  int16_t i;
 
   // search all sectors for ones with same tag as activating line
 
@@ -392,7 +392,7 @@ void EV_LightTurnOn(const line_t __far* line, int32_t bright)
     {
       sector_t __far* temp;
       sector_t __far* sector = _g_sectors+i;
-      int32_t j, tbright = bright; //jff 5/17/98 search for maximum PER sector
+      int16_t j, tbright = bright; //jff 5/17/98 search for maximum PER sector
 
       // bright = 0 means to search for highest light level surrounding sector
 
@@ -420,7 +420,7 @@ void EV_LightTurnOn(const line_t __far* line, int32_t bright)
 
 void EV_LightTurnOnPartway(const line_t __far* line, fixed_t level)
 {
-  int32_t i;
+  int16_t i;
 
   if (level < 0)          // clip at extremes
     level = 0;
@@ -432,7 +432,7 @@ void EV_LightTurnOnPartway(const line_t __far* line, fixed_t level)
     {
       sector_t __far* temp;
       sector_t __far* sector = _g_sectors+i;
-      int32_t j, bright = 0, min = sector->lightlevel;
+      int16_t j, bright = 0, min = sector->lightlevel;
 
       for (j = 0; j < sector->linecount; j++)
   if ((temp = getNextSector(sector->lines[j],sector)))

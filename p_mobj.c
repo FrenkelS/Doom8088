@@ -631,7 +631,7 @@ static mobj_t __far* P_NewMobj()
 {
     mobj_t __far* mobj = NULL;
 
-    for(int32_t i = _g_thingPoolSize-1; i >= 0; i--)
+    for(int16_t i = _g_thingPoolSize-1; i >= 0; i--)
     {
         if(_g_thingPool[i].type == MT_NOTHING)
         {
@@ -752,10 +752,10 @@ void P_RemoveMobj(mobj_t __far* mobj)
  * killough 8/24/98: rewrote to use hashing
  */
 
-static PUREFUNC int32_t P_FindDoomedNum(uint32_t type)
+static PUREFUNC int16_t P_FindDoomedNum(uint32_t type)
 {
     // find which type to spawn
-    for (int32_t i=0 ; i< NUMMOBJTYPES ; i++)
+    for (int16_t i=0 ; i< NUMMOBJTYPES ; i++)
     {
         if (type == mobjinfo[i].doomednum)
             return i;
@@ -846,7 +846,7 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 
 void P_SpawnMapThing(const mapthing_t __far* mthing)
 {
-    int32_t     i;
+    int16_t     i;
     mobj_t __far* mobj;
     fixed_t x;
     fixed_t y;

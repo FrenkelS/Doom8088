@@ -48,7 +48,7 @@
 
 static mobj_t __far* P_TeleportDestination(const line_t __far* line)
 {
-  int32_t i;
+  int16_t i;
   for (i = -1; (i = P_FindSectorFromLineTag(line, i)) >= 0;) {
     register thinker_t __far* th = NULL;
     while ((th = P_NextThinker(th)) != NULL)
@@ -65,7 +65,7 @@ static mobj_t __far* P_TeleportDestination(const line_t __far* line)
 // TELEPORTATION
 //
 
-boolean EV_Teleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
+boolean EV_Teleport(const line_t __far* line, int16_t side, mobj_t __far* thing)
 {
   mobj_t    __far* m;
 
@@ -129,7 +129,7 @@ boolean EV_Teleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
 // Primarily for rooms-over-rooms etc.
 //
 
-boolean EV_SilentTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing)
+boolean EV_SilentTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing)
 {
   mobj_t    __far* m;
 
@@ -211,9 +211,9 @@ boolean EV_SilentTeleport(const line_t __far* line, int32_t side, mobj_t __far* 
 // maximum fixed_t units to move object to avoid hiccups
 #define FUDGEFACTOR 10
 
-boolean EV_SilentLineTeleport(const line_t __far* line, int32_t side, mobj_t __far* thing, boolean reverse)
+boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing, boolean reverse)
 {
-  int32_t i;
+  int16_t i;
   const line_t __far* l;
 
   if (side || thing->flags & MF_MISSILE)
@@ -244,7 +244,7 @@ boolean EV_SilentLineTeleport(const line_t __far* line, int32_t side, mobj_t __f
 
         // Maximum distance thing can be moved away from interpolated
         // exit, to ensure that it is on the correct side of exit linedef
-        int32_t fudge = FUDGEFACTOR;
+        int16_t fudge = FUDGEFACTOR;
 
         // Whether this is a player, and if so, a pointer to its player_t.
         // Voodoo dolls are excluded by making sure thing->player->mo==thing.
@@ -252,7 +252,7 @@ boolean EV_SilentLineTeleport(const line_t __far* line, int32_t side, mobj_t __f
           P_MobjIsPlayer(thing) : NULL;
 
         // Whether walking towards first side of exit linedef steps down
-        int32_t stepdown =
+        int16_t stepdown =
           LN_FRONTSECTOR(l)->floorheight < LN_BACKSECTOR(l)->floorheight;
 
         // Height of thing above ground
@@ -280,7 +280,7 @@ boolean EV_SilentLineTeleport(const line_t __far* line, int32_t side, mobj_t __f
         // Exiting on side 1 slightly improves player viewing
         // when going down a step on a non-reversed teleporter.
 
-        int32_t side = reverse || (player && stepdown);
+        int16_t side = reverse || (player && stepdown);
 
         // Make sure we are on correct side of exit linedef.
         while (P_PointOnLineSide(x, y, l) != side && --fudge>=0)

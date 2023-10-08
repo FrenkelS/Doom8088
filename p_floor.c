@@ -150,7 +150,7 @@ static void PIT_ChangeSector(mobj_t __far* thing)
   _g_nofit = true;
 
   if (_g_crushchange && !(_g_leveltime&3)) {
-    int32_t t;
+    int16_t t;
     P_DamageMobj(thing,NULL,NULL,10);
 
     // spray blood in a random direction
@@ -231,7 +231,7 @@ static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
 //  pastdest - plane moved normally and is now at destination height
 //  crushed - plane encountered an obstacle, is holding until removed
 //
-result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int32_t floorOrCeiling, int32_t direction)
+result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int16_t floorOrCeiling, int16_t direction)
 {
   boolean       flag;
   fixed_t       lastpos;
@@ -764,7 +764,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 //
 boolean EV_DoChange(const line_t __far* line, change_e changetype)
 {
-  int32_t                   secnum;
+  int16_t                   secnum;
   boolean                   rtn;
   sector_t __far*             sec;
   sector_t __far*             secm;
@@ -825,13 +825,13 @@ boolean EV_DoChange(const line_t __far* line, change_e changetype)
  * stairs
  * - Boom fixed the bug, and MBF/PrBoom without comp_stairs work right
  */
-static inline int32_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* l, int32_t start, int32_t min)
+static inline int32_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* l, int16_t start, int16_t min)
 {
   /* Emulate original Doom's linear lower-bounded P_FindSectorFromLineTag
    * as needed */
   do {
     start = P_FindSectorFromLineTag(l,start);
-  } while (start >= 0 && start <= min);
+  } while (0 <= start && start <= min);
   return start;
 }
 
@@ -840,14 +840,14 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
   /* cph 2001/09/22 - cleaned up this function to save my sanity. A separate
    * outer loop index makes the logic much cleared, and local variables moved
    * into the inner blocks helps too */
-  int32_t                   ssec = -1;
-  int32_t                   minssec = -1;
+  int16_t                   ssec = -1;
+  int16_t                   minssec = -1;
   boolean                   rtn = false;
 
   // start a stair at each sector tagged the same as the linedef
   while ((ssec = P_FindSectorFromLineTagWithLowerBound(line,ssec,minssec)) >= 0)
   {
-   int32_t           secnum = ssec;
+   int16_t           secnum = ssec;
    sector_t __far*     sec = &_g_sectors[secnum];
 
     // don't start a stair if the first step's floor is already moving
@@ -856,7 +856,7 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
     int32_t           texture, height;
     fixed_t       stairsize;
     fixed_t       speed;
-    int32_t           ok;
+    boolean           ok;
 
     // create new floor thinker for first step
     rtn = true;
@@ -895,13 +895,13 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
     //   3. Unless already moving, or different texture, then stop building
     do
     {
-      int32_t i;
-      ok = 0;
+      int16_t i;
+      ok = false;
 
       for (i = 0;i < sec->linecount;i++)
       {          
         sector_t __far* tsec = LN_FRONTSECTOR((sec->lines[i]));
-        int32_t newsecnum;
+        int16_t newsecnum;
         if ( !((sec->lines[i])->flags & ML_TWOSIDED) )
           continue;
 
@@ -940,7 +940,7 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
         floor->type = buildStair; //jff 3/31/98 do not leave uninited
         //jff 2/27/98 fix uninitialized crush field
           floor->crush = type==build8? false : true;
-        ok = 1;
+        ok = true;
         break;
       }
     } while(ok);      // continue until no next step is found
@@ -964,9 +964,9 @@ boolean EV_DoDonut(const line_t __far* line)
   sector_t __far* s1;
   sector_t __far* s2;
   sector_t __far* s3;
-  int32_t       secnum;
+  int16_t       secnum;
   boolean       rtn;
-  int32_t       i;
+  int16_t       i;
   floormove_t __far* floor;
 
   secnum = -1;
@@ -1043,7 +1043,7 @@ boolean EV_DoDonut(const line_t __far* line)
 //
 boolean EV_DoElevator(const line_t __far* line, elevator_e elevtype)
 {
-  int32_t                   secnum;
+  int16_t                   secnum;
   boolean                   rtn;
   sector_t __far*             sec;
   elevator_t __far*           elevator;

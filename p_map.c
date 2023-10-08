@@ -613,7 +613,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
         while (_g_numspechit--)
             if (LN_SPECIAL(_g_spechit[_g_numspechit]))  // see if the line was crossed
             {
-                int32_t oldside;
+                int16_t oldside;
                 if ((oldside = P_PointOnLineSide(oldx, oldy, _g_spechit[_g_numspechit])) !=
                         P_PointOnLineSide(thing->x, thing->y, _g_spechit[_g_numspechit]))
                     P_CrossSpecialLine(_g_spechit[_g_numspechit], oldside, thing);
@@ -639,7 +639,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
 
 static void P_HitSlideLine(const line_t __far* ld)
 {
-    int32_t     side;
+    int16_t     side;
     angle_t lineangle;
     angle_t moveangle;
     angle_t deltaangle;
@@ -1155,7 +1155,7 @@ void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slo
 
 static boolean PTR_UseTraverse (intercept_t* in)
   {
-  int32_t side;
+  int16_t side;
 
 
 

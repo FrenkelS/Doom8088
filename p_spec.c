@@ -359,9 +359,9 @@ fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
 //
 // RETURN NEXT SECTOR # THAT LINE TAG REFERS TO
 //
-int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start)
+int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
 {
-    int32_t	i;
+    int16_t	i;
 
     for (i=start+1; i<_g_numsectors; i++)
     {
@@ -375,10 +375,10 @@ int32_t P_FindSectorFromLineTag(const line_t __far* line, int32_t start)
 
 // killough 4/16/98: Same thing, only for linedefs
 
-int32_t P_FindLineFromLineTag(const line_t __far* line, int32_t start)
+int16_t P_FindLineFromLineTag(const line_t __far* line, int16_t start)
 {
 
-    int32_t	i;
+    int16_t	i;
 
     for (i=start+1; i<_g_numlines; i++)
     {
@@ -703,9 +703,9 @@ boolean P_CheckTag(const line_t __far* line)
 //  crossed. Change is qualified by demo_compatibility.
 //
 // CPhipps - take a line_t pointer instead of a line number, as in MBF
-void P_CrossSpecialLine(const line_t __far* line, int32_t side, mobj_t __far* thing)
+void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __far* thing)
 {
-  int32_t         ok;
+  boolean         ok;
 
   //  Things that should never trigger lines
   if (!P_MobjIsPlayer(thing))
@@ -812,7 +812,7 @@ void P_CrossSpecialLine(const line_t __far* line, int32_t side, mobj_t __far* th
 
   if (!P_MobjIsPlayer(thing))
   {
-    ok = 0;
+    ok = false;
     switch(LN_SPECIAL(line))
     {
       case 39:      // teleport trigger
@@ -835,7 +835,7 @@ void P_CrossSpecialLine(const line_t __far* line, int32_t side, mobj_t __far* th
       case 267:
       case 268:
       case 269:
-        ok = 1;
+        ok = true;
         break;
     }
     if (!ok)
@@ -1965,17 +1965,17 @@ void P_SpawnSpecials (void)
 
       case 2:
         // strobe fast
-        P_SpawnStrobeFlash(sector,FASTDARK,0);
+        P_SpawnStrobeFlash(sector,FASTDARK,false);
         break;
 
       case 3:
         // strobe slow
-        P_SpawnStrobeFlash(sector,SLOWDARK,0);
+        P_SpawnStrobeFlash(sector,SLOWDARK,false);
         break;
 
       case 4:
         // strobe fast/death slime
-        P_SpawnStrobeFlash(sector,FASTDARK,0);
+        P_SpawnStrobeFlash(sector,FASTDARK,false);
         sector->special |= 3<<DAMAGE_SHIFT; //jff 3/14/98 put damage bits in
         break;
 
@@ -1996,12 +1996,12 @@ void P_SpawnSpecials (void)
 
       case 12:
         // sync strobe slow
-        P_SpawnStrobeFlash (sector, SLOWDARK, 1);
+        P_SpawnStrobeFlash (sector, SLOWDARK, true);
         break;
 
       case 13:
         // sync strobe fast
-        P_SpawnStrobeFlash (sector, FASTDARK, 1);
+        P_SpawnStrobeFlash (sector, FASTDARK, true);
         break;
 
       case 14:

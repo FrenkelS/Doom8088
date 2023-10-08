@@ -138,7 +138,7 @@ int32_t P_SwitchWeapon(player_t *player)
   const int32_t *prefer = &weapon_preferences[0]; // killough 3/22/98
   int32_t currentweapon = player->readyweapon;
   int32_t newweapon = currentweapon;
-  int32_t i = NUMWEAPONS+1;   // killough 5/2/98
+  int16_t i = NUMWEAPONS+1;   // killough 5/2/98
 
   // killough 2/8/98: follow preferences and fix BFG/SSG bugs
 
@@ -251,7 +251,7 @@ int32_t P_WeaponCycleUp(player_t *player)
 {
     int32_t w = player->readyweapon;
 
-    for(int32_t i = 0; i < NUMWEAPONS; i++)
+    for(int16_t i = 0; i < NUMWEAPONS; i++)
     {
         w++;
         if(w >= NUMWEAPONS)
@@ -302,7 +302,7 @@ int32_t P_WeaponCycleDown(player_t *player)
 {
     int32_t w = player->readyweapon;
 
-    for(int32_t i = 0; i < NUMWEAPONS; i++)
+    for(int16_t i = 0; i < NUMWEAPONS; i++)
     {
         w--;
         if(w < 0)
@@ -358,7 +358,7 @@ int32_t P_WeaponCycleDown(player_t *player)
 boolean P_CheckAmmo(player_t *player)
 {
   ammotype_t ammo = weaponinfo[player->readyweapon].ammo;
-  int32_t count = 1;  // Regular
+  int16_t count = 1;  // Regular
 
   if (player->readyweapon == wp_bfg)  // Minimal amount for one shot varies.
     count = BFGCELLS;
@@ -736,7 +736,7 @@ void A_FirePistol(player_t *player, pspdef_t *psp)
 
 void A_FireShotgun(player_t *player, pspdef_t *psp)
 {
-	int32_t i;
+	int16_t i;
 
 	UNUSED(psp);
 
@@ -805,7 +805,7 @@ void A_Light2 (player_t *player, pspdef_t *psp)
 
 void P_SetupPsprites(player_t *player)
 {
-  int32_t i;
+  int16_t i;
 
   // remove all psprites
   for (i=0; i<NUMPSPRITES; i++)
@@ -824,7 +824,7 @@ void P_SetupPsprites(player_t *player)
 void P_MovePsprites(player_t *player)
 {
   pspdef_t *psp = player->psprites;
-  int32_t i;
+  int16_t i;
 
   // a null state means not active
   // drop tic count and possibly change state

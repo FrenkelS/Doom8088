@@ -196,7 +196,7 @@ void T_PlatRaise(plat_t __far* plat)
 boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount)
 {
   plat_t __far* plat;
-  int32_t             secnum;
+  int16_t             secnum;
   boolean             rtn;
   sector_t __far*       sec;
 

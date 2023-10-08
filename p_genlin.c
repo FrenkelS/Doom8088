@@ -461,7 +461,7 @@ static fixed_t P_FindShortestUpperAround(int16_t secnum)
 //
 boolean EV_DoGenCeiling(const line_t __far* line)
 {
-  int32_t                   secnum;
+  int16_t                   secnum;
   boolean                   rtn;
   boolean               manual;
   fixed_t               targheight;
@@ -666,7 +666,7 @@ manual_ceiling:
 boolean EV_DoGenLift(const line_t __far* line)
 {
   plat_t __far*         plat;
-  int32_t             secnum;
+  int16_t             secnum;
   boolean             rtn;
   boolean         manual;
   sector_t __far*       sec;
@@ -813,12 +813,12 @@ manual_lift:
 //
 boolean EV_DoGenStairs(const line_t __far* line)
 {
-  int32_t                   secnum;
-  int32_t                   osecnum; //jff 3/4/98 preserve loop index
+  int16_t                   secnum;
+  int16_t                   osecnum; //jff 3/4/98 preserve loop index
   int32_t                   height;
-  int32_t                   i;
-  int32_t                   newsecnum;
-  int32_t                   texture;
+  int16_t                   i;
+  int16_t                   newsecnum;
+  int16_t                   texture;
   boolean                   ok;
   boolean                   rtn;
   boolean               manual;
@@ -996,7 +996,7 @@ manual_stair:
 //
 boolean EV_DoGenCrusher(const line_t __far* line)
 {
-  int32_t                   secnum;
+  int16_t                   secnum;
   boolean                   rtn;
   boolean               manual;
   sector_t __far*             sec;
@@ -1092,7 +1092,7 @@ manual_crusher:
 //
 boolean EV_DoGenLockedDoor(const line_t __far* line)
 {
-  int32_t   secnum;
+  int16_t   secnum;
   boolean   rtn;
   sector_t __far* sec;
   vldoor_t __far* door;
@@ -1198,7 +1198,7 @@ manual_locked:
 //
 boolean EV_DoGenDoor(const line_t __far* line)
 {
-  int32_t   secnum;
+  int16_t   secnum;
   boolean   rtn;
   sector_t __far* sec;
   boolean   manual;
