@@ -859,13 +859,6 @@ void P_UpdateAnimatedFlat(void);
 // when needed
 boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t side);
 
-void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line);
-
-void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __far* thing);
-
-void P_PlayerInSpecialSector
-( player_t* player );
-
 // p_lights
 
 void P_SpawnFireFlicker(sector_t __far* sector);

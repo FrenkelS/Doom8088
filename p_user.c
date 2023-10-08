@@ -37,7 +37,9 @@
 
 #include "d_player.h"
 #include "d_event.h"
+#include "m_random.h"
 #include "r_main.h"
+#include "p_inter.h"
 #include "p_map.h"
 #include "p_spec.h"
 #include "p_user.h"
@@ -277,6 +279,121 @@ static void P_DeathThink (player_t* player)
     player->playerstate = PST_REBORN;
 
   }
+
+
+//
+// P_PlayerInSpecialSector()
+//
+// Called every tick frame
+//  that the player origin is in a special sector
+//
+// Changed to ignore sector types the engine does not recognize
+//
+static void P_PlayerInSpecialSector (player_t* player)
+{
+  sector_t __far*   sector;
+
+  sector = player->mo->subsector->sector;
+
+  // Falling, not all the way down yet?
+  // Sector specials don't apply in mid-air
+  if (player->mo->z != sector->floorheight)
+    return;
+
+  // Has hit ground.
+  //jff add if to handle old vs generalized types
+  if (sector->special<32) // regular sector specials
+  {
+    switch (sector->special)
+      {
+      case 5:
+        // 5/10 unit damage per 31 ticks
+        if (!player->powers[pw_ironfeet])
+          if (!(_g_leveltime&0x1f))
+            P_DamageMobj (player->mo, NULL, NULL, 10);
+        break;
+
+      case 7:
+        // 2/5 unit damage per 31 ticks
+        if (!player->powers[pw_ironfeet])
+          if (!(_g_leveltime&0x1f))
+            P_DamageMobj (player->mo, NULL, NULL, 5);
+        break;
+
+      case 16:
+        // 10/20 unit damage per 31 ticks
+      case 4:
+        // 10/20 unit damage plus blinking light (light already spawned)
+        if (!player->powers[pw_ironfeet]
+            || (P_Random()<5) ) // even with suit, take damage
+        {
+          if (!(_g_leveltime&0x1f))
+            P_DamageMobj (player->mo, NULL, NULL, 20);
+        }
+        break;
+
+      case 9:
+        // Tally player in secret sector, clear secret special
+        player->secretcount++;
+        sector->special = 0;
+        break;
+
+      case 11:
+        _g_player.cheats &= ~CF_GODMODE;
+
+        if (!(_g_leveltime&0x1f))
+          P_DamageMobj (player->mo, NULL, NULL, 20);
+
+        if (player->health <= 10)
+          G_ExitLevel();
+        break;
+
+      default:
+        //jff 1/24/98 Don't exit as DOOM2 did, just ignore
+        break;
+      }
+  }
+  else //jff 3/14/98 handle extended sector types for secrets and damage
+  {
+    switch ((sector->special&DAMAGE_MASK)>>DAMAGE_SHIFT)
+    {
+      case 0: // no damage
+        break;
+      case 1: // 2/5 damage per 31 ticks
+        if (!player->powers[pw_ironfeet])
+          if (!(_g_leveltime&0x1f))
+            P_DamageMobj (player->mo, NULL, NULL, 5);
+        break;
+      case 2: // 5/10 damage per 31 ticks
+        if (!player->powers[pw_ironfeet])
+          if (!(_g_leveltime&0x1f))
+            P_DamageMobj (player->mo, NULL, NULL, 10);
+        break;
+      case 3: // 10/20 damage per 31 ticks
+        if (!player->powers[pw_ironfeet]
+            || (P_Random()<5))  // take damage even with suit
+        {
+          if (!(_g_leveltime&0x1f))
+            P_DamageMobj (player->mo, NULL, NULL, 20);
+        }
+        break;
+    }
+    if (sector->special&SECRET_MASK)
+    {
+      player->secretcount++;
+      sector->special &= ~SECRET_MASK;
+      if (sector->special<32) // if all extended bits clear,
+        sector->special=0;    // sector is not special anymore
+    }
+
+    // phares 3/19/98:
+    //
+    // If FRICTION_MASK or PUSH_MASK is set, we don't care at this
+    // point, since the code to deal with those situations is
+    // handled by Thinkers.
+
+  }
+}
 
 
 //
