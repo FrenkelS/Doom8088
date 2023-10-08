@@ -54,6 +54,7 @@
 #include "p_map.h"
 #include "g_game.h"
 #include "p_inter.h"
+#include "p_user.h"
 #include "s_sound.h"
 #include "sounds.h"
 #include "i_system.h"
@@ -563,6 +564,155 @@ boolean P_CheckTag(const line_t __far* line)
       break;
   }
   return false;       // zero tag not allowed
+}
+
+
+// killough 4/16/98: Same thing, only for linedefs
+
+static int16_t P_FindLineFromLineTag(const line_t __far* line, int16_t start)
+{
+
+    int16_t	i;
+
+    for (i=start+1; i<_g_numlines; i++)
+    {
+        if (_g_lines[i].tag == line->tag)
+            return i;
+    }
+
+    return -1;
+}
+
+
+//
+// Silent linedef-based TELEPORTATION, by Lee Killough
+// Primarily for rooms-over-rooms etc.
+// This is the complete player-preserving kind of teleporter.
+// It has advantages over the teleporter with thing exits.
+//
+
+// maximum fixed_t units to move object to avoid hiccups
+#define FUDGEFACTOR 10
+
+static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing, boolean reverse)
+{
+  int16_t i;
+  const line_t __far* l;
+
+  if (side || thing->flags & MF_MISSILE)
+    return false;
+
+  for (i = -1; (i = P_FindLineFromLineTag(line, i)) >= 0;)
+    if ((l=_g_lines+i) != line && LN_BACKSECTOR(l))
+      {
+        // Get the thing's position along the source linedef
+        fixed_t pos = D_abs(line->dx) > D_abs(line->dy) ?
+          FixedDiv(thing->x - line->v1.x, line->dx) :
+          FixedDiv(thing->y - line->v1.y, line->dy) ;
+
+        // Get the angle between the two linedefs, for rotating
+        // orientation and momentum. Rotate 180 degrees, and flip
+        // the position across the exit linedef, if reversed.
+        angle_t angle = (reverse ? pos = FRACUNIT-pos, 0 : ANG180) +
+          R_PointToAngle2(0, 0, l->dx, l->dy) -
+          R_PointToAngle2(0, 0, line->dx, line->dy);
+
+        // Interpolate position across the exit linedef
+        fixed_t x = l->v2.x - FixedMul(pos, l->dx);
+        fixed_t y = l->v2.y - FixedMul(pos, l->dy);
+
+        // Sine, cosine of angle adjustment
+        fixed_t s = finesine(  angle>>ANGLETOFINESHIFT);
+        fixed_t c = finecosine(angle>>ANGLETOFINESHIFT);
+
+        // Maximum distance thing can be moved away from interpolated
+        // exit, to ensure that it is on the correct side of exit linedef
+        int16_t fudge = FUDGEFACTOR;
+
+        // Whether this is a player, and if so, a pointer to its player_t.
+        // Voodoo dolls are excluded by making sure thing->player->mo==thing.
+        player_t *player = P_MobjIsPlayer(thing) && P_MobjIsPlayer(thing)->mo == thing ?
+          P_MobjIsPlayer(thing) : NULL;
+
+        // Whether walking towards first side of exit linedef steps down
+        int16_t stepdown =
+          LN_FRONTSECTOR(l)->floorheight < LN_BACKSECTOR(l)->floorheight;
+
+        // Height of thing above ground
+        fixed_t z = thing->z - thing->floorz;
+
+        // Side to exit the linedef on positionally.
+        //
+        // Notes:
+        //
+        // This flag concerns exit position, not momentum. Due to
+        // roundoff error, the thing can land on either the left or
+        // the right side of the exit linedef, and steps must be
+        // taken to make sure it does not end up on the wrong side.
+        //
+        // Exit momentum is always towards side 1 in a reversed
+        // teleporter, and always towards side 0 otherwise.
+        //
+        // Exiting positionally on side 1 is always safe, as far
+        // as avoiding oscillations and stuck-in-wall problems,
+        // but may not be optimum for non-reversed teleporters.
+        //
+        // Exiting on side 0 can cause oscillations if momentum
+        // is towards side 1, as it is with reversed teleporters.
+        //
+        // Exiting on side 1 slightly improves player viewing
+        // when going down a step on a non-reversed teleporter.
+
+        int16_t side = reverse || (player && stepdown);
+
+        // Make sure we are on correct side of exit linedef.
+        while (P_PointOnLineSide(x, y, l) != side && --fudge>=0)
+          if (D_abs(l->dx) > D_abs(l->dy))
+            y -= l->dx < 0 != side ? -1 : 1;
+          else
+            x += l->dy < 0 != side ? -1 : 1;
+
+        // Attempt to teleport, aborting if blocked
+        if (!P_TeleportMove(thing, x, y, false)) /* killough 8/9/98 */
+          return false;
+
+
+
+        // Adjust z position to be same height above ground as before.
+        // Ground level at the exit is measured as the higher of the
+        // two floor heights at the exit linedef.
+        thing->z = z + _g_sides[l->sidenum[stepdown]].sector->floorheight;
+
+        // Rotate thing's orientation according to difference in linedef angles
+        thing->angle += angle;
+
+        // Momentum of thing crossing teleporter linedef
+        x = thing->momx;
+        y = thing->momy;
+
+        // Rotate thing's momentum to come out of exit just like it entered
+        thing->momx = FixedMul(x, c) - FixedMul(y, s);
+        thing->momy = FixedMul(y, c) + FixedMul(x, s);
+
+        // Adjust a player's view, in case there has been a height change
+        if (player)
+          {
+            // Save the current deltaviewheight, used in stepping
+            fixed_t deltaviewheight = player->deltaviewheight;
+
+            // Clear deltaviewheight, since we don't want any changes now
+            player->deltaviewheight = 0;
+
+            // Set player's view according to the newly set parameters
+            P_CalcHeight(player);
+
+            // Reset the delta to have the same dynamics as before
+            player->deltaviewheight = deltaviewheight;
+          }
+
+        return true;
+      }
+  return false;
 }
 
 

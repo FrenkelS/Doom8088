@@ -781,9 +781,6 @@ boolean EV_Teleport(const line_t __far* line, int16_t side, mobj_t __far* thing)
 // killough 2/14/98: Add silent teleporter
 boolean EV_SilentTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing);
 
-// killough 1/31/98: Add silent line teleporter
-boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing, boolean reverse);
-
 // p_floor
 
 boolean EV_DoElevator(const line_t __far* line, elevator_e type);
