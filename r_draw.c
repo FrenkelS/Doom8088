@@ -695,7 +695,7 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
     const byte __far* source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
-    volatile uint8_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+    volatile uint8_t __far* dest = (uint8_t __far*)(_g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x);
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery)*dcvars->iscale) << COLEXTRABITS;

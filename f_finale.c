@@ -150,38 +150,6 @@ static int32_t Get_TextSpeed(void)
 }
 
 
-/*
- * V_DrawBackground tiles a 64x64 patch over the entire screen, providing the
- * background for the Help and Setup screens, and plot text between levels.
- * cphipps - used to have M_DrawBackground, but that was used the framebuffer
- * directly, so this is my code from the equivalent function in f_finale.c
- */
-static void V_DrawBackground(void)
-{
-    /* erase the entire screen to a tiled background */
-    const byte __far* src = W_GetLumpByName("FLOOR4_8");
-    uint16_t __far* dest = _g_screen;
-
-    for(uint8_t y = 0; y < SCREENHEIGHT; y++)
-    {
-        for(uint16_t x = 0; x < 240; x+=64)
-        {
-            uint16_t __far* d = &dest[ ScreenYToOffset(y) + (x >> 1)];
-            const byte __far* s = &src[((y&63) * 64) + (x&63)];
-
-            uint8_t len = 64;
-
-            if( (240-x) < 64)
-                len = 240-x;
-
-            _fmemcpy(d, s, len);
-        }
-    }
-
-    Z_ChangeTagToCache(src);
-}
-
-
 //
 // F_TextWrite
 //

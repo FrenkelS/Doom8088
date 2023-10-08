@@ -46,6 +46,38 @@
 
 
 /*
+ * V_DrawBackground tiles a 64x64 patch over the entire screen, providing the
+ * background for the Help and Setup screens, and plot text between levels.
+ * cphipps - used to have M_DrawBackground, but that was used the framebuffer
+ * directly, so this is my code from the equivalent function in f_finale.c
+ */
+void V_DrawBackground(void)
+{
+    /* erase the entire screen to a tiled background */
+    const byte __far* src = W_GetLumpByName("FLOOR4_8");
+    uint16_t __far* dest = _g_screen;
+
+    for(uint8_t y = 0; y < SCREENHEIGHT; y++)
+    {
+        for(uint16_t x = 0; x < 240; x+=64)
+        {
+            uint16_t __far* d = &dest[ ScreenYToOffset(y) + (x >> 1)];
+            const byte __far* s = &src[((y&63) * 64) + (x&63)];
+
+            uint8_t len = 64;
+
+            if( (240-x) < 64)
+                len = 240-x;
+
+            _fmemcpy(d, s, len);
+        }
+    }
+
+    Z_ChangeTagToCache(src);
+}
+
+
+/*
  * This function draws at GBA resolution (ie. not pixel doubled)
  * so the st bar and menus don't look like garbage.
  */
@@ -192,4 +224,21 @@ void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
 	const patch_t __far* patch = W_GetLumpByNum(num);
 	V_DrawPatchNoScale(x, y, patch);
 	Z_ChangeTagToCache(patch);
+}
+
+
+//
+// V_FillRect
+//
+void V_FillRect(byte colour)
+{
+	_fmemset(_g_screen, colour, SCREENWIDTH * 2 * (SCREENHEIGHT - ST_HEIGHT));
+}
+
+
+void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
+{
+    byte __far * fb = (byte __far*)_g_screen;
+
+    fb[(ScreenYToOffset(y) << 1) + x] = color;
 }

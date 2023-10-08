@@ -48,6 +48,17 @@
 // VIDEO
 //
 
+//Cheap mul by 120. Not sure if faster.
+#if 0
+#define ScreenYToOffset(x) ((x << 7) - (x << 3))
+#else
+#define ScreenYToOffset(x) (x * SCREENWIDTH)
+#endif
+
+
+void V_DrawBackground(void);
+
+
 // V_DrawNumPatch - Draws the patch from lump num
 void V_DrawNumPatch(int16_t x, int16_t y, int16_t lump);
 void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t lump);
@@ -59,12 +70,10 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch);
 void V_DrawNamePatch(int16_t x, int16_t y, const char *name);
 
 
-//Cheap mul by 120. Not sure if faster.
-#if 0
-#define ScreenYToOffset(x) ((x << 7) - (x << 3))
-#else
-#define ScreenYToOffset(x) (x * SCREENWIDTH)
-#endif
+void V_FillRect(byte colour);
+
+
+void V_PlotPixel(int16_t x, int16_t y, uint8_t color);
 
 
 #endif

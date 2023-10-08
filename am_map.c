@@ -83,6 +83,22 @@ typedef struct
  fixed_t x,y;
 } mpoint_t;
 
+typedef struct
+{
+    mpoint_t a, b;
+} mline_t;
+
+typedef struct
+{
+  int32_t x, y;
+} fpoint_t;
+
+typedef struct
+{
+  fpoint_t a, b;
+} fline_t;
+
+
 static mpoint_t m_paninc;    // how far the window pans each tic (map coords)
 
 static fixed_t m_x,  m_y;    // LL x,y window location on the map (map coords)
@@ -140,23 +156,6 @@ static fixed_t ftom_zoommul = FRACUNIT; // how far the window zooms each tic (fb
 // translates between frame-buffer and map coordinates
 #define CXMTOF(x)  (MTOF((x)- m_x))
 #define CYMTOF(y)  ((f_h - MTOF((y)- m_y)))
-
-typedef struct
-{
-    mpoint_t a, b;
-} mline_t;
-
-
-typedef struct
-{
-  int32_t x, y;
-} fpoint_t;
-
-
-typedef struct
-{
-  fpoint_t a, b;
-} fline_t;
 
 
 //
@@ -729,14 +728,6 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
 #undef DOOUTCODE
 
 
-static void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
-{
-    byte __far * fb = (byte __far*)_g_screen;
-
-    fb[(ScreenYToOffset(y) << 1) + x] = color;
-}
-
-
 //
 // V_DrawLine()
 //
@@ -1064,15 +1055,6 @@ static void AM_drawPlayers(void)
 
 
 //
-// V_FillRect
-//
-static void V_FillRect(void)
-{
-	_fmemset(_g_screen, mapcolor_back, SCREENWIDTH * 2 * (SCREENHEIGHT - ST_HEIGHT));
-}
-
-
-//
 // AM_Drawer()
 //
 // Draws the entire automap
@@ -1085,7 +1067,7 @@ void AM_Drawer (void)
     if (!(automapmode & am_active)) return;
 
     if (!(automapmode & am_overlay)) // cph - If not overlay mode, clear background for the automap
-        V_FillRect(); //jff 1/5/98 background default color
+        V_FillRect(mapcolor_back); //jff 1/5/98 background default color
 
     AM_drawWalls();
     AM_drawPlayers();
