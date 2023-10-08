@@ -40,7 +40,6 @@
 
 #include <stdint.h>
 
-#include "compiler.h"
 #include "d_player.h"
 #include "r_defs.h"
 #include "st_stuff.h"

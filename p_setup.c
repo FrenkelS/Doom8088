@@ -37,7 +37,6 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "compiler.h"
 #include "d_player.h"
 #include "g_game.h"
 #include "w_wad.h"

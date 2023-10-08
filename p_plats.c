@@ -35,7 +35,6 @@
 
 #include <stdint.h>
 
-#include "compiler.h"
 #include "d_player.h"
 #include "m_random.h"
 #include "r_main.h"
