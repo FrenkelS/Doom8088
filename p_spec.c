@@ -150,7 +150,7 @@ fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec)
 //
 fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 {
-  int32_t i;
+  int16_t i;
   const line_t __far* check;
   sector_t __far* other;
   fixed_t floor = -32000*FRACUNIT;
@@ -167,42 +167,6 @@ fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
       floor = other->floorheight;
   }
   return floor;
-}
-
-
-//
-// P_FindNextHighestFloor()
-//
-// Passed a sector, returns the fixed point value
-// of the smallest floor height in a surrounding sector larger than
-// the floor height passed. If no such height exists the floorheight
-// of the passed sector is returned.
-//
-// Rewritten by Lee Killough to avoid fixed array and to be faster
-//
-fixed_t P_FindNextHighestFloor(sector_t __far* sec)
-{
-  int32_t currentheight = sec->floorheight;
-  sector_t __far* other;
-  int32_t i;
-
-  for (i=0 ;i < sec->linecount ; i++)
-    if ((other = getNextSector(sec->lines[i],sec)) &&
-         other->floorheight > currentheight)
-    {
-      int32_t height = other->floorheight;
-      while (++i < sec->linecount)
-        if ((other = getNextSector(sec->lines[i],sec)) &&
-            other->floorheight < height &&
-            other->floorheight > currentheight)
-          height = other->floorheight;
-      return height;
-    }
-  /* cph - my guess at doom v1.2 - 1.4beta compatibility here.
-   * If there are no higher neighbouring sectors, Heretic just returned
-   * heightlist[0] (local variable), i.e. noise off the stack. 0 is right for
-   * RETURN01 E1M2, so let's take that. */
-  return currentheight;
 }
 
 
@@ -782,7 +746,7 @@ static void T_Scroll(scroll_t __far* s)
 // accel: non-zero if this is an accelerative effect
 //
 
-static void Add_Scroller(int32_t affectee)
+static void Add_Scroller(int16_t affectee)
 {
   scroll_t __far* s = Z_CallocLevSpec(sizeof *s);
   s->thinker.function = T_Scroll;
@@ -793,7 +757,7 @@ static void Add_Scroller(int32_t affectee)
 // Initialize the scrollers
 static void P_SpawnScrollers(void)
 {
-    int32_t i;
+    int16_t i;
     const line_t __far* l = _g_lines;
 
     for (i=0;i<_g_numlines;i++,l++)
