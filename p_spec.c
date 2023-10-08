@@ -1869,11 +1869,11 @@ void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
       {
         case GunOnce:
           if (linefunc(line))
-            P_ChangeSwitchTexture(line,0);
+            P_ChangeSwitchTexture(line,false);
           return;
         case GunMany:
           if (linefunc(line))
-            P_ChangeSwitchTexture(line,1);
+            P_ChangeSwitchTexture(line,true);
           return;
         default:  // if not a gun type, do nothing here
           return;
@@ -1902,19 +1902,19 @@ void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
     case 24:
       // 24 G1 raise floor to highest adjacent
       if (EV_DoFloor(line,raiseFloor))
-        P_ChangeSwitchTexture(line,0);
+        P_ChangeSwitchTexture(line,false);
       break;
 
     case 46:
       // 46 GR open door, stay open
       EV_DoDoor(line,dopen);
-      P_ChangeSwitchTexture(line,1);
+      P_ChangeSwitchTexture(line,true);
       break;
 
     case 47:
       // 47 G1 raise floor to nearest and change texture and type
       if (EV_DoPlat(line,raiseToNearestAndChange,0))
-        P_ChangeSwitchTexture(line,0);
+        P_ChangeSwitchTexture(line,false);
       break;
 
     //jff 1/30/98 added new gun linedefs here
@@ -1928,7 +1928,7 @@ void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
             // killough 10/98: prevent zombies from exiting levels
             if(P_MobjIsPlayer(thing) && P_MobjIsPlayer(thing)->health<=0)
               break;
-            P_ChangeSwitchTexture(line,0);
+            P_ChangeSwitchTexture(line,false);
             G_ExitLevel();
             break;
 
@@ -1937,7 +1937,7 @@ void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
             // killough 10/98: prevent zombies from exiting levels
             if(P_MobjIsPlayer(thing) && P_MobjIsPlayer(thing)->health<=0)
               break;
-            P_ChangeSwitchTexture(line,0);
+            P_ChangeSwitchTexture(line,false);
             G_SecretExitLevel();
             break;
             //jff end addition of new gun linedefs

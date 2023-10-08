@@ -760,7 +760,7 @@ boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player);
 boolean P_SectorActive(special_e t, const sector_t __far* s);
 
 
-void P_ChangeSwitchTexture(const line_t __far* line, int32_t useAgain);
+void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain);
 
 ////////////////////////////////////////////////////////////////
 //
