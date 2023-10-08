@@ -695,7 +695,7 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
     const byte __far* source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
-    volatile uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+    volatile uint8_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery)*dcvars->iscale) << COLEXTRABITS;
@@ -704,28 +704,14 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
     //  e.g. a DDA-lile scaling.
     // This is as fast as it gets.
 
-    uint16_t mask;
-    uint8_t shift;
-
-    if(!dcvars->odd_pixel)
-    {
-        mask  = 0xff00;
-        shift = 0;
-    }
-    else
-    {
-        mask  = 0xff;
-        shift = 8;
-    }
+    if(dcvars->odd_pixel)
+        dest++;
 
     while(count--)
     {
-        uint16_t old = *dest;
-        uint16_t color = colormap[source[frac>>COLBITS]];
+        *dest = colormap[source[frac>>COLBITS]];
 
-        *dest = ((old & mask) | (color << shift));
-
-        dest += SCREENWIDTH;
+        dest += SCREENWIDTH*2;
         frac += fracstep;
     }
 }
