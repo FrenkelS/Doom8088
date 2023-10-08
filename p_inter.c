@@ -696,7 +696,7 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
        * so that a friend can tell who's hurting a player
        */
       if (player)
-  P_SetTarget(&target->target, source);
+        target->target = source;
 
   if (P_Random () < mobjinfo[target->type].painchance &&
       !(target->flags & MF_SKULLFLY))
@@ -723,9 +723,9 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
     (
      !((target->flags ^ target->lastenemy->flags) & MF_FRIEND) &&
      target->target != source)) // remember last enemy - killough
-  P_SetTarget(&target->lastenemy, target->target);
+       target->lastenemy = target->target;
 
-      P_SetTarget(&target->target, source);
+      target->target    = source;
       target->threshold = BASETHRESHOLD;
       if (target->state == &states[mobjinfo[target->type].spawnstate]
           && mobjinfo[target->type].seestate != S_NULL)

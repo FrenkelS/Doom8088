@@ -734,9 +734,9 @@ void P_RemoveMobj(mobj_t __far* mobj)
 
   if (!_g_demoplayback)
   {
-    P_SetTarget(&mobj->target,    NULL);
-    P_SetTarget(&mobj->tracer,    NULL);
-    P_SetTarget(&mobj->lastenemy, NULL);
+    mobj->target    = NULL;
+    mobj->tracer    = NULL;
+    mobj->lastenemy = NULL;
   }
   // free block
 
@@ -1042,7 +1042,7 @@ mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_
   if (mobjinfo[th->type].seesound)
     S_StartSound (th, mobjinfo[th->type].seesound);
 
-  P_SetTarget(&th->target, source);    // where it came from
+  th->target = source;    // where it came from
   an = R_PointToAngle2 (source->x, source->y, dest->x, dest->y);
 
   // fuzzy player
@@ -1112,11 +1112,11 @@ void P_SpawnPlayerMissile(mobj_t __far* source, mobjtype_t type)
 	if (mobjinfo[th->type].seesound)
 		S_StartSound(th, mobjinfo[th->type].seesound);
 
-	P_SetTarget(&th->target, source);
-	th->angle = an;
-	th->momx = FixedMul(mobjinfo[th->type].speed,finecosine(an >> ANGLETOFINESHIFT));
-	th->momy = FixedMul(mobjinfo[th->type].speed,finesine(  an >> ANGLETOFINESHIFT));
-	th->momz = FixedMul(mobjinfo[th->type].speed,slope);
+	th->target = source;
+	th->angle  = an;
+	th->momx   = FixedMul(mobjinfo[th->type].speed,finecosine(an >> ANGLETOFINESHIFT));
+	th->momy   = FixedMul(mobjinfo[th->type].speed,finesine(  an >> ANGLETOFINESHIFT));
+	th->momz   = FixedMul(mobjinfo[th->type].speed,slope);
 
 	P_CheckMissileSpawn(th);
 }

@@ -165,23 +165,6 @@ thinker_t __far* P_NextThinker(thinker_t __far* th)
   return th == top ? NULL : th;
 }
 
-/*
- * P_SetTarget
- *
- * This function is used to keep track of pointer references to mobj thinkers.
- * In Doom, objects such as lost souls could sometimes be removed despite
- * their still being referenced. In Boom, 'target' mobj fields were tested
- * during each gametic, and any objects pointed to by them would be prevented
- * from being removed. But this was incomplete, and was slow (every mobj was
- * checked during every gametic). Now, we keep a count of the number of
- * references, and delay removal until the count is 0.
- */
-
-void P_SetTarget(mobj_t __far*__far* mop, mobj_t __far* targ)
-{
-    *mop = targ;    // Set new target and if non-NULL, increase its counter
-}
-
 
 //
 // P_RunThinkers

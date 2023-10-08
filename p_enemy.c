@@ -94,9 +94,9 @@ static void P_RecursiveSound(sector_t __far* sec, int32_t soundblocks, mobj_t __
   if (sec->validcount == validcount && sec->soundtraversed <= soundblocks+1)
     return;             // already flooded
 
-  sec->validcount = validcount;
+  sec->validcount     = validcount;
   sec->soundtraversed = soundblocks+1;
-  P_SetTarget(&sec->soundtarget, soundtarget);
+  sec->soundtarget    = soundtarget;
 
   for (i=0; i<sec->linecount; i++)
     {
@@ -599,7 +599,7 @@ static boolean P_LookForPlayers(mobj_t __far* actor, boolean allaround)
         if (!P_IsVisible(actor, player->mo, allaround))
             return false;
 
-        P_SetTarget(&actor->target, player->mo);
+        actor->target = player->mo;
 
         /* killough 9/9/98: give monsters a threshold towards getting players
        * (we don't want it to be too easy for a player with dogs :)

@@ -49,9 +49,6 @@ void P_RemoveThinker(thinker_t __far* thinker);
 void P_RemoveThing(mobj_t __far* thing);
 
 
-void P_SetTarget(mobj_t __far*__far* mo, mobj_t __far* target);
-
-
 /* cph 2002/01/13 - iterator for thinker lists */
 thinker_t __far* P_NextThinker(thinker_t __far*);
 
