@@ -33,6 +33,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include "d_englsh.h"
 #include "d_player.h"
 #include "w_wad.h"
 #include "r_main.h"
@@ -216,6 +217,256 @@ void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
 
     if (useAgain)
         P_StartButton(line, position, switchlist[i], BUTTONTIME);
+}
+
+
+//
+// EV_VerticalDoor
+//
+// Handle opening a door manually, no tag value
+//
+// Passed the line activating the door and the thing activating it
+//
+static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
+{
+  player_t* player;
+  sector_t __far* sec;
+  vldoor_t __far* door;
+
+  //  Check for locks
+  player = P_MobjIsPlayer(thing);
+
+  switch(LN_SPECIAL(line))
+  {
+    case 26: // Blue Lock
+    case 32:
+      if ( !player )
+        return;
+      if (!player->cards[it_bluecard] && !player->cards[it_blueskull])
+      {
+          player->message = PD_BLUEK;         // Ty 03/27/98 - externalized
+          S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
+          return;
+      }
+      break;
+
+    case 27: // Yellow Lock
+    case 34:
+      if ( !player )
+          return;
+      if (!player->cards[it_yellowcard] && !player->cards[it_yellowskull])
+      {
+          player->message = PD_YELLOWK;       // Ty 03/27/98 - externalized
+          S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
+          return;
+      }
+      break;
+
+    case 28: // Red Lock
+    case 33:
+      if ( !player )
+          return;
+      if (!player->cards[it_redcard] && !player->cards[it_redskull])
+      {
+          player->message = PD_REDK;          // Ty 03/27/98 - externalized
+          S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
+          return;
+      }
+      break;
+
+    default:
+      break;
+  }
+
+  // if the wrong side of door is pushed, give oof sound
+  if (line->sidenum[1]==NO_INDEX)                     // killough
+  {
+    S_StartSound(player->mo,sfx_oof);           // killough 3/20/98
+    return;
+  }
+
+  // get the sector on the second side of activating linedef
+  sec = _g_sides[line->sidenum[1]].sector;
+
+  /* if door already has a thinker, use it
+   * cph 2001/04/05 -
+   * Ok, this is a disaster area. We're assuming that sec->ceilingdata
+   *  is a vldoor_t! What if this door is controlled by both DR lines
+   *  and by switches? I don't know how to fix that.
+   * Secondly, original Doom didn't distinguish floor/lighting/ceiling
+   *  actions, so we need to do the same in demo compatibility mode.
+   */
+  door = sec->ceilingdata;
+
+  /* If this is a repeatable line, and the door is already moving, then we can just reverse the current action. Note that in prboom 2.3.0 I erroneously removed the if-this-is-repeatable check, hence the prboom_4_compatibility clause below (foolishly assumed that already moving implies repeatable - but it could be moving due to another switch, e.g. lv19-509) */
+  if (door &&
+      (
+       (LN_SPECIAL(line) == 1) || (LN_SPECIAL(line) == 117) || (LN_SPECIAL(line) == 26) || (LN_SPECIAL(line) == 27) || (LN_SPECIAL(line) == 28)
+	  )
+     ) {
+    /* For old demos we have to emulate the old buggy behavior and
+     * mess up non-T_VerticalDoor actions.
+     */
+    if (door->thinker.function == T_VerticalDoor)
+    {
+      /* cph - we are writing outval to door->direction iff it is non-zero */
+      int16_t outval = 0;
+
+      /* An already moving repeatable door which is being re-pressed, or a
+       * monster is trying to open a closing door - so change direction
+       * DEMOSYNC: we only read door->direction now if it really is a door.
+       */
+      if (door->thinker.function == T_VerticalDoor && door->direction == -1) {
+        outval = 1; /* go back up */
+      } else if (player) {
+        outval = -1; /* go back down */
+      }
+
+      /* Write this to the thinker. In demo compatibility mode, we might be 
+       *  overwriting a field of a non-vldoor_t thinker - we need to add any 
+       *  other thinker types here if any demos depend on specific fields
+       *  being corrupted by this.
+       */
+      if (outval) {
+        if (door->thinker.function == T_VerticalDoor) {
+          door->direction = outval;
+        } else if (door->thinker.function == T_PlatRaise) {
+          plat_t __far* p = (plat_t __far*)door;
+          p->wait = outval;
+        } else {
+          printf("EV_VerticalDoor: unknown thinker.function in thinker corruption emulation\n");
+        }
+
+        return;
+      }
+    }
+    /* Either we're in prboom >=v2.3 and it's not a door, or it's a door but
+     * we're a monster and don't want to shut it; exit with no action.
+     */
+    return;
+  }
+
+  // emit proper sound
+  switch(LN_SPECIAL(line))
+  {
+    case 117: // blazing door raise
+    case 118: // blazing door open
+      S_StartSound2(&sec->soundorg,sfx_bdopn);
+      break;
+
+    default:  // normal or locked door sound
+      S_StartSound2(&sec->soundorg,sfx_doropn);
+      break;
+  }
+
+  // new door thinker
+  door = Z_CallocLevSpec(sizeof(*door));
+  P_AddThinker (&door->thinker);
+  sec->ceilingdata = door; //jff 2/22/98
+  door->thinker.function = T_VerticalDoor;
+  door->sector = sec;
+  door->direction = 1;
+  door->speed = VDOORSPEED;
+  door->topwait = VDOORWAIT;
+  door->line = line; // jff 1/31/98 remember line that triggered us
+
+  /* killough 10/98: use gradual lighting changes if nonzero tag given */
+  door->lighttag = line->tag;
+
+  // set the type of door from the activating linedef type
+  switch(LN_SPECIAL(line))
+  {
+    case 1:
+    case 26:
+    case 27:
+    case 28:
+      door->type = normal;
+      break;
+
+    case 31:
+    case 32:
+    case 33:
+    case 34:
+      door->type = dopen;
+      LN_SPECIAL(line) = 0;
+      break;
+
+    case 117: // blazing door raise
+      door->type = blazeRaise;
+      door->speed = VDOORSPEED*4;
+      break;
+    case 118: // blazing door open
+      door->type = blazeOpen;
+      LN_SPECIAL(line) = 0;
+      door->speed = VDOORSPEED*4;
+      break;
+
+    default:
+      door->lighttag = 0;   // killough 10/98
+      break;
+  }
+
+  // find the top and bottom of the movement range
+  door->topheight = P_FindLowestCeilingSurrounding(sec);
+  door->topheight -= 4*FRACUNIT;
+}
+
+
+//
+// EV_DoLockedDoor
+//
+// Handle opening a tagged locked door
+//
+// Passed the line activating the door, the type of door,
+// and the thing that activated the line
+// Returns true if a thinker created
+//
+static boolean EV_DoLockedDoor(const line_t __far* line, vldoor_e type, mobj_t __far* thing)
+{
+  player_t* p;
+
+  // only players can open locked doors
+  p = P_MobjIsPlayer(thing);
+
+  if (!p)
+    return false;
+
+  // check type of linedef, and if key is possessed to open it
+  switch(LN_SPECIAL(line))
+  {
+    case 99:  // Blue Lock
+    case 133:
+      if (!p->cards[it_bluecard] && !p->cards[it_blueskull])
+      {
+        p->message = PD_BLUEO;             // Ty 03/27/98 - externalized
+        S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
+        return false;
+      }
+      break;
+
+    case 134: // Red Lock
+    case 135:
+      if (!p->cards[it_redcard] && !p->cards[it_redskull])
+      {
+        p->message = PD_REDO;              // Ty 03/27/98 - externalized
+        S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
+        return false;
+      }
+      break;
+
+    case 136: // Yellow Lock
+    case 137:
+      if (!p->cards[it_yellowcard] && !p->cards[it_yellowskull])
+      {
+        p->message = PD_YELLOWO;           // Ty 03/27/98 - externalized
+        S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
+        return false;
+      }
+      break;
+  }
+
+  // got the key, so open the door
+  return EV_DoDoor(line,type);
 }
 
 

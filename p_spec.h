@@ -797,11 +797,7 @@ boolean EV_CeilingCrushStop(const line_t __far* line);
 
 // p_doors
 
-void EV_VerticalDoor(const line_t __far* line, mobj_t  __far* thing);
-
 boolean EV_DoDoor(const line_t __far* line, vldoor_e type);
-
-boolean EV_DoLockedDoor(const line_t __far* line, vldoor_e type, mobj_t __far* thing);
 
 // p_lights
 
