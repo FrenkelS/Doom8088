@@ -807,8 +807,6 @@ void EV_TurnTagLightsOff(const line_t __far* line);
 
 void EV_LightTurnOn(const line_t __far* line, int32_t bright);
 
-void EV_LightTurnOnPartway(const line_t __far* line, fixed_t level);
-
 // p_floor
 
 boolean EV_DoChange(const line_t __far* line, change_e changetype);
