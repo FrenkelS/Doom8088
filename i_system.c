@@ -301,10 +301,9 @@ void I_DrawBuffer(uint16_t __far* buffer)
 #else
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
 #endif
-		for (uint_fast8_t x = 0; x < (SCREENWIDTH * 2) / 2; x++) {
-			*dst++ = *src++;
-		}
-		dst += ((SCREENWIDTH_VGA - (SCREENWIDTH * 2)) / 2);
+		_fmemcpy(dst, src, SCREENWIDTH * 2);
+		dst += SCREENWIDTH_VGA / 2;
+		src += SCREENWIDTH;
 	}
 }
 
