@@ -305,14 +305,14 @@ inline static CONSTFUNC fixed_t FixedApproxDiv(fixed_t a, fixed_t b)
 
 #define SLOPERANGE 2048
 
-static CONSTFUNC int32_t SlopeDiv(uint32_t num, uint32_t den)
+static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
 {
     den = den >> 8;
 
     if (den == 0)
         return SLOPERANGE;
 
-    const uint32_t ans = FixedApproxDiv(num << 3, den) >> FRACBITS;
+    const uint16_t ans = FixedApproxDiv(num << 3, den) >> FRACBITS;
 
     return (ans <= SLOPERANGE) ? ans : SLOPERANGE;
 }
@@ -696,6 +696,7 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
     const byte __far* colormap = dcvars->colormap;
 
     volatile uint8_t __far* dest = (uint8_t __far*)(_g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x);
+    dest += dcvars->odd_pixel;
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery)*dcvars->iscale) << COLEXTRABITS;
@@ -703,9 +704,6 @@ static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
     // This is as fast as it gets.
-
-    if(dcvars->odd_pixel)
-        dest++;
 
     while(count--)
     {
@@ -859,8 +857,6 @@ typedef struct vissprite_s
   int16_t lump_num;
   int16_t patch_topoffset;
 
-  uint32_t mobjflags;
-
   // for color translation and shadow draw, maxbright frames as well
   const lighttable_t __far* colormap;
 
@@ -914,7 +910,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
         xiscale >>= 1;
 
     dcvars.x = vis->x1;
-    dcvars.odd_pixel = false;
+    dcvars.odd_pixel = 0;
 
     while(dcvars.x < SCREENWIDTH)
     {
@@ -926,7 +922,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
         if(((frac >> FRACBITS) >= patch->width) || frac < 0)
             break;
 
-        dcvars.odd_pixel = true;
+        dcvars.odd_pixel = 1;
 
         if(!hires)
             dcvars.x++;
@@ -943,7 +939,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
             break;
 
         dcvars.x++;
-        dcvars.odd_pixel = false;
+        dcvars.odd_pixel = 0;
     }
 
     Z_ChangeTagToCache(patch);
@@ -1232,7 +1228,6 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 
     // store information in a vissprite
     vis = &avis;
-    vis->mobjflags = 0;
     // killough 12/98: fix psprite positioning problem
     vis->texturemid = (((int32_t)BASEYCENTER)<<FRACBITS) /* +  FRACUNIT/2 */ -
             (psp->sy-topoffset);
@@ -1453,7 +1448,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     const spritedef_t __far*   sprdef   = &sprites[thing->sprite];
     const spriteframe_t __far* sprframe = &sprdef->spriteframes[thing->frame & FF_FRAMEMASK];
 
-    uint32_t rot = 0;
+    uint16_t rot = 0;
 
     if (sprframe->rotate)
     {
@@ -1501,8 +1496,8 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     }
 
 
-    const int32_t x1 = (xl >> FRACBITS);
-    const int32_t x2 = (xr >> FRACBITS);
+    const int16_t x1 = (xl >> FRACBITS);
+    const int16_t x2 = (xr >> FRACBITS);
 
     // store information in a vissprite
     vissprite_t* vis = R_NewVisSprite ();
@@ -1514,7 +1509,6 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
         return;
     }
 
-    vis->mobjflags       = thing->flags;
     vis->scale           = FixedDiv(projectiony, tz);
     vis->iscale          = tz >> 7;
     vis->lump_num        = sprframe->lump[rot];

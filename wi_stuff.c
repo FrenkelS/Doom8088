@@ -196,10 +196,7 @@ int16_t V_NumPatchWidth(int16_t num)
 
 static int16_t V_NamePatchWidth(const char *name)
 {
-	const patch_t __far* patch = W_GetLumpByName(name);
-	int16_t width = patch->width;
-	Z_ChangeTagToCache(patch);
-	return width;
+	return V_NumPatchWidth(W_GetNumForName(name));
 }
 
 static int16_t V_NamePatchHeight(const char *name)

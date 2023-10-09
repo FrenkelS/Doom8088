@@ -54,7 +54,7 @@ typedef struct {
 
   const lighttable_t  __far* colormap;
 
-  boolean             odd_pixel;
+  int16_t             odd_pixel;
 
 } draw_column_vars_t;
 
