@@ -200,10 +200,7 @@ uint16_t __far* I_GetBackBuffer(void)
 
 void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
 {
-	uint16_t __far* src = backBuffer;
-	uint16_t __far* dst = buffer;
-	for (int16_t i = 0; i < SCREENWIDTH * SCREENHEIGHT; i++)
-		*dst++ = *src++;
+	_fmemcpy(buffer, backBuffer, SCREENWIDTH * SCREENHEIGHT * 2u);
 }
 
 
