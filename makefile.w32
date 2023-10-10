@@ -27,6 +27,8 @@
 CCOPTS = -omaxtnrih -ol+ -oe=32 -zp1 -bt=dos -D__far= -3r -j -zq -zc -wx -za99
 
 GLOBOBJS = &
+ a_taskmn.obj &
+ a_tsmapi.obj &
  am_map.obj &
  d_items.obj &
  d_main.obj &

@@ -30,6 +30,7 @@
 
 #include "doomdef.h"
 #include "compiler.h"
+#include "a_tsmapi.h"
 #include "d_main.h"
 #include "i_system.h"
 #include "globdata.h"
@@ -307,6 +308,44 @@ void I_DrawBuffer(uint16_t __far* buffer)
 
 //**************************************************************************************
 //
+// Returns time in 1/35th second tics.
+//
+
+static volatile int32_t ticcount;
+
+static int16_t tsm_ID;
+static boolean isTimerSet;
+
+
+static void I_TimerISR (void)
+{
+	ticcount++;
+}
+
+
+int32_t I_GetTime(void)
+{
+    return ticcount;
+}
+
+
+void I_InitTimer(void)
+{
+	TSM_Install();
+	tsm_ID = TSM_NewService(I_TimerISR, TICRATE, 0);
+	isTimerSet = true;
+}
+
+
+static void I_ShutdownTimer(void)
+{
+	TSM_DelService(tsm_ID);
+	TSM_Remove();
+}
+
+
+//**************************************************************************************
+//
 // Exit code
 //
 
@@ -314,6 +353,9 @@ static void I_Shutdown(void)
 {
 	if (isGraphicsModeSet)
 		I_SetScreenMode(3);
+
+	if (isTimerSet)
+		I_ShutdownTimer();
 
 	if (isKeyboardIsrSet)
 	{
@@ -353,41 +395,4 @@ void I_Error (const char *error, ...)
 	va_end(argptr);
 	printf("\n");
 	exit(1);
-}
-
-
-//**************************************************************************************
-//
-// Returns time in 1/35th second tics.
-//
-
-int32_t I_GetTime(void)
-{
-    int32_t thistimereply;
-    static int32_t lasttimereply = 0;
-    static int32_t basetime = 0;
-    clock_t now = clock();
-
-    thistimereply = (now * TICRATE) / CLOCKS_PER_SEC;
-
-    if (thistimereply < lasttimereply)
-    {
-        basetime -= 0xffff;
-    }
-
-    lasttimereply = thistimereply;
-
-
-    /* Fix for time problem */
-    if (!basetime)
-    {
-        basetime = thistimereply;
-        thistimereply = 0;
-    }
-    else
-    {
-        thistimereply -= basetime;
-    }
-
-    return thistimereply;
 }

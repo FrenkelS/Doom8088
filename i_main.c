@@ -106,6 +106,8 @@ int main(int argc, const char * const * argv)
 
 	tprintf();
 
+	I_InitTimer();
+
 	//Call this before Z_Init as maxmod uses malloc.
 	I_Init();
 

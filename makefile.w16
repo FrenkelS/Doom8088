@@ -38,6 +38,8 @@ CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
 CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
 
 GLOBOBJS = &
+ a_taskmn.obj &
+ a_tsmapi.obj &
  am_map.obj &
  d_items.obj &
  d_main.obj &

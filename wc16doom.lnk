@@ -13,6 +13,8 @@ lib noemu87.lib
 format dos
 name DOOM16WC
 
+file a_taskmn.obj
+file a_tsmapi.obj
 file am_map.obj
 file d_items.obj
 file d_main.obj
