@@ -312,9 +312,9 @@ void I_DrawBuffer(uint16_t __far* buffer)
 // Returns time in 1/35th second tics.
 //
 
-static volatile int32_t ticcount;
+#define TIMER_PRIORITY 0
 
-static task *t;
+static volatile int32_t ticcount;
 
 static boolean isTimerSet;
 
@@ -333,7 +333,7 @@ int32_t I_GetTime(void)
 
 void I_InitTimer(void)
 {
-	t = TS_ScheduleTask(I_TimerISR, TICRATE, 0);
+	TS_ScheduleTask(I_TimerISR, TICRATE, TIMER_PRIORITY);
 	TS_Dispatch();
 
 	isTimerSet = true;
@@ -342,9 +342,7 @@ void I_InitTimer(void)
 
 static void I_ShutdownTimer(void)
 {
-	TS_Terminate(t);
-	t = NULL;
-
+	TS_Terminate(TIMER_PRIORITY);
 	TS_Shutdown();
 }
 

@@ -32,20 +32,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __TASK_MAN_H
 #define __TASK_MAN_H
 
-typedef struct task
-{
-	struct task			*next;
-	struct task			*prev;
-	void				(*TaskService)(void);
-	int32_t				rate;
-	volatile int32_t	count;
-	int16_t				priority;
-	boolean				active;
-} task;
-
 void TS_Shutdown(void);
-task *TS_ScheduleTask(void (*Function)(void), int16_t rate, int16_t priority);
-void TS_Terminate(task *ptr);
+void TS_ScheduleTask(void (*function)(void), int16_t rate, int16_t priority);
+void TS_Terminate(int16_t priority);
 void TS_Dispatch(void);
 
 #endif

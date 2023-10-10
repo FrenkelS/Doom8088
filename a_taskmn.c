@@ -31,7 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <conio.h>
 #include <dos.h>
-#include <malloc.h>
 #include <stdint.h>
 
 #include "doomtype.h"
@@ -43,8 +42,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
    Global variables
 ---------------------------------------------------------------------*/
 
-static task HeadTask;
-static task *TaskList = &HeadTask;
+typedef struct
+{
+	void				(*taskService)(void);
+	int32_t				rate;
+	volatile int32_t	count;
+	boolean				active;
+} task_t;
+
+
+#define MAX_TASKS 1
+#define MAX_SERVICE_RATE 0x10000L
+
+static task_t tasks[MAX_TASKS];
+
 
 #if defined __DJGPP__
 static _go32_dpmi_seginfo OldInt8, NewInt8;
@@ -52,36 +63,11 @@ static _go32_dpmi_seginfo OldInt8, NewInt8;
 static void (__interrupt *OldInt8)(void);
 #endif
 
-static volatile int32_t TaskServiceRate  = 0x10000L;
-static volatile int32_t TaskServiceCount = 0;
 
-static boolean TS_Installed = false;
+static volatile int32_t taskServiceRate  = MAX_SERVICE_RATE;
+static volatile int32_t taskServiceCount = 0;
 
-
-/*---------------------------------------------------------------------
-   Function: TS_FreeTaskList
-
-   Terminates all tasks and releases any memory used for control
-   structures.
----------------------------------------------------------------------*/
-
-static void TS_FreeTaskList(void)
-{
-	_disable();
-
-	task *node = TaskList->next;
-	while (node != TaskList)
-	{
-		task *next = node->next;
-		free(node);
-		node = next;
-	}
-
-	TaskList->next = TaskList;
-	TaskList->prev = TaskList;
-
-	_enable();
-}
+static boolean isTS_Installed = false;
 
 
 /*---------------------------------------------------------------------
@@ -97,60 +83,14 @@ static void TS_SetClockSpeed(int32_t speed)
 {
 	_disable();
 
-	if (0 < speed && speed < 0x10000L)
-		TaskServiceRate = speed;
+	if (0 < speed && speed < MAX_SERVICE_RATE)
+		taskServiceRate = speed;
 	else
-		TaskServiceRate = 0x10000L;
+		taskServiceRate = MAX_SERVICE_RATE;
 
 	outp(0x43, 0x36);
-	outp(0x40, LOBYTE(TaskServiceRate));
-	outp(0x40, HIBYTE(TaskServiceRate));
-
-	_enable();
-}
-
-
-/*---------------------------------------------------------------------
-   Function: TS_SetTimer
-
-   Calculates the rate at which a task will occur and sets the clock
-   speed if necessary.
----------------------------------------------------------------------*/
-
-static int32_t TS_SetTimer(int32_t TickBase)
-{
-	int32_t speed = 1193182L / TickBase;
-	if (speed < TaskServiceRate)
-		TS_SetClockSpeed(speed);
-
-	return speed;
-}
-
-
-/*---------------------------------------------------------------------
-   Function: TS_SetTimerToMaxTaskRate
-
-   Finds the fastest running task and sets the clock to operate at
-   that speed.
----------------------------------------------------------------------*/
-
-static void TS_SetTimerToMaxTaskRate(void)
-{
-	_disable();
-
-	int32_t MaxServiceRate = 0x10000L;
-
-	task *ptr = TaskList->next;
-	while (ptr != TaskList)
-	{
-		if (ptr->rate < MaxServiceRate)
-			MaxServiceRate = ptr->rate;
-
-		ptr = ptr->next;
-	}
-
-	if (TaskServiceRate != MaxServiceRate)
-		TS_SetClockSpeed(MaxServiceRate);
+	outp(0x40, LOBYTE(taskServiceRate));
+	outp(0x40, HIBYTE(taskServiceRate));
 
 	_enable();
 }
@@ -164,28 +104,25 @@ static void TS_SetTimerToMaxTaskRate(void)
 
 static void __interrupt TS_ServiceSchedule (void)
 {
-	task *ptr = TaskList->next;
-	while (ptr != TaskList)
+	for (int16_t i = 0; i < MAX_TASKS; i++)
 	{
-		task *next = ptr->next;
-
-		if (ptr->active)
+		task_t *task = &tasks[i];
+		if (task->active)
 		{
-			ptr->count += TaskServiceRate;
+			task->count += taskServiceRate;
 
-			while (ptr->count >= ptr->rate)
+			while (task->count >= task->rate)
 			{
-				ptr->count -= ptr->rate;
-				ptr->TaskService();
+				task->count -= task->rate;
+				task->taskService();
 			}
 		}
-		ptr = next;
 	}
 
-	TaskServiceCount += TaskServiceRate;
-	if (TaskServiceCount > 0xffffL)
+	taskServiceCount += taskServiceRate;
+	if (taskServiceCount > 0xffffL)
 	{
-		TaskServiceCount &= 0xffff;
+		taskServiceCount &= 0xffff;
 		_chain_intr(OldInt8);
 	} else {
 		outp(0x20, 0x20);
@@ -203,17 +140,14 @@ static void __interrupt TS_ServiceSchedule (void)
 
 static void TS_Startup(void)
 {
-	if (!TS_Installed)
+	if (!isTS_Installed)
 	{
-		TaskList->next = TaskList;
-		TaskList->prev = TaskList;
-
-		TaskServiceRate  = 0x10000L;
-		TaskServiceCount = 0;
+		taskServiceRate  = MAX_SERVICE_RATE;
+		taskServiceCount = 0;
 
 		replaceInterrupt(OldInt8, NewInt8, TIMERINT, TS_ServiceSchedule);
 
-		TS_Installed = true;
+		isTS_Installed = true;
 	}
 }
 
@@ -226,35 +160,31 @@ static void TS_Startup(void)
 
 void TS_Shutdown(void)
 {
-	if (TS_Installed)
+	if (isTS_Installed)
 	{
-		TS_FreeTaskList();
-
 		TS_SetClockSpeed(0);
 
 		restoreInterrupt(TIMERINT, OldInt8, NewInt8);
 
-		TS_Installed = false;
+		isTS_Installed = false;
 	}
 }
 
 
 /*---------------------------------------------------------------------
-   Function: TS_AddTask
+   Function: TS_SetTimer
 
-   Adds a new task to our list of tasks.
+   Calculates the rate at which a task will occur and sets the clock
+   speed if necessary.
 ---------------------------------------------------------------------*/
 
-static void TS_AddTask(task *node)
+static uint16_t TS_SetTimer(int16_t tickBase)
 {
-	task *ptr = TaskList->next;
-	while ((ptr != TaskList) && (node->priority > ptr->priority))
-		ptr = ptr->next;
+	uint16_t speed = 1193182L / tickBase;
+	if (speed < taskServiceRate)
+		TS_SetClockSpeed(speed);
 
-	node->next = ptr;
-	node->prev = ptr->prev;
-	ptr->prev->next = node;
-	ptr->prev = node;
+	return speed;
 }
 
 
@@ -264,24 +194,39 @@ static void TS_AddTask(task *node)
    Schedules a new task for processing.
 ---------------------------------------------------------------------*/
 
-task *TS_ScheduleTask(void (*Function)(void), int16_t rate, int16_t priority)
+void TS_ScheduleTask(void (*function)(void), int16_t rate, int16_t priority)
 {
-	task *ptr = malloc(sizeof(task));
-	if (ptr != NULL)
-	{
-		if (!TS_Installed)
-			TS_Startup();
+	if (!isTS_Installed)
+		TS_Startup();
 
-		ptr->TaskService = Function;
-		ptr->rate        = TS_SetTimer(rate);
-		ptr->count       = 0;
-		ptr->priority    = priority;
-		ptr->active      = false;
+	tasks[priority].taskService = function;
+	tasks[priority].rate        = TS_SetTimer(rate);
+	tasks[priority].count       = 0;
+	tasks[priority].active      = false;
+}
 
-		TS_AddTask(ptr);
-	}
 
-	return ptr;
+/*---------------------------------------------------------------------
+   Function: TS_SetTimerToMaxTaskRate
+
+   Finds the fastest running task and sets the clock to operate at
+   that speed.
+---------------------------------------------------------------------*/
+
+static void TS_SetTimerToMaxTaskRate(void)
+{
+	_disable();
+
+	int32_t maxServiceRate = MAX_SERVICE_RATE;
+
+	for (int16_t i = 0; i < MAX_TASKS; i++)
+		if (tasks[i].rate < maxServiceRate)
+			maxServiceRate = tasks[i].rate;
+
+	if (taskServiceRate != maxServiceRate)
+		TS_SetClockSpeed(maxServiceRate);
+
+	_enable();
 }
 
 
@@ -291,30 +236,13 @@ task *TS_ScheduleTask(void (*Function)(void), int16_t rate, int16_t priority)
    Ends processing of a specific task.
 ---------------------------------------------------------------------*/
 
-void TS_Terminate(task *NodeToRemove)
+void TS_Terminate(int16_t priority)
 {
 	_disable();
 
-	task *ptr = TaskList->next;
-	while (ptr != TaskList)
-	{
-		task *next = ptr->next;
+	tasks[priority].rate = MAX_SERVICE_RATE;
 
-		if (ptr == NodeToRemove)
-		{
-			NodeToRemove->prev->next = NodeToRemove->next;
-			NodeToRemove->next->prev = NodeToRemove->prev;
-			NodeToRemove->next = NULL;
-			NodeToRemove->prev = NULL;
-			free(NodeToRemove);
-
-			TS_SetTimerToMaxTaskRate();
-
-			break;
-		}
-
-		ptr = next;
-	}
+	TS_SetTimerToMaxTaskRate();
 
 	_enable();
 }
@@ -330,12 +258,8 @@ void TS_Dispatch(void)
 {
 	_disable();
 
-	task *ptr = TaskList->next;
-	while (ptr != TaskList)
-	{
-		ptr->active = true;
-		ptr = ptr->next;
-	}
+	for (int16_t i = 0; i < MAX_TASKS; i++)
+		tasks[i].active = true;
 
 	_enable();
 }
