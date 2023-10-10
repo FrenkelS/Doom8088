@@ -176,7 +176,7 @@ static void __interrupt TS_ServiceSchedule (void)
 			while (ptr->count >= ptr->rate)
 			{
 				ptr->count -= ptr->rate;
-				ptr->TaskService(ptr);
+				ptr->TaskService();
 			}
 		}
 		ptr = next;
@@ -264,7 +264,7 @@ static void TS_AddTask(task *node)
    Schedules a new task for processing.
 ---------------------------------------------------------------------*/
 
-task *TS_ScheduleTask(void (*Function)(task *), int16_t rate, int16_t priority, int16_t taskId)
+task *TS_ScheduleTask(void (*Function)(void), int16_t rate, int16_t priority)
 {
 	task *ptr = malloc(sizeof(task));
 	if (ptr != NULL)
@@ -273,7 +273,6 @@ task *TS_ScheduleTask(void (*Function)(task *), int16_t rate, int16_t priority, 
 			TS_Startup();
 
 		ptr->TaskService = Function;
-		ptr->taskId      = taskId;
 		ptr->rate        = TS_SetTimer(rate);
 		ptr->count       = 0;
 		ptr->priority    = priority;

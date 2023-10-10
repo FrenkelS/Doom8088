@@ -36,8 +36,7 @@ typedef struct task
 {
 	struct task			*next;
 	struct task			*prev;
-	void				(*TaskService)(struct task *);
-	int16_t				taskId;
+	void				(*TaskService)(void);
 	int32_t				rate;
 	volatile int32_t	count;
 	int16_t				priority;
@@ -45,7 +44,7 @@ typedef struct task
 } task;
 
 void TS_Shutdown(void);
-task *TS_ScheduleTask(void (*Function)(task *), int16_t rate, int16_t priority, int16_t taskId);
+task *TS_ScheduleTask(void (*Function)(void), int16_t rate, int16_t priority);
 void TS_Terminate(task *ptr);
 void TS_Dispatch(void);
 

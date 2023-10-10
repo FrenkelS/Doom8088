@@ -17,7 +17,6 @@ export CFLAGS="-march=i286 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse
 #export CFLAGS="$CFLAGS -Wall -Wextra"
 
 export GLOBOBJS="  a_taskmn.c"
-export GLOBOBJS+=" a_tsmapi.c"
 export GLOBOBJS+=" am_map.c"
 export GLOBOBJS+=" d_items.c"
 export GLOBOBJS+=" d_main.c"

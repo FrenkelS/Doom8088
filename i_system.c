@@ -29,8 +29,9 @@
 #include <time.h>
 
 #include "doomdef.h"
+#include "doomtype.h"
 #include "compiler.h"
-#include "a_tsmapi.h"
+#include "a_taskmn.h"
 #include "d_main.h"
 #include "i_system.h"
 #include "globdata.h"
@@ -313,11 +314,12 @@ void I_DrawBuffer(uint16_t __far* buffer)
 
 static volatile int32_t ticcount;
 
-static int16_t tsm_ID;
+static task *t;
+
 static boolean isTimerSet;
 
 
-static void I_TimerISR (void)
+static void I_TimerISR(void)
 {
 	ticcount++;
 }
@@ -331,16 +333,19 @@ int32_t I_GetTime(void)
 
 void I_InitTimer(void)
 {
-	TSM_Install();
-	tsm_ID = TSM_NewService(I_TimerISR);
+	t = TS_ScheduleTask(I_TimerISR, TICRATE, 0);
+	TS_Dispatch();
+
 	isTimerSet = true;
 }
 
 
 static void I_ShutdownTimer(void)
 {
-	TSM_DelService(tsm_ID);
-	TSM_Remove();
+	TS_Terminate(t);
+	t = NULL;
+
+	TS_Shutdown();
 }
 
 
