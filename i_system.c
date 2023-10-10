@@ -332,7 +332,7 @@ int32_t I_GetTime(void)
 void I_InitTimer(void)
 {
 	TSM_Install();
-	tsm_ID = TSM_NewService(I_TimerISR, TICRATE, 0);
+	tsm_ID = TSM_NewService(I_TimerISR);
 	isTimerSet = true;
 }
 

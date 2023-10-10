@@ -20,7 +20,7 @@
 #define _TSMAPI_H_
 
 void TSM_Install(void);
-int16_t TSM_NewService(void(*timerISR)(void), int16_t rate, int16_t priority);
+int16_t TSM_NewService(void(*timerISR)(void));
 void TSM_DelService(int16_t taskId);
 void TSM_Remove(void);
 

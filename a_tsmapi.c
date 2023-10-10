@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "doomdef.h"
 #include "doomtype.h"
 #include "a_taskmn.h"
 #include "a_tsmapi.h"
@@ -44,7 +45,7 @@ static void tsm_funch(task *t)
 	tasks[taskId].callback();
 }
 
-int16_t TSM_NewService(void(*function)(void), int16_t rate, int16_t priority)
+int16_t TSM_NewService(void(*function)(void))
 {
 	int16_t taskId;
 
@@ -58,7 +59,7 @@ int16_t TSM_NewService(void(*function)(void), int16_t rate, int16_t priority)
 		I_Error("Can't register service");
 
 	tasks[taskId].callback = function;
-	tasks[taskId].t = TS_ScheduleTask(tsm_funch, rate, priority, taskId);
+	tasks[taskId].t = TS_ScheduleTask(tsm_funch, TICRATE, 0, taskId);
 	TS_Dispatch();
 	return taskId;
 }
