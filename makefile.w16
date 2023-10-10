@@ -32,12 +32,10 @@
 #
 # --------------------------------------------------------------------------
 
-#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
-#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
-#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
-CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
-#CCOPTS = -oaxes -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -mm -wx -za99
-#CCOPTS = -oaxet -oh -ol+ -zp1 -bt=dos -3 -j -zq -s -mm -wx -za99
+#CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
+#CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
+CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
+CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
 
 GLOBOBJS = &
  am_map.obj &
@@ -96,4 +94,11 @@ WC16\DOOM16WC.EXE : $(GLOBOBJS)
 .obj : WC16
 
 .c.obj :
- wcc $(CCOPTS) $[* /fo=WC16\$^&
+ wcc $(CCOPTSS) $[* /fo=WC16\$^&
+
+
+i_system.obj : i_system.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
+r_draw.obj : r_draw.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
