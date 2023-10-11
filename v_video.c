@@ -85,8 +85,9 @@ void V_DrawRaw(const char *name, uint16_t offset)
 
 	if (W_IsLumpCached(num) || Z_IsEnoughFreeMemory(lumpLength))
 	{
-		const uint8_t __far* ptr = W_GetLumpByNum(num);
-		_fmemcpy(&_g_screen[offset], ptr, lumpLength);
+		const uint8_t __far* lump = W_GetLumpByNum(num);
+		_fmemcpy(&_g_screen[offset], lump, lumpLength);
+		Z_ChangeTagToCache(lump);
 	}
 	else
 		W_ReadLumpByName(name, &_g_screen[offset]);
