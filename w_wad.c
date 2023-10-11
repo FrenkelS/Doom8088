@@ -223,3 +223,9 @@ const void __far* PUREFUNC W_GetLumpByNum(int16_t num)
 
 	return lumpcache[num];
 }
+
+
+boolean PUREFUNC W_IsLumpCached(int16_t num)
+{
+	return lumpcache[num] != NULL;
+}

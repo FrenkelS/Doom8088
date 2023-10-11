@@ -28,7 +28,6 @@
 #include "compiler.h"
 #include "z_zone.h"
 #include "doomdef.h"
-#include "doomtype.h"
 #include "i_system.h"
 
 
@@ -570,6 +569,18 @@ void __far* Z_CallocLevSpec(int32_t size)
 	void __far* ptr = Z_Malloc(size, PU_LEVSPEC, NULL);
 	_fmemset(ptr, 0, size);
 	return ptr;
+}
+
+
+boolean Z_IsEnoughFreeMemory(int32_t size)
+{
+	const uint8_t __far* ptr = Z_TryMallocStatic(size);
+	if (ptr)
+	{
+		Z_Free(ptr);
+		return true;
+	} else
+		return false;
 }
 
 

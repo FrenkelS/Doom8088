@@ -27,19 +27,21 @@
 #define __Z_ZONE__
 
 #include <stddef.h>
+#include "doomtype.h"
 
-void  Z_Init(void);
-void  Z_Shutdown(void);
+void Z_Init(void);
+void Z_Shutdown(void);
+boolean Z_IsEnoughFreeMemory(int32_t size);
 void __far* Z_TryMallocStatic(int32_t size);
 void __far* Z_MallocStatic(int32_t size);
 void __far* Z_MallocStaticWithUser(int32_t size, void __far*__far* user); 
 void __far* Z_MallocLevel(int32_t size, void __far*__far* user);
 void __far* Z_CallocLevel(int32_t size);
 void __far* Z_CallocLevSpec(int32_t size);
-void  Z_ChangeTagToStatic(const void __far* ptr);
-void  Z_ChangeTagToCache(const void __far* ptr);
-void  Z_Free(const void __far* ptr);
-void  Z_FreeTags(void);
-void  Z_CheckHeap(void);
+void Z_ChangeTagToStatic(const void __far* ptr);
+void Z_ChangeTagToCache(const void __far* ptr);
+void Z_Free(const void __far* ptr);
+void Z_FreeTags(void);
+void Z_CheckHeap(void);
 
 #endif
