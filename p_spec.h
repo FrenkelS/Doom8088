@@ -66,7 +66,6 @@
 // 4 players, 4 buttons each at once, max.
 // killough 2/14/98: redefine in terms of MAXPLAYERS
 #define MAXBUTTONS    (MAXPLAYERS*4)
-#define MAXSWITCHES		50
 
 
 // 1 second, in ticks.
@@ -516,15 +515,6 @@ typedef enum
 //////////////////////////////////////////////////////////////////
 
 // p_switch
-
-// switch animation structure type
-
-typedef PACKEDATTR_PRE struct
-{
-  char name1[9];
-  char name2[9];
-  int16_t episode;
-} PACKEDATTR_POST switchlist_t; //jff 3/23/98 pack to read from memory
 
 typedef struct
 {

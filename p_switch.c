@@ -46,36 +46,45 @@
 #include "globdata.h"
 
 
-static int16_t switchlist[MAXSWITCHES * 2];
+#define MAXSWITCHES		19
+
+static int16_t switchlist[(MAXSWITCHES + 1) * 2];
 static int16_t   numswitches;
 
 button_t  _g_buttonlist[MAXBUTTONS];
 
 
-static const switchlist_t alphSwitchList[] =
+// switch animation structure type
+
+typedef PACKEDATTR_PRE struct
+{
+  char name1[9];
+  char name2[9];
+} PACKEDATTR_POST switchlist_t; //jff 3/23/98 pack to read from memory
+
+
+static const switchlist_t alphSwitchList[MAXSWITCHES] =
 {
     // Doom episode 1 switches
-    {"SW1BRCOM",	"SW2BRCOM",	1},
-    {"SW1BRN1",	"SW2BRN1",	1},
-    {"SW1BRN2",	"SW2BRN2",	1},
-    {"SW1BRNGN",	"SW2BRNGN",	1},
-    {"SW1BROWN",	"SW2BROWN",	1},
-    {"SW1COMM",	"SW2COMM",	1},
-    {"SW1COMP",	"SW2COMP",	1},
-    {"SW1DIRT",	"SW2DIRT",	1},
-    {"SW1EXIT",	"SW2EXIT",	1},
-    {"SW1GRAY",	"SW2GRAY",	1},
-    {"SW1GRAY1",	"SW2GRAY1",	1},
-    {"SW1METAL",	"SW2METAL",	1},
-    {"SW1PIPE",	"SW2PIPE",	1},
-    {"SW1SLAD",	"SW2SLAD",	1},
-    {"SW1STARG",	"SW2STARG",	1},
-    {"SW1STON1",	"SW2STON1",	1},
-    {"SW1STON2",	"SW2STON2",	1},
-    {"SW1STONE",	"SW2STONE",	1},
-    {"SW1STRTN",	"SW2STRTN",	1},
-
-    {"\0",		"\0",		0}
+    {"SW1BRCOM", "SW2BRCOM"},
+    {"SW1BRN1",  "SW2BRN1" },
+    {"SW1BRN2",  "SW2BRN2" },
+    {"SW1BRNGN", "SW2BRNGN"},
+    {"SW1BROWN", "SW2BROWN"},
+    {"SW1COMM",  "SW2COMM" },
+    {"SW1COMP",  "SW2COMP" },
+    {"SW1DIRT",  "SW2DIRT" },
+    {"SW1EXIT",  "SW2EXIT" },
+    {"SW1GRAY",  "SW2GRAY" },
+    {"SW1GRAY1", "SW2GRAY1"},
+    {"SW1METAL", "SW2METAL"},
+    {"SW1PIPE",  "SW2PIPE" },
+    {"SW1SLAD",  "SW2SLAD" },
+    {"SW1STARG", "SW2STARG"},
+    {"SW1STON1", "SW2STON1"},
+    {"SW1STON2", "SW2STON2"},
+    {"SW1STONE", "SW2STONE"},
+    {"SW1STRTN", "SW2STRTN"}
 };
 
 
@@ -85,25 +94,16 @@ static const switchlist_t alphSwitchList[] =
 //
 void P_InitSwitchList(void)
 {
-    int16_t		i;
-    int16_t		index;
-    const int16_t		episode = 1;
+    int16_t		index = 0;
 
-    for (index = 0,i = 0;i < MAXSWITCHES;i++)
+    for (int16_t i = 0; i < MAXSWITCHES; i++)
     {
-        if (!alphSwitchList[i].episode)
-        {
-            numswitches = index/2;
-            switchlist[index] = -1;
-            break;
-        }
-
-        if (alphSwitchList[i].episode <= episode)
-        {
-            switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name1);
-            switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name2);
-        }
+        switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name1);
+        switchlist[index++] = R_CheckTextureNumForName(alphSwitchList[i].name2);
     }
+
+    numswitches = index/2;
+    switchlist[index] = -1;
 }
 //
 // P_StartButton()
