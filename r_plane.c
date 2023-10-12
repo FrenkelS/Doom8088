@@ -280,7 +280,7 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
 #endif
 
 
-#define LOBYTE(w)	(((uint8_t __far*)&w)[0])
+#define LOBYTE(w)	(((uint8_t *)&w)[0])
 
 
 static void R_DoDrawPlane(visplane_t __far* pl)
@@ -300,7 +300,8 @@ static void R_DoDrawPlane(visplane_t __far* pl)
             pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
 
 #if defined FLAT_SPAN
-            uint16_t color = LOBYTE(pl->picnum);
+            uint16_t color = pl->picnum;
+            color = LOBYTE(color);
             color = (color << 8) | color;
 
             for (register int16_t x = pl->minx; x <= stop; x++)
