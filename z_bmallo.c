@@ -66,9 +66,9 @@ __inline static PUREFUNC uint32_t linearAddress(const void __far* ptr)
 }
 
 
-__inline static PUREFUNC int32_t iselem(const bmalpool_t __far* pool, size_t size, const void __far* p)
+__inline static PUREFUNC int16_t iselem(const bmalpool_t __far* pool, size_t size, const void __far* p)
 {
-	int32_t dif = linearAddress(p) - linearAddress(pool);
+	int16_t dif = linearAddress(p) - linearAddress(pool);
 
 	dif -= sizeof(bmalpool_t);
 	dif -= pool->blocks;
@@ -89,7 +89,7 @@ void __far* Z_BMalloc(struct block_memory_alloc_s *pzone)
 	while (*pool != NULL) {
 		byte __far* p = _fmemchr((*pool)->used, unused_block, (*pool)->blocks); // Scan for unused marker
 		if (p) {
-			int32_t n = p - (*pool)->used;
+			int16_t n = p - (*pool)->used;
 			(*pool)->used[n] = used_block;
 			return getelem(*pool, pzone->size, n);
 		} else
@@ -116,7 +116,7 @@ void Z_BFree(struct block_memory_alloc_s *pzone, void __far* p)
 	register bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
 
 	while (*pool != NULL) {
-		int32_t n = iselem(*pool, pzone->size, p);
+		int16_t n = iselem(*pool, pzone->size, p);
 		if (n >= 0) {
 			(*pool)->used[n] = unused_block;
 			if (_fmemchr(((*pool)->used), used_block, (*pool)->blocks) == NULL) {
