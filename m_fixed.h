@@ -59,7 +59,7 @@ inline static int32_t CONSTFUNC D_abs(fixed_t x)
 {
   fixed_t _t = (x),_s;
   _s = _t >> (8*sizeof _t-1);
-  return (_t^_s)-_s;
+  return (_t+_s)^_s;
 }
 
 
