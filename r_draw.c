@@ -294,36 +294,11 @@ inline static CONSTFUNC fixed_t FixedReciprocal(fixed_t v)
 }
 
 
-//Approx fixed point divide of a/b using reciprocal. -> a * (1/b).
-inline static CONSTFUNC fixed_t FixedApproxDiv(fixed_t a, fixed_t b)
-{
-    return FixedMul(a, FixedReciprocal(b));
-}
-
-
-// killough 5/3/98: reformatted
-
-#define SLOPERANGE 2048
-
-static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
-{
-    den = den >> 8;
-
-    if (den == 0)
-        return SLOPERANGE;
-
-    const uint16_t ans = FixedApproxDiv(num << 3, den) >> FRACBITS;
-
-    return (ans <= SLOPERANGE) ? ans : SLOPERANGE;
-}
-
 //
 // R_PointOnSide
 // Traverse BSP (sub) tree,
 //  check point against partition plane.
 // Returns side 0 (front) or 1 (back).
-//
-// killough 5/2/98: reformatted
 //
 
 static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
@@ -353,7 +328,6 @@ static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __fa
 //
 // R_PointInSubsector
 //
-// killough 5/2/98: reformatted, cleaned up
 
 subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y)
 {
@@ -367,6 +341,22 @@ subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y)
         nodenum = nodes[nodenum].children[R_PointOnSide(x, y, nodes+nodenum)];
     return &_g_subsectors[(int16_t)(nodenum & ~NF_SUBSECTOR)];
 }
+
+
+#define SLOPERANGE 2048
+
+static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
+{
+    den = den >> 8;
+
+    if (den == 0)
+        return SLOPERANGE;
+
+    const uint16_t ans = FixedDiv(num << 3, den) >> FRACBITS;
+
+    return (ans <= SLOPERANGE) ? ans : SLOPERANGE;
+}
+
 
 //
 // R_PointToAngle
@@ -483,7 +473,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
         dy = t;
     }
 
-    return FixedApproxDiv(dx, finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT));
+    return FixedDiv(dx, finesine((tantoangle(FixedDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT));
 }
 
 
@@ -1067,8 +1057,6 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 }
 
 
-// killough 5/2/98: reformatted
-
 static PUREFUNC boolean R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t __far* line)
 {
     const fixed_t lx = line->v1.x;
@@ -1393,8 +1381,6 @@ static void R_ClearSprites(void)
 //  at the given angle.
 // rw_distance must be calculated first.
 //
-// killough 5/2/98: reformatted, cleaned up
-// CPhipps - moved here from r_main.c
 
 static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 {
@@ -2650,7 +2636,7 @@ static void R_Subsector(int16_t num)
 //  if some part of the bbox might be visible.
 //
 
-static const byte checkcoord[12][4] = // killough -- static const
+static const byte checkcoord[12][4] =
 {
   {3,0,2,1},
   {3,0,2,0},
@@ -2665,7 +2651,7 @@ static const byte checkcoord[12][4] = // killough -- static const
   {2,1,3,0}
 };
 
-// killough 1/28/98: static // CPhipps - const parameter, reformatted
+
 static boolean R_CheckBBox(const int16_t __far* bspcoord)
 {
     angle_t angle1, angle2;
