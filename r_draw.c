@@ -273,25 +273,7 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 
 
 //Approx Reciprocal of v
-inline static CONSTFUNC fixed_t FixedReciprocal(fixed_t v)
-{
-    if (v == 0)
-        return 0;
-
-    uint32_t val = v < 0 ? -v : v;
-
-    uint8_t shift = 0;
-
-    while (val > (1L << FRACBITS))
-    {
-        val = (val >> 1u);
-        shift++;
-    }
-
-    fixed_t result = (0x100000000 / val) >> shift;
-
-    return v < 0 ? -result : result;
-}
+#define FixedReciprocal(v) 0xffffffff/(v)
 
 
 //
@@ -1507,7 +1489,6 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     vis->x2              = x2 >= SCREENWIDTH ? SCREENWIDTH-1 : x2;
 
 
-    //const fixed_t iscale = FixedDiv (FRACUNIT, xscale);
     const fixed_t iscale = FixedReciprocal(xscale);
 
     if (flip)
