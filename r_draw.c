@@ -597,7 +597,11 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     }
 }
 
+#include <conio.h>
+#define SC_INDEX                0x3c4
+#define SC_MAPMASK              2
 
+#define PLANEWIDTH 80
 void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
@@ -606,51 +610,56 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	const uint16_t color = (texture << 8) | texture;
+	const uint8_t color = texture;
 
-	uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+	uint8_t __far* dest = ((uint8_t __far *)_g_screen) + ScreenYToOffset(dcvars->yl) + dcvars->x / 2;
+
+	if (dcvars->x & 1)
+		outp(SC_INDEX + 1, 12);
+	else
+		outp(SC_INDEX + 1, 3);
 
 	uint16_t l = count >> 4;
 
 	while (l--)
 	{
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
 
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
 
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
 
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
+		*dest = color; dest += PLANEWIDTH;
 	}
 
 	switch (count & 15)
 	{
-		case 15:	*dest = color; dest += SCREENWIDTH;
-		case 14:	*dest = color; dest += SCREENWIDTH;
-		case 13:	*dest = color; dest += SCREENWIDTH;
-		case 12:	*dest = color; dest += SCREENWIDTH;
-		case 11:	*dest = color; dest += SCREENWIDTH;
-		case 10:	*dest = color; dest += SCREENWIDTH;
-		case  9:	*dest = color; dest += SCREENWIDTH;
-		case  8:	*dest = color; dest += SCREENWIDTH;
-		case  7:	*dest = color; dest += SCREENWIDTH;
-		case  6:	*dest = color; dest += SCREENWIDTH;
-		case  5:	*dest = color; dest += SCREENWIDTH;
-		case  4:	*dest = color; dest += SCREENWIDTH;
-		case  3:	*dest = color; dest += SCREENWIDTH;
-		case  2:	*dest = color; dest += SCREENWIDTH;
+		case 15:	*dest = color; dest += PLANEWIDTH;
+		case 14:	*dest = color; dest += PLANEWIDTH;
+		case 13:	*dest = color; dest += PLANEWIDTH;
+		case 12:	*dest = color; dest += PLANEWIDTH;
+		case 11:	*dest = color; dest += PLANEWIDTH;
+		case 10:	*dest = color; dest += PLANEWIDTH;
+		case  9:	*dest = color; dest += PLANEWIDTH;
+		case  8:	*dest = color; dest += PLANEWIDTH;
+		case  7:	*dest = color; dest += PLANEWIDTH;
+		case  6:	*dest = color; dest += PLANEWIDTH;
+		case  5:	*dest = color; dest += PLANEWIDTH;
+		case  4:	*dest = color; dest += PLANEWIDTH;
+		case  3:	*dest = color; dest += PLANEWIDTH;
+		case  2:	*dest = color; dest += PLANEWIDTH;
 		case  1:	*dest = color;
 	}
 }
@@ -2844,9 +2853,10 @@ void R_RenderPlayerView (player_t* player)
     // The head node is the last node output.
     R_RenderBSPNode (numnodes-1);
 
+	outp(SC_INDEX + 1, 15);
     R_DrawPlanes ();
 
-    R_DrawMasked ();
+    //R_DrawMasked ();
 }
 
 

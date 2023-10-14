@@ -57,7 +57,7 @@ static  int16_t __far* wipe_y_lookup;
 
 void wipe_StartScreen(void)
 {
-	frontbuffer = Z_TryMallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
+	frontbuffer = NULL; //FIXME Z_TryMallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
 	if (frontbuffer)
 		I_CopyBackBufferToBuffer(frontbuffer);
 }

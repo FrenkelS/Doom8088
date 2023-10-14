@@ -52,7 +52,7 @@
 #if 0
 #define ScreenYToOffset(x) ((x << 7) - (x << 3))
 #else
-#define ScreenYToOffset(x) (x * SCREENWIDTH)
+#define ScreenYToOffset(x) (x * 80)
 #endif
 
 

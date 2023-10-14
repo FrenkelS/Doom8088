@@ -49,53 +49,15 @@ static int16_t firstflat;
 //
 
 #if defined FLAT_SPAN
-static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint16_t color)
+static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint8_t color)
 {
-	uint16_t __far* dest = _g_screen + ScreenYToOffset(y) + x1;
-
-	uint16_t count = x2 - x1;
-	uint16_t l = count >> 4;
-
-	while (l--)
+	x1 <<= 1;
+	x2 <<= 1;
+	uint8_t __far* offset = ((uint8_t __far *)_g_screen) + ScreenYToOffset(y);
+	for (uint16_t i = x1; i < x2; i += 4)
 	{
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-	}
-
-	switch (count & 15)
-	{
-		case 15:	*dest++ = color;
-		case 14:	*dest++ = color;
-		case 13:	*dest++ = color;
-		case 12:	*dest++ = color;
-		case 11:	*dest++ = color;
-		case 10:	*dest++ = color;
-		case  9:	*dest++ = color;
-		case  8:	*dest++ = color;
-		case  7:	*dest++ = color;
-		case  6:	*dest++ = color;
-		case  5:	*dest++ = color;
-		case  4:	*dest++ = color;
-		case  3:	*dest++ = color;
-		case  2:	*dest++ = color;
-		case  1:	*dest   = color;
+		uint8_t __far* dest = offset + i / 4;
+		*dest = color;
 	}
 }
 
@@ -104,7 +66,7 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint16_t color)
 // R_MakeSpans
 //
 
-static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16_t b2, uint16_t color)
+static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16_t b2, uint8_t color)
 {
 	static byte spanstart[SCREENHEIGHT];
 
@@ -280,9 +242,6 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
 #endif
 
 
-#define LOBYTE(w)	(((uint8_t *)&w)[0])
-
-
 static void R_DoDrawPlane(visplane_t __far* pl)
 {
     if (pl->minx <= pl->maxx)
@@ -300,9 +259,7 @@ static void R_DoDrawPlane(visplane_t __far* pl)
             pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
 
 #if defined FLAT_SPAN
-            uint16_t color = pl->picnum;
-            color = LOBYTE(color);
-            color = (color << 8) | color;
+            uint8_t color = pl->picnum;
 
             for (register int16_t x = pl->minx; x <= stop; x++)
             {
