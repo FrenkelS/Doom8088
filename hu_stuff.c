@@ -50,6 +50,40 @@
 #include "globdata.h"
 
 
+#define HU_MAXLINELENGTH  31
+
+
+/* Text Line widget
+ *  (parent of Scrolling Text and Input Text widgets) */
+typedef struct
+{
+  // left-justified position of scrolling text window
+  int16_t   x;
+  int16_t   y;
+
+  int16_t   linelen;
+  char  l[HU_MAXLINELENGTH+1]; // line of text
+  int16_t   len;                            // current line length
+
+  // whether this line needs to be updated
+  int16_t   needsupdate;
+
+} hu_textline_t;
+
+
+// Scrolling Text window widget
+//  (child of Text Line widget)
+typedef struct
+{
+  hu_textline_t l; // text line to draw
+
+  // pointer to boolean stating whether to update window
+  boolean*    on;
+  boolean   laston;             // last value of *->on.
+
+} hu_stext_t;
+
+
 // widgets
 static hu_textline_t  w_title;
 static hu_stext_t     w_message;
