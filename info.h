@@ -446,8 +446,8 @@ typedef enum
 typedef struct
 {
   spritenum_t sprite;       /* sprite number to show                       */
-  int32_t     frame;        /* which frame/subframe of the sprite is shown */
-  int32_t     tics;         /* number of gametics this frame should last   */
+  uint16_t    frame;        /* which frame/subframe of the sprite is shown */
+  int16_t     tics;         /* number of gametics this frame should last   */
   actionf_t   action;       /* code pointer to function for action if any  */
   statenum_t  nextstate;    /* linked list pointer to next state or zero   */
 } state_t;
