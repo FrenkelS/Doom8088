@@ -90,15 +90,15 @@ static segment_t pointerToSegment(const memblock_t __far* ptr)
 		I_Error("pointerToSegment: pointer is not aligned: 0x%lx", ptr);
 #endif
 
-	uint32_t seg = FP_SEG(ptr);
-	uint16_t off = FP_OFF(ptr);
+	uint32_t seg = D_FP_SEG(ptr);
+	uint16_t off = D_FP_OFF(ptr);
 	uint32_t linear = seg * PARAGRAPH_SIZE + off;
 	return linear / PARAGRAPH_SIZE;
 }
 
 static memblock_t __far* segmentToPointer(segment_t seg)
 {
-	return MK_FP(seg, 0);
+	return D_MK_FP(seg, 0);
 }
 
 
@@ -118,7 +118,7 @@ static segment_t Z_InitExpandedMemory(void)
 {
 #if defined _M_I86
 	void __far* emsInterruptVector = _dos_getvect(EMS_INT);
-	uint64_t __far* actualEmsDeviceName = MK_FP(FP_SEG(emsInterruptVector), 0x000a);
+	uint64_t __far* actualEmsDeviceName = D_MK_FP(FP_SEG(emsInterruptVector), 0x000a);
 	uint64_t expectedEmsDeviceName = *(uint64_t*)"EMMXXXX0";
 	if (*actualEmsDeviceName != expectedEmsDeviceName)
 		return 0;
@@ -220,7 +220,7 @@ static unsigned int _dos_allocmem(unsigned int __size, unsigned int *__seg)
 		*__seg = paragraphs;
 	}
 	else
-		*__seg = FP_SEG(ptr);
+		*__seg = D_FP_SEG(ptr);
 
 	return 0;
 }
@@ -236,7 +236,7 @@ void Z_Init (void)
 	unsigned int max, segment;
 	_dos_allocmem(0xffff, &max);
 	_dos_allocmem(max, &segment);
-	static uint8_t __far* mainzone; mainzone = MK_FP(segment, 0);
+	static uint8_t __far* mainzone; mainzone = D_MK_FP(segment, 0);
 
 	uint32_t heapSize = (uint32_t)max * PARAGRAPH_SIZE;
 
@@ -333,7 +333,7 @@ static void Z_FreeBlock(memblock_t __far* block)
         I_Error("Z_FreeBlock: block has id %x instead of ZONEID", block->id);
 #endif
 
-    if (FP_SEG(block->user) != 0)
+    if (D_FP_SEG(block->user) != 0)
     {
         // far pointers with segment 0 are not user pointers
         // Note: OS-dependend
@@ -507,7 +507,7 @@ static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
     if (user)
         base->user = user;
     else
-        base->user = (void __far*__far*) MK_FP(0,2); // unowned
+        base->user = (void __far*__far*) D_MK_FP(0,2); // unowned
 #if defined ZONEIDCHECK
     base->id  = ZONEID;
 #endif

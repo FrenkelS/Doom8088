@@ -277,7 +277,7 @@ void I_InitGraphics(void)
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
-	screen = MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH * 2) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH * 2) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 
 	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
 	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
@@ -373,7 +373,7 @@ static void I_Quit(void)
 {
 	I_Shutdown();
 
-	W_ReadLumpByName("ENDOOM", MK_FP(0xb800, __djgpp_conventional_base));
+	W_ReadLumpByName("ENDOOM", D_MK_FP(0xb800, __djgpp_conventional_base));
 
 	union REGS regs;
 	regs.h.ah = 2;

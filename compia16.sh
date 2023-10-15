@@ -7,8 +7,6 @@ ia16-elf-gcc -c i_system.c -march=i286 -mcmodel=medium -Ofast -fomit-frame-point
 ia16-elf-gcc -c p_map.c    -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
 ia16-elf-gcc -c p_mobj.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program
 ia16-elf-gcc -c r_draw.c   -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c z_bmallo.c -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
-ia16-elf-gcc -c z_zone.c   -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
 
 export CFLAGS="-march=i286 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program"
 #export CFLAGS="$CFLAGS -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
@@ -65,10 +63,8 @@ export GLOBOBJS+=" tables.c"
 export GLOBOBJS+=" v_video.c"
 export GLOBOBJS+=" w_wad.c"
 export GLOBOBJS+=" wi_stuff.c"
-#export GLOBOBJS+=" z_bmallo.c"
-export GLOBOBJS+=" z_bmallo.o"
-#export GLOBOBJS+=" z_zone.c"
-export GLOBOBJS+=" z_zone.o"
+export GLOBOBJS+=" z_bmallo.c"
+export GLOBOBJS+=" z_zone.c"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS -o GCCIA16/DOOM8088.EXE
 
@@ -77,5 +73,3 @@ rm i_system.o
 rm p_map.o
 rm p_mobj.o
 rm r_draw.o
-rm z_bmallo.o
-rm z_zone.o
