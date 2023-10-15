@@ -376,7 +376,7 @@ boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(const line_t __f
 
     list++;     // skip 0 starting delimiter                      // phares
 
-    const int16_t vcount = validcount;
+    const uint16_t vcount = validcount;
 
     for ( ; *list != -1 ; list++)                                   // phares
     {

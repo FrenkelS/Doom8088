@@ -2547,7 +2547,7 @@ static void R_AddLine(const seg_t __far* line)
     linedef = &_g_lines[curline->linenum];
     linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
-    if (linedata->r_validcount != _g_gametic)
+    if (linedata->r_validcount != (uint16_t)_g_gametic)
         R_RecalcLineFlags();
 
     if (linedata->r_flags & RF_IGNORE)
