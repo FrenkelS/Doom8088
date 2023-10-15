@@ -6,7 +6,6 @@ ia16-elf-gcc -c i_main.c   -march=i286 -mcmodel=medium -Os    -fomit-frame-point
 ia16-elf-gcc -c i_system.c -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c p_map.c    -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
 ia16-elf-gcc -c p_mobj.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program
-ia16-elf-gcc -c p_switch.c -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
 ia16-elf-gcc -c r_draw.c   -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c z_bmallo.c -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
 ia16-elf-gcc -c z_zone.c   -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
@@ -49,8 +48,7 @@ export GLOBOBJS+=" p_pspr.c"
 export GLOBOBJS+=" p_setup.c"
 export GLOBOBJS+=" p_sight.c"
 export GLOBOBJS+=" p_spec.c"
-#export GLOBOBJS+=" p_switch.c"
-export GLOBOBJS+=" p_switch.o"
+export GLOBOBJS+=" p_switch.c"
 export GLOBOBJS+=" p_telept.c"
 export GLOBOBJS+=" p_tick.c"
 export GLOBOBJS+=" p_user.c"
@@ -78,7 +76,6 @@ rm i_main.o
 rm i_system.o
 rm p_map.o
 rm p_mobj.o
-rm p_switch.o
 rm r_draw.o
 rm z_bmallo.o
 rm z_zone.o
