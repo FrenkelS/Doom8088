@@ -158,12 +158,12 @@ extern divline_t _g_trace;
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
 //
 
-extern int32_t      _g_numvertexes;
+extern int16_t      _g_numvertexes;
 extern const vertex_t __far* _g_vertexes;
 
 extern const seg_t    __far* _g_segs;
 
-extern int32_t      _g_numsectors;
+extern int16_t      _g_numsectors;
 extern sector_t __far* _g_sectors;
 
 
@@ -171,7 +171,7 @@ extern subsector_t __far* _g_subsectors;
 
 
 
-extern int32_t      _g_numlines;
+extern int16_t      _g_numlines;
 extern const line_t   __far* _g_lines;
 extern linedata_t __far* _g_linedata;
 
@@ -214,7 +214,7 @@ extern const byte __far* _g_rejectmatrix;
 extern mapthing_t _g_playerstarts[MAXPLAYERS];
 
 extern mobj_t __far*      _g_thingPool;
-extern uint32_t _g_thingPoolSize;
+extern int16_t _g_thingPoolSize;
 
 
 //******************************************************************************

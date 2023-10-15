@@ -621,7 +621,7 @@ static void P_SpawnScrollers(void);
 void P_SpawnSpecials (void)
 {
   sector_t __far*   sector;
-  int32_t         i;
+  int16_t         i;
 
   //  Init special sectors.
   sector = _g_sectors;
