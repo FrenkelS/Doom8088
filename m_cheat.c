@@ -130,7 +130,7 @@ static void cheat_choppers()
 
 static void cheat_idkfa()
 {
-    int32_t i;
+    int16_t i;
 
     player_t* plyr = &_g_player;
 
@@ -162,7 +162,7 @@ static void cheat_idkfa()
 
 static void cheat_ammo()
 {
-    int32_t i;
+    int16_t i;
     player_t* plyr = &_g_player;
 
     if (!plyr->backpack)
