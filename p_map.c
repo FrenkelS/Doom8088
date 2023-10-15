@@ -89,7 +89,7 @@ static mobj_t __far*   shootthing;
 // Height if not aiming up or down
 static fixed_t   shootz;
 
-static int32_t       la_damage;
+static int16_t       la_damage;
 fixed_t   _g_attackrange;
 
 // slopes to top and bottom of target
@@ -99,7 +99,7 @@ static fixed_t  bottomslope;
 
 static mobj_t __far* bombsource;
 static mobj_t __far* bombspot;
-static int32_t bombdamage;
+static int16_t bombdamage;
 
 static mobj_t __far*   usething;
 
@@ -163,12 +163,12 @@ static boolean PIT_StompThing(mobj_t __far* thing)
 
 boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss)
   {
-  int32_t     xl;
-  int32_t     xh;
-  int32_t     yl;
-  int32_t     yh;
-  int32_t     bx;
-  int32_t     by;
+  int16_t     xl;
+  int16_t     xh;
+  int16_t     yl;
+  int16_t     yh;
+  int16_t     bx;
+  int16_t     by;
 
   subsector_t __far*  newsubsec;
 
@@ -203,10 +203,10 @@ boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss)
 
   // stomp on any things contacted
 
-  xl = (_g_tmbbox[BOXLEFT] - _g_bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
-  xh = (_g_tmbbox[BOXRIGHT] - _g_bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
+  xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
+  xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
   yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy - MAXRADIUS)>>MAPBLOCKSHIFT;
-  yh = (_g_tmbbox[BOXTOP] - _g_bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
+  yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
 
   for (bx=xl ; bx<=xh ; bx++)
     for (by=yl ; by<=yh ; by++)
@@ -345,7 +345,7 @@ static boolean PIT_CheckLine (const line_t __far* ld)
 static boolean PIT_CheckThing(mobj_t __far* thing)
 {
   fixed_t blockdist;
-  int32_t damage;
+  int16_t damage;
 
   // killough 11/98: add touchy things
   if (!(thing->flags & (MF_SOLID|MF_SPECIAL|MF_SHOOTABLE)))
@@ -373,7 +373,7 @@ static boolean PIT_CheckThing(mobj_t __far* thing)
       // A flying skull is smacking something.
       // Determine damage amount, and the skull comes to a dead stop.
 
-      int32_t damage = ((P_Random()%8)+1)*mobjinfo[tmthing->type].damage;
+      int16_t damage = ((P_Random()%8)+1)*mobjinfo[tmthing->type].damage;
 
       P_DamageMobj (thing, tmthing, tmthing, damage);
 
@@ -441,7 +441,7 @@ static boolean PIT_CheckThing(mobj_t __far* thing)
 
   if (thing->flags & MF_SPECIAL)
     {
-      uint32_t solid = thing->flags & MF_SOLID;
+      boolean solid = thing->flags & MF_SOLID;
       if (tmthing->flags & MF_PICKUP)
   P_TouchSpecialThing(thing, tmthing); // can remove thing
       return !solid;
@@ -482,12 +482,12 @@ static boolean PIT_CheckThing(mobj_t __far* thing)
 
 boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   {
-  int32_t     xl;
-  int32_t     xh;
-  int32_t     yl;
-  int32_t     yh;
-  int32_t     bx;
-  int32_t     by;
+  int16_t     xl;
+  int16_t     xh;
+  int16_t     yl;
+  int16_t     yh;
+  int16_t     bx;
+  int16_t     by;
   subsector_t __far*  newsubsec;
 
   tmthing = thing;
@@ -526,10 +526,10 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   // based on their origin point, and can overlap
   // into adjacent blocks by up to MAXRADIUS units.
 
-  xl = (_g_tmbbox[BOXLEFT] - _g_bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
-  xh = (_g_tmbbox[BOXRIGHT] - _g_bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
+  xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
+  xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
   yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy - MAXRADIUS)>>MAPBLOCKSHIFT;
-  yh = (_g_tmbbox[BOXTOP] - _g_bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
+  yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
 
 
   for (bx=xl ; bx<=xh ; bx++)
@@ -539,10 +539,10 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
 
   // check lines
 
-  xl = (_g_tmbbox[BOXLEFT] - _g_bmaporgx)>>MAPBLOCKSHIFT;
-  xh = (_g_tmbbox[BOXRIGHT] - _g_bmaporgx)>>MAPBLOCKSHIFT;
+  xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx)>>MAPBLOCKSHIFT;
+  xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx)>>MAPBLOCKSHIFT;
   yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy)>>MAPBLOCKSHIFT;
-  yh = (_g_tmbbox[BOXTOP] - _g_bmaporgy)>>MAPBLOCKSHIFT;
+  yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy)>>MAPBLOCKSHIFT;
 
   for (bx=xl ; bx<=xh ; bx++)
     for (by=yl ; by<=yh ; by++)
@@ -2088,7 +2088,7 @@ fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boole
 // that will leave linetarget set.
 //
 
-void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int32_t damage)
+void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int16_t damage)
 {
   fixed_t x2;
   fixed_t y2;
@@ -2257,15 +2257,15 @@ static boolean PIT_RadiusAttack (mobj_t __far* thing)
 // P_RadiusAttack
 // Source is the creature that caused the explosion at spot.
 //
-void P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int32_t damage)
+void P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int16_t damage)
   {
-  int32_t x;
-  int32_t y;
+  int16_t x;
+  int16_t y;
 
-  int32_t xl;
-  int32_t xh;
-  int32_t yl;
-  int32_t yh;
+  int16_t xl;
+  int16_t xh;
+  int16_t yl;
+  int16_t yh;
 
   fixed_t dist;
 
@@ -2493,13 +2493,13 @@ void P_CreateSecNodeList(mobj_t __far* thing)
 
   validcount++; // used to make sure we only process a line once
 
-  int32_t xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx) >> MAPBLOCKSHIFT;
-  int32_t xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx) >> MAPBLOCKSHIFT;
-  int32_t yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy) >> MAPBLOCKSHIFT;
-  int32_t yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy) >> MAPBLOCKSHIFT;
+  int16_t xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx) >> MAPBLOCKSHIFT;
+  int16_t xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx) >> MAPBLOCKSHIFT;
+  int16_t yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy) >> MAPBLOCKSHIFT;
+  int16_t yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy) >> MAPBLOCKSHIFT;
 
-  for (int32_t bx = xl; bx <= xh; bx++)
-    for (int32_t by = yl; by <= yh; by++)
+  for (int16_t bx = xl; bx <= xh; bx++)
+    for (int16_t by = yl; by <= yh; by++)
       P_BlockLinesIterator(bx,by,PIT_GetSectors);
 
   // Add the sector of the (x,y) point to sector_list.

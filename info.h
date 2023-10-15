@@ -567,7 +567,7 @@ typedef struct
   int32_t mass;         /* How much an impact will move it.  Cacodemons
            seem to retreat when shot because they have
            very little mass and are moved by impact */
-  int32_t damage;       /* If this is a missile, how much does it hurt? */
+  int16_t damage;       /* If this is a missile, how much does it hurt? */
   int32_t activesound;  /* What sound it makes wandering around, once
            in a while.  Chance is 3/256 it will. */
   uint32_t flags;  /* Bit masks for lots of things.  See p_mobj.h */

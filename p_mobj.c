@@ -1229,11 +1229,11 @@ void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
 //
 // P_SpawnBlood
 //
-void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int32_t damage)
+void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int16_t damage)
   {
   mobj_t __far* th;
   // killough 5/5/98: remove dependence on order of evaluation:
-  int32_t t = P_Random();
+  fixed_t t = P_Random();
   z += (t - P_Random())<<10;
   th = P_SpawnMobj(x,y,z, MT_BLOOD);
   th->momz = FRACUNIT*2;
@@ -1242,7 +1242,7 @@ void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int32_t damage)
   if (th->tics < 1)
     th->tics = 1;
 
-  if (damage <= 12 && damage >= 9)
+  if (9 <= damage && damage <= 12)
     P_SetMobjState (th,S_BLOOD2);
   else if (damage < 9)
     P_SetMobjState (th,S_BLOOD3);

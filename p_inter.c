@@ -599,7 +599,7 @@ static void P_KillMobj(mobj_t __far* source, mobj_t __far* target)
 // and other environmental stuff.
 //
 
-void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int32_t damage)
+void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int16_t damage)
 {
   player_t *player;
   boolean justhit = false;          /* killough 11/98 */
@@ -626,13 +626,13 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
       (!source || !P_MobjIsPlayer(source) ||
        P_MobjIsPlayer(source)->readyweapon != wp_chainsaw))
     {
-      uint32_t ang = R_PointToAngle2 (inflictor->x, inflictor->y,
+      angle_t ang = R_PointToAngle2 (inflictor->x, inflictor->y,
                                       target->x,    target->y);
 
       fixed_t thrust = damage*(FRACUNIT>>3)*100/mobjinfo[target->type].mass;
 
       // make fall forwards sometimes
-      if ( damage < 40 && damage > target->health
+      if ( target->health < damage && damage < 40
            && target->z - inflictor->z > 64*FRACUNIT
            && P_Random() & 1)
         {
@@ -662,7 +662,7 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
 
       if (player->armortype)
         {
-          int32_t saved = player->armortype == 1 ? damage/3 : damage/2;
+          int16_t saved = player->armortype == 1 ? damage/3 : damage/2;
           if (player->armorpoints <= saved)
             {
               // armor is used up

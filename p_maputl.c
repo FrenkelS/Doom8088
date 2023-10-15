@@ -55,6 +55,7 @@ divline_t _g_trace;
 
 
 // 1/11/98 killough: Intercept limit removed
+#define MAXINTERCEPTS 64
 static intercept_t intercepts[MAXINTERCEPTS];
 static intercept_t* intercept_p;
 
@@ -320,8 +321,8 @@ void P_SetThingPosition(mobj_t __far* thing)
   if (!(thing->flags & MF_NOBLOCKMAP))
     {
       // inert things don't need to be in blockmap
-      int32_t blockx = (thing->x - _g_bmaporgx)>>MAPBLOCKSHIFT;
-      int32_t blocky = (thing->y - _g_bmaporgy)>>MAPBLOCKSHIFT;
+      int16_t blockx = (thing->x - _g_bmaporgx)>>MAPBLOCKSHIFT;
+      int16_t blocky = (thing->y - _g_bmaporgy)>>MAPBLOCKSHIFT;
       if (0 <= blockx && blockx < _g_bmapwidth && 0 <= blocky && blocky < _g_bmapheight)
         {
         // killough 8/11/98: simpler scheme using pointer-to-pointer prev
@@ -357,7 +358,7 @@ void P_SetThingPosition(mobj_t __far* thing)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t __far*))
+boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(const line_t __far*))
 {
 
     if (!(0 <= x && x < _g_bmapwidth && 0 <= y && y <_g_bmapheight))
@@ -375,7 +376,7 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t __f
 
     list++;     // skip 0 starting delimiter                      // phares
 
-    const int32_t vcount = validcount;
+    const int16_t vcount = validcount;
 
     for ( ; *list != -1 ; list++)                                   // phares
     {
@@ -400,9 +401,8 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t __f
 //
 // P_BlockThingsIterator
 //
-// killough 5/3/98: reformatted, cleaned up
 
-boolean P_BlockThingsIterator(int32_t x, int32_t y, boolean func(mobj_t __far*))
+boolean P_BlockThingsIterator(int16_t x, int16_t y, boolean func(mobj_t __far*))
 {
   mobj_t __far* mobj;
   if (0 <= x && x < _g_bmapwidth && 0 <= y && y < _g_bmapheight)
@@ -569,15 +569,15 @@ static boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
 // killough 5/3/98: reformatted, cleaned up
 
 boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
-                       int32_t flags, boolean trav(intercept_t *))
+                       int16_t flags, boolean trav(intercept_t *))
 {
-  fixed_t xt1, yt1;
-  fixed_t xt2, yt2;
+  int16_t xt1, yt1;
+  int16_t xt2, yt2;
   fixed_t xstep, ystep;
   fixed_t partial;
   fixed_t xintercept, yintercept;
-  int32_t     mapx, mapy;
-  int32_t     mapxstep, mapystep;
+  int16_t     mapx, mapy;
+  int16_t     mapxstep, mapystep;
   int16_t     count;
 
   validcount++;

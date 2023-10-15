@@ -489,13 +489,13 @@ static boolean PIT_AvoidDropoff(const line_t __far* line)
 // Driver for above
 //
 
-static fixed_t P_AvoidDropoff(mobj_t __far* actor)
+static boolean P_AvoidDropoff(mobj_t __far* actor)
 {
-  int32_t yh=((_g_tmbbox[BOXTOP]   = actor->y+actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
-  int32_t yl=((_g_tmbbox[BOXBOTTOM]= actor->y-actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
-  int32_t xh=((_g_tmbbox[BOXRIGHT] = actor->x+actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
-  int32_t xl=((_g_tmbbox[BOXLEFT]  = actor->x-actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
-  int32_t bx, by;
+  int16_t yh=((_g_tmbbox[BOXTOP]   = actor->y+actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
+  int16_t yl=((_g_tmbbox[BOXBOTTOM]= actor->y-actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
+  int16_t xh=((_g_tmbbox[BOXRIGHT] = actor->x+actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
+  int16_t xl=((_g_tmbbox[BOXLEFT]  = actor->x-actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
+  int16_t bx, by;
 
   floorz = actor->z;            // remember floor height
 
@@ -508,7 +508,7 @@ static fixed_t P_AvoidDropoff(mobj_t __far* actor)
     for (by=yl ; by<=yh ; by++)
       P_BlockLinesIterator(bx, by, PIT_AvoidDropoff);  // all contacted lines
 
-  return dropoff_deltax | dropoff_deltay;   // Non-zero if movement prescribed
+  return (dropoff_deltax | dropoff_deltay) != 0;   // Non-zero if movement prescribed
 }
 
 
@@ -843,7 +843,10 @@ void A_FaceTarget(mobj_t __far* actor)
 
 void A_PosAttack(mobj_t __far* actor)
 {
-  int32_t angle, damage, slope, t;
+  angle_t angle;
+  int16_t damage;
+  fixed_t slope;
+  angle_t t;
 
   if (!actor->target)
     return;
@@ -861,7 +864,9 @@ void A_PosAttack(mobj_t __far* actor)
 
 void A_SPosAttack(mobj_t __far* actor)
 {
-  int32_t i, bangle, slope;
+  int16_t i;
+  angle_t bangle;
+  fixed_t slope;
 
   if (!actor->target)
     return;
@@ -871,9 +876,9 @@ void A_SPosAttack(mobj_t __far* actor)
   slope = P_AimLineAttack(actor, bangle, MISSILERANGE, false);
   for (i=0; i<3; i++)
     {  // killough 5/5/98: remove dependence on order of evaluation:
-      int32_t t = P_Random();
-      int32_t angle = bangle + ((t - P_Random())<<20);
-      int32_t damage = ((P_Random()%5)+1)*3;
+      angle_t t = P_Random();
+      angle_t angle = bangle + ((t - P_Random())<<20);
+      int16_t damage = ((P_Random()%5)+1)*3;
       P_LineAttack(actor, angle, MISSILERANGE, slope, damage);
     }
 }
@@ -890,7 +895,7 @@ void A_TroopAttack(mobj_t __far* actor)
   A_FaceTarget(actor);
   if (P_CheckMeleeRange(actor))
     {
-      int32_t damage;
+      int16_t damage;
       S_StartSound(actor, sfx_claw);
       damage = (P_Random()%8+1)*3;
       P_DamageMobj(actor->target, actor, actor, damage);
@@ -906,7 +911,7 @@ void A_SargAttack(mobj_t __far* actor)
   A_FaceTarget(actor);
   if (P_CheckMeleeRange(actor))
     {
-      int32_t damage = ((P_Random()%10)+1)*4;
+      int16_t damage = ((P_Random()%10)+1)*4;
       P_DamageMobj(actor->target, actor, actor, damage);
     }
 }
@@ -927,7 +932,7 @@ void A_BruisAttack(mobj_t __far* actor)
     return;
   if (P_CheckMeleeRange(actor))
     {
-      int32_t damage;
+      int16_t damage;
       S_StartSound(actor, sfx_claw);
       damage = (P_Random()%8+1)*10;
       P_DamageMobj(actor->target, actor, actor, damage);

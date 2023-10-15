@@ -577,8 +577,9 @@ void A_GunFlash(player_t *player, pspdef_t *psp)
 
 void A_Punch(player_t *player, pspdef_t *psp)
 {
-	angle_t angle;
-	int32_t t, slope, damage = (P_Random()%10+1)<<1;
+	angle_t	angle, t;
+	fixed_t	slope;
+	int16_t	damage = (P_Random()%10+1)<<1;
 
 	UNUSED(psp);
 
@@ -612,10 +613,11 @@ void A_Punch(player_t *player, pspdef_t *psp)
 
 void A_Saw(player_t *player, pspdef_t *psp)
 {
-	int32_t slope, damage = 2*(P_Random()%10+1);
+	fixed_t slope;
+	int16_t	damage = 2*(P_Random()%10+1);
 	angle_t angle = player->mo->angle;
 	// killough 5/5/98: remove dependence on order of evaluation:
-	int32_t t = P_Random();
+	angle_t t = P_Random();
 	angle += (t - P_Random())<<18;
 
 	UNUSED(psp);
@@ -700,12 +702,12 @@ static void P_BulletSlope(mobj_t __far* mo)
 
 static void P_GunShot(mobj_t __far* mo, boolean accurate)
 {
-  int32_t damage = 5*(P_Random()%3+1);
+  int16_t damage = 5*(P_Random()%3+1);
   angle_t angle = mo->angle;
 
   if (!accurate)
     {  // killough 5/5/98: remove dependence on order of evaluation:
-      int32_t t = P_Random();
+      angle_t t = P_Random();
       angle += (t - P_Random())<<18;
     }
 

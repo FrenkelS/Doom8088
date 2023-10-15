@@ -45,7 +45,7 @@
 
 boolean P_GivePower(player_t *, powertype_t);
 void P_TouchSpecialThing(mobj_t __far* special, mobj_t __far* toucher);
-void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int32_t damage);
+void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int16_t damage);
 
 
 extern const int16_t god_health;
