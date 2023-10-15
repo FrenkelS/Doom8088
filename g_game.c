@@ -133,7 +133,7 @@ static const int32_t     key_strafeleft = KEYD_L;
 static const int32_t     key_straferight = KEYD_R;
 //Match Doom II GBA controls ~ Kippykip
 const int32_t     key_fire = KEYD_B; 
-const int32_t     key_use = KEYD_A;
+const int16_t     key_use = KEYD_A;
 const int32_t     key_escape = KEYD_START;                           // phares 4/13/98
 const int32_t     key_enter = KEYD_A;
 const int32_t     key_map_right = KEYD_RIGHT;

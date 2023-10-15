@@ -238,9 +238,9 @@ static void P_GiveCard(player_t *player, card_t card)
 // Rewritten by Lee Killough
 //
 
-boolean P_GivePower(player_t *player, int32_t power)
+boolean P_GivePower(player_t *player, powertype_t power)
 {
-  static const int32_t tics[NUMPOWERS] = {
+  static const int16_t tics[NUMPOWERS] = {
     INVULNTICS, 1 /* strength */, INVISTICS,
     IRONTICS, 1 /* allmap */, INFRATICS,
    };

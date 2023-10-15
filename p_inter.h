@@ -43,7 +43,7 @@
 /* follow a player exclusively for 3 seconds */
 #define BASETHRESHOLD   (100)
 
-boolean P_GivePower(player_t *, int32_t);
+boolean P_GivePower(player_t *, powertype_t);
 void P_TouchSpecialThing(mobj_t __far* special, mobj_t __far* toucher);
 void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int32_t damage);
 

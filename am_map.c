@@ -207,7 +207,7 @@ static void AM_activateNewScale(void)
 //
 static void AM_findMinMaxBoundaries(void)
 {
-    int32_t i;
+    int16_t i;
     fixed_t a;
     fixed_t b;
 
@@ -872,7 +872,7 @@ static boolean PUREFUNC P_WasSecret(const sector_t __far* sec)
 //
 static void AM_drawWalls(void)
 {
-    int32_t i;
+    int16_t i;
     mline_t l;
 
     // draw the unclipped visible portions of all lines
@@ -1011,7 +1011,7 @@ static void AM_drawWalls(void)
 //
 static void AM_drawLineCharacter(angle_t angle, fixed_t x, fixed_t y)
 {
-    int32_t   i;
+    int16_t   i;
     mline_t l;
 
     if (automapmode & am_rotate) angle -= _g_player.mo->angle - ANG90; // cph

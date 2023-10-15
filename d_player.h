@@ -123,7 +123,7 @@ typedef struct player_s
   int32_t                 armortype;
 
   // Power ups. invinc and invis are tic counters.
-  int32_t                 powers[NUMPOWERS];
+  int16_t                 powers[NUMPOWERS];
   boolean             cards[NUMCARDS];
   boolean             backpack;
 

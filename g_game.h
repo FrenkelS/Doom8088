@@ -75,7 +75,7 @@ extern const int32_t  key_menu_down;
 extern const int32_t  key_menu_escape;                                 //     |
 extern const int32_t  key_menu_enter;                                  // phares 3/7/98
 extern const int32_t  key_fire;
-extern const int32_t  key_use;
+extern const int16_t  key_use;
 extern const int32_t  key_escape;                                             // phares
 extern const int32_t  key_savegame;                                           //    |
 extern const int32_t  key_loadgame;                                           //    V
