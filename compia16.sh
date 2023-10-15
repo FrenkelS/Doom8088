@@ -2,7 +2,7 @@ mkdir GCCIA16
 
 unset CFLAGS
 
-ia16-elf-gcc -c i_main.c   -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
+ia16-elf-gcc -c i_main.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program
 ia16-elf-gcc -c i_system.c -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c p_map.c    -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall
 ia16-elf-gcc -c p_mobj.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -fno-function-sections -mregparmcall -flto -fwhole-program
