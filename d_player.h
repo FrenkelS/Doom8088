@@ -212,7 +212,7 @@ typedef struct
   int32_t         maxsecret;
 
   // the par time
-  int32_t         partime;
+  int16_t         partime;
 
   // index of this player in game
   int32_t         pnum;

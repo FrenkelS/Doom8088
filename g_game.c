@@ -119,32 +119,31 @@ boolean         _g_singledemo;           // quit after playing a demo from cmdli
 // controls (have defaults)
 //
 
-static const int32_t     key_right = KEYD_RIGHT;
-static const int32_t     key_left = KEYD_LEFT;
-static const int32_t     key_up = KEYD_UP;
-static const int32_t     key_down = KEYD_DOWN;
-const int32_t     key_menu_right = KEYD_RIGHT;                                      // phares 3/7/98
-const int32_t     key_menu_left = KEYD_LEFT;                                       //     |
-const int32_t     key_menu_up = KEYD_UP;                                         //     V
-const int32_t     key_menu_down = KEYD_DOWN;
-const int32_t     key_menu_escape = KEYD_START;                                     //     |
-const int32_t     key_menu_enter = KEYD_A;                                      // phares 3/7/98
-static const int32_t     key_strafeleft = KEYD_L;
-static const int32_t     key_straferight = KEYD_R;
-//Match Doom II GBA controls ~ Kippykip
-const int32_t     key_fire = KEYD_B; 
-const int16_t     key_use = KEYD_A;
-const int32_t     key_escape = KEYD_START;                           // phares 4/13/98
-const int32_t     key_enter = KEYD_A;
-const int32_t     key_map_right = KEYD_RIGHT;
-const int32_t     key_map_left = KEYD_LEFT;
-const int32_t     key_map_up = KEYD_UP;
-const int32_t     key_map_down = KEYD_DOWN;
-const int32_t     key_map = KEYD_SELECT;
-const int32_t     key_map_follow = KEYD_A;
-const int32_t     key_map_zoomin = KEYD_R;
-const int32_t     key_map_zoomout = KEYD_L;
-                                          // phares
+static const int16_t key_right       = KEYD_RIGHT;
+static const int16_t key_left        = KEYD_LEFT;
+static const int16_t key_up          = KEYD_UP;
+static const int16_t key_down        = KEYD_DOWN;
+       const int32_t key_menu_right  = KEYD_RIGHT;
+       const int32_t key_menu_left   = KEYD_LEFT;
+       const int32_t key_menu_up     = KEYD_UP;
+       const int32_t key_menu_down   = KEYD_DOWN;
+       const int32_t key_menu_escape = KEYD_START;
+       const int32_t key_menu_enter  = KEYD_A;
+static const int16_t key_strafeleft  = KEYD_L;
+static const int16_t key_straferight = KEYD_R;
+       const int16_t key_fire        = KEYD_B; 
+       const int16_t key_use         = KEYD_A;
+       const int32_t key_escape      = KEYD_START;
+       const int32_t key_enter       = KEYD_A;
+       const int32_t key_map_right   = KEYD_RIGHT;
+       const int32_t key_map_left    = KEYD_LEFT;
+       const int32_t key_map_up      = KEYD_UP;
+       const int32_t key_map_down    = KEYD_DOWN;
+       const int32_t key_map         = KEYD_SELECT;
+       const int32_t key_map_follow  = KEYD_A;
+       const int32_t key_map_zoomin  = KEYD_R;
+       const int32_t key_map_zoomout = KEYD_L;
+
 
 #define MAXPLMOVE   (forwardmove[1])
 #define SLOWTURNTICS  6
@@ -214,8 +213,8 @@ void G_BuildTiccmd(void)
 {
     static int16_t     turnheld = 0;       // for accelerative turning
 
-    int32_t speed;
-    int32_t tspeed;
+    int16_t speed;
+    int16_t tspeed;
     int32_t forward;
     int32_t side;
     int32_t newweapon;                                          // phares
@@ -618,11 +617,6 @@ void G_DoReborn (void)
     _g_gameaction = ga_loadlevel;      // reload the level from scratch
 }
 
-// DOOM Par Times
-static const int32_t pars[10] = {
-    0,30,75,120,90,165,180,180,30,165
-};
-
 
 void G_ExitLevel (void)
 {
@@ -638,6 +632,13 @@ void G_SecretExitLevel (void)
     secretexit = true;
     _g_gameaction = ga_completed;
 }
+
+
+// DOOM Par Times
+static const uint8_t pars[10] = {
+    0,30,75,120,90,165,180,180,30,165
+};
+
 
 //
 // G_DoCompleted
@@ -759,7 +760,7 @@ void G_UpdateSaveGameStrings()
 
     gba_save_data_t __far* saveslots = (gba_save_data_t __far*)loadbuffer;
 
-    for(int32_t i = 0; i < 8; i++)
+    for(int16_t i = 0; i < 8; i++)
     {
         if(saveslots[i].save_present != 1)
         {
@@ -1082,7 +1083,7 @@ static const byte __far* G_ReadDemoHeader(const byte __far* demo_p)
 static void ExtractFileBase (const char *path, char *dest)
 {
     const char *src = path + strlen(path) - 1;
-    int32_t length;
+    int16_t length;
 
     // back up until a \ or the start
     while (src != path && src[-1] != ':' // killough 3/22/98: allow c:filename
