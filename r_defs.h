@@ -174,7 +174,8 @@ typedef struct line_s
 {
     vertex_t v1;
     vertex_t v2;     // Vertices, from v1 to v2.
-    uint32_t lineno;         //line number.
+    uint16_t lineno;         //line number.
+    uint16_t filler;
 
     fixed_t dx, dy;        // Precalculated v2 - v1 for side checking.
 

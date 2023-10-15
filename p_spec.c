@@ -122,7 +122,7 @@ sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec)
 //
 fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec)
 {
-  int32_t                 i;
+  int16_t                 i;
   const line_t __far*             check;
   sector_t __far*           other;
   fixed_t             floor = sec->floorheight;
@@ -237,7 +237,7 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 //
 fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
 {
-  int32_t             i;
+  int16_t             i;
   const line_t __far* check;
   sector_t __far*       other;
   fixed_t height = -32000*FRACUNIT;
@@ -554,7 +554,7 @@ boolean P_CheckTag(const line_t __far* line)
 
 static void P_UpdateAnimatedTexture(void)
 {
-	uint32_t t = _g_leveltime >> 3;
+	uint16_t t = _g_leveltime >> 3;
 
 	int16_t pic = animated_texture_basepic + (t % 3);
 
@@ -761,16 +761,7 @@ static void P_SpawnScrollers(void)
     const line_t __far* l = _g_lines;
 
     for (i=0;i<_g_numlines;i++,l++)
-    {
-        int32_t special = LN_SPECIAL(l);
-
-        switch (special)
-        {
-        case 48:                  // scroll first side
+        if (LN_SPECIAL(l) == 48)
             Add_Scroller(_g_lines[i].sidenum[0]);
-            break;
-
-        }
-    }
 }
 
