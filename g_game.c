@@ -577,13 +577,13 @@ static void G_PlayerFinishLevel(void)
 void G_PlayerReborn (void)
 {
     player_t *p;
-    int32_t i;
-    int32_t killcount;
-    int32_t itemcount;
-    int32_t secretcount;
+    int16_t i;
+    int16_t killcount;
+    int16_t itemcount;
+    int16_t secretcount;
 
-    killcount = _g_player.killcount;
-    itemcount = _g_player.itemcount;
+    killcount   = _g_player.killcount;
+    itemcount   = _g_player.itemcount;
     secretcount = _g_player.secretcount;
 
     p = &_g_player;

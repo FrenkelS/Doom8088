@@ -57,25 +57,25 @@
 // dehacked support (and future flexibility).  Most var names came from the key
 // strings used in dehacked.
 
-const int32_t initial_health = 100;
-const int32_t initial_bullets = 50;
-static const int32_t maxhealth = 100; // was MAXHEALTH as a #define, used only in this module
-static const int32_t max_armor = 200;
-static const int32_t green_armor_class = 1;  // these are involved with armortype below
-static const int32_t blue_armor_class = 2;
-static const int32_t max_soul = 200;
-static const int32_t soul_health = 100;
-const int32_t god_health = 100;   // these are used in cheats (see st_stuff.c)
-const int32_t idfa_armor = 200;
-const int32_t idfa_armor_class = 2;
+       const int16_t initial_health    = 100;
+       const int16_t initial_bullets   = 50;
+static const int16_t maxhealth         = 100; // was MAXHEALTH as a #define, used only in this module
+static const int16_t max_armor         = 200;
+static const int16_t green_armor_class = 1;  // these are involved with armortype below
+static const int16_t blue_armor_class  = 2;
+static const int16_t max_soul          = 200;
+static const int16_t soul_health       = 100;
+       const int16_t god_health        = 100;   // these are used in cheats (see st_stuff.c)
+       const int16_t idfa_armor        = 200;
+       const int16_t idfa_armor_class  = 2;
 
-const int32_t bfgcells = 40;      // used in p_pspr.c
+       const int16_t bfgcells          = 40;      // used in p_pspr.c
 // Ty 03/07/98 - end deh externals
 
 // a weapon is found with two clip loads,
 // a big item has five clip loads
-const int32_t maxammo[NUMAMMO]  = {200, 50, 300, 50};
-static const int32_t clipammo[NUMAMMO] = { 10,  4,  20,  1};
+       const int16_t maxammo[NUMAMMO] = {200, 50, 300, 50};
+static const int8_t clipammo[NUMAMMO] = { 10,  4,  20,  1};
 
 //
 // GET STUFF
@@ -88,9 +88,9 @@ static const int32_t clipammo[NUMAMMO] = { 10,  4,  20,  1};
 // Returns false if the ammo can't be picked up at all
 //
 
-static boolean P_GiveAmmo(player_t *player, ammotype_t ammo, int32_t num)
+static boolean P_GiveAmmo(player_t *player, ammotype_t ammo, int16_t num)
 {
-  int32_t oldammo;
+  int16_t oldammo;
 
   if (ammo == am_noammo)
     return false;

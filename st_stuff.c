@@ -502,12 +502,12 @@ void ST_Ticker(void)
 static void ST_doPaletteStuff(void)
 {
     int8_t         palette;
-    int32_t cnt = _g_player.damagecount;
+    int16_t cnt = _g_player.damagecount;
 
     if (_g_player.powers[pw_strength])
     {
         // slowly fade the berzerk out
-        int32_t bzc = 12 - (_g_player.powers[pw_strength]>>6);
+        int16_t bzc = 12 - (_g_player.powers[pw_strength]>>6);
         if (bzc > cnt)
             cnt = bzc;
     }
@@ -847,7 +847,7 @@ static void STlib_initMultIcon(st_multicon_t* i, int32_t x, int32_t y, int16_t* 
 // to the value displayed, and the width
 // Returns nothing
 //
-static void STlib_initNum(st_number_t* n, int32_t x, int32_t y, int16_t* pl, int32_t* num, int32_t width)
+static void STlib_initNum(st_number_t* n, int32_t x, int32_t y, int16_t* pl, int16_t* num, int32_t width)
 {
 	n->x      = x;
 	n->y      = y;
