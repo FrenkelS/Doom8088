@@ -117,7 +117,7 @@ extern const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking
 // 1/11/98 killough: removed limit on special lines crossed
 extern const line_t __far* _g_spechit[4];
 
-extern int32_t _g_numspechit;
+extern int16_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
 extern msecnode_t __far* _g_sector_list;
