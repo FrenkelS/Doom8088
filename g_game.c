@@ -148,9 +148,9 @@ static const int16_t key_straferight = KEYD_R;
 #define MAXPLMOVE   (forwardmove[1])
 #define SLOWTURNTICS  6
 
-static const fixed_t forwardmove[2] = {0x19, 0x32};
-static const fixed_t sidemove[2]    = {0x18, 0x28};
-static const fixed_t angleturn[3]   = {640, 1280, 320};  // + slow turn
+static const int8_t forwardmove[2] = {0x19, 0x32};
+static const int8_t sidemove[2]    = {0x18, 0x28};
+static const int16_t angleturn[3]  = {640, 1280, 320};  // + slow turn
 
 static void G_DoReborn (void);
 static void G_DoCompleted(void);
@@ -159,7 +159,7 @@ static void G_DoLoadGame(void);
 static void G_DoSaveGame (void);
 static void G_DoNewGame (void);
 static void G_DoPlayDemo(void);
-static void G_InitNew(skill_t skill, int32_t map);
+static void G_InitNew(skill_t skill, int16_t map);
 static void G_ReadDemoTiccmd (void);
 
 
@@ -215,9 +215,9 @@ void G_BuildTiccmd(void)
 
     int16_t speed;
     int16_t tspeed;
-    int32_t forward;
-    int32_t side;
-    int32_t newweapon;                                          // phares
+    int16_t forward;
+    int16_t side;
+    weapontype_t newweapon;
     /* cphipps - remove needless I_BaseTiccmd call, just set the ticcmd to zero */
     memset(&netcmd,0,sizeof(ticcmd_t));
 
@@ -948,7 +948,7 @@ static void G_DoNewGame (void)
 // consoleplayer, displayplayer, playeringame[] should be set.
 //
 
-static void G_InitNew(skill_t skill, int32_t map)
+static void G_InitNew(skill_t skill, int16_t map)
 {
     if (skill > sk_nightmare)
         skill = sk_nightmare;
@@ -1028,7 +1028,7 @@ static void CheckForOverrun(const byte __far* start_p, const byte __far* current
 static const byte __far* G_ReadDemoHeader(const byte __far* demo_p)
 {
     skill_t skill;
-    int32_t map;
+    int16_t map;
 
     // e6y
     // The local variable should be used instead of demobuffer,

@@ -38,17 +38,18 @@
 #define __D_ITEMS__
 
 #include "doomdef.h"
+#include "info.h"
 
 
 /* Weapon info: sprite frames, ammunition use. */
 typedef struct
 {
   ammotype_t  ammo;
-  int32_t         upstate;
-  int32_t         downstate;
-  int32_t         readystate;
-  int32_t         atkstate;
-  int32_t         flashstate;
+  statenum_t         upstate;
+  statenum_t         downstate;
+  statenum_t         readystate;
+  statenum_t         atkstate;
+  statenum_t         flashstate;
 
 } weaponinfo_t;
 
