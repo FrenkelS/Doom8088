@@ -274,7 +274,7 @@ void P_TouchSpecialThing(mobj_t __far* special, mobj_t __far* toucher)
 {
   player_t *player;
   int16_t      i;
-  int32_t      sound;
+  sfxenum_t      sound;
   fixed_t  delta = special->z - toucher->z;
 
   if (delta > toucher->height || delta < -8*FRACUNIT)

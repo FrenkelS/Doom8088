@@ -153,7 +153,7 @@ static void P_StartButton(const line_t __far* line, bwhere_e w, int32_t texture,
 void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
 {
     /* Rearranged a bit to avoid too much code duplication */
-    int16_t     i, sound;
+    int16_t     i;
     int16_t   *texture, ttop, tmid, tbot;
     bwhere_e position;
 
@@ -161,7 +161,7 @@ void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
     tmid = _g_sides[line->sidenum[0]].midtexture;
     tbot = _g_sides[line->sidenum[0]].bottomtexture;
 
-    sound = sfx_swtchn;
+    sfxenum_t sound = sfx_swtchn;
 
     /* don't zero line->special until after exit switch test */
     if (!useAgain)

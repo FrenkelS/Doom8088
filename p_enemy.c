@@ -671,7 +671,7 @@ void A_Look(mobj_t __far* actor)
 
     if (mobjinfo[actor->type].seesound)
     {
-        int32_t sound;
+        sfxenum_t sound;
         switch (mobjinfo[actor->type].seesound)
         {
         case sfx_posit1:
@@ -944,7 +944,7 @@ void A_BruisAttack(mobj_t __far* actor)
 
 void A_Scream(mobj_t __far* actor)
 {
-  int32_t sound;
+  sfxenum_t sound;
 
   switch (mobjinfo[actor->type].deathsound)
     {
@@ -1033,6 +1033,6 @@ void A_BossDeath(mobj_t __far* mo)
 
 void A_PlayerScream(mobj_t __far* mo)
 {
-  int32_t sound = sfx_pldeth;  // Default death sound.
+  sfxenum_t sound = sfx_pldeth;  // Default death sound.
   S_StartSound(mo, sound);
 }

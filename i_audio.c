@@ -71,7 +71,7 @@
 //  which is maintained as a given number
 //  (eight, usually) of internal channels.
 //
-static void addsfx(int32_t sfxid, int32_t channel, int32_t volume, int32_t sep)
+static void addsfx(sfxenum_t sfxid, int16_t channel, int32_t volume, int16_t sep)
 {
 	UNUSED(sfxid);
 	UNUSED(channel);
@@ -91,9 +91,9 @@ static void addsfx(int32_t sfxid, int32_t channel, int32_t volume, int32_t sep)
 // Pitching (that is, increased speed of playback)
 //  is set, but currently not used by mixing.
 //
-int32_t I_StartSound(int32_t id, int32_t channel, int32_t vol, int32_t sep)
+int16_t I_StartSound(sfxenum_t id, int16_t channel, int32_t vol, int16_t sep)
 {
-	if ((channel < 0) || (channel >= MAX_CHANNELS))
+	if (!(0 <= channel < 0 && channel < MAX_CHANNELS))
 		return -1;
 
     addsfx(id, channel, vol, sep);
