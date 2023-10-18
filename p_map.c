@@ -68,7 +68,7 @@ fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // so missiles don't explode against sky hack walls
 
 const line_t    __far* _g_ceilingline;
-const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
+static const line_t        __far* blockline;    /* blocking linedef */
 static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
 
 // keep track of special lines as they are hit,
@@ -282,7 +282,7 @@ static boolean PIT_CheckLine (const line_t __far* ld)
   // killough 7/24/98: allow player to move out of 1s wall, to prevent sticking
   if (!LN_BACKSECTOR(ld)) // one sided line
     {
-      _g_blockline = ld;
+      blockline = ld;
       return tmunstuck && !untouched(ld) &&
   FixedMul(tmx-tmthing->x,ld->dy) > FixedMul(tmy-tmthing->y,ld->dx);
     }
@@ -310,13 +310,13 @@ static boolean PIT_CheckLine (const line_t __far* ld)
     {
       _g_tmceilingz = _g_opentop;
       _g_ceilingline = ld;
-      _g_blockline = ld;
+      blockline = ld;
     }
 
   if (_g_openbottom > _g_tmfloorz)
     {
       _g_tmfloorz = _g_openbottom;
-      _g_blockline = ld;
+      blockline = ld;
     }
 
   if (_g_lowfloor < _g_tmdropoffz)
@@ -499,7 +499,7 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   _g_tmbbox[BOXLEFT] = x - tmthing->radius;
 
   newsubsec = R_PointInSubsector (x,y);
-  _g_blockline = _g_ceilingline = NULL; // killough 8/1/98
+  blockline = _g_ceilingline = NULL;
 
   // Whether object can get out of a sticky situation:
   tmunstuck = P_MobjIsPlayer(thing) &&          /* only players */
