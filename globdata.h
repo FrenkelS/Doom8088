@@ -243,9 +243,6 @@ extern uint16_t __far* _g_screen;
 // used to accelerate or skip a stage
 extern boolean   _g_acceleratestage;
 
-// used for general timing
-extern int32_t    _g_cnt;
-
 
 extern enum automapmode_e automapmode;
 
