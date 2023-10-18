@@ -55,12 +55,8 @@ typedef int32_t fixed_t;
  *
  */
 
-inline static int32_t CONSTFUNC D_abs(fixed_t x)
-{
-  fixed_t _t = (x),_s;
-  _s = _t >> (8*sizeof _t-1);
-  return (_t+_s)^_s;
-}
+#include <stdlib.h>
+#define D_abs labs
 
 
 /*
@@ -74,10 +70,6 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b);
  * Fixed Point Division
  */
 
-inline static fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
-{
-    return ((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b) ? ((a^b)>>31) ^ INT32_MAX :
-                                                  (fixed_t)(((int64_t) a << FRACBITS) / b);
-}
+fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b);
 
 #endif
