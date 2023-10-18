@@ -450,8 +450,8 @@ void D_StartTitle (void)
 =================
 */
 
-int myargc;
-const char * const * myargv;
+static int myargc;
+static const char * const * myargv;
 
 static int16_t M_CheckParm(char *check)
 {
@@ -530,8 +530,11 @@ static void D_DoomMainSetup(void)
 // D_DoomMain
 //
 
-void D_DoomMain(void)
+void D_DoomMain(int argc, const char * const * argv)
 {
+    myargc = argc;
+    myargv = argv;
+
     D_DoomMainSetup(); // CPhipps - setup out of main execution stack
 
     D_DoomLoop ();  // never returns

@@ -2,7 +2,6 @@ mkdir GCCIA16
 
 unset CFLAGS
 
-ia16-elf-gcc -c i_main.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program
 ia16-elf-gcc -c i_system.c -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c p_mobj.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program
 ia16-elf-gcc -c r_draw.c   -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program -funroll-loops
@@ -20,8 +19,7 @@ export GLOBOBJS+=" f_wipe.c"
 export GLOBOBJS+=" g_game.c"
 export GLOBOBJS+=" hu_stuff.c"
 export GLOBOBJS+=" i_audio.c"
-#export GLOBOBJS+=" i_main.c"
-export GLOBOBJS+=" i_main.o"
+export GLOBOBJS+=" i_main.c"
 #export GLOBOBJS+=" i_system.c"
 export GLOBOBJS+=" i_system.o"
 export GLOBOBJS+=" info.c"
@@ -66,7 +64,6 @@ export GLOBOBJS+=" z_zone.c"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS -o GCCIA16/DOOM8088.EXE
 
-rm i_main.o
 rm i_system.o
 rm p_mobj.o
 rm r_draw.o
