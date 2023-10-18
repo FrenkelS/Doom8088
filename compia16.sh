@@ -4,7 +4,6 @@ unset CFLAGS
 
 ia16-elf-gcc -c i_main.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program
 ia16-elf-gcc -c i_system.c -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c p_map.c    -march=i286 -mcmodel=medium -Os    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall
 ia16-elf-gcc -c p_mobj.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program
 ia16-elf-gcc -c r_draw.c   -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program -funroll-loops
 
@@ -36,8 +35,7 @@ export GLOBOBJS+=" p_floor.c"
 export GLOBOBJS+=" p_genlin.c"
 export GLOBOBJS+=" p_inter.c"
 export GLOBOBJS+=" p_lights.c"
-#export GLOBOBJS+=" p_map.c"
-export GLOBOBJS+=" p_map.o"
+export GLOBOBJS+=" p_map.c"
 export GLOBOBJS+=" p_maputl.c"
 #export GLOBOBJS+=" p_mobj.c"
 export GLOBOBJS+=" p_mobj.o"
@@ -70,6 +68,5 @@ ia16-elf-gcc $GLOBOBJS $CFLAGS -o GCCIA16/DOOM8088.EXE
 
 rm i_main.o
 rm i_system.o
-rm p_map.o
 rm p_mobj.o
 rm r_draw.o
