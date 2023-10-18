@@ -268,7 +268,7 @@ static void TryRunTics (void)
 //  calls all ?_Responder, ?_Ticker, and ?_Drawer,
 //  calls I_GetTime and I_StartTic
 //
-
+static void NORETURN_PRE D_DoomLoop(void) NORETURN_POST;
 static void D_DoomLoop(void)
 {
     for (;;)
