@@ -490,7 +490,7 @@ void HU_Ticker(void)
             message_counter = HU_MSGTIMEOUT;
 
             // clear the flag that "Messages Off" is being posted
-            _g_message_dontfuckwithme = 0;
+            _g_message_dontfuckwithme = false;
         }
     }
 }

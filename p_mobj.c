@@ -55,6 +55,10 @@
 #include "globdata.h"
 
 
+// Maintain player starting spot.
+static mapthing_t playerstart;
+
+
 void A_CyberAttack(mobj_t __far* actor);
 
 
@@ -1135,9 +1139,9 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     //Only care about start spot for player 1.
     if(mthing->type == 1)
     {
-        _g_playerstarts[0] = *mthing;
-        _g_playerstarts[0].options = 1;
-        P_SpawnPlayer (&_g_playerstarts[0]);
+        playerstart = *mthing;
+        playerstart.options = 1;
+        P_SpawnPlayer (&playerstart);
         return;
     }
 

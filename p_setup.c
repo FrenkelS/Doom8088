@@ -114,9 +114,6 @@ mobj_t    __far*__far* _g_blocklinks;           // for thing chains
 
 const byte __far* _g_rejectmatrix;
 
-// Maintain single and multi player starting spots.
-mapthing_t _g_playerstarts[MAXPLAYERS];
-
 mobj_t __far*      _g_thingPool;
 int16_t _g_thingPoolSize;
 
@@ -644,11 +641,8 @@ void P_SetupLevel(int16_t map)
 
     P_GroupLines();
 
-    // Note: you don't need to clear player queue slots --
-    // a much simpler fix is in g_game.c -- killough 10/98
-
-    /* cph - reset all multiplayer starts */
-    memset(_g_playerstarts,0,sizeof(_g_playerstarts));
+    // Note: you don't need to clear player queue slots
+    // a much simpler fix is in g_game.c
 
     for (i = 0; i < MAXPLAYERS; i++)
         _g_player.mo = NULL;

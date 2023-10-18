@@ -198,8 +198,6 @@ extern mobj_t    __far*__far* _g_blocklinks;           // for thing chains
 
 extern const byte __far* _g_rejectmatrix;
 
-// Maintain single and multi player starting spots.
-extern mapthing_t _g_playerstarts[MAXPLAYERS];
 
 extern mobj_t __far*      _g_thingPool;
 extern int16_t _g_thingPoolSize;
