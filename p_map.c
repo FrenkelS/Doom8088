@@ -662,9 +662,9 @@ static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mob
         // Make sure we are on correct side of exit linedef.
         while (P_PointOnLineSide(x, y, l) != side && --fudge>=0)
           if (D_abs(l->dx) > D_abs(l->dy))
-            y -= l->dx < 0 != side ? -1 : 1;
+            y -= (l->dx < 0) != side ? -1 : 1;
           else
-            x += l->dy < 0 != side ? -1 : 1;
+            x += (l->dy < 0) != side ? -1 : 1;
 
         // Attempt to teleport, aborting if blocked
         if (!P_TeleportMove(thing, x, y, false)) /* killough 8/9/98 */
@@ -1940,7 +1940,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 // PTR_ShootTraverse
 //
 static boolean PTR_ShootTraverse (intercept_t* in)
-  {
+{
   fixed_t x;
   fixed_t y;
   fixed_t z;
@@ -1954,25 +1954,23 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   fixed_t thingbottomslope;
 
   if (in->isaline)
-    {
+  {
     const line_t __far* li = in->d.line;
 
     if (LN_SPECIAL(li))
       P_ShootSpecialLine (shootthing, li);
 
-      if (li->flags & ML_TWOSIDED)
-  {  // crosses a two sided (really 2s) line
-    P_LineOpening (li);
-    dist = FixedMul(attackrange, in->frac);
+    if (li->flags & ML_TWOSIDED)
+    {  // crosses a two sided (really 2s) line
+      P_LineOpening (li);
+      dist = FixedMul(attackrange, in->frac);
 
-    // killough 11/98: simplify
-
-    if ((LN_FRONTSECTOR(li)->floorheight==LN_BACKSECTOR(li)->floorheight ||
+      if ((LN_FRONTSECTOR(li)->floorheight==LN_BACKSECTOR(li)->floorheight ||
          (slope = FixedDiv(_g_openbottom - shootz , dist)) <= aimslope) &&
-        (LN_FRONTSECTOR(li)->ceilingheight==LN_BACKSECTOR(li)->ceilingheight ||
+         (LN_FRONTSECTOR(li)->ceilingheight==LN_BACKSECTOR(li)->ceilingheight ||
          (slope = FixedDiv (_g_opentop - shootz , dist)) >= aimslope))
-      return true;      // shot continues
-  }
+        return true;      // shot continues
+    }
 
     // hit line
     // position a bit closer
@@ -1983,7 +1981,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
 
     if (LN_FRONTSECTOR(li)->ceilingpic == skyflatnum)
-      {
+    {
       // don't shoot the sky!
 
       if (z > LN_FRONTSECTOR(li)->ceilingheight)
@@ -1996,9 +1994,9 @@ static boolean PTR_ShootTraverse (intercept_t* in)
         // fix bullet-eaters -- killough:
         // WARNING: Almost all demos will lose sync without this
         // demo_compatibility flag check!!! killough 1/18/98
-      if (LN_BACKSECTOR(li)->ceilingheight < z)
-        return false;
-      }
+        if (LN_BACKSECTOR(li)->ceilingheight < z)
+          return false;
+    }
 
     // Spawn bullet puffs.
 
@@ -2007,7 +2005,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     // don't go any farther
 
     return false;
-    }
+  }
 
   // shoot a thing
 
@@ -2052,7 +2050,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   // don't go any farther
   return false;
-  }
+}
 
 
 //

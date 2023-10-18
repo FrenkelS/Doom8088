@@ -1011,7 +1011,7 @@ static void AM_drawWalls(void)
 //
 static void AM_drawLineCharacter(angle_t angle, fixed_t x, fixed_t y)
 {
-    int16_t   i;
+    uint16_t   i;
     mline_t l;
 
     if (automapmode & am_rotate) angle -= _g_player.mo->angle - ANG90; // cph

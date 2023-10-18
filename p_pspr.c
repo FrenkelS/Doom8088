@@ -302,12 +302,13 @@ weapontype_t P_WeaponCycleDown(player_t *player)
 {
     weapontype_t w = player->readyweapon;
 
-    for(int16_t i = 0; i < NUMWEAPONS; i++)
+    for (int16_t i = 0; i < NUMWEAPONS; i++)
     {
-        w--;
-        if(w < 0)
+        if (w == 0)
             w = NUMWEAPONS-1;
-		
+        else
+            w--;
+
 		//Dumb hack to fix weapon order	to be like PSXDoom ~Kippykip
 		switch(w)
 		{

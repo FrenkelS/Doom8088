@@ -93,7 +93,7 @@ static void addsfx(sfxenum_t sfxid, int16_t channel, int32_t volume, int16_t sep
 //
 int16_t I_StartSound(sfxenum_t id, int16_t channel, int32_t vol, int16_t sep)
 {
-	if (!(0 <= channel < 0 && channel < MAX_CHANNELS))
+	if (!(0 <= channel && channel < MAX_CHANNELS))
 		return -1;
 
     addsfx(id, channel, vol, sep);

@@ -1006,10 +1006,10 @@ void P_RemoveMobj(mobj_t __far* mobj)
  * killough 8/24/98: rewrote to use hashing
  */
 
-static PUREFUNC int16_t P_FindDoomedNum(uint32_t type)
+static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
 {
     // find which type to spawn
-    for (int16_t i=0 ; i< NUMMOBJTYPES ; i++)
+    for (int16_t i = 0; i < NUMMOBJTYPES; i++)
     {
         if (type == mobjinfo[i].doomednum)
             return i;
