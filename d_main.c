@@ -94,8 +94,6 @@ static boolean singletics; // debug flag to cancel adaptiveness
 static boolean advancedemo;
 boolean _g_fps_show;
 
-uint32_t _g_gamma;
-
 //fps counter stuff
 uint16_t _g_fps_framerate;
 

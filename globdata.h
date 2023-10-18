@@ -34,7 +34,7 @@
 
 extern boolean _g_fps_show;
 
-extern uint32_t _g_gamma;
+extern uint16_t _g_gamma;
 
 //fps counter stuff
 extern uint16_t _g_fps_framerate;
