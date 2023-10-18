@@ -117,8 +117,8 @@ static uint16_t emsHandle;
 static segment_t Z_InitExpandedMemory(void)
 {
 #if defined _M_I86
-	void __far* emsInterruptVector = _dos_getvect(EMS_INT);
-	uint64_t __far* actualEmsDeviceName = D_MK_FP(FP_SEG(emsInterruptVector), 0x000a);
+	segment_t __far* emsInterruptVectorSegment = D_MK_FP(0, EMS_INT * 4 + 2);
+	uint64_t __far* actualEmsDeviceName = D_MK_FP(*emsInterruptVectorSegment, 0x000a);
 	uint64_t expectedEmsDeviceName = *(uint64_t*)"EMMXXXX0";
 	if (*actualEmsDeviceName != expectedEmsDeviceName)
 		return 0;
