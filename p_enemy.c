@@ -297,8 +297,6 @@ static boolean P_Move(mobj_t __far* actor)
 
   if (!try_ok)
     {      // open any specials
-      int32_t good;
-
       if (actor->flags & MF_FLOAT && _g_floatok)
         {
           if (actor->z < _g_tmfloorz)          // must adjust height
@@ -333,9 +331,10 @@ static boolean P_Move(mobj_t __far* actor)
        * back out when they shouldn't, and creates secondary stickiness).
        */
 
-      for (good = false; _g_numspechit--; )
+      boolean good = false;
+      for ( ; _g_numspechit--; )
         if (P_UseSpecialLine(actor, _g_spechit[_g_numspechit], 0))
-    good |= _g_spechit[_g_numspechit] == _g_blockline ? 1 : 2;
+          good = true;
 
       /* cph - compatibility maze here
        * Boom v2.01 and orig. Doom return "good"
