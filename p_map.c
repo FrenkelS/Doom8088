@@ -110,8 +110,6 @@ boolean   _g_floatok;
 /* killough 11/98: if "felldown" true, object was pushed down ledge */
 boolean   _g_felldown;
 
-boolean _g_crushchange, _g_nofit;
-
 static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 
 

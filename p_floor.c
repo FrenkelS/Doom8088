@@ -47,6 +47,10 @@
 #include "globdata.h"
 
 
+static boolean crushchange;
+static boolean nofit;
+
+
 //
 // P_ThingHeightClip
 // Takes a valid thing and adjusts the thing->floorz,
@@ -147,9 +151,9 @@ static void PIT_ChangeSector(mobj_t __far* thing)
     return;
     }
 
-  _g_nofit = true;
+  nofit = true;
 
-  if (_g_crushchange && !(_g_leveltime&3)) {
+  if (crushchange && !(_g_leveltime&3)) {
     int16_t t;
     P_DamageMobj(thing,NULL,NULL,10);
 
@@ -178,8 +182,8 @@ static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
   {
   msecnode_t __far* n;
 
-  _g_nofit = false;
-  _g_crushchange = crunch;
+  nofit = false;
+  crushchange = crunch;
 
   // killough 4/4/98: scan list front-to-back until empty or exhausted,
   // restarting from beginning after each thing is processed. Avoids
@@ -205,7 +209,7 @@ static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
         }
   while (n);  // repeat from scratch until all things left are marked valid
 
-  return _g_nofit;
+  return nofit;
   }
 
 

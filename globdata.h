@@ -133,8 +133,6 @@ extern boolean   _g_floatok;
 /* killough 11/98: if "felldown" true, object was pushed down ledge */
 extern boolean   _g_felldown;
 
-extern boolean _g_crushchange, _g_nofit;
-
 
 //******************************************************************************
 //p_maputl.c
