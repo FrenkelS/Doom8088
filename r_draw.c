@@ -91,7 +91,7 @@ static const angle_t tantoangleTable[2049];
 
 
 static const uint16_t finetangentTable_part_3[1024];
-static const fixed_t  __far finetangentTable_part_4[1024];
+static const fixed_t  finetangentTable_part_4[1024];
 
 static fixed_t finetangent(int16_t x)
 {
@@ -1680,11 +1680,11 @@ static visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16
 #if defined FLAT_WALL
 #define R_DrawSegTextureColumn(x,y,z) R_DrawColumnFlat(x,z)
 #else
-static void R_DrawColumnInCache(const column_t* patch, byte* cache, int16_t originy, int16_t cacheheight)
+static void R_DrawColumnInCache(const column_t __far* patch, byte* cache, int16_t originy, int16_t cacheheight)
 {
     while (patch->topdelta != 0xff)
     {
-        const byte* source = (const byte *)patch + 3;
+        const byte __far* source = (const byte __far*)patch + 3;
         int16_t count = patch->length;
         int16_t position = originy + patch->topdelta;
 
@@ -1698,9 +1698,9 @@ static void R_DrawColumnInCache(const column_t* patch, byte* cache, int16_t orig
             count = cacheheight - position;
 
         if (count > 0)
-            memcpy(cache + position, source, count);
+            _fmemcpy(cache + position, source, count);
 
-        patch = (const column_t *)(  (const byte *)patch + patch->length + 4);
+        patch = (const column_t __far*)((const byte __far*)patch + patch->length + 4);
     }
 }
 
@@ -1751,7 +1751,7 @@ static uint16_t FindColumnCacheItem(int16_t texture, uint32_t column)
 }
 
 
-static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, int32_t texcolumn, uint32_t iscale)
+static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int32_t texcolumn, uint32_t iscale)
 {
     uint16_t colmask;
 
@@ -1795,7 +1795,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
 
         do
         {
-            const texpatch_t* patch = &tex->patches[i];
+            const texpatch_t __far* patch = &tex->patches[i];
 
             const patch_t __far* realpatch = W_GetLumpByNum(patch->patch_num);
 
@@ -1827,7 +1827,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
 
 static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_column_vars_t* dcvars)
 {
-    const texture_t* tex = R_GetTexture(texture);
+    const texture_t __far* tex = R_GetTexture(texture);
 
     if (!tex->overlapped)
     {
@@ -3396,7 +3396,7 @@ static const uint16_t finetangentTable_part_3[1024] =
     64786,64885,64985,65085,65185,65285,65385,65485
 };
 
-static const fixed_t __far finetangentTable_part_4[1024] =
+static const fixed_t finetangentTable_part_4[1024] =
 {
     65586,65686,65787,65888,65989,66091,66192,66294,
     66396,66498,66600,66702,66804,66907,67010,67113,
