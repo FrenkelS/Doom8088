@@ -95,7 +95,7 @@ static boolean advancedemo;
 boolean _g_fps_show;
 
 //fps counter stuff
-uint16_t _g_fps_framerate;
+int16_t _g_fps_framerate;
 
 
 /*
