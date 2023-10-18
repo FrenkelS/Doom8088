@@ -123,8 +123,6 @@ extern msecnode_t __far* _g_sector_list;
 
 extern mobj_t __far*   _g_linetarget; // who got hit (or NULL)
 
-extern fixed_t   _g_attackrange;
-
 // If "floatok" true, move would be ok
 // if within "tmfloorz - tmceilingz".
 extern boolean   _g_floatok;

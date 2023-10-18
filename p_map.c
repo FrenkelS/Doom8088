@@ -90,7 +90,7 @@ static mobj_t __far*   shootthing;
 static fixed_t   shootz;
 
 static int16_t       la_damage;
-fixed_t   _g_attackrange;
+static fixed_t   attackrange;
 
 // slopes to top and bottom of target
 
@@ -116,6 +116,11 @@ static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 // MAXRADIUS is for precalculated sector block boxes
 #define MAXRADIUS       (32*FRACUNIT)
 
+
+boolean P_IsAttackRangeMeleeRange(void)
+{
+	return attackrange == MELEERANGE;
+}
 
 //
 // TELEPORT MOVE
@@ -1682,7 +1687,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
         if (_g_openbottom >= _g_opentop)
             return false;   // stop
 
-        dist = FixedMul(_g_attackrange, in->frac);
+        dist = FixedMul(attackrange, in->frac);
 
         if (LN_FRONTSECTOR(li)->floorheight != LN_BACKSECTOR(li)->floorheight)
         {
@@ -1722,7 +1727,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
 
     // check angles to see if the thing can be aimed at
 
-    dist = FixedMul (_g_attackrange, in->frac);
+    dist = FixedMul (attackrange, in->frac);
     thingtopslope = FixedDiv (th->z+th->height - shootz , dist);
 
     if (thingtopslope < bottomslope)
@@ -1953,7 +1958,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
       if (li->flags & ML_TWOSIDED)
   {  // crosses a two sided (really 2s) line
     P_LineOpening (li);
-    dist = FixedMul(_g_attackrange, in->frac);
+    dist = FixedMul(attackrange, in->frac);
 
     // killough 11/98: simplify
 
@@ -1967,10 +1972,10 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     // hit line
     // position a bit closer
 
-    frac = in->frac - FixedDiv(4 * FRACUNIT, _g_attackrange);
+    frac = in->frac - FixedDiv(4 * FRACUNIT, attackrange);
     x = _g_trace.x + FixedMul(_g_trace.dx, frac);
     y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-    z = shootz  + FixedMul(aimslope, FixedMul(frac, _g_attackrange));
+    z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
 
     if (LN_FRONTSECTOR(li)->ceilingpic == skyflatnum)
       {
@@ -2010,7 +2015,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   // check angles to see if the thing can be aimed at
 
-  dist = FixedMul (_g_attackrange, in->frac);
+  dist = FixedMul (attackrange, in->frac);
   thingtopslope = FixedDiv (th->z+th->height - shootz , dist);
 
   if (thingtopslope < aimslope)
@@ -2024,11 +2029,11 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   // hit thing
   // position a bit closer
 
-  frac = in->frac - FixedDiv (10*FRACUNIT,_g_attackrange);
+  frac = in->frac - FixedDiv (10*FRACUNIT,attackrange);
 
   x = _g_trace.x + FixedMul(_g_trace.dx, frac);
   y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-  z = shootz  + FixedMul(aimslope, FixedMul(frac, _g_attackrange));
+  z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
 
   // Spawn bullet puffs or blod spots,
   // depending on target type.
@@ -2065,7 +2070,7 @@ fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boole
   topslope    =  100 * FRACUNIT / 160;
   bottomslope = -100 * FRACUNIT / 160;
 
-  _g_attackrange = distance;
+  attackrange = distance;
   _g_linetarget  = NULL;
 
   // prevent friends from aiming at friends
@@ -2097,7 +2102,7 @@ void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slo
   x2 = t1->x + (distance>>FRACBITS)*finecosine(angle);
   y2 = t1->y + (distance>>FRACBITS)*finesine(  angle);
   shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
-  _g_attackrange = distance;
+  attackrange = distance;
   aimslope = slope;
 
   P_PathTraverse(t1->x,t1->y,x2,y2,PT_ADDLINES|PT_ADDTHINGS,PTR_ShootTraverse);

@@ -1221,7 +1221,7 @@ void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
 
   // don't make punches spark on the wall
 
-  if (_g_attackrange == MELEERANGE)
+  if (P_IsAttackRangeMeleeRange())
     P_SetMobjState (th, S_PUFF3);
   }
 

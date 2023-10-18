@@ -43,6 +43,8 @@
 #define MELEERANGE      (64*FRACUNIT)
 #define MISSILERANGE    (32*64*FRACUNIT)
 
+boolean P_IsAttackRangeMeleeRange(void);
+
 boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y);
 
 // killough 8/9/98: extra argument for telefragging
