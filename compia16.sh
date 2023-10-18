@@ -3,7 +3,6 @@ mkdir GCCIA16
 unset CFLAGS
 
 ia16-elf-gcc -c i_system.c -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c p_mobj.c   -march=i286 -mcmodel=medium -Og    -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program
 ia16-elf-gcc -c r_draw.c   -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program -funroll-loops
 
 export CFLAGS="-march=i286 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -ffunction-sections -mregparmcall -flto -fwhole-program"
@@ -35,8 +34,7 @@ export GLOBOBJS+=" p_inter.c"
 export GLOBOBJS+=" p_lights.c"
 export GLOBOBJS+=" p_map.c"
 export GLOBOBJS+=" p_maputl.c"
-#export GLOBOBJS+=" p_mobj.c"
-export GLOBOBJS+=" p_mobj.o"
+export GLOBOBJS+=" p_mobj.c"
 export GLOBOBJS+=" p_plats.c"
 export GLOBOBJS+=" p_pspr.c"
 export GLOBOBJS+=" p_setup.c"
@@ -65,5 +63,4 @@ export GLOBOBJS+=" z_zone.c"
 ia16-elf-gcc $GLOBOBJS $CFLAGS -o GCCIA16/DOOM8088.EXE
 
 rm i_system.o
-rm p_mobj.o
 rm r_draw.o

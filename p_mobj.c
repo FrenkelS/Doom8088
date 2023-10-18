@@ -1018,13 +1018,6 @@ static PUREFUNC int16_t P_FindDoomedNum(uint32_t type)
     return NUMMOBJTYPES;
 }
 
-//
-// P_RespawnSpecials
-//
-
-void P_RespawnSpecials (void)
-  {
-  }
 
 //
 // P_SpawnPlayer
