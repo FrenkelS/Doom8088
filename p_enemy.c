@@ -346,9 +346,8 @@ static boolean P_Move(mobj_t __far* actor)
   else
     actor->flags &= ~MF_INFLOAT;
 
-  /* killough 11/98: fall more slowly, under gravity, if felldown==true */
-  if (!(actor->flags & MF_FLOAT) &&
-      (!_g_felldown))
+  /* fall more slowly, under gravity */
+  if (!(actor->flags & MF_FLOAT))
     actor->z = actor->floorz;
 
   return true;

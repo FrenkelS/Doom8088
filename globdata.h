@@ -127,9 +127,6 @@ extern mobj_t __far*   _g_linetarget; // who got hit (or NULL)
 // if within "tmfloorz - tmceilingz".
 extern boolean   _g_floatok;
 
-/* killough 11/98: if "felldown" true, object was pushed down ledge */
-extern boolean   _g_felldown;
-
 
 //******************************************************************************
 //p_maputl.c

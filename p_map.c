@@ -107,8 +107,6 @@ static mobj_t __far*   usething;
 // if within "tmfloorz - tmceilingz".
 boolean   _g_floatok;
 
-/* killough 11/98: if "felldown" true, object was pushed down ledge */
-boolean   _g_felldown;
 
 static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 
@@ -1596,7 +1594,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
     fixed_t oldx;
     fixed_t oldy;
 
-    _g_felldown = _g_floatok = false;               // killough 11/98
+    _g_floatok = false;
 
     if (!P_CheckPosition (thing, x, y))
         return false;   // solid wall or thing
