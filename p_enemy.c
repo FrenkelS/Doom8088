@@ -55,7 +55,7 @@
 static fixed_t dropoff_deltax, dropoff_deltay, floorz;
 
 
-static const int32_t distfriend = 128;
+static const fixed_t distfriend = 128L << FRACBITS;
 
 typedef enum {
   DI_EAST,
@@ -73,64 +73,11 @@ typedef enum {
 
 //
 // ENEMY THINKING
-// Enemies are allways spawned
+// Enemies are always spawned
 // with targetplayer = -1, threshold = 0
 // Most monsters are spawned unaware of all players,
 // but some can be made preaware
 //
-
-//
-// Called by P_NoiseAlert.
-// Recursively traverse adjacent sectors,
-// sound blocking lines cut off traversal.
-//
-// killough 5/5/98: reformatted, cleaned up
-
-static void P_RecursiveSound(sector_t __far* sec, int32_t soundblocks, mobj_t __far* soundtarget)
-{
-  int16_t i;
-
-  // wake up all monsters in this sector
-  if (sec->validcount == validcount && sec->soundtraversed <= soundblocks+1)
-    return;             // already flooded
-
-  sec->validcount     = validcount;
-  sec->soundtraversed = soundblocks+1;
-  sec->soundtarget    = soundtarget;
-
-  for (i=0; i<sec->linecount; i++)
-    {
-      sector_t __far* other;
-      const line_t __far* check = sec->lines[i];
-
-      if (!(check->flags & ML_TWOSIDED))
-        continue;
-
-      P_LineOpening(check);
-
-      if (_g_openrange <= 0)
-        continue;       // closed door
-
-      other=_g_sides[check->sidenum[_g_sides[check->sidenum[0]].sector==sec]].sector;
-
-      if (!(check->flags & ML_SOUNDBLOCK))
-        P_RecursiveSound(other, soundblocks, soundtarget);
-      else
-        if (!soundblocks)
-          P_RecursiveSound(other, 1, soundtarget);
-    }
-}
-
-//
-// P_NoiseAlert
-// If a monster yells at a player,
-// it will alert other monsters to the player.
-//
-void P_NoiseAlert(mobj_t __far* emitter)
-{
-  validcount++;
-  P_RecursiveSound(emitter->subsector->sector, 0, emitter);
-}
 
 //
 // P_CheckMeleeRange
@@ -548,7 +495,7 @@ static void P_NewChaseDir(mobj_t __far* actor)
         // in certain situations (e.g. a crowded lift)
 
         if (actor->flags & target->flags & MF_FRIEND &&
-                distfriend << FRACBITS > dist &&
+                distfriend > dist &&
                 !P_IsOnLift(target) && !P_IsUnderDamage(actor))
         {
             deltax = -deltax, deltay = -deltay;

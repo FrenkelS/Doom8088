@@ -376,6 +376,60 @@ boolean P_CheckAmmo(player_t *player)
   return false;
 }
 
+
+//
+// Called by P_NoiseAlert.
+// Recursively traverse adjacent sectors,
+// sound blocking lines cut off traversal.
+//
+
+static void P_RecursiveSound(sector_t __far* sec, int16_t soundblocks, mobj_t __far* soundtarget)
+{
+  int16_t i;
+
+  // wake up all monsters in this sector
+  if (sec->validcount == validcount && sec->soundtraversed <= soundblocks+1)
+    return;             // already flooded
+
+  sec->validcount     = validcount;
+  sec->soundtraversed = soundblocks+1;
+  sec->soundtarget    = soundtarget;
+
+  for (i=0; i<sec->linecount; i++)
+    {
+      sector_t __far* other;
+      const line_t __far* check = sec->lines[i];
+
+      if (!(check->flags & ML_TWOSIDED))
+        continue;
+
+      P_LineOpening(check);
+
+      if (_g_openrange <= 0)
+        continue;       // closed door
+
+      other=_g_sides[check->sidenum[_g_sides[check->sidenum[0]].sector==sec]].sector;
+
+      if (!(check->flags & ML_SOUNDBLOCK))
+        P_RecursiveSound(other, soundblocks, soundtarget);
+      else
+        if (!soundblocks)
+          P_RecursiveSound(other, 1, soundtarget);
+    }
+}
+
+//
+// P_NoiseAlert
+// If a monster yells at a player,
+// it will alert other monsters to the player.
+//
+static void P_NoiseAlert(mobj_t __far* emitter)
+{
+  validcount++;
+  P_RecursiveSound(emitter->subsector->sector, 0, emitter);
+}
+
+
 //
 // P_FireWeapon.
 //

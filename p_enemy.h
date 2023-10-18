@@ -40,8 +40,6 @@
 
 #include "p_mobj.h"
 
-void P_NoiseAlert (mobj_t __far* emmiter);
-
 
 // ********************************************************************
 // Function addresses or Code Pointers
