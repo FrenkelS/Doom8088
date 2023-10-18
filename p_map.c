@@ -105,7 +105,7 @@ static mobj_t __far*   usething;
 
 // If "floatok" true, move would be ok
 // if within "tmfloorz - tmceilingz".
-boolean   _g_floatok;
+static boolean   floatok;
 
 
 static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
@@ -119,6 +119,13 @@ boolean P_IsAttackRangeMeleeRange(void)
 {
 	return attackrange == MELEERANGE;
 }
+
+
+boolean P_IsFloatOk(void)
+{
+	return floatok;
+}
+
 
 //
 // TELEPORT MOVE
@@ -1594,7 +1601,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
     fixed_t oldx;
     fixed_t oldy;
 
-    _g_floatok = false;
+    floatok = false;
 
     if (!P_CheckPosition (thing, x, y))
         return false;   // solid wall or thing
@@ -1604,7 +1611,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
         if (_g_tmceilingz - _g_tmfloorz < thing->height)
             return false;	// doesn't fit
 
-        _g_floatok = true;
+        floatok = true;
 
         if ( !(thing->flags & MF_TELEPORT)
              && _g_tmceilingz - thing->z < thing->height)

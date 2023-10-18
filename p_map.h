@@ -44,6 +44,7 @@
 #define MISSILERANGE    (32*64*FRACUNIT)
 
 boolean P_IsAttackRangeMeleeRange(void);
+boolean P_IsFloatOk(void);
 
 boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y);
 

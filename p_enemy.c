@@ -297,7 +297,7 @@ static boolean P_Move(mobj_t __far* actor)
 
   if (!try_ok)
     {      // open any specials
-      if (actor->flags & MF_FLOAT && _g_floatok)
+      if (actor->flags & MF_FLOAT && P_IsFloatOk())
         {
           if (actor->z < _g_tmfloorz)          // must adjust height
             actor->z += FLOATSPEED;
