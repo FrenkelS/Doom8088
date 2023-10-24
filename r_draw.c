@@ -251,10 +251,10 @@ static const fixed_t projection = ((int32_t)(SCREENWIDTH/2)) << FRACBITS;
 
 static const fixed_t projectiony = ((SCREENHEIGHT * (SCREENWIDTH/2L) * 320) / 200) / SCREENWIDTH * FRACUNIT;
 
-static const fixed_t pspritescale = FRACUNIT*SCREENWIDTH/320;
+static const int16_t pspritescale = FRACUNIT*SCREENWIDTH/320;
 static const fixed_t pspriteiscale = FRACUNIT*320/SCREENWIDTH;
 
-static const fixed_t pspriteyscale = (((int32_t)SCREENHEIGHT) << FRACBITS) / 200;
+static const uint16_t pspriteyscale = (((int32_t)SCREENHEIGHT) << FRACBITS) / 200;
 static const fixed_t pspriteyiscale = ((UINT32_MAX) / ((((int32_t)SCREENHEIGHT) << FRACBITS) / 200));
 
 
