@@ -741,7 +741,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 
       case raiseToTexture:
         {
-          int32_t minsize = ((int32_t)32000)<<FRACBITS; /* jff 3/13/98 no ovf */
+          fixed_t minsize = 32000L << FRACBITS; /* jff 3/13/98 no ovf */
           side_t __far*     side;
 
           floor->direction = 1;
@@ -878,7 +878,7 @@ boolean EV_DoChange(const line_t __far* line, change_e changetype)
  * stairs
  * - Boom fixed the bug, and MBF/PrBoom without comp_stairs work right
  */
-static inline int32_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* l, int16_t start, int16_t min)
+static inline int16_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* l, int16_t start, int16_t min)
 {
   /* Emulate original Doom's linear lower-bounded P_FindSectorFromLineTag
    * as needed */
@@ -906,10 +906,11 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
     // don't start a stair if the first step's floor is already moving
    if (!P_SectorActive(floor_special,sec)) { //jff 2/22/98
     floormove_t __far*  floor;
-    int32_t           texture, height;
+    int16_t       texture;
+    fixed_t       height;
     fixed_t       stairsize;
     fixed_t       speed;
-    boolean           ok;
+    boolean       ok;
 
     // create new floor thinker for first step
     rtn = true;
