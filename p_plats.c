@@ -193,7 +193,7 @@ void T_PlatRaise(plat_t __far* plat)
 // and for some plat types, an amount to raise
 // Returns true if a thinker is started, or restarted from stasis
 //
-boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount)
+boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
 {
   plat_t __far* plat;
   int16_t             secnum;

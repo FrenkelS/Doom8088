@@ -805,7 +805,7 @@ boolean EV_DoDonut(const line_t __far* line);
 
 // p_plats
 
-boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount);
+boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount);
 
 void EV_StopPlat(const line_t __far* line);
 
