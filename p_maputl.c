@@ -128,7 +128,7 @@ int16_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-static int32_t PUREFUNC P_PointOnDivlineSide(fixed_t x, fixed_t y, const divline_t *line)
+static int16_t PUREFUNC P_PointOnDivlineSide(fixed_t x, fixed_t y, const divline_t *line)
 {
   return
     !line->dx ? x <= line->x ? line->dy > 0 : line->dy < 0 :
@@ -537,12 +537,11 @@ static boolean PIT_AddThingIntercepts(mobj_t __far* thing)
 // Returns true if the traverser function returns true
 // for all lines.
 //
-// killough 5/3/98: reformatted, cleaned up
 
 static boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
 {
   intercept_t *in = NULL;
-  int32_t count = intercept_p - intercepts;
+  int16_t count = intercept_p - intercepts;
   while (count--)
     {
       fixed_t dist = INT32_MAX;
