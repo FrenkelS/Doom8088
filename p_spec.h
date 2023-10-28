@@ -68,9 +68,6 @@
 #define MAXBUTTONS    (MAXPLAYERS*4)
 
 
-// 1 second, in ticks.
-#define BUTTONTIME  TICRATE
-
 // p_lights
 
 #define GLOWSPEED       8
@@ -520,8 +517,8 @@ typedef struct
 {
   const line_t __far* line;
   bwhere_e where;
-  int32_t   btexture;
-  int32_t   btimer;
+  int16_t   btexture;
+  int16_t   btimer;
   degenmobj_t __far* soundorg;
 
 } button_t;

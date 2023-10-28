@@ -115,7 +115,7 @@ void P_InitSwitchList(void)
 // to remain active in gametics.
 // No return.
 //
-static void P_StartButton(const line_t __far* line, bwhere_e w, int32_t texture, int32_t time)
+static void P_StartButton(const line_t __far* line, bwhere_e w, int16_t texture, int16_t time)
 {
   int16_t           i;
 
@@ -150,6 +150,10 @@ static void P_StartButton(const line_t __far* line, bwhere_e w, int32_t texture,
 //
 // No return
 //
+
+// 1 second, in ticks.
+#define BUTTONTIME  TICRATE
+
 void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
 {
     /* Rearranged a bit to avoid too much code duplication */
