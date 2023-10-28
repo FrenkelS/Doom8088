@@ -90,7 +90,7 @@ extern int16_t highDetail;
 angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2);
 subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 
-void R_GetColumn(const texture_t __far* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c);
+void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16_t* patch_num, int16_t* x_c);
 
 const lighttable_t* R_LoadColorMap(int16_t lightlevel);
 

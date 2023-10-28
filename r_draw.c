@@ -930,12 +930,12 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 }
 
 
-void R_GetColumn(const texture_t __far* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c)
+void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16_t* patch_num, int16_t* x_c)
 {
     const uint8_t patchcount = texture->patchcount;
     const uint16_t widthmask = texture->widthmask;
 
-    const int32_t xc = texcolumn & widthmask;
+    const int16_t xc = texcolumn & widthmask;
 
     if (patchcount != 1)
     {
@@ -1825,7 +1825,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far*
     return colcache;
 }
 
-static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_column_vars_t* dcvars)
+static void R_DrawSegTextureColumn(int16_t texture, int16_t texcolumn, draw_column_vars_t* dcvars)
 {
     const texture_t __far* tex = R_GetTexture(texture);
 
@@ -1862,7 +1862,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_colu
 static void R_RenderSegLoop (int16_t rw_x)
 {
     draw_column_vars_t dcvars;
-    fixed_t  texturecolumn = 0;   // shut up compiler warning
+    int16_t  texturecolumn = 0;   // shut up compiler warning
 
     R_SetDefaultDrawColumnVars(&dcvars);
 
@@ -1926,9 +1926,7 @@ static void R_RenderSegLoop (int16_t rw_x)
             // calculate texture offset
             angle_t angle =(rw_centerangle+xtoviewangle(rw_x))>>ANGLETOFINESHIFT;
 
-            texturecolumn = rw_offset-FixedMul(finetangent(angle),rw_distance);
-
-            texturecolumn >>= FRACBITS;
+            texturecolumn = (rw_offset - FixedMul(finetangent(angle), rw_distance)) >> FRACBITS;
 
             dcvars.x = rw_x;
 
