@@ -500,11 +500,11 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
     boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
-    if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
+    if ((uint16_t)LN_SPECIAL(line) >= GenEnd)
     {
       // Out of range for GenFloors
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenFloorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenFloorBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & FloorChange) || !(LN_SPECIAL(line) & FloorModel))
@@ -513,7 +513,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
         return false;                         // generalized types require tag
       linefunc = EV_DoGenFloor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenCeilingBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenCeilingBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & CeilingChange) || !(LN_SPECIAL(line) & CeilingModel))
@@ -522,7 +522,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
         return false;                         // generalized types require tag
       linefunc = EV_DoGenCeiling;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenDoorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenDoorBase)
     {
       if (!P_MobjIsPlayer(thing))
       {
@@ -535,7 +535,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
         return false;                         // generalized types require tag
       linefunc = EV_DoGenDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLockedBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLockedBase)
     {
       if (!P_MobjIsPlayer(thing))
         return false;   // monsters disallowed from unlocking doors
@@ -546,7 +546,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
 
       linefunc = EV_DoGenLockedDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLiftBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLiftBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & LiftMonster))
@@ -555,7 +555,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
         return false;                         // generalized types require tag
       linefunc = EV_DoGenLift;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenStairsBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenStairsBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & StairMonster))
@@ -564,7 +564,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
         return false;                         // generalized types require tag
       linefunc = EV_DoGenStairs;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenCrusherBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenCrusherBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & CrusherMonster))
