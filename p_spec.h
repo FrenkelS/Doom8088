@@ -532,8 +532,8 @@ typedef struct
   fixed_t speed;
   fixed_t low;
   fixed_t high;
-  int32_t wait;
-  int32_t count;
+  int16_t wait;
+  int16_t count;
   plat_e status;
   plat_e oldstatus;
   boolean crush;
@@ -558,10 +558,10 @@ typedef struct
   int16_t direction;
 
   // tics to wait at the top
-  int32_t topwait;
+  int16_t topwait;
   // (keep in case a door going down is reset)
   // when it reaches 0, start going down
-  int32_t topcountdown;
+  int16_t topcountdown;
 
   //jff 1/31/98 keep track of line door is triggered by
   const line_t __far* line;
