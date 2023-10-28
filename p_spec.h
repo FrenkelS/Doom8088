@@ -666,14 +666,6 @@ typedef struct {
   int32_t affectee;        // Number of affected sidedef, sector, tag, or whatever
 } scroll_t;
 
-// phares 3/12/98: added new model of friction for ice/sludge effects
-
-typedef struct {
-  //thinker_t thinker;   // Thinker structure for friction
-  int32_t friction;        // friction value (E800 = normal)
-  //int32_t movefactor;      // inertia factor when adding to momentum
-  int32_t affectee;        // Number of affected sector
-} friction_t;
 
 // phares 3/20/98: added new model of Pushers for push/pull effects
 
@@ -795,7 +787,7 @@ void EV_StartLightStrobing(const line_t __far* line);
 
 void EV_TurnTagLightsOff(const line_t __far* line);
 
-void EV_LightTurnOn(const line_t __far* line, int32_t bright);
+void EV_LightTurnOn(const line_t __far* line, int16_t bright);
 
 // p_floor
 

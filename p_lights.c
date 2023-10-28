@@ -412,7 +412,7 @@ void EV_TurnTagLightsOff(const line_t __far* line)
 // Passed the activating line, and a level to set the light to
 // If level passed is 0, the maximum neighbor lighting is used
 //
-void EV_LightTurnOn(const line_t __far* line, int32_t bright)
+void EV_LightTurnOn(const line_t __far* line, int16_t bright)
 {
 	int16_t i;
 
