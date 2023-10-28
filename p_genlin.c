@@ -106,9 +106,9 @@ boolean twoSided(int16_t sector, int16_t line)
 //
 // jff 02/03/98 Add routine to find shortest lower texture
 //
-static fixed_t P_FindShortestTextureAround(int16_t secnum)
+static int16_t P_FindShortestTextureAround(int16_t secnum)
 {
-  int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
+  int32_t minsize = 32000L << FRACBITS; //jff 3/13/98 prevent overflow in height calcs
   side_t __far*     side;
   int16_t i;
   sector_t __far* sec = &_g_sectors[secnum];
@@ -127,7 +127,7 @@ static fixed_t P_FindShortestTextureAround(int16_t secnum)
           minsize = textureheight[side->bottomtexture];
     }
   }
-  return minsize;
+  return minsize >> FRACBITS;
 }
 
 
@@ -329,7 +329,7 @@ manual_floor:
         break;
       case FbyST:
         floor->floordestheight = (floor->sector->floorheight>>FRACBITS) +
-          floor->direction * (P_FindShortestTextureAround(secnum)>>FRACBITS);
+          floor->direction * P_FindShortestTextureAround(secnum);
         if (floor->floordestheight>32000)  //jff 3/13/98 prevent overflow
           floor->floordestheight=32000;    // wraparound in floor height
         if (floor->floordestheight<-32000)
@@ -423,9 +423,9 @@ manual_floor:
 //
 // jff 03/20/98 Add routine to find shortest upper texture
 //
-static fixed_t P_FindShortestUpperAround(int16_t secnum)
+static int16_t P_FindShortestUpperAround(int16_t secnum)
 {
-  int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
+  int32_t minsize = 32000L << FRACBITS; //jff 3/13/98 prevent overflow in height calcs
   side_t __far*     side;
   int16_t i;
   sector_t __far* sec = &_g_sectors[secnum];
@@ -444,7 +444,7 @@ static fixed_t P_FindShortestUpperAround(int16_t secnum)
           minsize = textureheight[side->toptexture];
     }
   }
-  return minsize;
+  return minsize >> FRACBITS;
 }
 
 
@@ -630,7 +630,7 @@ manual_ceiling:
         break;
       case CbyST:
         targheight = (ceiling->sector->ceilingheight>>FRACBITS) +
-          ceiling->direction * (P_FindShortestUpperAround(secnum)>>FRACBITS);
+          ceiling->direction * P_FindShortestUpperAround(secnum);
         if (targheight>32000)  //jff 3/13/98 prevent overflow
           targheight=32000;    // wraparound in ceiling height
         if (targheight<-32000)
