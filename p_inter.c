@@ -193,7 +193,7 @@ static boolean P_GiveWeapon(player_t *player, weapontype_t weapon, boolean dropp
 // Returns false if the body isn't needed at all
 //
 
-static boolean P_GiveBody(player_t *player, int32_t num)
+static boolean P_GiveBody(player_t *player, int16_t num)
 {
   if (player->health >= maxhealth)
     return false; // Ty 03/09/98 externalized MAXHEALTH to maxhealth
@@ -210,9 +210,9 @@ static boolean P_GiveBody(player_t *player, int32_t num)
 // than the current armor.
 //
 
-static boolean P_GiveArmor(player_t *player, int32_t armortype)
+static boolean P_GiveArmor(player_t *player, int16_t armortype)
 {
-  int32_t hits = armortype*100;
+  int16_t hits = armortype*100;
   if (player->armorpoints >= hits)
     return false;   // don't pick up
   player->armortype = armortype;
