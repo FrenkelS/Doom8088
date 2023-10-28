@@ -520,7 +520,7 @@ static void P_XYMovement(mobj_t __far* mo)
         // killough 10/98:
         // Don't affect main player when voodoo dolls stop, except in old demos:
 
-        if (player && (uint32_t)(player->mo->state - states - S_PLAY_RUN1) < 4
+        if (player && (uint16_t)(player->mo->state - states - S_PLAY_RUN1) < 4
                 && (player->mo == mo))
             P_SetMobjState(player->mo, S_PLAY);
 
@@ -1098,7 +1098,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     fixed_t x;
     fixed_t y;
     fixed_t z;
-    int32_t options = mthing->options; /* cph 2001/07/07 - make writable copy */
+    int16_t options = mthing->options; /* cph 2001/07/07 - make writable copy */
 
     // killough 2/26/98: Ignore type-0 things as NOPs
     // phares 5/14/98: Ignore Player 5-8 starts (for now)
@@ -1123,7 +1123,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
 
     if (options & MTF_RESERVED)
     {
-        printf("P_SpawnMapThing: correcting bad flags (%lu) (thing type %d)\n", options, mthing->type);
+        printf("P_SpawnMapThing: correcting bad flags (%u) (thing type %d)\n", options, mthing->type);
         options &= MTF_EASY|MTF_NORMAL|MTF_HARD|MTF_AMBUSH|MTF_NOTSINGLE;
     }
 
@@ -1282,7 +1282,7 @@ mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_
   {
   mobj_t __far* th;
   angle_t an;
-  int32_t     dist;
+  fixed_t     dist;
 
   th = P_SpawnMobj (source->x,source->y,source->z + 4*8*FRACUNIT,type);
 
