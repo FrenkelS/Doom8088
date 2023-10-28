@@ -231,7 +231,7 @@ static boolean P_Move(mobj_t __far* actor)
     return false;
 
 #ifdef RANGECHECK
-  if ((uint32_t)actor->movedir >= 8)
+  if ((uint16_t)actor->movedir >= 8)
     I_Error ("P_Move: Weird actor->movedir!");
 #endif
 
@@ -332,9 +332,9 @@ static boolean P_TryWalk(mobj_t __far* actor)
 
 static void P_DoNewChaseDir(mobj_t __far* actor, fixed_t deltax, fixed_t deltay)
 {
-  int32_t xdir, ydir, tdir;
-  int32_t olddir = actor->movedir;
-  int32_t turnaround = olddir;
+  int16_t xdir, ydir, tdir;
+  int16_t olddir = actor->movedir;
+  int16_t turnaround = olddir;
 
   if (turnaround != DI_NODIR)         // find reverse direction
     turnaround ^= 4;
@@ -563,7 +563,7 @@ static boolean P_LookForPlayers(mobj_t __far* actor, boolean allaround)
 // killough 9/5/98: look for targets to go after, depending on kind of monster
 //
 
-static boolean P_LookForTargets(mobj_t __far* actor, int32_t allaround)
+static boolean P_LookForTargets(mobj_t __far* actor, boolean allaround)
 {
     return P_LookForPlayers (actor, allaround);
 }
@@ -667,9 +667,8 @@ void A_Chase(mobj_t __far* actor)
         int32_t delta = (actor->angle &= (((int32_t)7)<<29)) - (((int32_t)actor->movedir) << 29);
         if (delta > 0)
             actor->angle -= ANG90/2;
-        else
-            if (delta < 0)
-                actor->angle += ANG90/2;
+        else if (delta < 0)
+            actor->angle += ANG90/2;
     }
 
     if (!actor->target || !(actor->target->flags&MF_SHOOTABLE))
