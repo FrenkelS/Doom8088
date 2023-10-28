@@ -63,15 +63,15 @@ typedef struct
 {
   thinker_t thinker;
   sector_t __far* sector;
-  int32_t count;
-  int32_t maxlight;
-  int32_t minlight;
+  int16_t count;
+  int16_t maxlight;
+  int16_t minlight;
 
 } fireflicker_t;
 
 static void T_FireFlicker (fireflicker_t __far* flick)
 {
-  int32_t amount;
+  int16_t amount;
 
   if (--flick->count)
     return;
@@ -99,11 +99,11 @@ typedef struct
 {
   thinker_t thinker;
   sector_t __far* sector;
-  int32_t count;
-  int32_t maxlight;
-  int32_t minlight;
-  int32_t maxtime;
-  int32_t mintime;
+  int16_t count;
+  int16_t maxlight;
+  int16_t minlight;
+  int16_t maxtime;
+  int16_t mintime;
 
 } lightflash_t;
 
@@ -139,8 +139,8 @@ typedef struct
   thinker_t thinker;
   sector_t __far* sector;
   int16_t count;
-  int32_t minlight;
-  int32_t maxlight;
+  int16_t minlight;
+  int16_t maxlight;
   int16_t darktime;
   int16_t brighttime;
 
@@ -176,8 +176,8 @@ typedef struct
 {
   thinker_t thinker;
   sector_t __far* sector;
-  int32_t minlight;
-  int32_t maxlight;
+  int16_t minlight;
+  int16_t maxlight;
   int16_t direction;
 } glow_t;
 
@@ -215,10 +215,10 @@ static void T_Glow(glow_t __far* g)
 // in a surrounding sector less than that passed. If no smaller light
 // level exists, the light level passed is returned.
 //
-static int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
+static int16_t P_FindMinSurroundingLight(sector_t __far* sector, int16_t max)
 {
   int16_t         i;
-  int32_t         min;
+  int16_t         min;
   const line_t __far*     line;
   sector_t __far*   check;
 
