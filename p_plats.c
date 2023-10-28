@@ -351,7 +351,7 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount)
 // Passed the tag of the plat that should be reactivated
 // Returns nothing
 //
-void P_ActivateInStasis(int32_t tag)
+void P_ActivateInStasis(int16_t tag)
 {
   platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)   // search the active plats

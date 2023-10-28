@@ -563,7 +563,7 @@ typedef struct
   plat_e status;
   plat_e oldstatus;
   boolean crush;
-  int32_t tag;
+  int16_t tag;
   plattype_e type;
 
   struct platlist __far* list;
@@ -593,7 +593,7 @@ typedef struct
   const line_t __far* line;
 
   /* killough 10/98: sector tag for gradual lighting effects */
-  int32_t lighttag;
+  int16_t lighttag;
 } vldoor_t;
 
 // p_doors
@@ -618,7 +618,7 @@ typedef struct
   int32_t direction;
 
   // ID
-  int32_t tag;
+  int16_t tag;
   int32_t olddirection;
   struct ceilinglist __far* list;
 } ceiling_t;
@@ -866,8 +866,7 @@ void P_AddActivePlat(plat_t __far* plat);
 void P_RemoveAllActivePlats
 ( void );    // killough
 
-void P_ActivateInStasis
-( int32_t tag );
+void P_ActivateInStasis(int16_t tag);
 
 // p_doors
 
