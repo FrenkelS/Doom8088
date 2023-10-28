@@ -304,7 +304,7 @@ typedef enum
 boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player)
 {
   // does this line special distinguish between skulls and keys?
-  int32_t skulliscard = (LN_SPECIAL(line) & LockedNKeys)>>LockedNKeysShift;
+  boolean skulliscard = (LN_SPECIAL(line) & LockedNKeys)>>LockedNKeysShift;
 
   // determine for each case of lock type if player's keys are adequate
   switch((LN_SPECIAL(line) & LockedKey)>>LockedKeyShift)
