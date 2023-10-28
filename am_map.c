@@ -812,7 +812,7 @@ static void AM_drawMline(mline_t* ml, uint8_t color)
 //
 // jff 4/3/98 add routine to get color of generalized keyed door
 //
-static int32_t AM_DoorColor(int32_t type)
+static int16_t AM_DoorColor(int16_t type)
 {
     if (GenLockedBase <= type && type< GenDoorBase)
     {
@@ -887,7 +887,7 @@ static void AM_drawWalls(void)
         const sector_t __far* backsector = LN_BACKSECTOR(&_g_lines[i]);
         const sector_t __far* frontsector = LN_FRONTSECTOR(&_g_lines[i]);
 
-        const uint32_t line_special =  LN_SPECIAL(&_g_lines[i]);
+        const int16_t line_special =  LN_SPECIAL(&_g_lines[i]);
 
         if (automapmode & am_rotate)
         {
@@ -902,7 +902,7 @@ static void AM_drawWalls(void)
                 continue;
             {
                 /* cph - show keyed doors and lines */
-                int32_t amd;
+                int16_t amd;
                 if (!(_g_lines[i].flags & ML_SECRET) && (amd = AM_DoorColor(line_special)) != -1)
                 {
                     {

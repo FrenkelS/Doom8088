@@ -286,6 +286,21 @@ int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
 // jff 02/05/98 routine added to test for unlockability of
 //  generalized locked doors
 //
+
+// define names for the locked door Kind field of the general ceiling
+
+typedef enum
+{
+  AnyKey,
+  RCard,
+  BCard,
+  YCard,
+  RSkull,
+  BSkull,
+  YSkull,
+  AllKeys,
+} keykind_e;
+
 boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player)
 {
   // does this line special distinguish between skulls and keys?
