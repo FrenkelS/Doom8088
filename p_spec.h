@@ -584,8 +584,8 @@ typedef struct
   boolean crush;
 
   //jff 02/04/98 add these to support ceiling changers
-  int32_t newspecial;
-  int32_t oldspecial; //jff 3/14/98 add to fix bug in change transfers
+  int16_t newspecial;
+  int16_t oldspecial; //jff 3/14/98 add to fix bug in change transfers
   int16_t texture;
 
   // 1 = up, 0 = waiting, -1 = down
@@ -612,8 +612,8 @@ typedef struct
   boolean crush;
   sector_t __far* sector;
   int16_t direction;
-  int32_t newspecial;
-  int32_t oldspecial;   //jff 3/14/98 add to fix bug in change transfers
+  int16_t newspecial;
+  int16_t oldspecial;   //jff 3/14/98 add to fix bug in change transfers
   int16_t texture;
   fixed_t floordestheight;
   fixed_t speed;
