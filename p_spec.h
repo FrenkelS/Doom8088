@@ -657,37 +657,6 @@ typedef struct
   fixed_t speed;
 } elevator_t;
 
-// p_spec
-
-// killough 3/7/98: Add generalized scroll effects
-
-typedef struct {
-  thinker_t thinker;   // Thinker structure for scrolling
-  int32_t affectee;        // Number of affected sidedef, sector, tag, or whatever
-} scroll_t;
-
-
-// phares 3/20/98: added new model of Pushers for push/pull effects
-
-typedef struct {
-  thinker_t thinker;   // Thinker structure for Pusher
-  enum
-  {
-    p_push,
-    p_pull,
-    p_wind,
-    p_current,
-  } type;
-  mobj_t* source;      // Point source if point pusher
-  int32_t x_mag;           // X Strength
-  int32_t y_mag;           // Y Strength
-  int32_t magnitude;       // Vector strength for point pusher
-  int32_t radius;          // Effective radius for point pusher
-  int32_t x;               // X of point source if point pusher
-  int32_t y;               // Y of point source if point pusher
-  int32_t affectee;        // Number of affected sector
-} pusher_t;
-
 
 ////////////////////////////////////////////////////////////////
 //

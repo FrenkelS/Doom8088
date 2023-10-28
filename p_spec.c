@@ -693,9 +693,9 @@ void P_SpawnSpecials (void)
     }
   }
 
-  P_RemoveAllActiveCeilings();  // jff 2/22/98 use killough's scheme
+  P_RemoveAllActiveCeilings();
 
-  P_RemoveAllActivePlats();     // killough
+  P_RemoveAllActivePlats();
 
   for (i = 0;i < MAXBUTTONS;i++)
     memset(&_g_buttonlist[i],0,sizeof(button_t));
@@ -703,7 +703,7 @@ void P_SpawnSpecials (void)
   P_SpawnScrollers(); // killough 3/7/98: Add generalized scrollers
 }
 
-// killough 2/28/98:
+
 //
 // This function, with the help of r_bsp.c, supports generalized
 // scrolling floors and walls, with optional mobj-carrying properties, e.g.
@@ -720,7 +720,11 @@ void P_SpawnSpecials (void)
 // Process the active scrollers.
 //
 // This is the main scrolling code
-// killough 3/7/98
+
+typedef struct {
+  thinker_t thinker;   // Thinker structure for scrolling
+  int16_t affectee;        // Number of affected sidedef, sector, tag, or whatever
+} scroll_t;
 
 static void T_Scroll(scroll_t __far* s)
 {
