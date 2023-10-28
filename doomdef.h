@@ -58,11 +58,6 @@
 #include <ctype.h>
 #include <limits.h>
 
-// this should go here, not in makefile/configure.ac -- josh
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
-
 #include "m_swap.h"
 
 
@@ -205,32 +200,12 @@ typedef enum {
 #define KEYD_SELECT     10
 
 
-
-// phares 4/19/98:
-// Defines Setup Screen groups that config variables appear in.
-// Used when resetting the defaults for every item in a Setup group.
-
-typedef enum {
-  ss_none,
-  ss_keys,
-  ss_weap,
-  ss_stat,
-  ss_auto,
-  ss_enem,
-  ss_mess,
-  ss_chat,
-  ss_gen,       /* killough 10/98 */
-  ss_comp,      /* killough 10/98 */
-  ss_max
-} ss_types;
-
-// phares 3/20/98:
 //
 // Player friction is variable, based on controlling
 // linedefs. More friction can create mud, sludge,
 // magnetized floors, etc. Less friction can create ice.
 
 #define ORIG_FRICTION          0xE800      // original value
-#define ORIG_FRICTION_FACTOR   2048        // original value
+#define ORIG_FRICTION_FACTOR   2048L       // original value
 
 #endif          // __DOOMDEF__
