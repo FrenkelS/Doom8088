@@ -69,7 +69,7 @@ fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 
 const line_t    __far* _g_ceilingline;
 static const line_t        __far* blockline;    /* blocking linedef */
-static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
+static boolean         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
@@ -747,11 +747,11 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
     boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
-    if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
+    if ((uint16_t)LN_SPECIAL(line) >= GenEnd)
     {
       // Out of range for GenFloors
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenFloorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenFloorBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & FloorChange) || !(LN_SPECIAL(line) & FloorModel))
@@ -760,7 +760,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenFloor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenCeilingBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenCeilingBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & CeilingChange) || !(LN_SPECIAL(line) & CeilingModel))
@@ -769,7 +769,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenCeiling;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenDoorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenDoorBase)
     {
       if (!P_MobjIsPlayer(thing))
       {
@@ -782,7 +782,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLockedBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLockedBase)
     {
       if (!P_MobjIsPlayer(thing))
         return;                     // monsters disallowed from unlocking doors
@@ -795,7 +795,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenLockedDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLiftBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLiftBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & LiftMonster))
@@ -804,7 +804,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenLift;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenStairsBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenStairsBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & StairMonster))
@@ -1775,11 +1775,11 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
     boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
-    if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
+    if ((uint16_t)LN_SPECIAL(line) >= GenEnd)
     {
       // Out of range for GenFloors
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenFloorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenFloorBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & FloorChange) || !(LN_SPECIAL(line) & FloorModel))
@@ -1789,7 +1789,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 
       linefunc = EV_DoGenFloor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenCeilingBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenCeilingBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & CeilingChange) || !(LN_SPECIAL(line) & CeilingModel))
@@ -1798,7 +1798,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
         return;
       linefunc = EV_DoGenCeiling;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenDoorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenDoorBase)
     {
       if (!P_MobjIsPlayer(thing))
       {
@@ -1811,7 +1811,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
         return;
       linefunc = EV_DoGenDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLockedBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLockedBase)
     {
       if (!P_MobjIsPlayer(thing))
         return;   // monsters disallowed from unlocking doors
@@ -1827,14 +1827,14 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 
       linefunc = EV_DoGenLockedDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLiftBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLiftBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & LiftMonster))
           return; // monsters disallowed
       linefunc = EV_DoGenLift;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenStairsBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenStairsBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & StairMonster))
@@ -1843,7 +1843,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
         return;
       linefunc = EV_DoGenStairs;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenCrusherBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenCrusherBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & StairMonster))
@@ -2184,7 +2184,7 @@ static boolean PTR_NoWayTraverse(intercept_t* in)
 //
 void P_UseLines (player_t*  player)
   {
-  int32_t     angle;
+  int16_t     angle;
   fixed_t x1;
   fixed_t y1;
   fixed_t x2;
