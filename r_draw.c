@@ -1924,9 +1924,7 @@ static void R_RenderSegLoop (int16_t rw_x)
         if (segtextured)
         {
             // calculate texture offset
-            angle_t angle =(rw_centerangle+xtoviewangle(rw_x))>>ANGLETOFINESHIFT;
-
-            texturecolumn = (rw_offset - FixedMul(finetangent(angle), rw_distance)) >> FRACBITS;
+            texturecolumn = (rw_offset - FixedMul(finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT), rw_distance)) >> FRACBITS;
 
             dcvars.x = rw_x;
 
@@ -2540,12 +2538,9 @@ static void R_AddLine(const seg_t __far* line)
     // The seg is in the view range,
     // but not necessarily visible.
 
-    angle1 = (angle1+ANG90)>>ANGLETOFINESHIFT;
-    angle2 = (angle2+ANG90)>>ANGLETOFINESHIFT;
-
     // killough 1/31/98: Here is where "slime trails" can SOMETIMES occur:
-    x1 = viewangletox(angle1);
-    x2 = viewangletox(angle2);
+    x1 = viewangletox((angle1 + ANG90) >> ANGLETOFINESHIFT);
+    x2 = viewangletox((angle2 + ANG90) >> ANGLETOFINESHIFT);
 
     // Does not cross a pixel?
     if (x1 >= x2)       // killough 1/31/98 -- change == to >= for robustness
@@ -2685,11 +2680,9 @@ static boolean R_CheckBBox(const int16_t __far* bspcoord)
     // Find the first clippost
     //  that touches the source post
     //  (adjacent pixels are touching).
-    angle1 = (angle1+ANG90)>>ANGLETOFINESHIFT;
-    angle2 = (angle2+ANG90)>>ANGLETOFINESHIFT;
     {
-        int8_t sx1 = viewangletox(angle1);
-        int8_t sx2 = viewangletox(angle2);
+        int8_t sx1 = viewangletox((angle1 + ANG90) >> ANGLETOFINESHIFT);
+        int8_t sx2 = viewangletox((angle2 + ANG90) >> ANGLETOFINESHIFT);
         //    const cliprange_t *start;
 
         // Does not cross a pixel.
