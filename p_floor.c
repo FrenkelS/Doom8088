@@ -474,6 +474,18 @@ void T_MoveFloor(floormove_t __far* floor)
 //
 // jff 02/22/98 added to support parallel floor/ceiling motion
 //
+
+typedef struct
+{
+  thinker_t thinker;
+  elevator_e type;
+  sector_t __far* sector;
+  int16_t direction;
+  fixed_t floordestheight;
+  fixed_t ceilingdestheight;
+  fixed_t speed;
+} elevator_t;
+
 static void T_MoveElevator(elevator_t __far* elevator)
 {
   result_e      res;

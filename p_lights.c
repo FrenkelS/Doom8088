@@ -58,6 +58,17 @@
 // Passed a fireflicker_t structure containing light levels and timing
 // Returns nothing
 //
+
+typedef struct
+{
+  thinker_t thinker;
+  sector_t __far* sector;
+  int32_t count;
+  int32_t maxlight;
+  int32_t minlight;
+
+} fireflicker_t;
+
 static void T_FireFlicker (fireflicker_t __far* flick)
 {
   int32_t amount;
@@ -160,6 +171,15 @@ static void T_StrobeFlash (strobe_t __far*   flash)
 // Passed a glow_t structure containing light levels and timing
 // Returns nothing
 //
+
+typedef struct
+{
+  thinker_t thinker;
+  sector_t __far* sector;
+  int32_t minlight;
+  int32_t maxlight;
+  int16_t direction;
+} glow_t;
 
 static void T_Glow(glow_t __far* g)
 {

@@ -526,29 +526,6 @@ typedef struct
 
 } button_t;
 
-// p_lights
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t __far* sector;
-  int32_t count;
-  int32_t maxlight;
-  int32_t minlight;
-
-} fireflicker_t;
-
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t __far* sector;
-  int32_t minlight;
-  int32_t maxlight;
-  int32_t direction;
-
-} glow_t;
-
 // p_plats
 
 typedef struct
@@ -581,7 +558,7 @@ typedef struct
   fixed_t speed;
 
   // 1 = up, 0 = waiting at top, -1 = down
-  int32_t direction;
+  int16_t direction;
 
   // tics to wait at the top
   int32_t topwait;
@@ -615,11 +592,11 @@ typedef struct
   int16_t texture;
 
   // 1 = up, 0 = waiting, -1 = down
-  int32_t direction;
+  int16_t direction;
 
   // ID
   int16_t tag;
-  int32_t olddirection;
+  int16_t olddirection;
   struct ceilinglist __far* list;
 } ceiling_t;
 
@@ -637,7 +614,7 @@ typedef struct
   floor_e type;
   boolean crush;
   sector_t __far* sector;
-  int32_t direction;
+  int16_t direction;
   int32_t newspecial;
   int32_t oldspecial;   //jff 3/14/98 add to fix bug in change transfers
   int16_t texture;
@@ -645,17 +622,6 @@ typedef struct
   fixed_t speed;
 
 } floormove_t;
-
-typedef struct
-{
-  thinker_t thinker;
-  elevator_e type;
-  sector_t __far* sector;
-  int32_t direction;
-  fixed_t floordestheight;
-  fixed_t ceilingdestheight;
-  fixed_t speed;
-} elevator_t;
 
 
 ////////////////////////////////////////////////////////////////
