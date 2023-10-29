@@ -1378,13 +1378,13 @@ static void R_ClearSprites(void)
 
 static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 {
-  int32_t     anglea = ANG90 + (visangle-viewangle);
-  int32_t     angleb = ANG90 + (visangle-rw_normalangle);
+  int16_t     anglea = (ANG90 + (visangle - viewangle))      >> ANGLETOFINESHIFT;
+  int16_t     angleb = (ANG90 + (visangle - rw_normalangle)) >> ANGLETOFINESHIFT;
 
-  int32_t     den = FixedMul(rw_distance, finesine(anglea>>ANGLETOFINESHIFT));
+  int32_t     den = FixedMul(rw_distance, finesine(anglea));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = FixedMul(projectiony, finesine(angleb>>ANGLETOFINESHIFT));
+  fixed_t num = FixedMul(projectiony, finesine(angleb));
 
   return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
