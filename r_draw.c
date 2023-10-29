@@ -268,7 +268,8 @@ inline
 #endif
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 {
-    return (fixed_t)((int64_t) a*b >> FRACBITS);
+	int64_t r = (int64_t)a * b;
+	return *((fixed_t *)(((uint8_t *)&r)+2)); // r >> FRACBITS
 }
 
 
@@ -279,8 +280,26 @@ inline
 #endif
 fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 {
-    return ((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b) ? (a>>31) ^ (b>>31) ^ INT32_MAX :
-                                                  (fixed_t)(((int64_t) a << FRACBITS) / b);
+	if (((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b))
+		return (a >> 31) ^ (b >> 31) ^ INT32_MAX;
+	else {
+#if defined __DJGPP__
+		return ((int64_t) a << FRACBITS) / b;
+#else
+		union int64_u {
+			int64_t ll;
+			struct {
+				int16_t wl;
+				fixed_t dw;
+				int16_t wh;
+			} s;
+		} x;
+		x.s.wl = 0;
+		x.s.dw = a;
+		x.s.wh = (a < 0) ? 0xffff : 0x0000;
+		return x.ll / b;
+#endif
+	}
 }
 
 
