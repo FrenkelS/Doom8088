@@ -286,7 +286,7 @@ fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 #if defined __DJGPP__
 		return ((int64_t) a << FRACBITS) / b;
 #else
-		union int64_u {
+		union {
 			int64_t ll;
 			struct {
 				int16_t wl;
