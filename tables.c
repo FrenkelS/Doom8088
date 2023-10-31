@@ -310,69 +310,101 @@ static const uint16_t finesineTable_part_1[2048] =
     65534,65535,65535,65535,65535,65535,65535,65535
 };
 
+
+#define finesine_part_1(a) finesineTable_part_1[a]
+
+static uint16_t finesine_part_2(int16_t x)
+{
+	x = 4095 - x;
+	switch (x) {
+		case  273: return 13646;
+		case  771: return 36556;
+		case  883: return 41088;
+		case 1080: return 48304;
+		case 1827: return 64600;
+		default: return finesineTable_part_1[x];
+	}
+}
+
+static fixed_t finesine_part_3(int16_t x)
+{
+	x -= 4096;
+	switch (x) {
+		case   51: return  -2588;
+		case  863: return -40299;
+		case 1078: return -48236;
+		case 1080: return -48304;
+		default: return 0xffff0000 | -finesineTable_part_1[x];
+	}
+}
+
+static fixed_t finesine_part_4(int16_t x)
+{
+	x = 8191 - x;
+	switch (x) {
+		case   51: return  -2588;
+		case  114: return  -5747;
+		case  244: return -12217;
+		case  455: return -22432;
+		case  771: return -36556;
+		case  795: return -37550;
+		case  863: return -40299;
+		case 1021: return -46251;
+		case 1051: return -47307;
+		case 1469: return -59189;
+		default: return 0xffff0000 | -finesineTable_part_1[x];
+	}
+}
+
+
+#define finecosine_part_1(a) finesine_part_2(a + (FINEANGLES / 4))
+#define finecosine_part_2(a) finesine_part_3(a + (FINEANGLES / 4))
+#define finecosine_part_3(a) finesine_part_4(a + (FINEANGLES / 4))
+
+static uint16_t finecosine_part_4(int16_t x)
+{
+	x -= 6144;
+	switch (x) {
+		case   70: return  3542;
+		case  114: return  5747;
+		case  455: return 22432;
+		case  629: return 30427;
+		case  631: return 30516;
+		case  771: return 36556;
+		case  863: return 40299;
+		case 1067: return 47861;
+		case 1133: return 50064;
+		case 1259: return 53912;
+		case 1273: return 54309;
+		case 1827: return 64600;
+		default: return finesineTable_part_1[x];
+	}
+}
+
 fixed_t finesine(int16_t x)
 {
 	if (x < 2048) {			//    0 <= x < 2048
-		return finesineTable_part_1[x];
+		return finesine_part_1(x);
 	} else if (x < 4096) {	// 2048 <= x < 4096
-		x = 4095 - x;
-		switch (x) {
-			case  273: return 13646;
-			case  771: return 36556;
-			case  883: return 41088;
-			case 1080: return 48304;
-			case 1827: return 64600;
-			default: return finesineTable_part_1[x];
-		}
+		return finesine_part_2(x);
 	} else if (x < 6144) {	// 4096 <= x < 6144
-		x -= 4096;
-		switch (x) {
-			case   51: return  -2588;
-			case  863: return -40299;
-			case 1078: return -48236;
-			case 1080: return -48304;
-			default: return -1 * (fixed_t)finesineTable_part_1[x];
-		}
+		return finesine_part_3(x);
 	} else {				// 6144 <= x < 8192
-		x = 8191 - x;
-		switch (x) {
-			case   51: return  -2588;
-			case  114: return  -5747;
-			case  244: return -12217;
-			case  455: return -22432;
-			case  771: return -36556;
-			case  795: return -37550;
-			case  863: return -40299;
-			case 1021: return -46251;
-			case 1051: return -47307;
-			case 1469: return -59189;
-			default: return -1 * (fixed_t)finesineTable_part_1[x];
-		}
+		return finesine_part_4(x);
 	}
 }
 
 
 fixed_t finecosine(int16_t x)
 {
-	if (x < 6144) {	//    0 <= x < 6144
-		return finesine(x + (FINEANGLES / 4));
-	} else {		// 6144 <= x < 8192
-		x -= 6144;
-		switch (x) {
-			case   70: return  3542;
-			case  114: return  5747;
-			case  455: return 22432;
-			case  629: return 30427;
-			case  631: return 30516;
-			case  771: return 36556;
-			case  863: return 40299;
-			case 1067: return 47861;
-			case 1133: return 50064;
-			case 1259: return 53912;
-			case 1273: return 54309;
-			case 1827: return 64600;
-			default: return finesineTable_part_1[x];
-		}
+	if (x < 2048) {			//    0 <= x < 2048
+		return finecosine_part_1(x);
+	} else if (x < 4096) {	// 2048 <= x < 4096
+		return finecosine_part_2(x);
+	} else if (x < 6144) {	// 4096 <= x < 6144
+		return finecosine_part_3(x);
+	} else {				// 6144 <= x < 8192
+		return finecosine_part_4(x);
 	}
 }
 
@@ -397,7 +429,7 @@ static const uint16_t xtoviewangleTable[SCREENWIDTH + 1] =
 	0xC000
 };
 
-angle_t xtoviewangle(int8_t x)
+angle_t xtoviewangle(int16_t x)
 {
 	return ((uint32_t)xtoviewangleTable[x]) << FRACBITS;
 }
