@@ -261,6 +261,16 @@ static const fixed_t pspriteyiscale = ((UINT32_MAX) / ((((int32_t)SCREENHEIGHT) 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
 
 
+union int64_u {
+	int64_t ll;
+	struct {
+		int16_t wl;
+		fixed_t dw;
+		int16_t wh;
+	} s;
+};
+
+
 #if defined __WATCOMC__
 //
 #else
@@ -268,8 +278,13 @@ inline
 #endif
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 {
-	int64_t r = (int64_t)a * b;
-	return *((fixed_t *)(((uint8_t *)&r)+2)); // r >> FRACBITS
+	union int64_u r;
+	r.ll = (int64_t)a * b;
+#if defined __DJGPP__
+	return r.ll >> FRACBITS;
+#else
+	return r.s.dw;
+#endif
 }
 
 
@@ -283,22 +298,15 @@ fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 	if (((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b))
 		return (a >> 31) ^ (b >> 31) ^ INT32_MAX;
 	else {
+		union int64_u r;
 #if defined __DJGPP__
-		return ((int64_t) a << FRACBITS) / b;
+		r.ll = (int64_t)a << FRACBITS;
 #else
-		union {
-			int64_t ll;
-			struct {
-				int16_t wl;
-				fixed_t dw;
-				int16_t wh;
-			} s;
-		} x;
-		x.s.wl = 0;
-		x.s.dw = a;
-		x.s.wh = (a < 0) ? 0xffff : 0x0000;
-		return x.ll / b;
+		r.s.wl = 0;
+		r.s.dw = a;
+		r.s.wh = (a < 0) ? 0xffff : 0x0000;
 #endif
+		return r.ll / b;
 	}
 }
 
