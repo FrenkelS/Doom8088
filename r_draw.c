@@ -2753,6 +2753,7 @@ static boolean R_RenderBspSubsector(int16_t bspnum)
 //  traversing subtree recursively.
 // Just call with BSP root.
 
+#if defined PROFILING
 //Non recursive version.
 //constant stack space used and easier to
 //performance profile.
@@ -2815,6 +2816,25 @@ static void R_RenderBSPNode(int16_t bspnum)
         bspnum = bsp->children[side^1];
     }
 }
+#else
+static void R_RenderBSPNode(int16_t bspnum)
+{
+	if (R_RenderBspSubsector(bspnum))
+		return;
+
+	const mapnode_t __far* bsp = &nodes[bspnum];
+
+//
+// decide which side the view point is on
+//
+	int16_t side = R_PointOnSide(viewx, viewy, bsp);
+
+	R_RenderBSPNode(bsp->children[side]); // recursively divide front space
+
+	if (R_CheckBBox(bsp->bbox[side ^ 1]))	// possibly divide back space
+		R_RenderBSPNode(bsp->children[side ^ 1]);
+}
+#endif
 
 
 static void R_ClearDrawSegs(void)
