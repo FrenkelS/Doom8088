@@ -324,26 +324,28 @@ fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 
 static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
 {
-    fixed_t dx = (fixed_t)node->dx << FRACBITS;
-    fixed_t dy = (fixed_t)node->dy << FRACBITS;
+	int16_t ix = x >> FRACBITS;
 
-    fixed_t nx = (fixed_t)node->x << FRACBITS;
-    fixed_t ny = (fixed_t)node->y << FRACBITS;
+	if (!node->dx)
+		return ix <= node->x ? node->dy > 0 : node->dy < 0;
 
-    if (!dx)
-        return x <= nx ? node->dy > 0 : node->dy < 0;
+	int16_t iy = y >> FRACBITS;
 
-    if (!dy)
-        return y <= ny ? node->dx < 0 : node->dx > 0;
+	if (!node->dy)
+		return iy <= node->y ? node->dx < 0 : node->dx > 0;
 
-    x -= nx;
-    y -= ny;
+	x -= (fixed_t)node->x << FRACBITS;
+	y -= (fixed_t)node->y << FRACBITS;
 
-    // Try to quickly decide by looking at sign bits.
-    if ((dy ^ dx ^ x ^ y) < 0)
-        return (dy ^ x) < 0;  // (left is negative)
+	ix = x >> FRACBITS;
+	iy = y >> FRACBITS;
 
-    return FixedMul(y, node->dx) >= FixedMul(node->dy, x);
+	// Try to quickly decide by looking at sign bits.
+	if ((node->dy ^ node->dx ^ ix ^ iy) < 0)
+		return (node->dy ^ ix) < 0;  // (left is negative)
+
+	//return FixedMul(y, node->dx) >= FixedMul(x, node->dy);
+	return (y >> 8) * node->dx >= (x >> 8) * node->dy;
 }
 
 //
