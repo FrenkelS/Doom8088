@@ -263,12 +263,14 @@ static const angle_t clipangle = 537395200; //xtoviewangle(0);
 
 union int64_u {
 	int64_t ll;
-	struct {
+	PACKEDATTR_PRE struct {
 		int16_t wl;
 		fixed_t dw;
 		int16_t wh;
-	} s;
+	} PACKEDATTR_POST s;
 };
+
+typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
 
 
 #if defined __WATCOMC__
@@ -280,11 +282,7 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 {
 	union int64_u r;
 	r.ll = (int64_t)a * b;
-#if defined __DJGPP__
-	return r.ll >> FRACBITS;
-#else
-	return r.s.dw;
-#endif
+	return r.s.dw; // r.ll >> FRACBITS;
 }
 
 
@@ -299,13 +297,10 @@ fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 		return (a >> 31) ^ (b >> 31) ^ INT32_MAX;
 	else {
 		union int64_u r;
-#if defined __DJGPP__
-		r.ll = (int64_t)a << FRACBITS;
-#else
+		// r.ll = (int64_t)a << FRACBITS;
 		r.s.wl = 0;
 		r.s.dw = a;
 		r.s.wh = (a < 0) ? 0xffff : 0x0000;
-#endif
 		return r.ll / b;
 	}
 }
