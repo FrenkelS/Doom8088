@@ -52,7 +52,7 @@ void I_InitGraphics();
 void I_FinishUpdate(void);
 void I_DrawBuffer(uint16_t __far* buffer);
 
-void I_SetPalette(int8_t pal);
+#define I_SetPalette(pal) 
 
 /* I_StartTic
  * Called by D_DoomLoop,

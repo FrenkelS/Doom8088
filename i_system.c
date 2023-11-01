@@ -37,9 +37,6 @@
 #include "globdata.h"
 
 
-#define DISABLE_STATUS_BAR
-
-
 static void I_SetScreenMode(uint16_t mode);
 static void NORETURN_PRE I_Quit(void) NORETURN_POST;
 
@@ -192,7 +189,6 @@ static uint16_t __far* backBuffer;
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
 uint16_t __far* _g_screen;
 
-static int8_t newpal;
 
 uint16_t __far* I_GetBackBuffer(void)
 {
@@ -214,70 +210,23 @@ static void I_SetScreenMode(uint16_t mode)
 }
 
 
-#define PEL_WRITE_ADR   0x3c8
-#define PEL_DATA        0x3c9
-
-static void I_UploadNewPalette(int8_t pal)
-{
-	// This is used to replace the current 256 colour cmap with a new one
-	// Used by 256 colour PseudoColor modes
-
-	char lumpName[9] = "PLAYPAL0";
-
-	if(_g_gamma == 0)
-		lumpName[7] = 0;
-	else
-		lumpName[7] = '0' + _g_gamma;
-
-	const uint8_t __far* palette_lump = W_GetLumpByName(lumpName);
-
-	const byte __far* palette = &palette_lump[pal * 256 * 3];
-	outp(PEL_WRITE_ADR, 0);
-	for (int_fast16_t i = 0; i < 256 * 3; i++)
-		outp(PEL_DATA, (*palette++) >> 2);
-
-	Z_ChangeTagToCache(palette_lump);
-}
-
-
 //
 // I_FinishUpdate
 //
 
-#define NO_PALETTE_CHANGE 100
-
 void I_FinishUpdate (void)
 {
-	if (newpal != NO_PALETTE_CHANGE)
-	{
-		I_UploadNewPalette(newpal);
-		newpal = NO_PALETTE_CHANGE;
-	}
-
 	I_DrawBuffer(backBuffer);
 }
 
 
-//
-// I_SetPalette
-//
-void I_SetPalette (int8_t pal)
-{
-	newpal = pal;
-}
-
-
-#define SCREENWIDTH_VGA  320
-#define SCREENHEIGHT_VGA 200
-
 void I_InitGraphics(void)
 {	
-	I_SetScreenMode(0x13);
-	I_UploadNewPalette(0);
+	I_SetScreenMode(8);
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
-	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH * 2) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	screen = D_MK_FP(0xb800, 10 * 80 + __djgpp_conventional_base);
 
 	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
 	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
@@ -292,17 +241,28 @@ void I_StartDisplay(void)
 
 void I_DrawBuffer(uint16_t __far* buffer)
 {
-	uint16_t __far* src = buffer;
-	uint16_t __far* dst = screen;
+	uint8_t __far* src = (uint8_t __far*) buffer;
+	uint8_t __far* dst = (uint8_t __far*) screen;
 
-#if defined DISABLE_STATUS_BAR
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
-#else
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
-#endif
-		_fmemcpy(dst, src, SCREENWIDTH * 2);
-		dst += SCREENWIDTH_VGA / 2;
-		src += SCREENWIDTH;
+	for (uint_fast8_t y = 0; y < 80; y++) {
+		for (uint_fast8_t x = 0; x < 80; x++) {
+			*dst++ = *src;
+			src++;
+			src++;
+			src++;
+		}
+
+		dst += 0x2000 - 80;
+
+		for (uint_fast8_t x = 0; x < 80; x++) {
+			uint8_t b = *src;
+			*dst++ = (b << 4 | b >> 4);
+			src++;
+			src++;
+			src++;
+		}
+
+		dst -= 0x2000;
 	}
 }
 

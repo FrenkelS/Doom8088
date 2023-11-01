@@ -2748,7 +2748,7 @@ static boolean R_RenderBspSubsector(int16_t bspnum)
 //  traversing subtree recursively.
 // Just call with BSP root.
 
-#if defined PROFILING
+#if 1
 //Non recursive version.
 //constant stack space used and easier to
 //performance profile.

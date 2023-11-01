@@ -53,7 +53,7 @@
 #include "globdata.h"
 
 
-#define DISABLE_STATUS_BAR
+//#define DISABLE_STATUS_BAR
 
 
 //
