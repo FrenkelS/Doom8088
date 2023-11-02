@@ -294,7 +294,7 @@ inline
 fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 {
 	if (((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b))
-		return (a >> 31) ^ (b >> 31) ^ INT32_MAX;
+		return ((a ^ b) >> 31) ^ INT32_MAX;
 	else {
 		union int64_u r;
 		// r.ll = (int64_t)a << FRACBITS;
