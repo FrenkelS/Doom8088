@@ -58,9 +58,20 @@
 // Passed a fireflicker_t structure containing light levels and timing
 // Returns nothing
 //
+
+typedef struct
+{
+  thinker_t thinker;
+  sector_t __far* sector;
+  int16_t count;
+  int16_t maxlight;
+  int16_t minlight;
+
+} fireflicker_t;
+
 static void T_FireFlicker (fireflicker_t __far* flick)
 {
-  int32_t amount;
+  int16_t amount;
 
   if (--flick->count)
     return;
@@ -88,11 +99,11 @@ typedef struct
 {
   thinker_t thinker;
   sector_t __far* sector;
-  int32_t count;
-  int32_t maxlight;
-  int32_t minlight;
-  int32_t maxtime;
-  int32_t mintime;
+  int16_t count;
+  int16_t maxlight;
+  int16_t minlight;
+  int16_t maxtime;
+  int16_t mintime;
 
 } lightflash_t;
 
@@ -128,8 +139,8 @@ typedef struct
   thinker_t thinker;
   sector_t __far* sector;
   int16_t count;
-  int32_t minlight;
-  int32_t maxlight;
+  int16_t minlight;
+  int16_t maxlight;
   int16_t darktime;
   int16_t brighttime;
 
@@ -160,6 +171,15 @@ static void T_StrobeFlash (strobe_t __far*   flash)
 // Passed a glow_t structure containing light levels and timing
 // Returns nothing
 //
+
+typedef struct
+{
+  thinker_t thinker;
+  sector_t __far* sector;
+  int16_t minlight;
+  int16_t maxlight;
+  int16_t direction;
+} glow_t;
 
 static void T_Glow(glow_t __far* g)
 {
@@ -195,10 +215,10 @@ static void T_Glow(glow_t __far* g)
 // in a surrounding sector less than that passed. If no smaller light
 // level exists, the light level passed is returned.
 //
-static int32_t P_FindMinSurroundingLight(sector_t __far* sector, int32_t max)
+static int16_t P_FindMinSurroundingLight(sector_t __far* sector, int16_t max)
 {
   int16_t         i;
-  int32_t         min;
+  int16_t         min;
   const line_t __far*     line;
   sector_t __far*   check;
 
@@ -412,27 +432,25 @@ void EV_TurnTagLightsOff(const line_t __far* line)
 // Passed the activating line, and a level to set the light to
 // If level passed is 0, the maximum neighbor lighting is used
 //
-void EV_LightTurnOn(const line_t __far* line, int32_t bright)
+void EV_LightTurnOn(const line_t __far* line, int16_t bright)
 {
-  int16_t i;
+	int16_t i;
 
-  // search all sectors for ones with same tag as activating line
+	// search all sectors for ones with same tag as activating line
 
-  // killough 10/98: replace inefficient search with fast search
-  for (i = -1; (i = P_FindSectorFromLineTag(line,i)) >= 0;)
-    {
-      sector_t __far* temp;
-      sector_t __far* sector = _g_sectors+i;
-      int16_t j, tbright = bright; //jff 5/17/98 search for maximum PER sector
+	for (i = -1; (i = P_FindSectorFromLineTag(line,i)) >= 0;)
+	{
+		sector_t __far* temp;
+		sector_t __far* sector = _g_sectors+i;
+		int16_t j, tbright = bright; //jff 5/17/98 search for maximum PER sector
 
-      // bright = 0 means to search for highest light level surrounding sector
+		// bright = 0 means to search for highest light level surrounding sector
 
-      if (!bright)
-  for (j = 0;j < sector->linecount; j++)
-    if ((temp = getNextSector(sector->lines[j],sector)) &&
-        temp->lightlevel > tbright)
-      tbright = temp->lightlevel;
+		if (!bright)
+			for (j = 0;j < sector->linecount; j++)
+				if ((temp = getNextSector(sector->lines[j],sector)) && temp->lightlevel > tbright)
+					tbright = temp->lightlevel;
 
-      sector->lightlevel = tbright;
-    }
+		sector->lightlevel = tbright;
+	}
 }

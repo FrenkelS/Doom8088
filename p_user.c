@@ -63,22 +63,9 @@ static boolean onground; // whether player is on ground or in air
 #define MAXBOB  0x100000
 
 
-//
-// P_Thrust
-// Moves the given origin along a given angle.
-//
-
-static void P_Thrust(player_t* player,angle_t angle,fixed_t move)
-  {
-  angle >>= ANGLETOFINESHIFT;
-  player->mo->momx += FixedMul(move,finecosine(angle));
-  player->mo->momy += FixedMul(move,finesine(  angle));
-  }
-
-
 /*
- * P_Bob
- * Same as P_Thrust, but only affects bobbing.
+ * P_BobAndThrust
+ * Moves the given origin along a given angle.
  *
  * killough 10/98: We apply thrust separately between the real physical player
  * and the part which affects bobbing. This way, bobbing only comes from player
@@ -87,10 +74,14 @@ static void P_Thrust(player_t* player,angle_t angle,fixed_t move)
  * reduced at a regular rate, even on ice (where the player coasts).
  */
 
-static void P_Bob(player_t *player, angle_t angle, fixed_t move)
+static void P_BobAndThrust(player_t *player, int16_t angle, int8_t move)
 {
-  player->momx += FixedMul(move,finecosine(angle >>= ANGLETOFINESHIFT));
-  player->momy += FixedMul(move,finesine(angle));
+	fixed_t x = FixedMul(move * ORIG_FRICTION_FACTOR,finecosine(angle));
+	fixed_t y = FixedMul(move * ORIG_FRICTION_FACTOR,finesine(  angle));
+	player->mo->momx += x;
+	player->mo->momy += y;
+	player->momx     += x;
+	player->momy     += y;
 }
 
 //
@@ -100,7 +91,7 @@ static void P_Bob(player_t *player, angle_t angle, fixed_t move)
 
 void P_CalcHeight (player_t* player)
   {
-  int32_t     angle;
+  int16_t     angle;
   fixed_t bob;
 
   // Regular movement bobbing
@@ -202,18 +193,14 @@ static void P_MovePlayer (player_t* player)
     {
       if (onground) // killough 8/9/98
       {
-        int32_t movefactor = ORIG_FRICTION_FACTOR;
-
         if (cmd->forwardmove)
         {
-          P_Bob(player,mo->angle,cmd->forwardmove*movefactor);
-          P_Thrust(player,mo->angle,cmd->forwardmove*movefactor);
+          P_BobAndThrust(player, mo->angle >> ANGLETOFINESHIFT, cmd->forwardmove);
         }
 
         if (cmd->sidemove)
         {
-          P_Bob(player,mo->angle-ANG90,cmd->sidemove*movefactor);
-          P_Thrust(player,mo->angle-ANG90,cmd->sidemove*movefactor);
+          P_BobAndThrust(player, (mo->angle-ANG90) >> ANGLETOFINESHIFT, cmd->sidemove);
         }
       }
       if (mo->state == states+S_PLAY)
@@ -257,7 +244,7 @@ static void P_DeathThink (player_t* player)
 
     delta = angle - player->mo->angle;
 
-    if (delta < ANG5 || delta > (uint32_t)-ANG5)
+    if ((uint32_t)-ANG5 < delta || delta < ANG5)
       {
       // Looking at killer,
       //  so fade damage flash down.

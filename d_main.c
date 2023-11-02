@@ -94,10 +94,8 @@ static boolean singletics; // debug flag to cancel adaptiveness
 static boolean advancedemo;
 boolean _g_fps_show;
 
-uint32_t _g_gamma;
-
 //fps counter stuff
-uint16_t _g_fps_framerate;
+int16_t _g_fps_framerate;
 
 
 /*
@@ -270,7 +268,7 @@ static void TryRunTics (void)
 //  calls all ?_Responder, ?_Ticker, and ?_Drawer,
 //  calls I_GetTime and I_StartTic
 //
-
+static void NORETURN_PRE D_DoomLoop(void) NORETURN_POST;
 static void D_DoomLoop(void)
 {
     for (;;)
@@ -452,8 +450,8 @@ void D_StartTitle (void)
 =================
 */
 
-int myargc;
-const char * const * myargv;
+static int myargc;
+static const char * const * myargv;
 
 static int16_t M_CheckParm(char *check)
 {
@@ -532,8 +530,11 @@ static void D_DoomMainSetup(void)
 // D_DoomMain
 //
 
-void D_DoomMain(void)
+void D_DoomMain(int argc, const char * const * argv)
 {
+    myargc = argc;
+    myargv = argv;
+
     D_DoomMainSetup(); // CPhipps - setup out of main execution stack
 
     D_DoomLoop ();  // never returns

@@ -58,7 +58,7 @@
 // P_SetPsprite
 //
 
-static void P_SetPsprite(player_t *player, int32_t position, statenum_t stnum)
+static void P_SetPsprite(player_t *player, psprnum_t position, statenum_t stnum)
 {
   pspdef_t *psp = &player->psprites[position];
 
@@ -122,7 +122,7 @@ WEAPONBOTTOM+FRACUNIT*2;
 // in DOOM2 to bring up the weapon, i.e. 6 = plasma gun. These    //    |
 // are NOT the wp_* constants.                                    //    V
 
-static const int32_t weapon_preferences[NUMWEAPONS+1] =
+static const weapontype_t weapon_preferences[NUMWEAPONS+1] =
 {
     6, 9, 4, 3, 2, 8, 5, 7, 1,  // !compatibility preferences
 };
@@ -133,11 +133,11 @@ static const int32_t weapon_preferences[NUMWEAPONS+1] =
 // because the raised weapon has no ammo anyway. When called from
 // G_BuildTiccmd you want to toggle to a different weapon regardless.
 
-int32_t P_SwitchWeapon(player_t *player)
+weapontype_t P_SwitchWeapon(player_t *player)
 {
-  const int32_t *prefer = &weapon_preferences[0]; // killough 3/22/98
-  int32_t currentweapon = player->readyweapon;
-  int32_t newweapon = currentweapon;
+  const weapontype_t *prefer = &weapon_preferences[0]; // killough 3/22/98
+  weapontype_t currentweapon = player->readyweapon;
+  weapontype_t newweapon = currentweapon;
   int16_t i = NUMWEAPONS+1;   // killough 5/2/98
 
   // killough 2/8/98: follow preferences and fix BFG/SSG bugs
@@ -177,7 +177,7 @@ int32_t P_SwitchWeapon(player_t *player)
 }
 
 // killough 5/2/98: whether consoleplayer prefers weapon w1 over weapon w2.
-int32_t P_WeaponPreferred(int32_t w1, int32_t w2)
+weapontype_t P_WeaponPreferred(weapontype_t w1, weapontype_t w2)
 {
   return
     (weapon_preferences[0] != ++w2 && (weapon_preferences[0] == ++w1 ||
@@ -191,7 +191,7 @@ int32_t P_WeaponPreferred(int32_t w1, int32_t w2)
    ))))))))))))))));
 }
 
-static int32_t P_CheckCanSwitchWeapon(weapontype_t weapon, player_t* player)
+static weapontype_t P_CheckCanSwitchWeapon(weapontype_t weapon, player_t* player)
 {
     switch(weapon)
     {
@@ -247,9 +247,9 @@ static int32_t P_CheckCanSwitchWeapon(weapontype_t weapon, player_t* player)
 }
 
 
-int32_t P_WeaponCycleUp(player_t *player)
+weapontype_t P_WeaponCycleUp(player_t *player)
 {
-    int32_t w = player->readyweapon;
+    weapontype_t w = player->readyweapon;
 
     for(int16_t i = 0; i < NUMWEAPONS; i++)
     {
@@ -298,16 +298,17 @@ int32_t P_WeaponCycleUp(player_t *player)
     return player->readyweapon;
 }
 
-int32_t P_WeaponCycleDown(player_t *player)
+weapontype_t P_WeaponCycleDown(player_t *player)
 {
-    int32_t w = player->readyweapon;
+    weapontype_t w = player->readyweapon;
 
-    for(int16_t i = 0; i < NUMWEAPONS; i++)
+    for (int16_t i = 0; i < NUMWEAPONS; i++)
     {
-        w--;
-        if(w < 0)
+        if (w == 0)
             w = NUMWEAPONS-1;
-		
+        else
+            w--;
+
 		//Dumb hack to fix weapon order	to be like PSXDoom ~Kippykip
 		switch(w)
 		{
@@ -374,6 +375,60 @@ boolean P_CheckAmmo(player_t *player)
 
   return false;
 }
+
+
+//
+// Called by P_NoiseAlert.
+// Recursively traverse adjacent sectors,
+// sound blocking lines cut off traversal.
+//
+
+static void P_RecursiveSound(sector_t __far* sec, int16_t soundblocks, mobj_t __far* soundtarget)
+{
+  int16_t i;
+
+  // wake up all monsters in this sector
+  if (sec->validcount == validcount && sec->soundtraversed <= soundblocks+1)
+    return;             // already flooded
+
+  sec->validcount     = validcount;
+  sec->soundtraversed = soundblocks+1;
+  sec->soundtarget    = soundtarget;
+
+  for (i=0; i<sec->linecount; i++)
+    {
+      sector_t __far* other;
+      const line_t __far* check = sec->lines[i];
+
+      if (!(check->flags & ML_TWOSIDED))
+        continue;
+
+      P_LineOpening(check);
+
+      if (_g_openrange <= 0)
+        continue;       // closed door
+
+      other=_g_sides[check->sidenum[_g_sides[check->sidenum[0]].sector==sec]].sector;
+
+      if (!(check->flags & ML_SOUNDBLOCK))
+        P_RecursiveSound(other, soundblocks, soundtarget);
+      else
+        if (!soundblocks)
+          P_RecursiveSound(other, 1, soundtarget);
+    }
+}
+
+//
+// P_NoiseAlert
+// If a monster yells at a player,
+// it will alert other monsters to the player.
+//
+static void P_NoiseAlert(mobj_t __far* emitter)
+{
+  validcount++;
+  P_RecursiveSound(emitter->subsector->sector, 0, emitter);
+}
+
 
 //
 // P_FireWeapon.
@@ -449,7 +504,7 @@ void A_WeaponReady(player_t *player, pspdef_t *psp)
 
   // bob the weapon based on movement speed
   {
-    int32_t angle = (128*_g_leveltime) & FINEMASK;
+    int16_t angle = (128*_g_leveltime) & FINEMASK;
     psp->sx = FRACUNIT  + FixedMul(player->bob, finecosine(angle));
     angle &= FINEANGLES/2-1;
     psp->sy = WEAPONTOP + FixedMul(player->bob, finesine(  angle));
@@ -548,7 +603,7 @@ void A_Raise(player_t *player, pspdef_t *psp)
 // muzzle flash, rather than the pressing of the trigger.
 // The BFG delay caused this to be necessary.
 
-static void A_FireSomething(player_t* player,int32_t adder)
+static void A_FireSomething(player_t* player,int16_t adder)
 {
   P_SetPsprite(player, ps_flash,
                weaponinfo[player->readyweapon].flashstate+adder);
@@ -577,8 +632,9 @@ void A_GunFlash(player_t *player, pspdef_t *psp)
 
 void A_Punch(player_t *player, pspdef_t *psp)
 {
-	angle_t angle;
-	int32_t t, slope, damage = (P_Random()%10+1)<<1;
+	angle_t	angle, t;
+	fixed_t	slope;
+	int16_t	damage = (P_Random()%10+1)<<1;
 
 	UNUSED(psp);
 
@@ -612,10 +668,11 @@ void A_Punch(player_t *player, pspdef_t *psp)
 
 void A_Saw(player_t *player, pspdef_t *psp)
 {
-	int32_t slope, damage = 2*(P_Random()%10+1);
+	fixed_t slope;
+	int16_t	damage = 2*(P_Random()%10+1);
 	angle_t angle = player->mo->angle;
 	// killough 5/5/98: remove dependence on order of evaluation:
-	int32_t t = P_Random();
+	angle_t t = P_Random();
 	angle += (t - P_Random())<<18;
 
 	UNUSED(psp);
@@ -700,12 +757,12 @@ static void P_BulletSlope(mobj_t __far* mo)
 
 static void P_GunShot(mobj_t __far* mo, boolean accurate)
 {
-  int32_t damage = 5*(P_Random()%3+1);
+  int16_t damage = 5*(P_Random()%3+1);
   angle_t angle = mo->angle;
 
   if (!accurate)
     {  // killough 5/5/98: remove dependence on order of evaluation:
-      int32_t t = P_Random();
+      angle_t t = P_Random();
       angle += (t - P_Random())<<18;
     }
 
@@ -824,7 +881,7 @@ void P_SetupPsprites(player_t *player)
 void P_MovePsprites(player_t *player)
 {
   pspdef_t *psp = player->psprites;
-  int16_t i;
+  psprnum_t i;
 
   // a null state means not active
   // drop tic count and possibly change state

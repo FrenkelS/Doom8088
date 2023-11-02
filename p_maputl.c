@@ -55,6 +55,7 @@ divline_t _g_trace;
 
 
 // 1/11/98 killough: Intercept limit removed
+#define MAXINTERCEPTS 64
 static intercept_t intercepts[MAXINTERCEPTS];
 static intercept_t* intercept_p;
 
@@ -84,8 +85,8 @@ int16_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* lin
   return
     !line->dx ? x <= line->v1.x ? line->dy > 0 : line->dy < 0 :
     !line->dy ? y <= line->v1.y ? line->dx < 0 : line->dx > 0 :
-    FixedMul(y-line->v1.y, line->dx>>FRACBITS) >=
-    FixedMul(line->dy>>FRACBITS, x-line->v1.x);
+    //FixedMul(y-line->v1.y, line->dx>>FRACBITS) >= FixedMul(line->dy>>FRACBITS, x-line->v1.x);
+    ((y - line->v1.y) >> 8) * (line->dx >> FRACBITS) >= (line->dy >> FRACBITS) * ((x - line->v1.x) >> 8);
 }
 
 //
@@ -127,13 +128,14 @@ int16_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-static int32_t PUREFUNC P_PointOnDivlineSide(fixed_t x, fixed_t y, const divline_t *line)
+static int16_t PUREFUNC P_PointOnDivlineSide(fixed_t x, fixed_t y, const divline_t *line)
 {
   return
     !line->dx ? x <= line->x ? line->dy > 0 : line->dy < 0 :
     !line->dy ? y <= line->y ? line->dx < 0 : line->dx > 0 :
     (line->dy^line->dx^(x -= line->x)^(y -= line->y)) < 0 ? (line->dy^x) < 0 :
-    FixedMul(y>>8, line->dx>>8) >= FixedMul(line->dy>>8, x>>8);
+    //FixedMul(y>>8, line->dx>>8) >= FixedMul(line->dy>>8, x>>8);
+    (y >> 8) * (line->dx >> 16) >= (line->dy >> 16) * (x >> 8);
 }
 
 //
@@ -320,8 +322,8 @@ void P_SetThingPosition(mobj_t __far* thing)
   if (!(thing->flags & MF_NOBLOCKMAP))
     {
       // inert things don't need to be in blockmap
-      int32_t blockx = (thing->x - _g_bmaporgx)>>MAPBLOCKSHIFT;
-      int32_t blocky = (thing->y - _g_bmaporgy)>>MAPBLOCKSHIFT;
+      int16_t blockx = (thing->x - _g_bmaporgx)>>MAPBLOCKSHIFT;
+      int16_t blocky = (thing->y - _g_bmaporgy)>>MAPBLOCKSHIFT;
       if (0 <= blockx && blockx < _g_bmapwidth && 0 <= blocky && blocky < _g_bmapheight)
         {
         // killough 8/11/98: simpler scheme using pointer-to-pointer prev
@@ -357,7 +359,7 @@ void P_SetThingPosition(mobj_t __far* thing)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t __far*))
+boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(const line_t __far*))
 {
 
     if (!(0 <= x && x < _g_bmapwidth && 0 <= y && y <_g_bmapheight))
@@ -375,7 +377,7 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t __f
 
     list++;     // skip 0 starting delimiter                      // phares
 
-    const int32_t vcount = validcount;
+    const uint16_t vcount = validcount;
 
     for ( ; *list != -1 ; list++)                                   // phares
     {
@@ -400,9 +402,8 @@ boolean P_BlockLinesIterator(int32_t x, int32_t y, boolean func(const line_t __f
 //
 // P_BlockThingsIterator
 //
-// killough 5/3/98: reformatted, cleaned up
 
-boolean P_BlockThingsIterator(int32_t x, int32_t y, boolean func(mobj_t __far*))
+boolean P_BlockThingsIterator(int16_t x, int16_t y, boolean func(mobj_t __far*))
 {
   mobj_t __far* mobj;
   if (0 <= x && x < _g_bmapwidth && 0 <= y && y < _g_bmapheight)
@@ -537,12 +538,11 @@ static boolean PIT_AddThingIntercepts(mobj_t __far* thing)
 // Returns true if the traverser function returns true
 // for all lines.
 //
-// killough 5/3/98: reformatted, cleaned up
 
 static boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
 {
   intercept_t *in = NULL;
-  int32_t count = intercept_p - intercepts;
+  int16_t count = intercept_p - intercepts;
   while (count--)
     {
       fixed_t dist = INT32_MAX;
@@ -569,15 +569,15 @@ static boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
 // killough 5/3/98: reformatted, cleaned up
 
 boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
-                       int32_t flags, boolean trav(intercept_t *))
+                       int16_t flags, boolean trav(intercept_t *))
 {
-  fixed_t xt1, yt1;
-  fixed_t xt2, yt2;
+  int16_t xt1, yt1;
+  int16_t xt2, yt2;
   fixed_t xstep, ystep;
   fixed_t partial;
   fixed_t xintercept, yintercept;
-  int32_t     mapx, mapy;
-  int32_t     mapxstep, mapystep;
+  int16_t     mapx, mapy;
+  int16_t     mapxstep, mapystep;
   int16_t     count;
 
   validcount++;

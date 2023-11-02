@@ -47,6 +47,10 @@
 #include "globdata.h"
 
 
+static boolean crushchange;
+static boolean nofit;
+
+
 //
 // P_ThingHeightClip
 // Takes a valid thing and adjusts the thing->floorz,
@@ -147,9 +151,9 @@ static void PIT_ChangeSector(mobj_t __far* thing)
     return;
     }
 
-  _g_nofit = true;
+  nofit = true;
 
-  if (_g_crushchange && !(_g_leveltime&3)) {
+  if (crushchange && !(_g_leveltime&3)) {
     int16_t t;
     P_DamageMobj(thing,NULL,NULL,10);
 
@@ -178,8 +182,8 @@ static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
   {
   msecnode_t __far* n;
 
-  _g_nofit = false;
-  _g_crushchange = crunch;
+  nofit = false;
+  crushchange = crunch;
 
   // killough 4/4/98: scan list front-to-back until empty or exhausted,
   // restarting from beginning after each thing is processed. Avoids
@@ -205,7 +209,7 @@ static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
         }
   while (n);  // repeat from scratch until all things left are marked valid
 
-  return _g_nofit;
+  return nofit;
   }
 
 
@@ -470,6 +474,18 @@ void T_MoveFloor(floormove_t __far* floor)
 //
 // jff 02/22/98 added to support parallel floor/ceiling motion
 //
+
+typedef struct
+{
+  thinker_t thinker;
+  elevator_e type;
+  sector_t __far* sector;
+  int16_t direction;
+  fixed_t floordestheight;
+  fixed_t ceilingdestheight;
+  fixed_t speed;
+} elevator_t;
+
 static void T_MoveElevator(elevator_t __far* elevator)
 {
   result_e      res;
@@ -725,7 +741,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 
       case raiseToTexture:
         {
-          int32_t minsize = ((int32_t)32000)<<FRACBITS; /* jff 3/13/98 no ovf */
+          fixed_t minsize = 32000L << FRACBITS; /* jff 3/13/98 no ovf */
           side_t __far*     side;
 
           floor->direction = 1;
@@ -862,7 +878,7 @@ boolean EV_DoChange(const line_t __far* line, change_e changetype)
  * stairs
  * - Boom fixed the bug, and MBF/PrBoom without comp_stairs work right
  */
-static inline int32_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* l, int16_t start, int16_t min)
+static inline int16_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* l, int16_t start, int16_t min)
 {
   /* Emulate original Doom's linear lower-bounded P_FindSectorFromLineTag
    * as needed */
@@ -890,10 +906,11 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
     // don't start a stair if the first step's floor is already moving
    if (!P_SectorActive(floor_special,sec)) { //jff 2/22/98
     floormove_t __far*  floor;
-    int32_t           texture, height;
+    int16_t       texture;
+    fixed_t       height;
     fixed_t       stairsize;
     fixed_t       speed;
-    boolean           ok;
+    boolean       ok;
 
     // create new floor thinker for first step
     rtn = true;

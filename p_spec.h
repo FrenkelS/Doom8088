@@ -68,9 +68,6 @@
 #define MAXBUTTONS    (MAXPLAYERS*4)
 
 
-// 1 second, in ticks.
-#define BUTTONTIME  TICRATE
-
 // p_lights
 
 #define GLOWSPEED       8
@@ -210,113 +207,6 @@ typedef enum
   PushMany,
 } triggertype_e;
 
-// define names for the Speed field of the general linedefs
-
-typedef enum
-{
-  SpeedSlow,
-  SpeedNormal,
-  SpeedFast,
-  SpeedTurbo,
-} motionspeed_e;
-
-// define names for the Target field of the general floor
-
-typedef enum
-{
-  FtoHnF,
-  FtoLnF,
-  FtoNnF,
-  FtoLnC,
-  FtoC,
-  FbyST,
-  Fby24,
-  Fby32,
-} floortarget_e;
-
-// define names for the Changer Type field of the general floor
-
-typedef enum
-{
-  FNoChg,
-  FChgZero,
-  FChgTxt,
-  FChgTyp,
-} floorchange_e;
-
-// define names for the Change Model field of the general floor
-
-typedef enum
-{
-  FTriggerModel,
-  FNumericModel,
-} floormodel_t;
-
-// define names for the Target field of the general ceiling
-
-typedef enum
-{
-  CtoHnC,
-  CtoLnC,
-  CtoNnC,
-  CtoHnF,
-  CtoF,
-  CbyST,
-  Cby24,
-  Cby32,
-} ceilingtarget_e;
-
-// define names for the Changer Type field of the general ceiling
-
-typedef enum
-{
-  CNoChg,
-  CChgZero,
-  CChgTxt,
-  CChgTyp,
-} ceilingchange_e;
-
-// define names for the Change Model field of the general ceiling
-
-typedef enum
-{
-  CTriggerModel,
-  CNumericModel,
-} ceilingmodel_t;
-
-// define names for the Target field of the general lift
-
-typedef enum
-{
-  F2LnF,
-  F2NnF,
-  F2LnC,
-  LnF2HnF,
-} lifttarget_e;
-
-// define names for the door Kind field of the general ceiling
-
-typedef enum
-{
-  OdCDoor,
-  ODoor,
-  CdODoor,
-  CDoor,
-} doorkind_e;
-
-// define names for the locked door Kind field of the general ceiling
-
-typedef enum
-{
-  AnyKey,
-  RCard,
-  BCard,
-  YCard,
-  RSkull,
-  BSkull,
-  YSkull,
-  AllKeys,
-} keykind_e;
 
 //////////////////////////////////////////////////////////////////
 //
@@ -520,34 +410,11 @@ typedef struct
 {
   const line_t __far* line;
   bwhere_e where;
-  int32_t   btexture;
-  int32_t   btimer;
+  int16_t   btexture;
+  int16_t   btimer;
   degenmobj_t __far* soundorg;
 
 } button_t;
-
-// p_lights
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t __far* sector;
-  int32_t count;
-  int32_t maxlight;
-  int32_t minlight;
-
-} fireflicker_t;
-
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t __far* sector;
-  int32_t minlight;
-  int32_t maxlight;
-  int32_t direction;
-
-} glow_t;
 
 // p_plats
 
@@ -558,12 +425,12 @@ typedef struct
   fixed_t speed;
   fixed_t low;
   fixed_t high;
-  int32_t wait;
-  int32_t count;
+  int16_t wait;
+  int16_t count;
   plat_e status;
   plat_e oldstatus;
   boolean crush;
-  int32_t tag;
+  int16_t tag;
   plattype_e type;
 
   struct platlist __far* list;
@@ -581,19 +448,19 @@ typedef struct
   fixed_t speed;
 
   // 1 = up, 0 = waiting at top, -1 = down
-  int32_t direction;
+  int16_t direction;
 
   // tics to wait at the top
-  int32_t topwait;
+  int16_t topwait;
   // (keep in case a door going down is reset)
   // when it reaches 0, start going down
-  int32_t topcountdown;
+  int16_t topcountdown;
 
   //jff 1/31/98 keep track of line door is triggered by
   const line_t __far* line;
 
   /* killough 10/98: sector tag for gradual lighting effects */
-  int32_t lighttag;
+  int16_t lighttag;
 } vldoor_t;
 
 // p_doors
@@ -610,16 +477,16 @@ typedef struct
   boolean crush;
 
   //jff 02/04/98 add these to support ceiling changers
-  int32_t newspecial;
-  int32_t oldspecial; //jff 3/14/98 add to fix bug in change transfers
+  int16_t newspecial;
+  int16_t oldspecial; //jff 3/14/98 add to fix bug in change transfers
   int16_t texture;
 
   // 1 = up, 0 = waiting, -1 = down
-  int32_t direction;
+  int16_t direction;
 
   // ID
-  int32_t tag;
-  int32_t olddirection;
+  int16_t tag;
+  int16_t olddirection;
   struct ceilinglist __far* list;
 } ceiling_t;
 
@@ -637,64 +504,14 @@ typedef struct
   floor_e type;
   boolean crush;
   sector_t __far* sector;
-  int32_t direction;
-  int32_t newspecial;
-  int32_t oldspecial;   //jff 3/14/98 add to fix bug in change transfers
+  int16_t direction;
+  int16_t newspecial;
+  int16_t oldspecial;   //jff 3/14/98 add to fix bug in change transfers
   int16_t texture;
   fixed_t floordestheight;
   fixed_t speed;
 
 } floormove_t;
-
-typedef struct
-{
-  thinker_t thinker;
-  elevator_e type;
-  sector_t __far* sector;
-  int32_t direction;
-  fixed_t floordestheight;
-  fixed_t ceilingdestheight;
-  fixed_t speed;
-} elevator_t;
-
-// p_spec
-
-// killough 3/7/98: Add generalized scroll effects
-
-typedef struct {
-  thinker_t thinker;   // Thinker structure for scrolling
-  int32_t affectee;        // Number of affected sidedef, sector, tag, or whatever
-} scroll_t;
-
-// phares 3/12/98: added new model of friction for ice/sludge effects
-
-typedef struct {
-  //thinker_t thinker;   // Thinker structure for friction
-  int32_t friction;        // friction value (E800 = normal)
-  //int32_t movefactor;      // inertia factor when adding to momentum
-  int32_t affectee;        // Number of affected sector
-} friction_t;
-
-// phares 3/20/98: added new model of Pushers for push/pull effects
-
-typedef struct {
-  thinker_t thinker;   // Thinker structure for Pusher
-  enum
-  {
-    p_push,
-    p_pull,
-    p_wind,
-    p_current,
-  } type;
-  mobj_t* source;      // Point source if point pusher
-  int32_t x_mag;           // X Strength
-  int32_t y_mag;           // Y Strength
-  int32_t magnitude;       // Vector strength for point pusher
-  int32_t radius;          // Effective radius for point pusher
-  int32_t x;               // X of point source if point pusher
-  int32_t y;               // Y of point source if point pusher
-  int32_t affectee;        // Number of affected sector
-} pusher_t;
 
 
 ////////////////////////////////////////////////////////////////
@@ -795,7 +612,7 @@ void EV_StartLightStrobing(const line_t __far* line);
 
 void EV_TurnTagLightsOff(const line_t __far* line);
 
-void EV_LightTurnOn(const line_t __far* line, int32_t bright);
+void EV_LightTurnOn(const line_t __far* line, int16_t bright);
 
 // p_floor
 
@@ -805,7 +622,7 @@ boolean EV_DoDonut(const line_t __far* line);
 
 // p_plats
 
-boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount);
+boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount);
 
 void EV_StopPlat(const line_t __far* line);
 
@@ -866,8 +683,7 @@ void P_AddActivePlat(plat_t __far* plat);
 void P_RemoveAllActivePlats
 ( void );    // killough
 
-void P_ActivateInStasis
-( int32_t tag );
+void P_ActivateInStasis(int16_t tag);
 
 // p_doors
 

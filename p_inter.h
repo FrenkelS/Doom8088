@@ -43,19 +43,18 @@
 /* follow a player exclusively for 3 seconds */
 #define BASETHRESHOLD   (100)
 
-boolean P_GivePower(player_t *, int32_t);
+boolean P_GivePower(player_t *, powertype_t);
 void P_TouchSpecialThing(mobj_t __far* special, mobj_t __far* toucher);
-void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int32_t damage);
+void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int16_t damage);
 
-/* killough 5/2/98: moved from d_deh.c, g_game.c, m_misc.c, others: */
 
-extern const int32_t god_health;   /* Ty 03/09/98 - deh support, see also p_inter.c */
-extern const int32_t idfa_armor;
-extern const int32_t idfa_armor_class;  /* Ty - end */
+extern const int16_t god_health;
+extern const int16_t idfa_armor;
+extern const int16_t idfa_armor_class;
 /* Ty 03/13/98 - externalized initial settings for respawned player */
-extern const int32_t initial_health;
-extern const int32_t initial_bullets;
-extern const int32_t bfgcells;
-extern const int32_t maxammo[];
+extern const int16_t initial_health;
+extern const int16_t initial_bullets;
+extern const int16_t bfgcells;
+extern const int16_t maxammo[];
 
 #endif

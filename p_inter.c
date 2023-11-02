@@ -57,25 +57,25 @@
 // dehacked support (and future flexibility).  Most var names came from the key
 // strings used in dehacked.
 
-const int32_t initial_health = 100;
-const int32_t initial_bullets = 50;
-static const int32_t maxhealth = 100; // was MAXHEALTH as a #define, used only in this module
-static const int32_t max_armor = 200;
-static const int32_t green_armor_class = 1;  // these are involved with armortype below
-static const int32_t blue_armor_class = 2;
-static const int32_t max_soul = 200;
-static const int32_t soul_health = 100;
-const int32_t god_health = 100;   // these are used in cheats (see st_stuff.c)
-const int32_t idfa_armor = 200;
-const int32_t idfa_armor_class = 2;
+       const int16_t initial_health    = 100;
+       const int16_t initial_bullets   = 50;
+static const int16_t maxhealth         = 100; // was MAXHEALTH as a #define, used only in this module
+static const int16_t max_armor         = 200;
+static const int16_t green_armor_class = 1;  // these are involved with armortype below
+static const int16_t blue_armor_class  = 2;
+static const int16_t max_soul          = 200;
+static const int16_t soul_health       = 100;
+       const int16_t god_health        = 100;   // these are used in cheats (see st_stuff.c)
+       const int16_t idfa_armor        = 200;
+       const int16_t idfa_armor_class  = 2;
 
-const int32_t bfgcells = 40;      // used in p_pspr.c
+       const int16_t bfgcells          = 40;      // used in p_pspr.c
 // Ty 03/07/98 - end deh externals
 
 // a weapon is found with two clip loads,
 // a big item has five clip loads
-const int32_t maxammo[NUMAMMO]  = {200, 50, 300, 50};
-static const int32_t clipammo[NUMAMMO] = { 10,  4,  20,  1};
+       const int16_t maxammo[NUMAMMO] = {200, 50, 300, 50};
+static const int8_t clipammo[NUMAMMO] = { 10,  4,  20,  1};
 
 //
 // GET STUFF
@@ -88,9 +88,9 @@ static const int32_t clipammo[NUMAMMO] = { 10,  4,  20,  1};
 // Returns false if the ammo can't be picked up at all
 //
 
-static boolean P_GiveAmmo(player_t *player, ammotype_t ammo, int32_t num)
+static boolean P_GiveAmmo(player_t *player, ammotype_t ammo, int16_t num)
 {
-  int32_t oldammo;
+  int16_t oldammo;
 
   if (ammo == am_noammo)
     return false;
@@ -140,13 +140,13 @@ static boolean P_GiveAmmo(player_t *player, ammotype_t ammo, int32_t num)
       if (player->readyweapon == wp_fist || player->readyweapon == wp_pistol)
         if (player->weaponowned[wp_shotgun])
           player->pendingweapon = wp_shotgun;
-        break;
+      break;
 
       case am_cell:
         if (player->readyweapon == wp_fist || player->readyweapon == wp_pistol)
           if (player->weaponowned[wp_plasma])
             player->pendingweapon = wp_plasma;
-        break;
+      break;
 
       case am_misl:
         if (player->readyweapon == wp_fist)
@@ -193,7 +193,7 @@ static boolean P_GiveWeapon(player_t *player, weapontype_t weapon, boolean dropp
 // Returns false if the body isn't needed at all
 //
 
-static boolean P_GiveBody(player_t *player, int32_t num)
+static boolean P_GiveBody(player_t *player, int16_t num)
 {
   if (player->health >= maxhealth)
     return false; // Ty 03/09/98 externalized MAXHEALTH to maxhealth
@@ -210,9 +210,9 @@ static boolean P_GiveBody(player_t *player, int32_t num)
 // than the current armor.
 //
 
-static boolean P_GiveArmor(player_t *player, int32_t armortype)
+static boolean P_GiveArmor(player_t *player, int16_t armortype)
 {
-  int32_t hits = armortype*100;
+  int16_t hits = armortype*100;
   if (player->armorpoints >= hits)
     return false;   // don't pick up
   player->armortype = armortype;
@@ -238,9 +238,9 @@ static void P_GiveCard(player_t *player, card_t card)
 // Rewritten by Lee Killough
 //
 
-boolean P_GivePower(player_t *player, int32_t power)
+boolean P_GivePower(player_t *player, powertype_t power)
 {
-  static const int32_t tics[NUMPOWERS] = {
+  static const int16_t tics[NUMPOWERS] = {
     INVULNTICS, 1 /* strength */, INVISTICS,
     IRONTICS, 1 /* allmap */, INFRATICS,
    };
@@ -274,7 +274,7 @@ void P_TouchSpecialThing(mobj_t __far* special, mobj_t __far* toucher)
 {
   player_t *player;
   int16_t      i;
-  int32_t      sound;
+  sfxenum_t      sound;
   fixed_t  delta = special->z - toucher->z;
 
   if (delta > toucher->height || delta < -8*FRACUNIT)
@@ -599,7 +599,7 @@ static void P_KillMobj(mobj_t __far* source, mobj_t __far* target)
 // and other environmental stuff.
 //
 
-void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int32_t damage)
+void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* source, int16_t damage)
 {
   player_t *player;
   boolean justhit = false;          /* killough 11/98 */
@@ -626,13 +626,13 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
       (!source || !P_MobjIsPlayer(source) ||
        P_MobjIsPlayer(source)->readyweapon != wp_chainsaw))
     {
-      uint32_t ang = R_PointToAngle2 (inflictor->x, inflictor->y,
+      angle_t ang = R_PointToAngle2 (inflictor->x, inflictor->y,
                                       target->x,    target->y);
 
       fixed_t thrust = damage*(FRACUNIT>>3)*100/mobjinfo[target->type].mass;
 
       // make fall forwards sometimes
-      if ( damage < 40 && damage > target->health
+      if ( target->health < damage && damage < 40
            && target->z - inflictor->z > 64*FRACUNIT
            && P_Random() & 1)
         {
@@ -662,7 +662,7 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
 
       if (player->armortype)
         {
-          int32_t saved = player->armortype == 1 ? damage/3 : damage/2;
+          int16_t saved = player->armortype == 1 ? damage/3 : damage/2;
           if (player->armorpoints <= saved)
             {
               // armor is used up

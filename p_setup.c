@@ -60,26 +60,26 @@
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
 //
 
-int32_t      _g_numvertexes;
+int16_t      _g_numvertexes;
 const vertex_t __far* _g_vertexes;
 
 const seg_t    __far* _g_segs;
 
-int32_t      _g_numsectors;
+int16_t      _g_numsectors;
 sector_t __far* _g_sectors;
 
 
-static int32_t      numsubsectors;
+static int16_t      numsubsectors;
 subsector_t __far* _g_subsectors;
 
 
 
-int32_t      _g_numlines;
+int16_t      _g_numlines;
 const line_t   __far* _g_lines;
 linedata_t __far* _g_linedata;
 
 
-static int32_t      numsides;
+static int16_t      numsides;
 side_t   __far* _g_sides;
 
 // BLOCKMAP
@@ -114,11 +114,8 @@ mobj_t    __far*__far* _g_blocklinks;           // for thing chains
 
 const byte __far* _g_rejectmatrix;
 
-// Maintain single and multi player starting spots.
-mapthing_t _g_playerstarts[MAXPLAYERS];
-
 mobj_t __far*      _g_thingPool;
-uint32_t _g_thingPoolSize;
+int16_t _g_thingPoolSize;
 
 
 // Lump order in a map WAD: each map needs a couple of lumps
@@ -161,7 +158,7 @@ static void P_LoadVertexes (int16_t lump)
 
 static void P_LoadSegs (int16_t lump)
 {
-    int32_t numsegs = W_LumpLength(lump) / sizeof(seg_t);
+    int16_t numsegs = W_LumpLength(lump) / sizeof(seg_t);
     _g_segs = (const seg_t __far*)W_GetLumpByNumAutoFree(lump);
 
     if (!numsegs)
@@ -183,7 +180,7 @@ static void P_LoadSubsectors (int16_t lump)
 {
   /* cph 2006/07/29 - make data a const mapsubsector_t *, so the loop below is simpler & gives no constness warnings */
   const mapsubsector_t __far* data;
-  int32_t  i;
+  int16_t  i;
 
   numsubsectors = W_LumpLength (lump) / sizeof(mapsubsector_t);
   _g_subsectors = Z_CallocLevel(numsubsectors * sizeof(subsector_t));
@@ -225,7 +222,7 @@ static int16_t R_FlatNumForFarName(const char __far* far_name)
 static void P_LoadSectors (int16_t lump)
 {
   const byte __far* data;
-  int32_t  i;
+  int16_t  i;
 
   _g_numsectors = W_LumpLength (lump) / sizeof(mapsector_t);
   _g_sectors = Z_CallocLevel(_g_numsectors * sizeof(sector_t));
@@ -326,7 +323,7 @@ static boolean P_IsDoomnumAllowed(int16_t doomnum)
 
 static void P_LoadThings (int16_t lump)
 {
-    int32_t  i, numthings = W_LumpLength (lump) / sizeof(mapthing_t);
+    int16_t  i, numthings = W_LumpLength (lump) / sizeof(mapthing_t);
     const mapthing_t __far* data = W_GetLumpByNumAutoFree (lump);
 
     if ((!data) || (!numthings))
@@ -365,7 +362,7 @@ static void P_LoadThings (int16_t lump)
 
 static void P_LoadLineDefs (int16_t lump)
 {
-    int32_t  i;
+    int16_t  i;
 
     _g_numlines = W_LumpLength (lump) / sizeof(line_t);
     _g_lines = W_GetLumpByNumAutoFree (lump);
@@ -438,23 +435,6 @@ static void P_LoadSideDefs2(int16_t lump)
     }
 }
 
-//
-// jff 10/6/98
-// New code added to speed up calculation of internal blockmap
-// Algorithm is order of nlines*(ncols+nrows) not nlines*ncols*nrows
-//
-
-#define blkshift 7               /* places to shift rel position for cell num */
-#define blkmask ((1<<blkshift)-1)/* mask for rel position within cell */
-#define blkmargin 0              /* size guardband around map used */
-                                 // jff 10/8/98 use guardband>0
-                                 // jff 10/12/98 0 ok with + 1 in rows,cols
-
-typedef struct linelist_t        // type used to list lines in each block
-{
-  int32_t num;
-  struct linelist_t *next;
-} linelist_t;
 
 //
 // P_LoadBlockMap
@@ -661,11 +641,8 @@ void P_SetupLevel(int16_t map)
 
     P_GroupLines();
 
-    // Note: you don't need to clear player queue slots --
-    // a much simpler fix is in g_game.c -- killough 10/98
-
-    /* cph - reset all multiplayer starts */
-    memset(_g_playerstarts,0,sizeof(_g_playerstarts));
+    // Note: you don't need to clear player queue slots
+    // a much simpler fix is in g_game.c
 
     for (i = 0; i < MAXPLAYERS; i++)
         _g_player.mo = NULL;

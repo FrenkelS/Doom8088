@@ -120,7 +120,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 
     for (int32_t dc_x=left; dc_x<right; dc_x++, col+=DXI)
     {
-        int32_t colindex = (col>>FRACBITS);
+        int16_t colindex = (col>>FRACBITS);
 
         if(dc_x < 0)
             continue;

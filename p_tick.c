@@ -227,7 +227,6 @@ void P_Ticker (void)
 
   P_RunThinkers();
   P_UpdateSpecials();
-  P_RespawnSpecials();
   P_MapEnd();
   _g_leveltime++;                       // for par times
 }

@@ -34,10 +34,10 @@
 
 extern boolean _g_fps_show;
 
-extern uint32_t _g_gamma;
+extern uint16_t _g_gamma;
 
 //fps counter stuff
-extern uint16_t _g_fps_framerate;
+extern int16_t _g_fps_framerate;
 
 
 //******************************************************************************
@@ -109,7 +109,6 @@ extern fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // so missiles don't explode against sky hack walls
 
 extern const line_t    __far* _g_ceilingline;
-extern const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
@@ -117,23 +116,12 @@ extern const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking
 // 1/11/98 killough: removed limit on special lines crossed
 extern const line_t __far* _g_spechit[4];
 
-extern int32_t _g_numspechit;
+extern int16_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
 extern msecnode_t __far* _g_sector_list;
 
 extern mobj_t __far*   _g_linetarget; // who got hit (or NULL)
-
-extern fixed_t   _g_attackrange;
-
-// If "floatok" true, move would be ok
-// if within "tmfloorz - tmceilingz".
-extern boolean   _g_floatok;
-
-/* killough 11/98: if "felldown" true, object was pushed down ledge */
-extern boolean   _g_felldown;
-
-extern boolean _g_crushchange, _g_nofit;
 
 
 //******************************************************************************
@@ -158,12 +146,12 @@ extern divline_t _g_trace;
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
 //
 
-extern int32_t      _g_numvertexes;
+extern int16_t      _g_numvertexes;
 extern const vertex_t __far* _g_vertexes;
 
 extern const seg_t    __far* _g_segs;
 
-extern int32_t      _g_numsectors;
+extern int16_t      _g_numsectors;
 extern sector_t __far* _g_sectors;
 
 
@@ -171,7 +159,7 @@ extern subsector_t __far* _g_subsectors;
 
 
 
-extern int32_t      _g_numlines;
+extern int16_t      _g_numlines;
 extern const line_t   __far* _g_lines;
 extern linedata_t __far* _g_linedata;
 
@@ -210,11 +198,9 @@ extern mobj_t    __far*__far* _g_blocklinks;           // for thing chains
 
 extern const byte __far* _g_rejectmatrix;
 
-// Maintain single and multi player starting spots.
-extern mapthing_t _g_playerstarts[MAXPLAYERS];
 
 extern mobj_t __far*      _g_thingPool;
-extern uint32_t _g_thingPoolSize;
+extern int16_t _g_thingPoolSize;
 
 
 //******************************************************************************
@@ -256,9 +242,6 @@ extern uint16_t __far* _g_screen;
 
 // used to accelerate or skip a stage
 extern boolean   _g_acceleratestage;
-
-// used for general timing
-extern int32_t    _g_cnt;
 
 
 extern enum automapmode_e automapmode;

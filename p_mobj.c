@@ -55,6 +55,10 @@
 #include "globdata.h"
 
 
+// Maintain player starting spot.
+static mapthing_t playerstart;
+
+
 void A_CyberAttack(mobj_t __far* actor);
 
 
@@ -516,7 +520,7 @@ static void P_XYMovement(mobj_t __far* mo)
         // killough 10/98:
         // Don't affect main player when voodoo dolls stop, except in old demos:
 
-        if (player && (uint32_t)(player->mo->state - states - S_PLAY_RUN1) < 4
+        if (player && (uint16_t)(player->mo->state - states - S_PLAY_RUN1) < 4
                 && (player->mo == mo))
             P_SetMobjState(player->mo, S_PLAY);
 
@@ -1002,10 +1006,10 @@ void P_RemoveMobj(mobj_t __far* mobj)
  * killough 8/24/98: rewrote to use hashing
  */
 
-static PUREFUNC int16_t P_FindDoomedNum(uint32_t type)
+static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
 {
     // find which type to spawn
-    for (int16_t i=0 ; i< NUMMOBJTYPES ; i++)
+    for (int16_t i = 0; i < NUMMOBJTYPES; i++)
     {
         if (type == mobjinfo[i].doomednum)
             return i;
@@ -1014,13 +1018,6 @@ static PUREFUNC int16_t P_FindDoomedNum(uint32_t type)
     return NUMMOBJTYPES;
 }
 
-//
-// P_RespawnSpecials
-//
-
-void P_RespawnSpecials (void)
-  {
-  }
 
 //
 // P_SpawnPlayer
@@ -1101,7 +1098,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     fixed_t x;
     fixed_t y;
     fixed_t z;
-    int32_t options = mthing->options; /* cph 2001/07/07 - make writable copy */
+    int16_t options = mthing->options; /* cph 2001/07/07 - make writable copy */
 
     // killough 2/26/98: Ignore type-0 things as NOPs
     // phares 5/14/98: Ignore Player 5-8 starts (for now)
@@ -1126,7 +1123,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
 
     if (options & MTF_RESERVED)
     {
-        printf("P_SpawnMapThing: correcting bad flags (%lu) (thing type %d)\n", options, mthing->type);
+        printf("P_SpawnMapThing: correcting bad flags (%u) (thing type %d)\n", options, mthing->type);
         options &= MTF_EASY|MTF_NORMAL|MTF_HARD|MTF_AMBUSH|MTF_NOTSINGLE;
     }
 
@@ -1135,9 +1132,9 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     //Only care about start spot for player 1.
     if(mthing->type == 1)
     {
-        _g_playerstarts[0] = *mthing;
-        _g_playerstarts[0].options = 1;
-        P_SpawnPlayer (&_g_playerstarts[0]);
+        playerstart = *mthing;
+        playerstart.options = 1;
+        P_SpawnPlayer (&playerstart);
         return;
     }
 
@@ -1221,7 +1218,7 @@ void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
 
   // don't make punches spark on the wall
 
-  if (_g_attackrange == MELEERANGE)
+  if (P_IsAttackRangeMeleeRange())
     P_SetMobjState (th, S_PUFF3);
   }
 
@@ -1229,11 +1226,11 @@ void P_SpawnPuff(fixed_t x,fixed_t y,fixed_t z)
 //
 // P_SpawnBlood
 //
-void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int32_t damage)
+void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int16_t damage)
   {
   mobj_t __far* th;
   // killough 5/5/98: remove dependence on order of evaluation:
-  int32_t t = P_Random();
+  fixed_t t = P_Random();
   z += (t - P_Random())<<10;
   th = P_SpawnMobj(x,y,z, MT_BLOOD);
   th->momz = FRACUNIT*2;
@@ -1242,7 +1239,7 @@ void P_SpawnBlood(fixed_t x,fixed_t y,fixed_t z,int32_t damage)
   if (th->tics < 1)
     th->tics = 1;
 
-  if (damage <= 12 && damage >= 9)
+  if (9 <= damage && damage <= 12)
     P_SetMobjState (th,S_BLOOD2);
   else if (damage < 9)
     P_SetMobjState (th,S_BLOOD3);
@@ -1285,7 +1282,7 @@ mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_
   {
   mobj_t __far* th;
   angle_t an;
-  int32_t     dist;
+  fixed_t     dist;
 
   th = P_SpawnMobj (source->x,source->y,source->z + 4*8*FRACUNIT,type);
 

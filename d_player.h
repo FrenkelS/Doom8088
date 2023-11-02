@@ -117,13 +117,13 @@ typedef struct player_s
 
   // This is only used between levels,
   // mo->health is used during levels.
-  int32_t                 health;
-  int32_t                 armorpoints;
+  int16_t                 health;
+  int16_t                 armorpoints;
   // Armor type is 0-2.
-  int32_t                 armortype;
+  int16_t                 armortype;
 
   // Power ups. invinc and invis are tic counters.
-  int32_t                 powers[NUMPOWERS];
+  int16_t                 powers[NUMPOWERS];
   boolean             cards[NUMCARDS];
   boolean             backpack;
 
@@ -133,32 +133,32 @@ typedef struct player_s
   // Is wp_nochange if not changing.
   weapontype_t        pendingweapon;
 
-  int32_t                 weaponowned[NUMWEAPONS];
-  int32_t                 ammo[NUMAMMO];
-  int32_t                 maxammo[NUMAMMO];
+  int16_t                 weaponowned[NUMWEAPONS];
+  int16_t                 ammo[NUMAMMO];
+  int16_t                 maxammo[NUMAMMO];
 
   // True if button down last tic.
-  int32_t                 attackdown;
-  int32_t                 usedown;
+  boolean                 attackdown;
+  boolean                 usedown;
 
   // Bit flags, for cheats and debug.
   // See cheat_t, above.
   int32_t                 cheats;
 
   // Refired shots are less accurate.
-  int32_t                 refire;
+  int16_t                 refire;
 
    // For intermission stats.
-  int32_t                 killcount;
-  int32_t                 itemcount;
-  int32_t                 secretcount;
+  int16_t                 killcount;
+  int16_t                 itemcount;
+  int16_t                 secretcount;
 
   // Hint messages. // CPhipps - const
   const char*         message;
 
   // For screen flashing (red or bright).
-  int32_t                 damagecount;
-  int32_t                 bonuscount;
+  int16_t                 damagecount;
+  int16_t                 bonuscount;
 
   // Who did damage (NULL for floors/ceilings).
   mobj_t __far*             attacker;
@@ -168,11 +168,11 @@ typedef struct player_s
 
   // Current PLAYPAL, ???
   //  can be set to REDCOLORMAP for pain, etc.
-  int32_t                 fixedcolormap;
+  int16_t                 fixedcolormap;
 
   // Player skin colorshift,
   //  0-3 for which color to draw player.
-  int32_t                 colormap;
+  int16_t                 colormap;
 
   // Overlay view sprites (gun, etc).
   pspdef_t            psprites[NUMPSPRITES];
@@ -212,7 +212,7 @@ typedef struct
   int32_t         maxsecret;
 
   // the par time
-  int32_t         partime;
+  int16_t         partime;
 
   // index of this player in game
   int32_t         pnum;

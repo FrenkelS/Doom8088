@@ -91,7 +91,7 @@ static const angle_t tantoangleTable[2049];
 
 
 static const uint16_t finetangentTable_part_3[1024];
-static const fixed_t  __far finetangentTable_part_4[1024];
+static const fixed_t  finetangentTable_part_4[1024];
 
 static fixed_t finetangent(int16_t x)
 {
@@ -251,14 +251,26 @@ static const fixed_t projection = ((int32_t)(SCREENWIDTH/2)) << FRACBITS;
 
 static const fixed_t projectiony = ((SCREENHEIGHT * (SCREENWIDTH/2L) * 320) / 200) / SCREENWIDTH * FRACUNIT;
 
-static const fixed_t pspritescale = FRACUNIT*SCREENWIDTH/320;
+static const int16_t pspritescale = FRACUNIT*SCREENWIDTH/320;
 static const fixed_t pspriteiscale = FRACUNIT*320/SCREENWIDTH;
 
-static const fixed_t pspriteyscale = (((int32_t)SCREENHEIGHT) << FRACBITS) / 200;
+static const uint16_t pspriteyscale = (((int32_t)SCREENHEIGHT) << FRACBITS) / 200;
 static const fixed_t pspriteyiscale = ((UINT32_MAX) / ((((int32_t)SCREENHEIGHT) << FRACBITS) / 200));
 
 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
+
+
+union int64_u {
+	int64_t ll;
+	PACKEDATTR_PRE struct {
+		int16_t wl;
+		fixed_t dw;
+		int16_t wh;
+	} PACKEDATTR_POST s;
+};
+
+typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
 
 
 #if defined __WATCOMC__
@@ -268,7 +280,29 @@ inline
 #endif
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 {
-    return (fixed_t)((int64_t) a*b >> FRACBITS);
+	union int64_u r;
+	r.ll = (int64_t)a * b;
+	return r.s.dw; // r.ll >> FRACBITS;
+}
+
+
+#if defined __WATCOMC__
+//
+#else
+inline
+#endif
+fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
+{
+	if (((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b))
+		return ((a ^ b) >> 31) ^ INT32_MAX;
+	else {
+		union int64_u r;
+		// r.ll = (int64_t)a << FRACBITS;
+		r.s.wl = 0;
+		r.s.dw = a;
+		r.s.wh = (a < 0) ? 0xffff : 0x0000;
+		return r.ll / b;
+	}
 }
 
 
@@ -285,26 +319,28 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 
 static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
 {
-    fixed_t dx = (fixed_t)node->dx << FRACBITS;
-    fixed_t dy = (fixed_t)node->dy << FRACBITS;
+	int16_t ix = x >> FRACBITS;
 
-    fixed_t nx = (fixed_t)node->x << FRACBITS;
-    fixed_t ny = (fixed_t)node->y << FRACBITS;
+	if (!node->dx)
+		return ix <= node->x ? node->dy > 0 : node->dy < 0;
 
-    if (!dx)
-        return x <= nx ? node->dy > 0 : node->dy < 0;
+	int16_t iy = y >> FRACBITS;
 
-    if (!dy)
-        return y <= ny ? node->dx < 0 : node->dx > 0;
+	if (!node->dy)
+		return iy <= node->y ? node->dx < 0 : node->dx > 0;
 
-    x -= nx;
-    y -= ny;
+	x -= (fixed_t)node->x << FRACBITS;
+	y -= (fixed_t)node->y << FRACBITS;
 
-    // Try to quickly decide by looking at sign bits.
-    if ((dy ^ dx ^ x ^ y) < 0)
-        return (dy ^ x) < 0;  // (left is negative)
+	ix = x >> FRACBITS;
+	iy = y >> FRACBITS;
 
-    return FixedMul(y, node->dx) >= FixedMul(node->dy, x);
+	// Try to quickly decide by looking at sign bits.
+	if ((node->dy ^ node->dx ^ ix ^ iy) < 0)
+		return (node->dy ^ ix) < 0;  // (left is negative)
+
+	//return FixedMul(y, node->dx) >= FixedMul(x, node->dy);
+	return (y >> 8) * node->dx >= (x >> 8) * node->dy;
 }
 
 //
@@ -927,12 +963,12 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 }
 
 
-void R_GetColumn(const texture_t __far* texture, int32_t texcolumn, int16_t* patch_num, int16_t* x_c)
+void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16_t* patch_num, int16_t* x_c)
 {
     const uint8_t patchcount = texture->patchcount;
     const uint16_t widthmask = texture->widthmask;
 
-    const int32_t xc = texcolumn & widthmask;
+    const int16_t xc = texcolumn & widthmask;
 
     if (patchcount != 1)
     {
@@ -1375,13 +1411,13 @@ static void R_ClearSprites(void)
 
 static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 {
-  int32_t     anglea = ANG90 + (visangle-viewangle);
-  int32_t     angleb = ANG90 + (visangle-rw_normalangle);
+  int16_t     anglea = (ANG90 + (visangle - viewangle))      >> ANGLETOFINESHIFT;
+  int16_t     angleb = (ANG90 + (visangle - rw_normalangle)) >> ANGLETOFINESHIFT;
 
-  int32_t     den = FixedMul(rw_distance, finesine(anglea>>ANGLETOFINESHIFT));
+  int32_t     den = FixedMul(rw_distance, finesine(anglea));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = FixedMul(projectiony, finesine(angleb>>ANGLETOFINESHIFT));
+  fixed_t num = FixedMul(projectiony, finesine(angleb));
 
   return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
@@ -1677,11 +1713,11 @@ static visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16
 #if defined FLAT_WALL
 #define R_DrawSegTextureColumn(x,y,z) R_DrawColumnFlat(x,z)
 #else
-static void R_DrawColumnInCache(const column_t* patch, byte* cache, int16_t originy, int16_t cacheheight)
+static void R_DrawColumnInCache(const column_t __far* patch, byte* cache, int16_t originy, int16_t cacheheight)
 {
     while (patch->topdelta != 0xff)
     {
-        const byte* source = (const byte *)patch + 3;
+        const byte __far* source = (const byte __far*)patch + 3;
         int16_t count = patch->length;
         int16_t position = originy + patch->topdelta;
 
@@ -1695,9 +1731,9 @@ static void R_DrawColumnInCache(const column_t* patch, byte* cache, int16_t orig
             count = cacheheight - position;
 
         if (count > 0)
-            memcpy(cache + position, source, count);
+            _fmemcpy(cache + position, source, count);
 
-        patch = (const column_t *)(  (const byte *)patch + patch->length + 4);
+        patch = (const column_t __far*)((const byte __far*)patch + patch->length + 4);
     }
 }
 
@@ -1748,7 +1784,7 @@ static uint16_t FindColumnCacheItem(int16_t texture, uint32_t column)
 }
 
 
-static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, int32_t texcolumn, uint32_t iscale)
+static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int32_t texcolumn, uint32_t iscale)
 {
     uint16_t colmask;
 
@@ -1792,7 +1828,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
 
         do
         {
-            const texpatch_t* patch = &tex->patches[i];
+            const texpatch_t __far* patch = &tex->patches[i];
 
             const patch_t __far* realpatch = W_GetLumpByNum(patch->patch_num);
 
@@ -1822,9 +1858,9 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t* tex, 
     return colcache;
 }
 
-static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_column_vars_t* dcvars)
+static void R_DrawSegTextureColumn(int16_t texture, int16_t texcolumn, draw_column_vars_t* dcvars)
 {
-    const texture_t* tex = R_GetTexture(texture);
+    const texture_t __far* tex = R_GetTexture(texture);
 
     if (!tex->overlapped)
     {
@@ -1859,7 +1895,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int32_t texcolumn, draw_colu
 static void R_RenderSegLoop (int16_t rw_x)
 {
     draw_column_vars_t dcvars;
-    fixed_t  texturecolumn = 0;   // shut up compiler warning
+    int16_t  texturecolumn = 0;   // shut up compiler warning
 
     R_SetDefaultDrawColumnVars(&dcvars);
 
@@ -1921,11 +1957,7 @@ static void R_RenderSegLoop (int16_t rw_x)
         if (segtextured)
         {
             // calculate texture offset
-            angle_t angle =(rw_centerangle+xtoviewangle(rw_x))>>ANGLETOFINESHIFT;
-
-            texturecolumn = rw_offset-FixedMul(finetangent(angle),rw_distance);
-
-            texturecolumn >>= FRACBITS;
+            texturecolumn = (rw_offset - FixedMul(finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT), rw_distance)) >> FRACBITS;
 
             dcvars.x = rw_x;
 
@@ -2539,12 +2571,9 @@ static void R_AddLine(const seg_t __far* line)
     // The seg is in the view range,
     // but not necessarily visible.
 
-    angle1 = (angle1+ANG90)>>ANGLETOFINESHIFT;
-    angle2 = (angle2+ANG90)>>ANGLETOFINESHIFT;
-
     // killough 1/31/98: Here is where "slime trails" can SOMETIMES occur:
-    x1 = viewangletox(angle1);
-    x2 = viewangletox(angle2);
+    x1 = viewangletox((angle1 + ANG90) >> ANGLETOFINESHIFT);
+    x2 = viewangletox((angle2 + ANG90) >> ANGLETOFINESHIFT);
 
     // Does not cross a pixel?
     if (x1 >= x2)       // killough 1/31/98 -- change == to >= for robustness
@@ -2556,7 +2585,7 @@ static void R_AddLine(const seg_t __far* line)
     linedef = &_g_lines[curline->linenum];
     linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
-    if (linedata->r_validcount != _g_gametic)
+    if (linedata->r_validcount != (uint16_t)_g_gametic)
         R_RecalcLineFlags();
 
     if (linedata->r_flags & RF_IGNORE)
@@ -2684,11 +2713,9 @@ static boolean R_CheckBBox(const int16_t __far* bspcoord)
     // Find the first clippost
     //  that touches the source post
     //  (adjacent pixels are touching).
-    angle1 = (angle1+ANG90)>>ANGLETOFINESHIFT;
-    angle2 = (angle2+ANG90)>>ANGLETOFINESHIFT;
     {
-        int8_t sx1 = viewangletox(angle1);
-        int8_t sx2 = viewangletox(angle2);
+        int8_t sx1 = viewangletox((angle1 + ANG90) >> ANGLETOFINESHIFT);
+        int8_t sx2 = viewangletox((angle2 + ANG90) >> ANGLETOFINESHIFT);
         //    const cliprange_t *start;
 
         // Does not cross a pixel.
@@ -2730,6 +2757,7 @@ static boolean R_RenderBspSubsector(int16_t bspnum)
 //  traversing subtree recursively.
 // Just call with BSP root.
 
+#if defined PROFILING
 //Non recursive version.
 //constant stack space used and easier to
 //performance profile.
@@ -2792,6 +2820,25 @@ static void R_RenderBSPNode(int16_t bspnum)
         bspnum = bsp->children[side^1];
     }
 }
+#else
+static void R_RenderBSPNode(int16_t bspnum)
+{
+	if (R_RenderBspSubsector(bspnum))
+		return;
+
+	const mapnode_t __far* bsp = &nodes[bspnum];
+
+//
+// decide which side the view point is on
+//
+	int16_t side = R_PointOnSide(viewx, viewy, bsp);
+
+	R_RenderBSPNode(bsp->children[side]); // recursively divide front space
+
+	if (R_CheckBBox(bsp->bbox[side ^ 1]))	// possibly divide back space
+		R_RenderBSPNode(bsp->children[side ^ 1]);
+}
+#endif
 
 
 static void R_ClearDrawSegs(void)
@@ -3394,7 +3441,7 @@ static const uint16_t finetangentTable_part_3[1024] =
     64786,64885,64985,65085,65185,65285,65385,65485
 };
 
-static const fixed_t __far finetangentTable_part_4[1024] =
+static const fixed_t finetangentTable_part_4[1024] =
 {
     65586,65686,65787,65888,65989,66091,66192,66294,
     66396,66498,66600,66702,66804,66907,67010,67113,

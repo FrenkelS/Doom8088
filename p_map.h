@@ -43,6 +43,9 @@
 #define MELEERANGE      (64*FRACUNIT)
 #define MISSILERANGE    (32*64*FRACUNIT)
 
+boolean P_IsAttackRangeMeleeRange(void);
+boolean P_IsFloatOk(void);
+
 boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y);
 
 // killough 8/9/98: extra argument for telefragging
@@ -52,8 +55,8 @@ void    P_UseLines(player_t *player);
 
 fixed_t P_AimLineAttack(mobj_t __far*t1, angle_t angle, fixed_t distance, boolean friend);
 
-void    P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int32_t damage);
-void    P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int32_t damage);
+void    P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int16_t damage);
+void    P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int16_t damage);
 boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y);
 
 

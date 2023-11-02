@@ -193,7 +193,7 @@ void T_PlatRaise(plat_t __far* plat)
 // and for some plat types, an amount to raise
 // Returns true if a thinker is started, or restarted from stasis
 //
-boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount)
+boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
 {
   plat_t __far* plat;
   int16_t             secnum;
@@ -351,7 +351,7 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int32_t amount)
 // Passed the tag of the plat that should be reactivated
 // Returns nothing
 //
-void P_ActivateInStasis(int32_t tag)
+void P_ActivateInStasis(int16_t tag)
 {
   platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)   // search the active plats

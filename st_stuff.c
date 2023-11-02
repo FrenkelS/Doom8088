@@ -56,6 +56,68 @@
 #define DISABLE_STATUS_BAR
 
 
+//
+// Typedefs of widgets
+//
+
+// Number widget
+
+typedef struct
+{
+  // upper right-hand corner
+  //  of the number (right-justified)
+  int16_t   x;
+  int16_t   y;
+
+  // max # of digits in number
+  int16_t width;
+
+  // last number value
+  int16_t   oldnum;
+
+  // pointer to current value
+  int16_t*  num;
+
+  // list of patches for 0-9
+  int16_t* p;
+
+} st_number_t;
+
+
+// Multiple Icon widget
+typedef struct
+{
+  // center-justified location of icons
+  int16_t     x;
+  int16_t     y;
+
+  // last icon number
+  int16_t     oldinum;
+
+  // pointer to current icon
+  int16_t*    inum;
+
+  // list of icons
+  int16_t*   p;
+
+} st_multicon_t;
+
+
+// Number of status faces.
+#define ST_NUMPAINFACES         5
+#define ST_NUMSTRAIGHTFACES     3
+#define ST_NUMTURNFACES         2
+#define ST_NUMSPECIALFACES      3
+
+#define ST_FACESTRIDE \
+          (ST_NUMSTRAIGHTFACES+ST_NUMTURNFACES+ST_NUMSPECIALFACES)
+
+#define ST_NUMEXTRAFACES        2
+
+#define ST_NUMFACES \
+          (ST_FACESTRIDE*ST_NUMPAINFACES+ST_NUMEXTRAFACES)
+
+
 // 0-9, tall numbers
 static int16_t tallnum[10];
 
@@ -99,13 +161,13 @@ static st_number_t  st_armor;
 static boolean  oldweaponsowned[NUMWEAPONS];
 
  // count until face changes
-static int32_t      st_facecount;
+static int16_t      st_facecount;
 
 // current face index, used by w_faces
-static int32_t      st_faceindex;
+static int16_t      st_faceindex;
 
 // holds key-type for each key box on bar
-static int32_t      keyboxes[3];
+static int16_t      keyboxes[3];
 
 // a random number per tick
 static int16_t      st_randomnumber;
@@ -254,7 +316,7 @@ static int8_t st_palette;
 
 
 // used to use appopriately pained face
-static int32_t      st_oldhealth = -1;
+static int16_t      st_oldhealth = -1;
 
 
 //
@@ -502,12 +564,12 @@ void ST_Ticker(void)
 static void ST_doPaletteStuff(void)
 {
     int8_t         palette;
-    int32_t cnt = _g_player.damagecount;
+    int16_t cnt = _g_player.damagecount;
 
     if (_g_player.powers[pw_strength])
     {
         // slowly fade the berzerk out
-        int32_t bzc = 12 - (_g_player.powers[pw_strength]>>6);
+        int16_t bzc = 12 - (_g_player.powers[pw_strength]>>6);
         if (bzc > cnt)
             cnt = bzc;
     }
@@ -706,7 +768,7 @@ static boolean ST_NeedUpdate()
 
 void ST_Drawer(void)
 {
-    static uint32_t st_needrefresh = 0;
+    static uint16_t st_needrefresh = 0;
 
     ST_doPaletteStuff();  // Do red-/gold-shifts from damage/items
 
@@ -828,7 +890,7 @@ static void ST_initData(void)
 // to the numbers representing what to display
 // Returns nothing.
 //
-static void STlib_initMultIcon(st_multicon_t* i, int32_t x, int32_t y, int16_t* il, int32_t* inum)
+static void STlib_initMultIcon(st_multicon_t* i, int16_t x, int16_t y, int16_t* il, int16_t* inum)
 {
 	i->x       = x;
 	i->y       = y;
@@ -847,7 +909,7 @@ static void STlib_initMultIcon(st_multicon_t* i, int32_t x, int32_t y, int16_t* 
 // to the value displayed, and the width
 // Returns nothing
 //
-static void STlib_initNum(st_number_t* n, int32_t x, int32_t y, int16_t* pl, int32_t* num, int32_t width)
+static void STlib_initNum(st_number_t* n, int16_t x, int16_t y, int16_t* pl, int16_t* num, int16_t width)
 {
 	n->x      = x;
 	n->y      = y;
@@ -872,7 +934,7 @@ static void ST_createWidgets(void)
     // weapons owned
     for(int8_t i = 0; i < 6; i++)
     {
-        STlib_initMultIcon(&w_arms[i], ST_ARMSX+(i%3)*ST_ARMSXSPACE, ST_ARMSY+(i/3)*ST_ARMSYSPACE, arms[i], (int32_t*) &_g_player.weaponowned[i+1]);
+        STlib_initMultIcon(&w_arms[i], ST_ARMSX+(i%3)*ST_ARMSXSPACE, ST_ARMSY+(i/3)*ST_ARMSYSPACE, arms[i], &_g_player.weaponowned[i+1]);
     }
 	
     // keyboxes 0-2

@@ -119,39 +119,38 @@ boolean         _g_singledemo;           // quit after playing a demo from cmdli
 // controls (have defaults)
 //
 
-static const int32_t     key_right = KEYD_RIGHT;
-static const int32_t     key_left = KEYD_LEFT;
-static const int32_t     key_up = KEYD_UP;
-static const int32_t     key_down = KEYD_DOWN;
-const int32_t     key_menu_right = KEYD_RIGHT;                                      // phares 3/7/98
-const int32_t     key_menu_left = KEYD_LEFT;                                       //     |
-const int32_t     key_menu_up = KEYD_UP;                                         //     V
-const int32_t     key_menu_down = KEYD_DOWN;
-const int32_t     key_menu_escape = KEYD_START;                                     //     |
-const int32_t     key_menu_enter = KEYD_A;                                      // phares 3/7/98
-static const int32_t     key_strafeleft = KEYD_L;
-static const int32_t     key_straferight = KEYD_R;
-//Match Doom II GBA controls ~ Kippykip
-const int32_t     key_fire = KEYD_B; 
-const int32_t     key_use = KEYD_A;
-const int32_t     key_escape = KEYD_START;                           // phares 4/13/98
-const int32_t     key_enter = KEYD_A;
-const int32_t     key_map_right = KEYD_RIGHT;
-const int32_t     key_map_left = KEYD_LEFT;
-const int32_t     key_map_up = KEYD_UP;
-const int32_t     key_map_down = KEYD_DOWN;
-const int32_t     key_map = KEYD_SELECT;
-const int32_t     key_map_follow = KEYD_A;
-const int32_t     key_map_zoomin = KEYD_R;
-const int32_t     key_map_zoomout = KEYD_L;
-                                          // phares
+static const int16_t key_right       = KEYD_RIGHT;
+static const int16_t key_left        = KEYD_LEFT;
+static const int16_t key_up          = KEYD_UP;
+static const int16_t key_down        = KEYD_DOWN;
+       const int32_t key_menu_right  = KEYD_RIGHT;
+       const int32_t key_menu_left   = KEYD_LEFT;
+       const int32_t key_menu_up     = KEYD_UP;
+       const int32_t key_menu_down   = KEYD_DOWN;
+       const int32_t key_menu_escape = KEYD_START;
+       const int32_t key_menu_enter  = KEYD_A;
+static const int16_t key_strafeleft  = KEYD_L;
+static const int16_t key_straferight = KEYD_R;
+       const int16_t key_fire        = KEYD_B; 
+       const int16_t key_use         = KEYD_A;
+       const int32_t key_escape      = KEYD_START;
+       const int32_t key_enter       = KEYD_A;
+       const int32_t key_map_right   = KEYD_RIGHT;
+       const int32_t key_map_left    = KEYD_LEFT;
+       const int32_t key_map_up      = KEYD_UP;
+       const int32_t key_map_down    = KEYD_DOWN;
+       const int32_t key_map         = KEYD_SELECT;
+       const int32_t key_map_follow  = KEYD_A;
+       const int32_t key_map_zoomin  = KEYD_R;
+       const int32_t key_map_zoomout = KEYD_L;
+
 
 #define MAXPLMOVE   (forwardmove[1])
 #define SLOWTURNTICS  6
 
-static const fixed_t forwardmove[2] = {0x19, 0x32};
-static const fixed_t sidemove[2]    = {0x18, 0x28};
-static const fixed_t angleturn[3]   = {640, 1280, 320};  // + slow turn
+static const int8_t forwardmove[2] = {0x19, 0x32};
+static const int8_t sidemove[2]    = {0x18, 0x28};
+static const int16_t angleturn[3]  = {640, 1280, 320};  // + slow turn
 
 static void G_DoReborn (void);
 static void G_DoCompleted(void);
@@ -160,7 +159,7 @@ static void G_DoLoadGame(void);
 static void G_DoSaveGame (void);
 static void G_DoNewGame (void);
 static void G_DoPlayDemo(void);
-static void G_InitNew(skill_t skill, int32_t map);
+static void G_InitNew(skill_t skill, int16_t map);
 static void G_ReadDemoTiccmd (void);
 
 
@@ -214,11 +213,11 @@ void G_BuildTiccmd(void)
 {
     static int16_t     turnheld = 0;       // for accelerative turning
 
-    int32_t speed;
-    int32_t tspeed;
-    int32_t forward;
-    int32_t side;
-    int32_t newweapon;                                          // phares
+    int16_t speed;
+    int16_t tspeed;
+    int16_t forward;
+    int16_t side;
+    weapontype_t newweapon;
     /* cphipps - remove needless I_BaseTiccmd call, just set the ticcmd to zero */
     memset(&netcmd,0,sizeof(ticcmd_t));
 
@@ -510,7 +509,7 @@ void G_Ticker (void)
             // This causes crashes at level end - Neil Stevens
             // The crash is because the sounds aren't stopped before freeing them
             // the following is a possible fix
-            // This fix does avoid the crash wowever, with this fix in, the exit
+            // This fix does avoid the crash however, with this fix in, the exit
             // switch sound is cut off
             // S_Stop();
             // Z_FreeTags(PU_LEVEL, PU_PURGELEVEL-1);
@@ -578,13 +577,13 @@ static void G_PlayerFinishLevel(void)
 void G_PlayerReborn (void)
 {
     player_t *p;
-    int32_t i;
-    int32_t killcount;
-    int32_t itemcount;
-    int32_t secretcount;
+    int16_t i;
+    int16_t killcount;
+    int16_t itemcount;
+    int16_t secretcount;
 
-    killcount = _g_player.killcount;
-    itemcount = _g_player.itemcount;
+    killcount   = _g_player.killcount;
+    itemcount   = _g_player.itemcount;
     secretcount = _g_player.secretcount;
 
     p = &_g_player;
@@ -618,11 +617,6 @@ void G_DoReborn (void)
     _g_gameaction = ga_loadlevel;      // reload the level from scratch
 }
 
-// DOOM Par Times
-static const int32_t pars[10] = {
-    0,30,75,120,90,165,180,180,30,165
-};
-
 
 void G_ExitLevel (void)
 {
@@ -638,6 +632,13 @@ void G_SecretExitLevel (void)
     secretexit = true;
     _g_gameaction = ga_completed;
 }
+
+
+// DOOM Par Times
+static const uint8_t pars[10] = {
+    0,30,75,120,90,165,180,180,30,165
+};
+
 
 //
 // G_DoCompleted
@@ -759,7 +760,7 @@ void G_UpdateSaveGameStrings()
 
     gba_save_data_t __far* saveslots = (gba_save_data_t __far*)loadbuffer;
 
-    for(int32_t i = 0; i < 8; i++)
+    for(int16_t i = 0; i < 8; i++)
     {
         if(saveslots[i].save_present != 1)
         {
@@ -947,7 +948,7 @@ static void G_DoNewGame (void)
 // consoleplayer, displayplayer, playeringame[] should be set.
 //
 
-static void G_InitNew(skill_t skill, int32_t map)
+static void G_InitNew(skill_t skill, int16_t map)
 {
     if (skill > sk_nightmare)
         skill = sk_nightmare;
@@ -1027,7 +1028,7 @@ static void CheckForOverrun(const byte __far* start_p, const byte __far* current
 static const byte __far* G_ReadDemoHeader(const byte __far* demo_p)
 {
     skill_t skill;
-    int32_t map;
+    int16_t map;
 
     // e6y
     // The local variable should be used instead of demobuffer,
@@ -1082,7 +1083,7 @@ static const byte __far* G_ReadDemoHeader(const byte __far* demo_p)
 static void ExtractFileBase (const char *path, char *dest)
 {
     const char *src = path + strlen(path) - 1;
-    int32_t length;
+    int16_t length;
 
     // back up until a \ or the start
     while (src != path && src[-1] != ':' // killough 3/22/98: allow c:filename

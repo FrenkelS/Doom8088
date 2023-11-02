@@ -122,7 +122,7 @@ sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec)
 //
 fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec)
 {
-  int32_t                 i;
+  int16_t                 i;
   const line_t __far*             check;
   sector_t __far*           other;
   fixed_t             floor = sec->floorheight;
@@ -237,7 +237,7 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 //
 fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
 {
-  int32_t             i;
+  int16_t             i;
   const line_t __far* check;
   sector_t __far*       other;
   fixed_t height = -32000*FRACUNIT;
@@ -286,10 +286,25 @@ int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
 // jff 02/05/98 routine added to test for unlockability of
 //  generalized locked doors
 //
+
+// define names for the locked door Kind field of the general ceiling
+
+typedef enum
+{
+  AnyKey,
+  RCard,
+  BCard,
+  YCard,
+  RSkull,
+  BSkull,
+  YSkull,
+  AllKeys,
+} keykind_e;
+
 boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player)
 {
   // does this line special distinguish between skulls and keys?
-  int32_t skulliscard = (LN_SPECIAL(line) & LockedNKeys)>>LockedNKeysShift;
+  boolean skulliscard = (LN_SPECIAL(line) & LockedNKeys)>>LockedNKeysShift;
 
   // determine for each case of lock type if player's keys are adequate
   switch((LN_SPECIAL(line) & LockedKey)>>LockedKeyShift)
@@ -554,7 +569,7 @@ boolean P_CheckTag(const line_t __far* line)
 
 static void P_UpdateAnimatedTexture(void)
 {
-	uint32_t t = _g_leveltime >> 3;
+	uint16_t t = _g_leveltime >> 3;
 
 	int16_t pic = animated_texture_basepic + (t % 3);
 
@@ -621,7 +636,7 @@ static void P_SpawnScrollers(void);
 void P_SpawnSpecials (void)
 {
   sector_t __far*   sector;
-  int32_t         i;
+  int16_t         i;
 
   //  Init special sectors.
   sector = _g_sectors;
@@ -693,9 +708,9 @@ void P_SpawnSpecials (void)
     }
   }
 
-  P_RemoveAllActiveCeilings();  // jff 2/22/98 use killough's scheme
+  P_RemoveAllActiveCeilings();
 
-  P_RemoveAllActivePlats();     // killough
+  P_RemoveAllActivePlats();
 
   for (i = 0;i < MAXBUTTONS;i++)
     memset(&_g_buttonlist[i],0,sizeof(button_t));
@@ -703,7 +718,7 @@ void P_SpawnSpecials (void)
   P_SpawnScrollers(); // killough 3/7/98: Add generalized scrollers
 }
 
-// killough 2/28/98:
+
 //
 // This function, with the help of r_bsp.c, supports generalized
 // scrolling floors and walls, with optional mobj-carrying properties, e.g.
@@ -720,7 +735,11 @@ void P_SpawnSpecials (void)
 // Process the active scrollers.
 //
 // This is the main scrolling code
-// killough 3/7/98
+
+typedef struct {
+  thinker_t thinker;   // Thinker structure for scrolling
+  int16_t affectee;        // Number of affected sidedef, sector, tag, or whatever
+} scroll_t;
 
 static void T_Scroll(scroll_t __far* s)
 {
@@ -761,16 +780,7 @@ static void P_SpawnScrollers(void)
     const line_t __far* l = _g_lines;
 
     for (i=0;i<_g_numlines;i++,l++)
-    {
-        int32_t special = LN_SPECIAL(l);
-
-        switch (special)
-        {
-        case 48:                  // scroll first side
+        if (LN_SPECIAL(l) == 48)
             Add_Scroller(_g_lines[i].sidenum[0]);
-            break;
-
-        }
-    }
 }
 

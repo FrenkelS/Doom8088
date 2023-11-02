@@ -60,8 +60,8 @@ __inline static void __far* getelem(bmalpool_t __far* p, size_t size, size_t n)
 
 __inline static PUREFUNC uint32_t linearAddress(const void __far* ptr)
 {
-	uint32_t seg = FP_SEG(ptr);
-	uint16_t off = FP_OFF(ptr);
+	uint32_t seg = D_FP_SEG(ptr);
+	uint16_t off = D_FP_OFF(ptr);
 	return seg * 16 + off;
 }
 

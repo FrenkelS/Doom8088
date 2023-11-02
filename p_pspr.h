@@ -81,17 +81,17 @@ typedef struct
   fixed_t sy;
 } pspdef_t;
 
-int32_t P_WeaponPreferred(int32_t w1, int32_t w2);
+weapontype_t P_WeaponPreferred(weapontype_t w1, weapontype_t w2);
 
 struct player_s;
-int32_t P_SwitchWeapon(struct player_s *player);
+weapontype_t P_SwitchWeapon(struct player_s *player);
 boolean P_CheckAmmo(struct player_s *player);
 void P_SetupPsprites(struct player_s *curplayer);
 void P_MovePsprites(struct player_s *curplayer);
 void P_DropWeapon(struct player_s *player);
 
-int32_t P_WeaponCycleUp(struct player_s *player);
-int32_t P_WeaponCycleDown(struct player_s *player);
+weapontype_t P_WeaponCycleUp(struct player_s *player);
+weapontype_t P_WeaponCycleDown(struct player_s *player);
 
 
 void A_Light0();

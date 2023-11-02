@@ -48,7 +48,7 @@ void I_InitSound(void);
 
 
 // Starts a sound in a particular sound channel.
-int32_t I_StartSound(int32_t id, int32_t channel, int32_t vol, int32_t sep);
+int16_t I_StartSound(sfxenum_t id, int16_t channel, int32_t vol, int16_t sep);
 
 
 //

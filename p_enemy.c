@@ -55,7 +55,7 @@
 static fixed_t dropoff_deltax, dropoff_deltay, floorz;
 
 
-static const int32_t distfriend = 128;
+static const fixed_t distfriend = 128L << FRACBITS;
 
 typedef enum {
   DI_EAST,
@@ -73,64 +73,11 @@ typedef enum {
 
 //
 // ENEMY THINKING
-// Enemies are allways spawned
+// Enemies are always spawned
 // with targetplayer = -1, threshold = 0
 // Most monsters are spawned unaware of all players,
 // but some can be made preaware
 //
-
-//
-// Called by P_NoiseAlert.
-// Recursively traverse adjacent sectors,
-// sound blocking lines cut off traversal.
-//
-// killough 5/5/98: reformatted, cleaned up
-
-static void P_RecursiveSound(sector_t __far* sec, int32_t soundblocks, mobj_t __far* soundtarget)
-{
-  int16_t i;
-
-  // wake up all monsters in this sector
-  if (sec->validcount == validcount && sec->soundtraversed <= soundblocks+1)
-    return;             // already flooded
-
-  sec->validcount     = validcount;
-  sec->soundtraversed = soundblocks+1;
-  sec->soundtarget    = soundtarget;
-
-  for (i=0; i<sec->linecount; i++)
-    {
-      sector_t __far* other;
-      const line_t __far* check = sec->lines[i];
-
-      if (!(check->flags & ML_TWOSIDED))
-        continue;
-
-      P_LineOpening(check);
-
-      if (_g_openrange <= 0)
-        continue;       // closed door
-
-      other=_g_sides[check->sidenum[_g_sides[check->sidenum[0]].sector==sec]].sector;
-
-      if (!(check->flags & ML_SOUNDBLOCK))
-        P_RecursiveSound(other, soundblocks, soundtarget);
-      else
-        if (!soundblocks)
-          P_RecursiveSound(other, 1, soundtarget);
-    }
-}
-
-//
-// P_NoiseAlert
-// If a monster yells at a player,
-// it will alert other monsters to the player.
-//
-void P_NoiseAlert(mobj_t __far* emitter)
-{
-  validcount++;
-  P_RecursiveSound(emitter->subsector->sector, 0, emitter);
-}
 
 //
 // P_CheckMeleeRange
@@ -284,7 +231,7 @@ static boolean P_Move(mobj_t __far* actor)
     return false;
 
 #ifdef RANGECHECK
-  if ((uint32_t)actor->movedir >= 8)
+  if ((uint16_t)actor->movedir >= 8)
     I_Error ("P_Move: Weird actor->movedir!");
 #endif
 
@@ -297,9 +244,7 @@ static boolean P_Move(mobj_t __far* actor)
 
   if (!try_ok)
     {      // open any specials
-      int32_t good;
-
-      if (actor->flags & MF_FLOAT && _g_floatok)
+      if (actor->flags & MF_FLOAT && P_IsFloatOk())
         {
           if (actor->z < _g_tmfloorz)          // must adjust height
             actor->z += FLOATSPEED;
@@ -333,9 +278,10 @@ static boolean P_Move(mobj_t __far* actor)
        * back out when they shouldn't, and creates secondary stickiness).
        */
 
-      for (good = false; _g_numspechit--; )
+      boolean good = false;
+      for ( ; _g_numspechit--; )
         if (P_UseSpecialLine(actor, _g_spechit[_g_numspechit], 0))
-    good |= _g_spechit[_g_numspechit] == _g_blockline ? 1 : 2;
+          good = true;
 
       /* cph - compatibility maze here
        * Boom v2.01 and orig. Doom return "good"
@@ -347,9 +293,8 @@ static boolean P_Move(mobj_t __far* actor)
   else
     actor->flags &= ~MF_INFLOAT;
 
-  /* killough 11/98: fall more slowly, under gravity, if felldown==true */
-  if (!(actor->flags & MF_FLOAT) &&
-      (!_g_felldown))
+  /* fall more slowly, under gravity */
+  if (!(actor->flags & MF_FLOAT))
     actor->z = actor->floorz;
 
   return true;
@@ -387,9 +332,9 @@ static boolean P_TryWalk(mobj_t __far* actor)
 
 static void P_DoNewChaseDir(mobj_t __far* actor, fixed_t deltax, fixed_t deltay)
 {
-  int32_t xdir, ydir, tdir;
-  int32_t olddir = actor->movedir;
-  int32_t turnaround = olddir;
+  int16_t xdir, ydir, tdir;
+  int16_t olddir = actor->movedir;
+  int16_t turnaround = olddir;
 
   if (turnaround != DI_NODIR)         // find reverse direction
     turnaround ^= 4;
@@ -489,13 +434,13 @@ static boolean PIT_AvoidDropoff(const line_t __far* line)
 // Driver for above
 //
 
-static fixed_t P_AvoidDropoff(mobj_t __far* actor)
+static boolean P_AvoidDropoff(mobj_t __far* actor)
 {
-  int32_t yh=((_g_tmbbox[BOXTOP]   = actor->y+actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
-  int32_t yl=((_g_tmbbox[BOXBOTTOM]= actor->y-actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
-  int32_t xh=((_g_tmbbox[BOXRIGHT] = actor->x+actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
-  int32_t xl=((_g_tmbbox[BOXLEFT]  = actor->x-actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
-  int32_t bx, by;
+  int16_t yh=((_g_tmbbox[BOXTOP]   = actor->y+actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
+  int16_t yl=((_g_tmbbox[BOXBOTTOM]= actor->y-actor->radius)-_g_bmaporgy)>>MAPBLOCKSHIFT;
+  int16_t xh=((_g_tmbbox[BOXRIGHT] = actor->x+actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
+  int16_t xl=((_g_tmbbox[BOXLEFT]  = actor->x-actor->radius)-_g_bmaporgx)>>MAPBLOCKSHIFT;
+  int16_t bx, by;
 
   floorz = actor->z;            // remember floor height
 
@@ -508,7 +453,7 @@ static fixed_t P_AvoidDropoff(mobj_t __far* actor)
     for (by=yl ; by<=yh ; by++)
       P_BlockLinesIterator(bx, by, PIT_AvoidDropoff);  // all contacted lines
 
-  return dropoff_deltax | dropoff_deltay;   // Non-zero if movement prescribed
+  return (dropoff_deltax | dropoff_deltay) != 0;   // Non-zero if movement prescribed
 }
 
 
@@ -550,7 +495,7 @@ static void P_NewChaseDir(mobj_t __far* actor)
         // in certain situations (e.g. a crowded lift)
 
         if (actor->flags & target->flags & MF_FRIEND &&
-                distfriend << FRACBITS > dist &&
+                distfriend > dist &&
                 !P_IsOnLift(target) && !P_IsUnderDamage(actor))
         {
             deltax = -deltax, deltay = -deltay;
@@ -618,7 +563,7 @@ static boolean P_LookForPlayers(mobj_t __far* actor, boolean allaround)
 // killough 9/5/98: look for targets to go after, depending on kind of monster
 //
 
-static boolean P_LookForTargets(mobj_t __far* actor, int32_t allaround)
+static boolean P_LookForTargets(mobj_t __far* actor, boolean allaround)
 {
     return P_LookForPlayers (actor, allaround);
 }
@@ -671,7 +616,7 @@ void A_Look(mobj_t __far* actor)
 
     if (mobjinfo[actor->type].seesound)
     {
-        int32_t sound;
+        sfxenum_t sound;
         switch (mobjinfo[actor->type].seesound)
         {
         case sfx_posit1:
@@ -722,9 +667,8 @@ void A_Chase(mobj_t __far* actor)
         int32_t delta = (actor->angle &= (((int32_t)7)<<29)) - (((int32_t)actor->movedir) << 29);
         if (delta > 0)
             actor->angle -= ANG90/2;
-        else
-            if (delta < 0)
-                actor->angle += ANG90/2;
+        else if (delta < 0)
+            actor->angle += ANG90/2;
     }
 
     if (!actor->target || !(actor->target->flags&MF_SHOOTABLE))
@@ -843,7 +787,10 @@ void A_FaceTarget(mobj_t __far* actor)
 
 void A_PosAttack(mobj_t __far* actor)
 {
-  int32_t angle, damage, slope, t;
+  angle_t angle;
+  int16_t damage;
+  fixed_t slope;
+  angle_t t;
 
   if (!actor->target)
     return;
@@ -861,7 +808,9 @@ void A_PosAttack(mobj_t __far* actor)
 
 void A_SPosAttack(mobj_t __far* actor)
 {
-  int32_t i, bangle, slope;
+  int16_t i;
+  angle_t bangle;
+  fixed_t slope;
 
   if (!actor->target)
     return;
@@ -871,9 +820,9 @@ void A_SPosAttack(mobj_t __far* actor)
   slope = P_AimLineAttack(actor, bangle, MISSILERANGE, false);
   for (i=0; i<3; i++)
     {  // killough 5/5/98: remove dependence on order of evaluation:
-      int32_t t = P_Random();
-      int32_t angle = bangle + ((t - P_Random())<<20);
-      int32_t damage = ((P_Random()%5)+1)*3;
+      angle_t t = P_Random();
+      angle_t angle = bangle + ((t - P_Random())<<20);
+      int16_t damage = ((P_Random()%5)+1)*3;
       P_LineAttack(actor, angle, MISSILERANGE, slope, damage);
     }
 }
@@ -890,7 +839,7 @@ void A_TroopAttack(mobj_t __far* actor)
   A_FaceTarget(actor);
   if (P_CheckMeleeRange(actor))
     {
-      int32_t damage;
+      int16_t damage;
       S_StartSound(actor, sfx_claw);
       damage = (P_Random()%8+1)*3;
       P_DamageMobj(actor->target, actor, actor, damage);
@@ -906,7 +855,7 @@ void A_SargAttack(mobj_t __far* actor)
   A_FaceTarget(actor);
   if (P_CheckMeleeRange(actor))
     {
-      int32_t damage = ((P_Random()%10)+1)*4;
+      int16_t damage = ((P_Random()%10)+1)*4;
       P_DamageMobj(actor->target, actor, actor, damage);
     }
 }
@@ -927,7 +876,7 @@ void A_BruisAttack(mobj_t __far* actor)
     return;
   if (P_CheckMeleeRange(actor))
     {
-      int32_t damage;
+      int16_t damage;
       S_StartSound(actor, sfx_claw);
       damage = (P_Random()%8+1)*10;
       P_DamageMobj(actor->target, actor, actor, damage);
@@ -939,7 +888,7 @@ void A_BruisAttack(mobj_t __far* actor)
 
 void A_Scream(mobj_t __far* actor)
 {
-  int32_t sound;
+  sfxenum_t sound;
 
   switch (mobjinfo[actor->type].deathsound)
     {
@@ -1028,6 +977,6 @@ void A_BossDeath(mobj_t __far* mo)
 
 void A_PlayerScream(mobj_t __far* mo)
 {
-  int32_t sound = sfx_pldeth;  // Default death sound.
+  sfxenum_t sound = sfx_pldeth;  // Default death sound.
   S_StartSound(mo, sound);
 }

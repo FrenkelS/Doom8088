@@ -68,8 +68,8 @@ fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // so missiles don't explode against sky hack walls
 
 const line_t    __far* _g_ceilingline;
-const line_t        __far* _g_blockline;    /* killough 8/11/98: blocking linedef */
-static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
+static const line_t        __far* blockline;    /* blocking linedef */
+static boolean         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
@@ -77,7 +77,7 @@ static int32_t         tmunstuck;     /* killough 8/1/98: whether to allow unsti
 // 1/11/98 killough: removed limit on special lines crossed
 const line_t __far* _g_spechit[4];
 
-int32_t _g_numspechit;
+int16_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
 msecnode_t __far* _g_sector_list;
@@ -89,8 +89,8 @@ static mobj_t __far*   shootthing;
 // Height if not aiming up or down
 static fixed_t   shootz;
 
-static int32_t       la_damage;
-fixed_t   _g_attackrange;
+static int16_t       la_damage;
+static fixed_t   attackrange;
 
 // slopes to top and bottom of target
 
@@ -99,24 +99,32 @@ static fixed_t  bottomslope;
 
 static mobj_t __far* bombsource;
 static mobj_t __far* bombspot;
-static int32_t bombdamage;
+static int16_t bombdamage;
 
 static mobj_t __far*   usething;
 
 // If "floatok" true, move would be ok
 // if within "tmfloorz - tmceilingz".
-boolean   _g_floatok;
+static boolean   floatok;
 
-/* killough 11/98: if "felldown" true, object was pushed down ledge */
-boolean   _g_felldown;
-
-boolean _g_crushchange, _g_nofit;
 
 static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 
 
 // MAXRADIUS is for precalculated sector block boxes
 #define MAXRADIUS       (32*FRACUNIT)
+
+
+boolean P_IsAttackRangeMeleeRange(void)
+{
+	return attackrange == MELEERANGE;
+}
+
+
+boolean P_IsFloatOk(void)
+{
+	return floatok;
+}
 
 
 //
@@ -163,12 +171,12 @@ static boolean PIT_StompThing(mobj_t __far* thing)
 
 boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss)
   {
-  int32_t     xl;
-  int32_t     xh;
-  int32_t     yl;
-  int32_t     yh;
-  int32_t     bx;
-  int32_t     by;
+  int16_t     xl;
+  int16_t     xh;
+  int16_t     yl;
+  int16_t     yh;
+  int16_t     bx;
+  int16_t     by;
 
   subsector_t __far*  newsubsec;
 
@@ -203,10 +211,10 @@ boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss)
 
   // stomp on any things contacted
 
-  xl = (_g_tmbbox[BOXLEFT] - _g_bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
-  xh = (_g_tmbbox[BOXRIGHT] - _g_bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
+  xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
+  xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
   yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy - MAXRADIUS)>>MAPBLOCKSHIFT;
-  yh = (_g_tmbbox[BOXTOP] - _g_bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
+  yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
 
   for (bx=xl ; bx<=xh ; bx++)
     for (by=yl ; by<=yh ; by++)
@@ -284,7 +292,7 @@ static boolean PIT_CheckLine (const line_t __far* ld)
   // killough 7/24/98: allow player to move out of 1s wall, to prevent sticking
   if (!LN_BACKSECTOR(ld)) // one sided line
     {
-      _g_blockline = ld;
+      blockline = ld;
       return tmunstuck && !untouched(ld) &&
   FixedMul(tmx-tmthing->x,ld->dy) > FixedMul(tmy-tmthing->y,ld->dx);
     }
@@ -312,13 +320,13 @@ static boolean PIT_CheckLine (const line_t __far* ld)
     {
       _g_tmceilingz = _g_opentop;
       _g_ceilingline = ld;
-      _g_blockline = ld;
+      blockline = ld;
     }
 
   if (_g_openbottom > _g_tmfloorz)
     {
       _g_tmfloorz = _g_openbottom;
-      _g_blockline = ld;
+      blockline = ld;
     }
 
   if (_g_lowfloor < _g_tmdropoffz)
@@ -345,7 +353,7 @@ static boolean PIT_CheckLine (const line_t __far* ld)
 static boolean PIT_CheckThing(mobj_t __far* thing)
 {
   fixed_t blockdist;
-  int32_t damage;
+  int16_t damage;
 
   // killough 11/98: add touchy things
   if (!(thing->flags & (MF_SOLID|MF_SPECIAL|MF_SHOOTABLE)))
@@ -373,7 +381,7 @@ static boolean PIT_CheckThing(mobj_t __far* thing)
       // A flying skull is smacking something.
       // Determine damage amount, and the skull comes to a dead stop.
 
-      int32_t damage = ((P_Random()%8)+1)*mobjinfo[tmthing->type].damage;
+      int16_t damage = ((P_Random()%8)+1)*mobjinfo[tmthing->type].damage;
 
       P_DamageMobj (thing, tmthing, tmthing, damage);
 
@@ -441,7 +449,7 @@ static boolean PIT_CheckThing(mobj_t __far* thing)
 
   if (thing->flags & MF_SPECIAL)
     {
-      uint32_t solid = thing->flags & MF_SOLID;
+      boolean solid = thing->flags & MF_SOLID;
       if (tmthing->flags & MF_PICKUP)
   P_TouchSpecialThing(thing, tmthing); // can remove thing
       return !solid;
@@ -482,12 +490,12 @@ static boolean PIT_CheckThing(mobj_t __far* thing)
 
 boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   {
-  int32_t     xl;
-  int32_t     xh;
-  int32_t     yl;
-  int32_t     yh;
-  int32_t     bx;
-  int32_t     by;
+  int16_t     xl;
+  int16_t     xh;
+  int16_t     yl;
+  int16_t     yh;
+  int16_t     bx;
+  int16_t     by;
   subsector_t __far*  newsubsec;
 
   tmthing = thing;
@@ -501,7 +509,7 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   _g_tmbbox[BOXLEFT] = x - tmthing->radius;
 
   newsubsec = R_PointInSubsector (x,y);
-  _g_blockline = _g_ceilingline = NULL; // killough 8/1/98
+  blockline = _g_ceilingline = NULL;
 
   // Whether object can get out of a sticky situation:
   tmunstuck = P_MobjIsPlayer(thing) &&          /* only players */
@@ -526,10 +534,10 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   // based on their origin point, and can overlap
   // into adjacent blocks by up to MAXRADIUS units.
 
-  xl = (_g_tmbbox[BOXLEFT] - _g_bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
-  xh = (_g_tmbbox[BOXRIGHT] - _g_bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
+  xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
+  xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
   yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy - MAXRADIUS)>>MAPBLOCKSHIFT;
-  yh = (_g_tmbbox[BOXTOP] - _g_bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
+  yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
 
 
   for (bx=xl ; bx<=xh ; bx++)
@@ -539,10 +547,10 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
 
   // check lines
 
-  xl = (_g_tmbbox[BOXLEFT] - _g_bmaporgx)>>MAPBLOCKSHIFT;
-  xh = (_g_tmbbox[BOXRIGHT] - _g_bmaporgx)>>MAPBLOCKSHIFT;
+  xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx)>>MAPBLOCKSHIFT;
+  xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx)>>MAPBLOCKSHIFT;
   yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy)>>MAPBLOCKSHIFT;
-  yh = (_g_tmbbox[BOXTOP] - _g_bmaporgy)>>MAPBLOCKSHIFT;
+  yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy)>>MAPBLOCKSHIFT;
 
   for (bx=xl ; bx<=xh ; bx++)
     for (by=yl ; by<=yh ; by++)
@@ -654,9 +662,9 @@ static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mob
         // Make sure we are on correct side of exit linedef.
         while (P_PointOnLineSide(x, y, l) != side && --fudge>=0)
           if (D_abs(l->dx) > D_abs(l->dy))
-            y -= l->dx < 0 != side ? -1 : 1;
+            y -= (l->dx < 0) != side ? -1 : 1;
           else
-            x += l->dy < 0 != side ? -1 : 1;
+            x += (l->dy < 0) != side ? -1 : 1;
 
         // Attempt to teleport, aborting if blocked
         if (!P_TeleportMove(thing, x, y, false)) /* killough 8/9/98 */
@@ -739,11 +747,11 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
     boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
-    if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
+    if ((uint16_t)LN_SPECIAL(line) >= GenEnd)
     {
       // Out of range for GenFloors
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenFloorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenFloorBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & FloorChange) || !(LN_SPECIAL(line) & FloorModel))
@@ -752,7 +760,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenFloor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenCeilingBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenCeilingBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & CeilingChange) || !(LN_SPECIAL(line) & CeilingModel))
@@ -761,7 +769,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenCeiling;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenDoorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenDoorBase)
     {
       if (!P_MobjIsPlayer(thing))
       {
@@ -774,7 +782,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLockedBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLockedBase)
     {
       if (!P_MobjIsPlayer(thing))
         return;                     // monsters disallowed from unlocking doors
@@ -787,7 +795,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenLockedDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLiftBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLiftBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & LiftMonster))
@@ -796,7 +804,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         return;
       linefunc = EV_DoGenLift;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenStairsBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenStairsBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & StairMonster))
@@ -1593,7 +1601,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
     fixed_t oldx;
     fixed_t oldy;
 
-    _g_felldown = _g_floatok = false;               // killough 11/98
+    floatok = false;
 
     if (!P_CheckPosition (thing, x, y))
         return false;   // solid wall or thing
@@ -1603,7 +1611,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
         if (_g_tmceilingz - _g_tmfloorz < thing->height)
             return false;	// doesn't fit
 
-        _g_floatok = true;
+        floatok = true;
 
         if ( !(thing->flags & MF_TELEPORT)
              && _g_tmceilingz - thing->z < thing->height)
@@ -1684,7 +1692,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
         if (_g_openbottom >= _g_opentop)
             return false;   // stop
 
-        dist = FixedMul(_g_attackrange, in->frac);
+        dist = FixedMul(attackrange, in->frac);
 
         if (LN_FRONTSECTOR(li)->floorheight != LN_BACKSECTOR(li)->floorheight)
         {
@@ -1724,7 +1732,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
 
     // check angles to see if the thing can be aimed at
 
-    dist = FixedMul (_g_attackrange, in->frac);
+    dist = FixedMul (attackrange, in->frac);
     thingtopslope = FixedDiv (th->z+th->height - shootz , dist);
 
     if (thingtopslope < bottomslope)
@@ -1767,11 +1775,11 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
     boolean (*linefunc)(const line_t __far* line)=NULL;
 
     // check each range of generalized linedefs
-    if ((uint32_t)LN_SPECIAL(line) >= GenEnd)
+    if ((uint16_t)LN_SPECIAL(line) >= GenEnd)
     {
       // Out of range for GenFloors
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenFloorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenFloorBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & FloorChange) || !(LN_SPECIAL(line) & FloorModel))
@@ -1781,7 +1789,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 
       linefunc = EV_DoGenFloor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenCeilingBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenCeilingBase)
     {
       if (!P_MobjIsPlayer(thing))
         if ((LN_SPECIAL(line) & CeilingChange) || !(LN_SPECIAL(line) & CeilingModel))
@@ -1790,7 +1798,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
         return;
       linefunc = EV_DoGenCeiling;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenDoorBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenDoorBase)
     {
       if (!P_MobjIsPlayer(thing))
       {
@@ -1803,7 +1811,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
         return;
       linefunc = EV_DoGenDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLockedBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLockedBase)
     {
       if (!P_MobjIsPlayer(thing))
         return;   // monsters disallowed from unlocking doors
@@ -1819,14 +1827,14 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 
       linefunc = EV_DoGenLockedDoor;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenLiftBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenLiftBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & LiftMonster))
           return; // monsters disallowed
       linefunc = EV_DoGenLift;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenStairsBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenStairsBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & StairMonster))
@@ -1835,7 +1843,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
         return;
       linefunc = EV_DoGenStairs;
     }
-    else if ((uint32_t)LN_SPECIAL(line) >= GenCrusherBase)
+    else if ((uint16_t)LN_SPECIAL(line) >= GenCrusherBase)
     {
       if (!P_MobjIsPlayer(thing))
         if (!(LN_SPECIAL(line) & StairMonster))
@@ -1932,7 +1940,7 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 // PTR_ShootTraverse
 //
 static boolean PTR_ShootTraverse (intercept_t* in)
-  {
+{
   fixed_t x;
   fixed_t y;
   fixed_t z;
@@ -1946,36 +1954,34 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   fixed_t thingbottomslope;
 
   if (in->isaline)
-    {
+  {
     const line_t __far* li = in->d.line;
 
     if (LN_SPECIAL(li))
       P_ShootSpecialLine (shootthing, li);
 
-      if (li->flags & ML_TWOSIDED)
-  {  // crosses a two sided (really 2s) line
-    P_LineOpening (li);
-    dist = FixedMul(_g_attackrange, in->frac);
+    if (li->flags & ML_TWOSIDED)
+    {  // crosses a two sided (really 2s) line
+      P_LineOpening (li);
+      dist = FixedMul(attackrange, in->frac);
 
-    // killough 11/98: simplify
-
-    if ((LN_FRONTSECTOR(li)->floorheight==LN_BACKSECTOR(li)->floorheight ||
+      if ((LN_FRONTSECTOR(li)->floorheight==LN_BACKSECTOR(li)->floorheight ||
          (slope = FixedDiv(_g_openbottom - shootz , dist)) <= aimslope) &&
-        (LN_FRONTSECTOR(li)->ceilingheight==LN_BACKSECTOR(li)->ceilingheight ||
+         (LN_FRONTSECTOR(li)->ceilingheight==LN_BACKSECTOR(li)->ceilingheight ||
          (slope = FixedDiv (_g_opentop - shootz , dist)) >= aimslope))
-      return true;      // shot continues
-  }
+        return true;      // shot continues
+    }
 
     // hit line
     // position a bit closer
 
-    frac = in->frac - FixedDiv(4 * FRACUNIT, _g_attackrange);
+    frac = in->frac - FixedDiv(4 * FRACUNIT, attackrange);
     x = _g_trace.x + FixedMul(_g_trace.dx, frac);
     y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-    z = shootz  + FixedMul(aimslope, FixedMul(frac, _g_attackrange));
+    z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
 
     if (LN_FRONTSECTOR(li)->ceilingpic == skyflatnum)
-      {
+    {
       // don't shoot the sky!
 
       if (z > LN_FRONTSECTOR(li)->ceilingheight)
@@ -1988,9 +1994,9 @@ static boolean PTR_ShootTraverse (intercept_t* in)
         // fix bullet-eaters -- killough:
         // WARNING: Almost all demos will lose sync without this
         // demo_compatibility flag check!!! killough 1/18/98
-      if (LN_BACKSECTOR(li)->ceilingheight < z)
-        return false;
-      }
+        if (LN_BACKSECTOR(li)->ceilingheight < z)
+          return false;
+    }
 
     // Spawn bullet puffs.
 
@@ -1999,7 +2005,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     // don't go any farther
 
     return false;
-    }
+  }
 
   // shoot a thing
 
@@ -2012,7 +2018,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   // check angles to see if the thing can be aimed at
 
-  dist = FixedMul (_g_attackrange, in->frac);
+  dist = FixedMul (attackrange, in->frac);
   thingtopslope = FixedDiv (th->z+th->height - shootz , dist);
 
   if (thingtopslope < aimslope)
@@ -2026,11 +2032,11 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   // hit thing
   // position a bit closer
 
-  frac = in->frac - FixedDiv (10*FRACUNIT,_g_attackrange);
+  frac = in->frac - FixedDiv (10*FRACUNIT,attackrange);
 
   x = _g_trace.x + FixedMul(_g_trace.dx, frac);
   y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-  z = shootz  + FixedMul(aimslope, FixedMul(frac, _g_attackrange));
+  z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
 
   // Spawn bullet puffs or blod spots,
   // depending on target type.
@@ -2044,7 +2050,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   // don't go any farther
   return false;
-  }
+}
 
 
 //
@@ -2067,7 +2073,7 @@ fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boole
   topslope    =  100 * FRACUNIT / 160;
   bottomslope = -100 * FRACUNIT / 160;
 
-  _g_attackrange = distance;
+  attackrange = distance;
   _g_linetarget  = NULL;
 
   // prevent friends from aiming at friends
@@ -2088,7 +2094,7 @@ fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boole
 // that will leave linetarget set.
 //
 
-void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int32_t damage)
+void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int16_t damage)
 {
   fixed_t x2;
   fixed_t y2;
@@ -2099,7 +2105,7 @@ void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slo
   x2 = t1->x + (distance>>FRACBITS)*finecosine(angle);
   y2 = t1->y + (distance>>FRACBITS)*finesine(  angle);
   shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
-  _g_attackrange = distance;
+  attackrange = distance;
   aimslope = slope;
 
   P_PathTraverse(t1->x,t1->y,x2,y2,PT_ADDLINES|PT_ADDTHINGS,PTR_ShootTraverse);
@@ -2178,7 +2184,7 @@ static boolean PTR_NoWayTraverse(intercept_t* in)
 //
 void P_UseLines (player_t*  player)
   {
-  int32_t     angle;
+  int16_t     angle;
   fixed_t x1;
   fixed_t y1;
   fixed_t x2;
@@ -2257,15 +2263,15 @@ static boolean PIT_RadiusAttack (mobj_t __far* thing)
 // P_RadiusAttack
 // Source is the creature that caused the explosion at spot.
 //
-void P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int32_t damage)
+void P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int16_t damage)
   {
-  int32_t x;
-  int32_t y;
+  int16_t x;
+  int16_t y;
 
-  int32_t xl;
-  int32_t xh;
-  int32_t yl;
-  int32_t yh;
+  int16_t xl;
+  int16_t xh;
+  int16_t yl;
+  int16_t yh;
 
   fixed_t dist;
 
@@ -2493,13 +2499,13 @@ void P_CreateSecNodeList(mobj_t __far* thing)
 
   validcount++; // used to make sure we only process a line once
 
-  int32_t xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx) >> MAPBLOCKSHIFT;
-  int32_t xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx) >> MAPBLOCKSHIFT;
-  int32_t yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy) >> MAPBLOCKSHIFT;
-  int32_t yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy) >> MAPBLOCKSHIFT;
+  int16_t xl = (_g_tmbbox[BOXLEFT]   - _g_bmaporgx) >> MAPBLOCKSHIFT;
+  int16_t xh = (_g_tmbbox[BOXRIGHT]  - _g_bmaporgx) >> MAPBLOCKSHIFT;
+  int16_t yl = (_g_tmbbox[BOXBOTTOM] - _g_bmaporgy) >> MAPBLOCKSHIFT;
+  int16_t yh = (_g_tmbbox[BOXTOP]    - _g_bmaporgy) >> MAPBLOCKSHIFT;
 
-  for (int32_t bx = xl; bx <= xh; bx++)
-    for (int32_t by = yl; by <= yh; by++)
+  for (int16_t bx = xl; bx <= xh; bx++)
+    for (int16_t by = yl; by <= yh; by++)
       P_BlockLinesIterator(bx,by,PIT_GetSectors);
 
   // Add the sector of the (x,y) point to sector_list.

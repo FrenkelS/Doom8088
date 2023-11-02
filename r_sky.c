@@ -74,7 +74,7 @@ void R_DrawSky(visplane_t __far* pl)
 	{
 		if ((dcvars.yl = pl->top[x]) != -1 && dcvars.yl <= (dcvars.yh = pl->bottom[x])) // dropoff overflow
 		{
-			int32_t xc = (viewangle + xtoviewangle(x)) >> ANGLETOSKYSHIFT;
+			int16_t xc = (viewangle + xtoviewangle(x)) >> ANGLETOSKYSHIFT;
 
 			int16_t patch_num;
 			int16_t x_c;

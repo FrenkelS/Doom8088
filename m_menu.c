@@ -96,6 +96,8 @@ int16_t _g_alwaysRun;
 
 int16_t _g_highDetail;
 
+uint16_t _g_gamma;
+
 static boolean messageToPrint;  // true = message to be printed
 
 static const char* messageString; // ...and here is the message string!

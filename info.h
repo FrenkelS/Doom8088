@@ -40,6 +40,8 @@
 
 /* Needed for action function pointer handling. */
 #include "d_think.h"
+#include "sounds.h"
+
 
 /********************************************************************
  * Sprite name enumeration - must match info.c                      *
@@ -444,8 +446,8 @@ typedef enum
 typedef struct
 {
   spritenum_t sprite;       /* sprite number to show                       */
-  int32_t     frame;        /* which frame/subframe of the sprite is shown */
-  int32_t     tics;         /* number of gametics this frame should last   */
+  uint16_t    frame;        /* which frame/subframe of the sprite is shown */
+  int16_t     tics;         /* number of gametics this frame should last   */
   actionf_t   action;       /* code pointer to function for action if any  */
   statenum_t  nextstate;    /* linked list pointer to next state or zero   */
 } state_t;
@@ -529,34 +531,34 @@ typedef enum {
 
 typedef struct
 {
-  int32_t doomednum;
+  int16_t doomednum;
   /* Thing number used in id's editor, and now
        probably by every other editor too */
-  int32_t spawnstate;
+  statenum_t spawnstate;
   /* The state (frame) index when this Thing is
            first created */
-  int32_t spawnhealth;  /* The initial hit points for this Thing */
-  int32_t seestate;     /* The state when it sees you or wakes up */
-  int32_t seesound;     /* The sound it makes when waking */
-  int32_t reactiontime; /* How many tics it waits after it wakes up
+  int16_t spawnhealth;  /* The initial hit points for this Thing */
+  statenum_t seestate;     /* The state when it sees you or wakes up */
+  sfxenum_t seesound;     /* The sound it makes when waking */
+  int16_t reactiontime; /* How many tics it waits after it wakes up
            before it will start to attack, in normal
            skills (halved for nightmare) */
-  int32_t attacksound;  /* The sound it makes when it attacks */
-  int32_t painstate;    /* The state to indicate pain */
-  int32_t painchance;   /* A number that is checked against a random
+  sfxenum_t attacksound;  /* The sound it makes when it attacks */
+  statenum_t painstate;    /* The state to indicate pain */
+  uint8_t painchance;   /* A number that is checked against a random
            number 0-255 to see if the Thing is supposed
            to go to its painstate or not.  Note this
            has absolutely nothing to do with the chance
            it will get hurt, just the chance of it
            reacting visibly. */
-  int32_t painsound;    /* The sound it emits when it feels pain */
-  int32_t meleestate;   /* Melee==close attack */
-  int32_t missilestate; /* What states to use when it's in the air, if
+  sfxenum_t painsound;    /* The sound it emits when it feels pain */
+  statenum_t meleestate;   /* Melee==close attack */
+  statenum_t missilestate; /* What states to use when it's in the air, if
            in fact it is ever used as a missile */
-  int32_t deathstate;   /* What state begins the death sequence */
-  int32_t xdeathstate;  /* What state begins the horrible death sequence
+  statenum_t deathstate;   /* What state begins the death sequence */
+  statenum_t xdeathstate;  /* What state begins the horrible death sequence
            like when a rocket takes out a trooper */
-  int32_t deathsound;   /* The death sound.  See also A_Scream() in
+  sfxenum_t deathsound;   /* The death sound.  See also A_Scream() in
            p_enemy.c for some tweaking that goes on
            for certain monsters */
   int32_t speed;        /* How fast it moves.  Too fast and it can miss
@@ -564,11 +566,11 @@ typedef struct
   int32_t radius;       /* An often incorrect radius */
   int32_t height;       /* An often incorrect height, used only to see
            if a monster can enter a sector */
-  int32_t mass;         /* How much an impact will move it.  Cacodemons
+  int16_t mass;         /* How much an impact will move it.  Cacodemons
            seem to retreat when shot because they have
            very little mass and are moved by impact */
-  int32_t damage;       /* If this is a missile, how much does it hurt? */
-  int32_t activesound;  /* What sound it makes wandering around, once
+  int16_t damage;       /* If this is a missile, how much does it hurt? */
+  sfxenum_t activesound;  /* What sound it makes wandering around, once
            in a while.  Chance is 3/256 it will. */
   uint32_t flags;  /* Bit masks for lots of things.  See p_mobj.h */
 } mobjinfo_t;

@@ -41,13 +41,12 @@
 /* mapblocks are used to check movement against lines and things */
 #define MAPBLOCKUNITS   128
 #define MAPBLOCKSIZE    (MAPBLOCKUNITS*FRACUNIT)
-#define MAPBLOCKSHIFT   (FRACBITS+7)
-#define MAPBTOFRAC      (MAPBLOCKSHIFT-FRACBITS)
+#define MAPBTOFRAC      7
+#define MAPBLOCKSHIFT   (FRACBITS+MAPBTOFRAC)
 
 #define PT_ADDLINES     1
 #define PT_ADDTHINGS    2
 
-#define MAXINTERCEPTS 64
 
 typedef struct
 {
@@ -79,9 +78,9 @@ fixed_t P_InterceptVector2(const divline_t *v2, const divline_t *v1);
 void    P_LineOpening(const line_t __far* linedef);
 void    P_UnsetThingPosition(mobj_t __far* thing);
 void    P_SetThingPosition(mobj_t __far* thing);
-boolean P_BlockLinesIterator (int32_t x, int32_t y, boolean func(const line_t __far*));
-boolean P_BlockThingsIterator(int32_t x, int32_t y, boolean func(mobj_t __far*));
+boolean P_BlockLinesIterator (int16_t x, int16_t y, boolean func(const line_t __far*));
+boolean P_BlockThingsIterator(int16_t x, int16_t y, boolean func(mobj_t __far*));
 boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
-                       int32_t flags, boolean trav(intercept_t *));
+                       int16_t flags, boolean trav(intercept_t *));
 
 #endif  /* __P_MAPUTL__ */

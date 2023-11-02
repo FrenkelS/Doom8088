@@ -106,9 +106,9 @@ boolean twoSided(int16_t sector, int16_t line)
 //
 // jff 02/03/98 Add routine to find shortest lower texture
 //
-static fixed_t P_FindShortestTextureAround(int16_t secnum)
+static int16_t P_FindShortestTextureAround(int16_t secnum)
 {
-  int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
+  int32_t minsize = 32000L << FRACBITS; //jff 3/13/98 prevent overflow in height calcs
   side_t __far*     side;
   int16_t i;
   sector_t __far* sec = &_g_sectors[secnum];
@@ -127,7 +127,7 @@ static fixed_t P_FindShortestTextureAround(int16_t secnum)
           minsize = textureheight[side->bottomtexture];
     }
   }
-  return minsize;
+  return minsize >> FRACBITS;
 }
 
 
@@ -225,6 +225,41 @@ static sector_t __far* P_FindModelCeilingSector(fixed_t ceildestheight,int16_t s
 // jff 02/04/98 Added this routine (and file) to handle generalized
 // floor movers using bit fields in the line special type.
 //
+
+// define names for the Changer Type field of the general floor
+
+typedef enum
+{
+  FNoChg,
+  FChgZero,
+  FChgTxt,
+  FChgTyp,
+} floorchange_e;
+
+// define names for the Target field of the general floor
+
+typedef enum
+{
+  FtoHnF,
+  FtoLnF,
+  FtoNnF,
+  FtoLnC,
+  FtoC,
+  FbyST,
+  Fby24,
+  Fby32,
+} floortarget_e;
+
+// define names for the Speed field of the general linedefs
+
+typedef enum
+{
+  SpeedSlow,
+  SpeedNormal,
+  SpeedFast,
+  SpeedTurbo,
+} motionspeed_e;
+
 boolean EV_DoGenFloor(const line_t __far* line)
 {
   int16_t                   secnum;
@@ -232,17 +267,17 @@ boolean EV_DoGenFloor(const line_t __far* line)
   boolean               manual;
   sector_t __far*             sec;
   floormove_t __far*          floor;
-  uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenFloorBase;
+  uint16_t              value = (uint16_t)LN_SPECIAL(line) - GenFloorBase;
 
   // parse the bit fields in the line's special type
 
-  int32_t Crsh = (value & FloorCrush) >> FloorCrushShift;
-  int32_t ChgT = (value & FloorChange) >> FloorChangeShift;
-  int32_t Targ = (value & FloorTarget) >> FloorTargetShift;
-  int32_t Dirn = (value & FloorDirection) >> FloorDirectionShift;
-  int32_t ChgM = (value & FloorModel) >> FloorModelShift;
-  int32_t Sped = (value & FloorSpeed) >> FloorSpeedShift;
-  int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
+  boolean       Crsh = (value & FloorCrush)     >> FloorCrushShift;
+  floorchange_e ChgT = (value & FloorChange)    >> FloorChangeShift;
+  floortarget_e Targ = (value & FloorTarget)    >> FloorTargetShift;
+  boolean       Dirn = (value & FloorDirection) >> FloorDirectionShift;
+  boolean       ChgM = (value & FloorModel)     >> FloorModelShift;
+  motionspeed_e Sped = (value & FloorSpeed)     >> FloorSpeedShift;
+  triggertype_e Trig = (value & TriggerType)    >> TriggerTypeShift;
 
   rtn = false;
 
@@ -329,7 +364,7 @@ manual_floor:
         break;
       case FbyST:
         floor->floordestheight = (floor->sector->floorheight>>FRACBITS) +
-          floor->direction * (P_FindShortestTextureAround(secnum)>>FRACBITS);
+          floor->direction * P_FindShortestTextureAround(secnum);
         if (floor->floordestheight>32000)  //jff 3/13/98 prevent overflow
           floor->floordestheight=32000;    // wraparound in floor height
         if (floor->floordestheight<-32000)
@@ -423,9 +458,9 @@ manual_floor:
 //
 // jff 03/20/98 Add routine to find shortest upper texture
 //
-static fixed_t P_FindShortestUpperAround(int16_t secnum)
+static int16_t P_FindShortestUpperAround(int16_t secnum)
 {
-  int32_t minsize = ((int32_t)32000)<<FRACBITS; //jff 3/13/98 prevent overflow in height calcs
+  int32_t minsize = 32000L << FRACBITS; //jff 3/13/98 prevent overflow in height calcs
   side_t __far*     side;
   int16_t i;
   sector_t __far* sec = &_g_sectors[secnum];
@@ -444,7 +479,7 @@ static fixed_t P_FindShortestUpperAround(int16_t secnum)
           minsize = textureheight[side->toptexture];
     }
   }
-  return minsize;
+  return minsize >> FRACBITS;
 }
 
 
@@ -523,6 +558,31 @@ static fixed_t P_FindNextHighestCeiling(sector_t __far* sec)
 // jff 02/04/98 Added this routine (and file) to handle generalized
 // floor movers using bit fields in the line special type.
 //
+
+// define names for the Changer Type field of the general ceiling
+
+typedef enum
+{
+  CNoChg,
+  CChgZero,
+  CChgTxt,
+  CChgTyp,
+} ceilingchange_e;
+
+// define names for the Target field of the general ceiling
+
+typedef enum
+{
+  CtoHnC,
+  CtoLnC,
+  CtoNnC,
+  CtoHnF,
+  CtoF,
+  CbyST,
+  Cby24,
+  Cby32,
+} ceilingtarget_e;
+
 boolean EV_DoGenCeiling(const line_t __far* line)
 {
   int16_t                   secnum;
@@ -531,17 +591,17 @@ boolean EV_DoGenCeiling(const line_t __far* line)
   fixed_t               targheight;
   sector_t __far*             sec;
   ceiling_t __far*            ceiling;
-  uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenCeilingBase;
+  uint16_t              value = (uint16_t)LN_SPECIAL(line) - GenCeilingBase;
 
   // parse the bit fields in the line's special type
 
-  int32_t Crsh = (value & CeilingCrush) >> CeilingCrushShift;
-  int32_t ChgT = (value & CeilingChange) >> CeilingChangeShift;
-  int32_t Targ = (value & CeilingTarget) >> CeilingTargetShift;
-  int32_t Dirn = (value & CeilingDirection) >> CeilingDirectionShift;
-  int32_t ChgM = (value & CeilingModel) >> CeilingModelShift;
-  int32_t Sped = (value & CeilingSpeed) >> CeilingSpeedShift;
-  int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
+  boolean         Crsh = (value & CeilingCrush)     >> CeilingCrushShift;
+  ceilingchange_e ChgT = (value & CeilingChange)    >> CeilingChangeShift;
+  ceilingtarget_e Targ = (value & CeilingTarget)    >> CeilingTargetShift;
+  boolean         Dirn = (value & CeilingDirection) >> CeilingDirectionShift;
+  boolean         ChgM = (value & CeilingModel)     >> CeilingModelShift;
+  motionspeed_e   Sped = (value & CeilingSpeed)     >> CeilingSpeedShift;
+  triggertype_e   Trig = (value & TriggerType)      >> TriggerTypeShift;
 
   rtn = false;
 
@@ -630,7 +690,7 @@ manual_ceiling:
         break;
       case CbyST:
         targheight = (ceiling->sector->ceilingheight>>FRACBITS) +
-          ceiling->direction * (P_FindShortestUpperAround(secnum)>>FRACBITS);
+          ceiling->direction * P_FindShortestUpperAround(secnum);
         if (targheight>32000)  //jff 3/13/98 prevent overflow
           targheight=32000;    // wraparound in ceiling height
         if (targheight<-32000)
@@ -727,6 +787,17 @@ manual_ceiling:
 // Passed the linedef activating the lift
 // Returns true if a thinker is created
 //
+
+// define names for the Target field of the general lift
+
+typedef enum
+{
+  F2LnF,
+  F2NnF,
+  F2LnC,
+  LnF2HnF,
+} lifttarget_e;
+
 boolean EV_DoGenLift(const line_t __far* line)
 {
   plat_t __far*         plat;
@@ -734,14 +805,14 @@ boolean EV_DoGenLift(const line_t __far* line)
   boolean             rtn;
   boolean         manual;
   sector_t __far*       sec;
-  uint32_t        value = (uint32_t)LN_SPECIAL(line) - GenLiftBase;
+  uint16_t        value = (uint16_t)LN_SPECIAL(line) - GenLiftBase;
 
   // parse the bit fields in the line's special type
 
-  int32_t Targ = (value & LiftTarget) >> LiftTargetShift;
-  int32_t Dely = (value & LiftDelay) >> LiftDelayShift;
-  int32_t Sped = (value & LiftSpeed) >> LiftSpeedShift;
-  int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
+  lifttarget_e  Targ = (value & LiftTarget)  >> LiftTargetShift;
+  int16_t       Dely = (value & LiftDelay)   >> LiftDelayShift;
+  motionspeed_e Sped = (value & LiftSpeed)   >> LiftSpeedShift;
+  triggertype_e Trig = (value & TriggerType) >> TriggerTypeShift;
 
   secnum = -1;
   rtn = false;
@@ -879,7 +950,7 @@ boolean EV_DoGenStairs(const line_t __far* line)
 {
   int16_t                   secnum;
   int16_t                   osecnum; //jff 3/4/98 preserve loop index
-  int32_t                   height;
+  fixed_t                   height;
   int16_t                   i;
   int16_t                   newsecnum;
   int16_t                   texture;
@@ -895,15 +966,15 @@ boolean EV_DoGenStairs(const line_t __far* line)
   fixed_t               stairsize;
   fixed_t               speed;
 
-  uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenStairsBase;
+  uint16_t              value = (uint16_t)LN_SPECIAL(line) - GenStairsBase;
 
   // parse the bit fields in the line's special type
 
-  int32_t Igno = (value & StairIgnore) >> StairIgnoreShift;
-  int32_t Dirn = (value & StairDirection) >> StairDirectionShift;
-  int32_t Step = (value & StairStep) >> StairStepShift;
-  int32_t Sped = (value & StairSpeed) >> StairSpeedShift;
-  int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
+  boolean       Igno = (value & StairIgnore)    >> StairIgnoreShift;
+  boolean       Dirn = (value & StairDirection) >> StairDirectionShift;
+  int16_t       Step = (value & StairStep)      >> StairStepShift;
+  motionspeed_e Sped = (value & StairSpeed)     >> StairSpeedShift;
+  triggertype_e Trig = (value & TriggerType)    >> TriggerTypeShift;
 
   rtn = false;
 
@@ -1065,13 +1136,13 @@ boolean EV_DoGenCrusher(const line_t __far* line)
   boolean               manual;
   sector_t __far*             sec;
   ceiling_t __far*            ceiling;
-  uint32_t              value = (uint32_t)LN_SPECIAL(line) - GenCrusherBase;
+  uint16_t              value = (uint16_t)LN_SPECIAL(line) - GenCrusherBase;
 
   // parse the bit fields in the line's special type
 
-  int32_t Slnt = (value & CrusherSilent) >> CrusherSilentShift;
-  int32_t Sped = (value & CrusherSpeed) >> CrusherSpeedShift;
-  int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
+  boolean       Slnt = (value & CrusherSilent) >> CrusherSilentShift;
+  motionspeed_e Sped = (value & CrusherSpeed)  >> CrusherSpeedShift;
+  triggertype_e Trig = (value & TriggerType)   >> TriggerTypeShift;
 
   //jff 2/22/98  Reactivate in-stasis ceilings...for certain types.
   //jff 4/5/98 return if activated
@@ -1161,13 +1232,13 @@ boolean EV_DoGenLockedDoor(const line_t __far* line)
   sector_t __far* sec;
   vldoor_t __far* door;
   boolean manual;
-  uint32_t  value = (uint32_t)LN_SPECIAL(line) - GenLockedBase;
+  uint16_t  value = (uint16_t)LN_SPECIAL(line) - GenLockedBase;
 
   // parse the bit fields in the line's special type
 
-  int32_t Kind = (value & LockedKind) >> LockedKindShift;
-  int32_t Sped = (value & LockedSpeed) >> LockedSpeedShift;
-  int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
+  boolean       Kind = (value & LockedKind)  >> LockedKindShift;
+  motionspeed_e Sped = (value & LockedSpeed) >> LockedSpeedShift;
+  triggertype_e Trig = (value & TriggerType) >> TriggerTypeShift;
 
   rtn = false;
 
@@ -1260,6 +1331,17 @@ manual_locked:
 // Passed the linedef activating the generalized door
 // Returns true if a thinker created
 //
+
+// define names for the door Kind field of the general ceiling
+
+typedef enum
+{
+  OdCDoor,
+  ODoor,
+  CdODoor,
+  CDoor,
+} doorkind_e;
+
 boolean EV_DoGenDoor(const line_t __far* line)
 {
   int16_t   secnum;
@@ -1267,14 +1349,14 @@ boolean EV_DoGenDoor(const line_t __far* line)
   sector_t __far* sec;
   boolean   manual;
   vldoor_t __far* door;
-  uint32_t  value = (uint32_t)LN_SPECIAL(line) - GenDoorBase;
+  uint16_t  value = (uint16_t)LN_SPECIAL(line) - GenDoorBase;
 
   // parse the bit fields in the line's special type
 
-  int32_t Dely = (value & DoorDelay) >> DoorDelayShift;
-  int32_t Kind = (value & DoorKind) >> DoorKindShift;
-  int32_t Sped = (value & DoorSpeed) >> DoorSpeedShift;
-  int32_t Trig = (value & TriggerType) >> TriggerTypeShift;
+  int16_t       Dely = (value & DoorDelay)   >> DoorDelayShift;
+  doorkind_e    Kind = (value & DoorKind)    >> DoorKindShift;
+  motionspeed_e Sped = (value & DoorSpeed)   >> DoorSpeedShift;
+  triggertype_e Trig = (value & TriggerType) >> TriggerTypeShift;
 
   rtn = false;
 

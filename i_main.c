@@ -93,14 +93,9 @@ static void tprintf(void)
 	printf("\n");
 }
 
-extern int myargc;
-extern const char * const * myargv;
 
 int main(int argc, const char * const * argv)
 {
-	myargc = argc;
-	myargv = argv;
-
 	/* cphipps - call to video specific startup code */
 	I_InitScreen();
 
@@ -117,6 +112,6 @@ int main(int argc, const char * const * argv)
 	//InitGlobals
 	freehead = &_g_freetail;
 
-	D_DoomMain ();
+	D_DoomMain(argc, argv);
 	return 0;
 }

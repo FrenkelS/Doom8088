@@ -297,7 +297,7 @@ void I_InitGraphics(void)
 
 	outp(SC_INDEX, SC_MEMMODE);
 	outp(SC_INDEX + 1, (inp(SC_INDEX + 1) & ~8) | 4);
-	
+
 	outp(GC_INDEX, GC_MODE);
 	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~0x13);
 
@@ -409,7 +409,7 @@ static void I_Quit(void)
 {
 	I_Shutdown();
 
-	W_ReadLumpByName("ENDOOM", MK_FP(0xb800, __djgpp_conventional_base));
+	W_ReadLumpByName("ENDOOM", D_MK_FP(0xb800, __djgpp_conventional_base));
 
 	union REGS regs;
 	regs.h.ah = 2;

@@ -23,13 +23,21 @@
 //16-bit
 #include <i86.h>
 
+#define D_MK_FP  MK_FP
+#define D_FP_SEG FP_SEG
+#if defined __WATCOMC__
+#define D_FP_OFF FP_OFF
+#else
+#define D_FP_OFF(p) ((uint16_t)((uint32_t)(p)))
+#endif
+
 typedef uint16_t segment_t;
 
 #else
 //32-bit
-#define MK_FP(s,o) (void*)((s<<4)+o)
-#define FP_SEG(p)  (((uint32_t)p)>>4)
-#define FP_OFF(p)  (((uint32_t)p)&15)
+#define D_MK_FP(s,o) (void*)((s<<4)+o)
+#define D_FP_SEG(p)  (((uint32_t)p)>>4)
+#define D_FP_OFF(p)  (((uint32_t)p)&15)
 
 typedef uint32_t segment_t;
 

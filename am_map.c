@@ -207,7 +207,7 @@ static void AM_activateNewScale(void)
 //
 static void AM_findMinMaxBoundaries(void)
 {
-    int32_t i;
+    int16_t i;
     fixed_t a;
     fixed_t b;
 
@@ -812,7 +812,7 @@ static void AM_drawMline(mline_t* ml, uint8_t color)
 //
 // jff 4/3/98 add routine to get color of generalized keyed door
 //
-static int32_t AM_DoorColor(int32_t type)
+static int16_t AM_DoorColor(int16_t type)
 {
     if (GenLockedBase <= type && type< GenDoorBase)
     {
@@ -872,7 +872,7 @@ static boolean PUREFUNC P_WasSecret(const sector_t __far* sec)
 //
 static void AM_drawWalls(void)
 {
-    int32_t i;
+    int16_t i;
     mline_t l;
 
     // draw the unclipped visible portions of all lines
@@ -887,7 +887,7 @@ static void AM_drawWalls(void)
         const sector_t __far* backsector = LN_BACKSECTOR(&_g_lines[i]);
         const sector_t __far* frontsector = LN_FRONTSECTOR(&_g_lines[i]);
 
-        const uint32_t line_special =  LN_SPECIAL(&_g_lines[i]);
+        const int16_t line_special =  LN_SPECIAL(&_g_lines[i]);
 
         if (automapmode & am_rotate)
         {
@@ -902,7 +902,7 @@ static void AM_drawWalls(void)
                 continue;
             {
                 /* cph - show keyed doors and lines */
-                int32_t amd;
+                int16_t amd;
                 if (!(_g_lines[i].flags & ML_SECRET) && (amd = AM_DoorColor(line_special)) != -1)
                 {
                     {
@@ -1011,7 +1011,7 @@ static void AM_drawWalls(void)
 //
 static void AM_drawLineCharacter(angle_t angle, fixed_t x, fixed_t y)
 {
-    int32_t   i;
+    uint16_t   i;
     mline_t l;
 
     if (automapmode & am_rotate) angle -= _g_player.mo->angle - ANG90; // cph

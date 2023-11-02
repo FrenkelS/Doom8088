@@ -95,7 +95,7 @@ typedef struct
 
   mobj_t __far* soundtarget;   // thing that made a sound (or null)
   degenmobj_t soundorg;  // origin for any sounds played by the sector
-  int32_t validcount;        // if == validcount, already checked
+  uint16_t validcount;        // if == validcount, already checked
   mobj_t __far* thinglist;     // list of mobjs in sector
 
 
@@ -174,7 +174,8 @@ typedef struct line_s
 {
     vertex_t v1;
     vertex_t v2;     // Vertices, from v1 to v2.
-    uint32_t lineno;         //line number.
+    uint16_t lineno;         //line number.
+    uint16_t filler;
 
     fixed_t dx, dy;        // Precalculated v2 - v1 for side checking.
 
@@ -192,9 +193,6 @@ typedef struct line_s
 #define LN_BACKSECTOR(l) ((l)->sidenum[1] != NO_INDEX ? _g_sides[(l)->sidenum[1]].sector : NULL)
 
 #define LN_SPECIAL(l) (_g_linedata[(l)->lineno].special)
-#define LN_VCOUNT(l) (_g_linedata[(l)->lineno].validcount)
-#define LN_RVCOUNT(l) (_g_linedata[(l)->lineno].r_validcount)
-#define LN_RFLAGS(l) (_g_linedata[(l)->lineno].r_flags)
 
 
 // phares 3/14/98

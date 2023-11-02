@@ -38,29 +38,11 @@
 #ifndef __STSTUFF_H__
 #define __STSTUFF_H__
 
-#include "doomtype.h"
-#include "d_event.h"
-
 
 // Size of statusbar.
 
 #define ST_HEIGHT 32
 #define ST_SCALED_HEIGHT ST_HEIGHT
-
-
-// Number of status faces.
-#define ST_NUMPAINFACES         5
-#define ST_NUMSTRAIGHTFACES     3
-#define ST_NUMTURNFACES         2
-#define ST_NUMSPECIALFACES      3
-
-#define ST_FACESTRIDE \
-          (ST_NUMSTRAIGHTFACES+ST_NUMTURNFACES+ST_NUMSPECIALFACES)
-
-#define ST_NUMEXTRAFACES        2
-
-#define ST_NUMFACES \
-          (ST_FACESTRIDE*ST_NUMPAINFACES+ST_NUMEXTRAFACES)
 
 
 //
@@ -78,53 +60,6 @@ void ST_Start(void);
 
 // Called by startup code.
 void ST_Init(void);
-
-
-//
-// Typedefs of widgets
-//
-
-// Number widget
-
-typedef struct
-{
-  // upper right-hand corner
-  //  of the number (right-justified)
-  int16_t   x;
-  int16_t   y;
-
-  // max # of digits in number
-  int16_t width;
-
-  // last number value
-  int16_t   oldnum;
-
-  // pointer to current value
-  int16_t*  num;
-
-  // list of patches for 0-9
-  int16_t* p;
-
-} st_number_t;
-
-
-// Multiple Icon widget
-typedef struct
-{
-  // center-justified location of icons
-  int16_t     x;
-  int16_t     y;
-
-  // last icon number
-  int32_t     oldinum;
-
-  // pointer to current icon
-  int32_t*    inum;
-
-  // list of icons
-  int16_t*   p;
-
-} st_multicon_t;
 
 
 #endif
