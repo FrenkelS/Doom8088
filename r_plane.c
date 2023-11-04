@@ -54,49 +54,8 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint16_t color)
 	uint16_t __far* dest = _g_screen + ScreenYToOffset(y) + x1;
 
 	uint16_t count = x2 - x1;
-	uint16_t l = count >> 4;
 
-	while (l--)
-	{
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-		*dest++ = color;
-	}
-
-	switch (count & 15)
-	{
-		case 15:	*dest++ = color;
-		case 14:	*dest++ = color;
-		case 13:	*dest++ = color;
-		case 12:	*dest++ = color;
-		case 11:	*dest++ = color;
-		case 10:	*dest++ = color;
-		case  9:	*dest++ = color;
-		case  8:	*dest++ = color;
-		case  7:	*dest++ = color;
-		case  6:	*dest++ = color;
-		case  5:	*dest++ = color;
-		case  4:	*dest++ = color;
-		case  3:	*dest++ = color;
-		case  2:	*dest++ = color;
-		case  1:	*dest   = color;
-	}
+	_fmemset(dest, color, count * sizeof(uint16_t));
 }
 
 
@@ -280,9 +239,6 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
 #endif
 
 
-#define LOBYTE(w)	(((uint8_t *)&w)[0])
-
-
 static void R_DoDrawPlane(visplane_t __far* pl)
 {
     if (pl->minx <= pl->maxx)
@@ -300,13 +256,9 @@ static void R_DoDrawPlane(visplane_t __far* pl)
             pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
 
 #if defined FLAT_SPAN
-            uint16_t color = pl->picnum;
-            color = LOBYTE(color);
-            color = (color << 8) | color;
-
             for (register int16_t x = pl->minx; x <= stop; x++)
             {
-                R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], color);
+                R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], pl->picnum);
             }
 #else
             draw_span_vars_t dsvars;
