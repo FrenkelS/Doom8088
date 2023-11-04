@@ -317,11 +317,11 @@ static uint16_t finesine_part_2(int16_t x)
 {
 	x = 4095 - x;
 	switch (x) {
-		case  273: return 13646;
-		case  771: return 36556;
-		case  883: return 41088;
-		case 1080: return 48304;
-		case 1827: return 64600;
+		case  273: return 13646; // 13647
+		case  771: return 36556; // 36555
+		case  883: return 41088; // 41087
+		case 1080: return 48304; // 48305
+		case 1827: return 64600; // 64601
 		default: return finesineTable_part_1[x];
 	}
 }
@@ -330,10 +330,10 @@ static fixed_t finesine_part_3(int16_t x)
 {
 	x -= 4096;
 	switch (x) {
-		case   51: return  -2588;
-		case  863: return -40299;
-		case 1078: return -48236;
-		case 1080: return -48304;
+		case   51: return  -2588; //  -2587
+		case  863: return -40299; // -40300
+		case 1078: return -48236; // -48237
+		case 1080: return -48304; // -48305
 		default: return 0xffff0000 | -finesineTable_part_1[x];
 	}
 }
@@ -342,16 +342,16 @@ static fixed_t finesine_part_4(int16_t x)
 {
 	x = 8191 - x;
 	switch (x) {
-		case   51: return  -2588;
-		case  114: return  -5747;
-		case  244: return -12217;
-		case  455: return -22432;
-		case  771: return -36556;
-		case  795: return -37550;
-		case  863: return -40299;
-		case 1021: return -46251;
-		case 1051: return -47307;
-		case 1469: return -59189;
+		case   51: return  -2588; //  -2587
+		case  114: return  -5747; //  -5748
+		case  244: return -12217; // -12218
+		case  455: return -22432; // -22433
+		case  771: return -36556; // -36555
+		case  795: return -37550; // -37551
+		case  863: return -40299; // -40300
+		case 1021: return -46251; // -46252
+		case 1051: return -47307; // -47308
+		case 1469: return -59189; // -59190
 		default: return 0xffff0000 | -finesineTable_part_1[x];
 	}
 }
@@ -365,18 +365,18 @@ static uint16_t finecosine_part_4(int16_t x)
 {
 	x -= 6144;
 	switch (x) {
-		case   70: return  3542;
-		case  114: return  5747;
-		case  455: return 22432;
-		case  629: return 30427;
-		case  631: return 30516;
-		case  771: return 36556;
-		case  863: return 40299;
-		case 1067: return 47861;
-		case 1133: return 50064;
-		case 1259: return 53912;
-		case 1273: return 54309;
-		case 1827: return 64600;
+		case   70: return  3542; //  3541
+		case  114: return  5747; //  5748
+		case  455: return 22432; // 22433
+		case  629: return 30427; // 30426
+		case  631: return 30516; // 30515
+		case  771: return 36556; // 36555
+		case  863: return 40299; // 40300
+		case 1067: return 47861; // 47860
+		case 1133: return 50064; // 50065
+		case 1259: return 53912; // 53911
+		case 1273: return 54309; // 54308
+		case 1827: return 64600; // 64601
 		default: return finesineTable_part_1[x];
 	}
 }
