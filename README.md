@@ -14,7 +14,6 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=JPz
 
 **What's special?:**
  - No textures
- - No status bar
  - No sound and music
  - No saving and loading
  - No multiplayer
