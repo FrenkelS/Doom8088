@@ -703,7 +703,6 @@ static void P_NightmareRespawn(mobj_t __far* mobj)
 {
     fixed_t      x;
     fixed_t      y;
-    fixed_t      z;
     subsector_t __far* ss;
     mobj_t __far*      mo;
 
@@ -757,16 +756,9 @@ static void P_NightmareRespawn(mobj_t __far* mobj)
     S_StartSound (mo, sfx_telept);
 
     // spawn the new monster
-
-    //mthing = &mobj->spawnpoint;
-    if (mobjinfo[mobj->type].flags & MF_SPAWNCEILING)
-        z = ONCEILINGZ;
-    else
-        z = ONFLOORZ;
-
     // inherit attributes from deceased one
 
-    mo = P_SpawnMobj (x,y,z, mobj->type);
+    mo = P_SpawnMobj(x, y, ONFLOORZ, mobj->type);
     mo->angle = mobj->angle;
 
     /* killough 11/98: transfer friendliness from deceased */
@@ -1091,13 +1083,24 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 // already be in host byte order.
 //
 
+// These are Thing flags
+
+// Skill flags.
+#define MTF_EASY                1
+#define MTF_NORMAL              2
+#define MTF_HARD                4
+// Deaf monsters/do not react to sound.
+#define MTF_AMBUSH              8
+#define MTF_NOTSINGLE          16
+#define MTF_FRIEND            128
+#define MTF_RESERVED          256
+
 void P_SpawnMapThing(const mapthing_t __far* mthing)
 {
     int16_t     i;
     mobj_t __far* mobj;
     fixed_t x;
     fixed_t y;
-    fixed_t z;
     int16_t options = mthing->options; /* cph 2001/07/07 - make writable copy */
 
     // killough 2/26/98: Ignore type-0 things as NOPs
@@ -1166,20 +1169,14 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     x = ((int32_t)mthing->x) << FRACBITS;
     y = ((int32_t)mthing->y) << FRACBITS;
 
-    if (mobjinfo[i].flags & MF_SPAWNCEILING)
-        z = ONCEILINGZ;
-    else
-        z = ONFLOORZ;
-
-    mobj = P_SpawnMobj (x,y,z, i);
+    mobj = P_SpawnMobj(x, y, ONFLOORZ, i);
 
     if (mobj->tics > 0)
         mobj->tics = 1 + (P_Random () % mobj->tics);
 
-    if (!(mobj->flags & MF_FRIEND) &&
-            options & MTF_FRIEND)
+    if (!(mobj->flags & MF_FRIEND) && options & MTF_FRIEND)
     {
-        mobj->flags |= MF_FRIEND;            // killough 10/98:
+        mobj->flags |= MF_FRIEND;
     }
 
     /* killough 7/20/98: exclude friends */

@@ -137,9 +137,7 @@
 #define MF_JUSTHIT      (uint32_t)(0x0000000000000040)
 // Will take at least one step before attacking.
 #define MF_JUSTATTACKED (uint32_t)(0x0000000000000080)
-// On level spawning (initial position),
-//  hang from ceiling instead of stand on floor.
-#define MF_SPAWNCEILING (uint32_t)(0x0000000000000100)
+
 // Don't apply gravity (every tic),
 //  that is, object will float, keeping current height
 //  or changing it actively.

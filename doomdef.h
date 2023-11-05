@@ -42,11 +42,6 @@
 #include "config.h"
 #endif
 
-// killough 4/25/98: Make gcc extensions mean nothing on other compilers
-#ifndef __GNUC__
-#define __attribute__(x)
-#endif
-
 #include <stdint.h>
 
 // This must come first, since it redefines malloc(), free(), etc. -- killough:
@@ -101,21 +96,6 @@ typedef enum {
 //
 // Difficulty/skill settings/filters.
 //
-// These are Thing flags
-
-// Skill flags.
-#define MTF_EASY                1
-#define MTF_NORMAL              2
-#define MTF_HARD                4
-// Deaf monsters/do not react to sound.
-#define MTF_AMBUSH              8
-
-/* killough 11/98 */
-#define MTF_NOTSINGLE          16
-#define MTF_NOTDM              32
-#define MTF_NOTCOOP            64
-#define MTF_FRIEND            128
-#define MTF_RESERVED          256
 
 typedef enum {
   sk_none=-1, //jff 3/24/98 create unpicked skill setting
