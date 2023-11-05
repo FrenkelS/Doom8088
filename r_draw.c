@@ -240,10 +240,10 @@ visplane_t __far*__far* freehead;
 // Constants
 //*****************************************
 
-static const int16_t viewheight = SCREENHEIGHT-ST_SCALED_HEIGHT;
-static const int16_t centery = (SCREENHEIGHT-ST_SCALED_HEIGHT)/2;
+static const int16_t viewheight = SCREENHEIGHT - ST_HEIGHT;
+static const int16_t centery = (SCREENHEIGHT - ST_HEIGHT) / 2;
 static const int32_t centerxfrac = ((int32_t)(SCREENWIDTH/2)) << FRACBITS;
-static const int32_t centeryfrac = ((int32_t)((SCREENHEIGHT-ST_SCALED_HEIGHT)/2)) << FRACBITS;
+static const int32_t centeryfrac = ((int32_t)((SCREENHEIGHT - ST_HEIGHT) / 2)) << FRACBITS;
 
 static const fixed_t projection = ((int32_t)(SCREENWIDTH/2)) << FRACBITS;
 

@@ -310,7 +310,7 @@ void R_DrawPlanes (void)
 // At begining of frame.
 //
 
-static const int16_t viewheight  = SCREENHEIGHT - ST_SCALED_HEIGHT;
+static const int16_t viewheight  = SCREENHEIGHT - ST_HEIGHT;
 
 void R_ClearPlanes(void)
 {

@@ -105,7 +105,7 @@ static boolean    headsupactive;
 //jff 2/16/98 change 167 to ST_Y-1
 // CPhipps - changed to ST_TY
 // proff - changed to 200-ST_HEIGHT for stretching
-#define HU_TITLEY ((SCREENHEIGHT-ST_SCALED_HEIGHT) - 1 - HU_FONT_HEIGHT)
+#define HU_TITLEY ((SCREENHEIGHT - ST_HEIGHT) - 1 - HU_FONT_HEIGHT)
 
 
 #define HU_MSGX         0
