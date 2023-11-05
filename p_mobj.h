@@ -150,8 +150,7 @@
 #define MF_PICKUP       (uint32_t)(0x0000000000000800)
 // Player cheat. ???
 #define MF_NOCLIP       (uint32_t)(0x0000000000001000)
-// Player: keep info about sliding along walls.
-#define MF_SLIDE        (uint32_t)(0x0000000000002000)
+
 // Allow moves to any height, no gravity.
 // For active floaters, e.g. cacodemons, pain elementals.
 #define MF_FLOAT        (uint32_t)(0x0000000000004000)
@@ -190,7 +189,7 @@
 // Neither a cacodemon nor a missile.
 #define MF_SKULLFLY     (uint32_t)(0x0000000001000000)
 
-#define MF_POOLED      (uint32_t)(0x0000000010000000)
+#define MF_POOLED       (uint32_t)(0x0000000010000000)
 
 #define MF_FRIEND       (uint32_t)(0x0000000080000000)
 
