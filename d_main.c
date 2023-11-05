@@ -504,8 +504,6 @@ static void D_DoomMainSetup(void)
     printf("ST_Init: Init status bar.\n");
     ST_Init();
 
-    _g_highDetail = 0;
-
     G_LoadSettings();
 
     _g_fps_show = false;

@@ -86,8 +86,6 @@ extern boolean    _g_message_dontfuckwithme;
 //
 extern int16_t _g_alwaysRun;
 
-extern int16_t _g_highDetail;
-
 extern boolean _g_menuactive;    // The menus are up
 
 extern char _g_savegamestrings[8][8];

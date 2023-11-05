@@ -232,8 +232,6 @@ static int32_t      worldlow;
 
 static lighttable_t current_colormap[256];
 
-int16_t highDetail = 0;
-
 
 uint16_t validcount = 1;         // increment every time a check is made
 visplane_t __far*__far* freehead;
@@ -654,36 +652,6 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 }
 
 
-static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
-{
-    int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
-
-    const byte __far* source   = dcvars->source;
-    const byte __far* colormap = dcvars->colormap;
-
-    volatile uint8_t __far* dest = (uint8_t __far*)(_g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x);
-    dest += dcvars->odd_pixel;
-
-    const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
-    uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery)*dcvars->iscale) << COLEXTRABITS;
-
-    // Inner loop that does the actual texture mapping,
-    //  e.g. a DDA-lile scaling.
-    // This is as fast as it gets.
-
-    while(count--)
-    {
-        *dest = colormap[source[frac>>COLBITS]];
-
-        dest += SCREENWIDTH*2;
-        frac += fracstep;
-    }
-}
-
 #define FUZZOFF (SCREENWIDTH)
 #define FUZZTABLE 50
 
@@ -784,8 +752,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
             dcvars->yh = yh;
             dcvars->yl = yl;
 
-            // Drawn by either R_DrawColumn, R_DrawColumnHiRes
-            //  or (SHADOW) R_DrawFuzzColumn.
+            // Drawn by either R_DrawColumn or (SHADOW) R_DrawFuzzColumn.
             colfunc (dcvars);
         }
 
@@ -844,7 +811,6 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     R_DrawColumn_f colfunc = R_DrawColumn;
     draw_column_vars_t dcvars;
-    boolean hires = false;
 
     R_SetDefaultDrawColumnVars(&dcvars);
 
@@ -855,13 +821,6 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     if (!dcvars.colormap)   // NULL colormap = shadow draw
         colfunc = R_DrawFuzzColumn;    // killough 3/14/98
-    else
-    {
-        hires = highDetail;
-
-        if(hires)
-            colfunc = R_DrawColumnHiRes;
-    }
 
     // proff 11/06/98: Changed for high-res
     dcvars.iscale = vis->iscale;
@@ -876,13 +835,9 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     fixed_t xiscale = vis->xiscale;
 
-    if(hires)
-        xiscale >>= 1;
-
     dcvars.x = vis->x1;
-    dcvars.odd_pixel = 0;
 
-    while(dcvars.x < SCREENWIDTH)
+    while (dcvars.x < SCREENWIDTH)
     {
         const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column);
@@ -892,24 +847,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
         if(((frac >> FRACBITS) >= patch->width) || frac < 0)
             break;
 
-        dcvars.odd_pixel = 1;
-
-        if(!hires)
-            dcvars.x++;
-
-        if(dcvars.x >= SCREENWIDTH)
-            break;
-
-        const column_t __far* column2 = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
-        R_DrawMaskedColumn(colfunc, &dcvars, column2);
-
-        frac += xiscale;
-
-        if(((frac >> FRACBITS) >= patch->width) || frac < 0)
-            break;
-
         dcvars.x++;
-        dcvars.odd_pixel = 0;
     }
 
     Z_ChangeTagToCache(patch);
@@ -1739,24 +1677,17 @@ static uint16_t FindColumnCacheItem(int16_t texture, uint32_t column)
 
 static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int32_t texcolumn, uint32_t iscale)
 {
-    uint16_t colmask;
+    uint16_t colmask = 0xfffe;
 
-    if(!highDetail)
+    if (tex->width > 8)
     {
-        colmask = 0xfffe;
-
-        if(tex->width > 8)
-        {
-            if(iscale > (((int32_t)4) << FRACBITS))
-                colmask = 0xfff0;
-            else if(iscale > (((int32_t)3) << FRACBITS))
-                colmask = 0xfff8;
-            else if (iscale > (((int32_t)2) << FRACBITS))
-                colmask = 0xfffc;
-        }
+        if (iscale >> FRACBITS > 4)
+            colmask = 0xfff0;
+        else if (iscale >> FRACBITS > 3)
+            colmask = 0xfff8;
+        else if (iscale >> FRACBITS > 2)
+            colmask = 0xfffc;
     }
-    else
-        colmask = 0xffff;
 
 
     const int32_t xc = (texcolumn & colmask) & tex->widthmask;
@@ -2832,8 +2763,6 @@ static void R_SetupFrame (player_t *player)
         fixedcolormap = 0;
 
     validcount++;
-
-    highDetail = _g_highDetail;
 }
 
 

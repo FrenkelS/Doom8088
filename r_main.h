@@ -53,9 +53,6 @@ typedef struct {
   const byte          __far* source; // first pixel in a column
 
   const lighttable_t  __far* colormap;
-
-  int16_t             odd_pixel;
-
 } draw_column_vars_t;
 
 
@@ -81,7 +78,6 @@ extern int16_t       __far* texturetranslation;
 
 extern fixed_t  viewcos, viewsin;
 
-extern int16_t highDetail;
 
 //
 // Utility functions.
