@@ -23,6 +23,9 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
+#include "compiler.h"
 #include "r_defs.h"
 #include "r_main.h"
 
