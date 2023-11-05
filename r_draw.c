@@ -646,48 +646,10 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 	uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
 
-	uint16_t l = count >> 4;
-
-	while (l--)
+	while (count--)
 	{
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-	}
-
-	switch (count & 15)
-	{
-		case 15:	*dest = color; dest += SCREENWIDTH;
-		case 14:	*dest = color; dest += SCREENWIDTH;
-		case 13:	*dest = color; dest += SCREENWIDTH;
-		case 12:	*dest = color; dest += SCREENWIDTH;
-		case 11:	*dest = color; dest += SCREENWIDTH;
-		case 10:	*dest = color; dest += SCREENWIDTH;
-		case  9:	*dest = color; dest += SCREENWIDTH;
-		case  8:	*dest = color; dest += SCREENWIDTH;
-		case  7:	*dest = color; dest += SCREENWIDTH;
-		case  6:	*dest = color; dest += SCREENWIDTH;
-		case  5:	*dest = color; dest += SCREENWIDTH;
-		case  4:	*dest = color; dest += SCREENWIDTH;
-		case  3:	*dest = color; dest += SCREENWIDTH;
-		case  2:	*dest = color; dest += SCREENWIDTH;
-		case  1:	*dest = color;
+		*dest = color;
+		dest += SCREENWIDTH;
 	}
 }
 
