@@ -833,8 +833,6 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     const patch_t __far* patch = W_GetLumpByNum(vis->lump_num);
 
-    fixed_t xiscale = vis->xiscale;
-
     dcvars.x = vis->x1;
 
     while (dcvars.x < SCREENWIDTH)
@@ -842,7 +840,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
         const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column);
 
-        frac += xiscale;
+        frac += vis->xiscale;
 
         if(((frac >> FRACBITS) >= patch->width) || frac < 0)
             break;
@@ -1675,17 +1673,17 @@ static uint16_t FindColumnCacheItem(int16_t texture, uint32_t column)
 }
 
 
-static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int32_t texcolumn, uint32_t iscale)
+static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int16_t texcolumn, uint16_t iscale)
 {
     uint16_t colmask = 0xfffe;
 
     if (tex->width > 8)
     {
-        if (iscale >> FRACBITS > 4)
+        if (iscale > 4)
             colmask = 0xfff0;
-        else if (iscale >> FRACBITS > 3)
+        else if (iscale > 3)
             colmask = 0xfff8;
-        else if (iscale >> FRACBITS > 2)
+        else if (iscale > 2)
             colmask = 0xfffc;
     }
 
@@ -1760,7 +1758,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int16_t texcolumn, draw_colu
     }
     else
     {
-        dcvars->source = R_ComposeColumn(texture, tex, texcolumn, dcvars->iscale);
+        dcvars->source = R_ComposeColumn(texture, tex, texcolumn, dcvars->iscale >> FRACBITS);
         R_DrawColumn (dcvars);
     }
 }
