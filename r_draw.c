@@ -1370,7 +1370,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     fixed_t xl = (centerxfrac + FixedMul(tx,xscale));
 
     // off the side?
-    if (xl > (((int32_t)VIEWWINDOWWIDTH) << FRACBITS))
+    if (xl >> FRACBITS > VIEWWINDOWWIDTH)
     {
         Z_ChangeTagToCache(patch);
         return;
