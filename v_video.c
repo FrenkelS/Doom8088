@@ -104,7 +104,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
     static const int32_t   DX  = (((int32_t)240)<<FRACBITS) / 320;
     static const int32_t   DXI = (((int32_t)320)<<FRACBITS) / 240;
     static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / 200;
-    static const int32_t   DYI = (((int32_t)200)<<FRACBITS) / SCREENHEIGHT;
+    static const int16_t   DYI = ((((int32_t)200)<<FRACBITS) / SCREENHEIGHT) >> 8;
 
     byte __far* byte_topleft = (byte __far*)_g_screen;
     static const int16_t byte_pitch = (SCREENPITCH * 2);
@@ -139,14 +139,14 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 
             byte __far* dest = byte_topleft + (dc_yl * byte_pitch) + dc_x;
 
-            fixed_t frac = 0;
+            int16_t frac = 0;
 
             const byte __far* source = (const byte __far*)column + 3;
 
             int16_t count = dc_yh - dc_yl;
             while (count--)
             {
-                *dest = source[frac >> FRACBITS];
+                *dest = source[frac >> 8];
                 dest += byte_pitch;
                 frac += DYI;
             }
