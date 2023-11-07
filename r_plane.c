@@ -68,7 +68,7 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint16_t color)
 
 static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16_t b2, uint16_t color)
 {
-	static byte spanstart[SCREENHEIGHT];
+	static byte spanstart[VIEWWINDOWHEIGHT];
 
 	for (; t1 < t2 && t1 <= b1; t1++)
 		R_DrawSpan(t1, spanstart[t1], x, color);
@@ -161,7 +161,7 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_var
 }
 
 
-static const fixed_t yslopeTable[(SCREENHEIGHT - ST_HEIGHT) / 2] =
+static const fixed_t yslopeTable[VIEWWINDOWHEIGHT / 2] =
 {
     132104,134218,136400,138655,140985,143395,145889,148471,151146,153919,156796,159783,162886,166111,
     169467,172961,176602,180400,184365,188508,192842,197379,202135,207126,212370,217886,223696,229825,
@@ -225,7 +225,7 @@ static void R_MapPlane(uint16_t y, uint16_t x1, uint16_t x2, draw_span_vars_t *d
 
 static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16_t b2, draw_span_vars_t *dsvars)
 {
-    static byte spanstart[SCREENHEIGHT];
+    static byte spanstart[VIEWWINDOWHEIGHT];
 
     for (; t1 < t2 && t1 <= b1; t1++)
         R_MapPlane(t1, spanstart[t1], x, dsvars);
@@ -310,13 +310,11 @@ void R_DrawPlanes (void)
 // At begining of frame.
 //
 
-static const int16_t viewheight  = SCREENHEIGHT - ST_HEIGHT;
-
 void R_ClearPlanes(void)
 {
     // opening / clipping determination
     for (int8_t i = 0; i < SCREENWIDTH; i++)
-        floorclip[i] = viewheight, ceilingclip[i] = -1;
+        floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
 
 
     for (int8_t i = 0; i < MAXVISPLANES; i++)    // new code -- killough

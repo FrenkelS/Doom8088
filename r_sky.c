@@ -65,7 +65,7 @@ void R_DrawSky(visplane_t __far* pl)
 	if (!(dcvars.colormap = fixedcolormap))
 		dcvars.colormap = fullcolormap;
 
-	dcvars.iscale = (FRACUNIT * 200) / ((SCREENHEIGHT - ST_HEIGHT) + 16);
+	dcvars.iscale = (FRACUNIT * 200) / (VIEWWINDOWHEIGHT + 16);
 
 	const texture_t __far* tex = R_GetTexture(skytexture);
 
