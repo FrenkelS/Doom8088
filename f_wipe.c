@@ -95,9 +95,9 @@ static boolean wipe_ScreenWipe(int32_t ticks)
                 if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
                     dy = SCREENHEIGHT - wipe_y_lookup[i];
 
-                uint16_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - dy - 1) * SCREENWIDTH / 2);
+                uint16_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - dy - 1) * (SCREENWIDTH / 2));
 
-                uint16_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1) * SCREENWIDTH / 2);
+                uint16_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1) * (SCREENWIDTH / 2));
 
                 // scroll down the column. Of course we need to copy from the bottom... up to
                 // SCREENHEIGHT - yLookup - dy
