@@ -73,7 +73,7 @@ static const uint8_t mapcolor_unsn = 104;    // computer map unseen line color
 static const uint8_t mapcolor_flat = 88;    // line with no floor/ceiling changes
 static const uint8_t mapcolor_sngl = 208;    // single player arrow color
 
-static const int32_t f_w = (SCREENWIDTH*2);
+static const int32_t f_w = SCREENWIDTH;
 static const int32_t f_h = SCREENHEIGHT - ST_HEIGHT;// to allow runtime setting of width/height
 
 

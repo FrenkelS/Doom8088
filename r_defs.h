@@ -401,11 +401,11 @@ typedef struct visplane
   byte		pad3;
   // Here lies the rub for all
   //  dynamic resize/change of resolution.
-  byte		top[SCREENWIDTH];
+  byte		top[VIEWWINDOWWIDTH];
   byte		pad4;
   byte		pad5;
   // See above.
-  byte		bottom[SCREENWIDTH];
+  byte		bottom[VIEWWINDOWWIDTH];
   byte		pad6;
 
 } visplane_t;

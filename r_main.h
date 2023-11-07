@@ -65,8 +65,8 @@ extern fixed_t  viewx, viewy, viewz;
 
 extern angle_t viewangle;
 
-extern int16_t floorclip[SCREENWIDTH];
-extern int16_t ceilingclip[SCREENWIDTH];
+extern int16_t floorclip[VIEWWINDOWWIDTH];
+extern int16_t ceilingclip[VIEWWINDOWWIDTH];
 
 extern const lighttable_t __far* fullcolormap;
 extern const lighttable_t __far* colormaps;

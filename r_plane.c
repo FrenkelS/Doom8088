@@ -170,7 +170,7 @@ static const fixed_t yslopeTable[VIEWWINDOWHEIGHT / 2] =
     1118481,1290555,1525201,1864135,2396745,3355443,5592405,16777216
 };
 
-static const uint16_t distscaleTable[SCREENWIDTH] =
+static const uint16_t distscaleTable[VIEWWINDOWWIDTH] =
 {
     0x6A75,
     0x676E,0x6438,0x6158,0x5E8C,0x5B90,0x58AB,0x55D9,0x5319,0x5034,0x4D63,0x4AA8,0x4800,0x456A,0x42B6,0x4018,0x3D8E,
@@ -313,7 +313,7 @@ void R_DrawPlanes (void)
 void R_ClearPlanes(void)
 {
     // opening / clipping determination
-    for (int8_t i = 0; i < SCREENWIDTH; i++)
+    for (int8_t i = 0; i < VIEWWINDOWWIDTH; i++)
         floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
 
 
@@ -324,7 +324,7 @@ void R_ClearPlanes(void)
     R_ClearOpenings();
 
 #if !defined FLAT_SPAN
-    static const fixed_t iprojection = 1092; //( (1 << FRACUNIT) / (SCREENWIDTH / 2))
+    static const fixed_t iprojection = 1092; //( (1 << FRACUNIT) / (VIEWWINDOWWIDTH / 2))
 
     basexscale = FixedMul(viewsin,iprojection);
     baseyscale = FixedMul(viewcos,iprojection);

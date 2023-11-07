@@ -66,7 +66,7 @@ visplane_t __far* _g_freetail;
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
 
 
-#define MAXOPENINGS (SCREENWIDTH*16)
+#define MAXOPENINGS (VIEWWINDOWWIDTH*16)
 
 static int16_t openings[MAXOPENINGS];
 static int16_t* lastopening;
@@ -106,11 +106,11 @@ static fixed_t finetangent(int16_t x)
 }
 
 
-int16_t floorclip[SCREENWIDTH];
-int16_t ceilingclip[SCREENWIDTH];
+int16_t floorclip[VIEWWINDOWWIDTH];
+int16_t ceilingclip[VIEWWINDOWWIDTH];
 
 
-static int16_t screenheightarray[SCREENWIDTH] =
+static int16_t screenheightarray[VIEWWINDOWWIDTH] =
 {
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,		VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,		VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
@@ -125,7 +125,7 @@ static int16_t screenheightarray[SCREENWIDTH] =
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,		VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT
 };
 
-static int16_t negonearray[SCREENWIDTH] =
+static int16_t negonearray[VIEWWINDOWWIDTH] =
 {
 	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
@@ -152,7 +152,7 @@ fixed_t  viewx, viewy, viewz;
 
 angle_t  viewangle;
 
-static byte solidcol[SCREENWIDTH];
+static byte solidcol[VIEWWINDOWWIDTH];
 
 static const seg_t     __far* curline;
 static side_t    __far* sidedef;
@@ -242,15 +242,15 @@ visplane_t __far*__far* freehead;
 
 static const int16_t viewheight = VIEWWINDOWHEIGHT;
 static const int16_t centery = VIEWWINDOWHEIGHT / 2;
-static const int32_t centerxfrac = ((int32_t)(SCREENWIDTH/2)) << FRACBITS;
+static const int32_t centerxfrac = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
 static const int32_t centeryfrac = ((int32_t)(VIEWWINDOWHEIGHT / 2)) << FRACBITS;
 
-static const fixed_t projection = ((int32_t)(SCREENWIDTH/2)) << FRACBITS;
+static const fixed_t projection = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
 
-static const fixed_t projectiony = ((SCREENHEIGHT * (SCREENWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / SCREENWIDTH * FRACUNIT;
+static const fixed_t projectiony = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
 
-static const int16_t pspritescale = FRACUNIT * SCREENWIDTH / SCREENWIDTH_VGA;
-static const fixed_t pspriteiscale = FRACUNIT * SCREENWIDTH_VGA / SCREENWIDTH;
+static const int16_t pspritescale = FRACUNIT * (SCREENWIDTH / 2) / SCREENWIDTH_VGA;
+static const fixed_t pspriteiscale = FRACUNIT * SCREENWIDTH_VGA / (SCREENWIDTH / 2);
 
 static const uint16_t pspriteyscale = (((int32_t)SCREENHEIGHT) << FRACBITS) / SCREENHEIGHT_VGA;
 static const fixed_t pspriteyiscale = ((UINT32_MAX) / ((((int32_t)SCREENHEIGHT) << FRACBITS) / SCREENHEIGHT_VGA));
@@ -590,43 +590,43 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
 
     while (l--)
     {
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
     }
 
     switch (count & 15)
     {
-        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
+        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=VIEWWINDOWWIDTH; frac+=fracstep;
         case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
     }
 }
@@ -647,12 +647,12 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	while (count--)
 	{
 		*dest = color;
-		dest += SCREENWIDTH;
+		dest += VIEWWINDOWWIDTH;
 	}
 }
 
 
-#define FUZZOFF (SCREENWIDTH)
+#define FUZZOFF (VIEWWINDOWWIDTH)
 #define FUZZTABLE 50
 
 static const int8_t fuzzoffset[FUZZTABLE] =
@@ -701,7 +701,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     do
     {        
-        R_DrawColumnPixel(dest, (const byte __far*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += SCREENWIDTH;
+        R_DrawColumnPixel(dest, (const byte __far*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += VIEWWINDOWWIDTH;
 
         fuzzpos++;
         if (fuzzpos >= FUZZTABLE)
@@ -835,7 +835,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     dcvars.x = vis->x1;
 
-    while (dcvars.x < SCREENWIDTH)
+    while (dcvars.x < VIEWWINDOWWIDTH)
     {
         const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column);
@@ -1124,7 +1124,7 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 
 
     // off the side
-    if (x2 < 0 || x1 > SCREENWIDTH)
+    if (x2 < 0 || x1 > VIEWWINDOWWIDTH)
     {
         Z_ChangeTagToCache(patch);
         return;
@@ -1136,7 +1136,7 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     vis->texturemid = (((int32_t)BASEYCENTER)<<FRACBITS) /* +  FRACUNIT/2 */ -
             (psp->sy-topoffset);
     vis->x1 = x1 < 0 ? 0 : x1;
-    vis->x2 = x2 >= SCREENWIDTH ? SCREENWIDTH-1 : x2;
+    vis->x2 = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
     // proff 11/06/98: Added for high-res
     vis->scale = pspriteyscale;
     vis->iscale = pspriteyiscale;
@@ -1370,7 +1370,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     fixed_t xl = (centerxfrac + FixedMul(tx,xscale));
 
     // off the side?
-    if (xl > (((int32_t)SCREENWIDTH) << FRACBITS))
+    if (xl > (((int32_t)VIEWWINDOWWIDTH) << FRACBITS))
     {
         Z_ChangeTagToCache(patch);
         return;
@@ -1415,7 +1415,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     vis->gz              = fz;
     vis->texturemid      = (fz + (((int32_t)patch->topoffset) << FRACBITS)) - viewz;
     vis->x1              = x1 < 0 ? 0 : x1;
-    vis->x2              = x2 >= SCREENWIDTH ? SCREENWIDTH-1 : x2;
+    vis->x2              = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
 
 
     const fixed_t iscale = FixedReciprocal(xscale);
@@ -1532,7 +1532,7 @@ static visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int16_t lig
     check->height = height;
     check->picnum = picnum;
     check->lightlevel = lightlevel;
-    check->minx = SCREENWIDTH; // Was SCREENWIDTH -- killough 11/98
+    check->minx = VIEWWINDOWWIDTH;
     check->maxx = -1;
 
     _fmemset(check->top, -1, sizeof(check->top));
@@ -2725,7 +2725,7 @@ static void R_ClearDrawSegs(void)
 
 static void R_ClearClipSegs (void)
 {
-    memset(solidcol, 0, SCREENWIDTH);
+    memset(solidcol, 0, VIEWWINDOWWIDTH);
 }
 
 

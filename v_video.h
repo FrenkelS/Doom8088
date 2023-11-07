@@ -48,12 +48,7 @@
 // VIDEO
 //
 
-//Cheap mul by 120. Not sure if faster.
-#if 0
-#define ScreenYToOffset(x) ((x << 7) - (x << 3))
-#else
-#define ScreenYToOffset(x) (x * SCREENWIDTH)
-#endif
+#define ScreenYToOffset(x) (x * VIEWWINDOWWIDTH)
 
 
 void V_DrawBackground(void);

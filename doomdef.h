@@ -63,7 +63,7 @@
 #define VIEWWINDOWHEIGHT 128
 
 // SCREENWIDTH and SCREENHEIGHT define the visible size
-#define SCREENWIDTH  120
+#define SCREENWIDTH  240
 #define SCREENHEIGHT 160
 
 #define SCREENWIDTH_VGA  320

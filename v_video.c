@@ -86,11 +86,11 @@ void V_DrawRaw(const char *name, uint16_t offset)
 	if (W_IsLumpCached(num) || Z_IsEnoughFreeMemory(lumpLength))
 	{
 		const uint8_t __far* lump = W_GetLumpByNum(num);
-		_fmemcpy(&_g_screen[offset], lump, lumpLength);
+		_fmemcpy(&_g_screen[offset / 2], lump, lumpLength);
 		Z_ChangeTagToCache(lump);
 	}
 	else
-		W_ReadLumpByName(name, &_g_screen[offset]);
+		W_ReadLumpByName(name, &_g_screen[offset / 2]);
 }
 
 
@@ -101,13 +101,13 @@ void V_DrawRaw(const char *name, uint16_t offset)
 
 static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 {
-    static const int32_t   DX  = (((int32_t)(SCREENWIDTH * 2))<<FRACBITS) / SCREENWIDTH_VGA;
-    static const int32_t   DXI = (((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / (SCREENWIDTH * 2);
+    static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
+    static const int32_t   DXI = (((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH;
     static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
     static const int16_t   DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
 
     byte __far* byte_topleft = (byte __far*)_g_screen;
-    static const int16_t byte_pitch = (SCREENWIDTH * 2);
+    static const int16_t byte_pitch = SCREENWIDTH;
 
     y -= patch->topoffset;
     x -= patch->leftoffset;
@@ -122,7 +122,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
     {
         if (dc_x < 0)
             continue;
-        else if (dc_x >= SCREENWIDTH * 2)
+        else if (dc_x >= SCREENWIDTH)
             break;
 
         const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> FRACBITS]);
@@ -182,7 +182,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
             while (count--)
             {
                 *dest = *source++;
-                dest += (SCREENWIDTH * 2);
+                dest += SCREENWIDTH;
             }
 
             column = (const column_t __far*)((const byte __far*)column + column->length + 4);
@@ -220,7 +220,7 @@ void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
 //
 void V_FillRect(byte colour)
 {
-	_fmemset(_g_screen, colour, SCREENWIDTH * 2 * (SCREENHEIGHT - ST_HEIGHT));
+	_fmemset(_g_screen, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
 }
 
 

@@ -202,7 +202,7 @@ uint16_t __far* I_GetBackBuffer(void)
 
 void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
 {
-	_fmemcpy(buffer, backBuffer, SCREENWIDTH * SCREENHEIGHT * 2u);
+	_fmemcpy(buffer, backBuffer, 1u * SCREENWIDTH * SCREENHEIGHT);
 }
 
 
@@ -274,10 +274,10 @@ void I_InitGraphics(void)
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
-	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH * 2) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 
-	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
-	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
+	backBuffer = Z_MallocStatic(1u * SCREENWIDTH * SCREENHEIGHT);
+	_fmemset(backBuffer, 0, 1u * SCREENWIDTH * SCREENHEIGHT);
 }
 
 
@@ -297,9 +297,9 @@ void I_DrawBuffer(uint16_t __far* buffer)
 #else
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
 #endif
-		_fmemcpy(dst, src, SCREENWIDTH * 2);
-		dst += SCREENWIDTH_VGA / 2;
-		src += SCREENWIDTH;
+		_fmemcpy(dst, src, SCREENWIDTH);
+		dst += (SCREENWIDTH_VGA / 2);
+		src += (SCREENWIDTH / 2);
 	}
 }
 
