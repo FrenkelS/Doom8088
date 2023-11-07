@@ -267,9 +267,6 @@ void I_SetPalette (int8_t pal)
 }
 
 
-#define SCREENWIDTH_VGA  320
-#define SCREENHEIGHT_VGA 200
-
 void I_InitGraphics(void)
 {	
 	I_SetScreenMode(0x13);

@@ -107,7 +107,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
     static const int16_t   DYI = ((((int32_t)200)<<FRACBITS) / SCREENHEIGHT) >> 8;
 
     byte __far* byte_topleft = (byte __far*)_g_screen;
-    static const int16_t byte_pitch = (SCREENPITCH * 2);
+    static const int16_t byte_pitch = (SCREENWIDTH * 2);
 
     y -= patch->topoffset;
     x -= patch->leftoffset;

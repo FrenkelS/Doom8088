@@ -59,14 +59,15 @@
 #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings
 
 
+#define VIEWWINDOWWIDTH  120
+#define VIEWWINDOWHEIGHT 128
+
 // SCREENWIDTH and SCREENHEIGHT define the visible size
-#define SCREENWIDTH 120
+#define SCREENWIDTH  120
 #define SCREENHEIGHT 160
-#define SCREENPITCH SCREENWIDTH //In shorts.
-// SCREENPITCH is the size of one line in the buffer and
-// can be bigger than the SCREENWIDTH depending on the size
-// of one pixel (8, 16 or 32 bit) and the padding at the
-// end of the line caused by hardware considerations
+
+#define SCREENWIDTH_VGA  320
+#define SCREENHEIGHT_VGA 200
 
 
 // The maximum number of players, multiplayer/networking.
