@@ -1197,20 +1197,18 @@ static void R_DrawPlayerSprites(void)
 //
 // R_SortVisSprites
 //
-// Rewritten by Lee Killough to avoid using unnecessary
-// linked lists, and to use faster sorting algorithm.
-//
 static int compare (const void* l, const void* r)
 {
 	const vissprite_t* vl = *(const vissprite_t**)l;
 	const vissprite_t* vr = *(const vissprite_t**)r;
 
-	if (vr->scale < vl->scale)
-		return -1;
-	else if (vr->scale > vl->scale)
-		return 1;
-	else
+	fixed_t diff = vr->scale - vl->scale;
+	if (!diff)
 		return 0;
+	else if (diff < 0)
+		return -1;
+	else
+		return 1;
 }
 
 #define MAXVISSPRITES 96
@@ -1245,14 +1243,11 @@ static void R_DrawMasked(void)
 
     // draw all vissprites back to front
     for (int8_t i = num_vissprite; --i >= 0; )
-        R_DrawSprite(vissprite_ptrs[i]);         // killough
+        R_DrawSprite(vissprite_ptrs[i]);
 
     // render any remaining masked mid textures
 
-    // Modified by Lee Killough:
-    // (pointer check was originally nonportable
-    // and buggy, by going past LEFT end of array):
-    for (ds=ds_p ; ds-- > drawsegs ; )  // new -- killough
+    for (ds=ds_p ; ds-- > drawsegs ; )
         if (ds->maskedtexturecol)
             R_RenderMaskedSegRange(ds, ds->x1, ds->x2);
 
