@@ -101,10 +101,10 @@ void V_DrawRaw(const char *name, uint16_t offset)
 
 static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 {
-    static const int32_t   DX  = (((int32_t)240)<<FRACBITS) / 320;
-    static const int32_t   DXI = (((int32_t)320)<<FRACBITS) / 240;
-    static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / 200;
-    static const int16_t   DYI = ((((int32_t)200)<<FRACBITS) / SCREENHEIGHT) >> 8;
+    static const int32_t   DX  = (((int32_t)(SCREENWIDTH * 2))<<FRACBITS) / SCREENWIDTH_VGA;
+    static const int32_t   DXI = (((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / (SCREENWIDTH * 2);
+    static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
+    static const int16_t   DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
 
     byte __far* byte_topleft = (byte __far*)_g_screen;
     static const int16_t byte_pitch = (SCREENWIDTH * 2);
@@ -122,7 +122,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
     {
         if (dc_x < 0)
             continue;
-        else if (dc_x >= 240)
+        else if (dc_x >= SCREENWIDTH * 2)
             break;
 
         const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> FRACBITS]);
