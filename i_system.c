@@ -186,8 +186,8 @@ void I_StartTic(void)
 //
 
 static boolean isGraphicsModeSet = false;
-static uint16_t __far* screen;
-static uint16_t __far* backBuffer;
+static uint8_t __far* screen;
+static uint8_t __far* backBuffer;
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
 uint16_t __far* _g_screen;
@@ -195,13 +195,13 @@ uint8_t  __far* _g_screen_byte;
 
 static int8_t newpal;
 
-uint16_t __far* I_GetBackBuffer(void)
+uint8_t __far* I_GetBackBuffer(void)
 {
 	return backBuffer;
 }
 
 
-void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
+void I_CopyBackBufferToBuffer(uint8_t __far* buffer)
 {
 	_fmemcpy(buffer, backBuffer, 1u * SCREENWIDTH * SCREENHEIGHT);
 }
@@ -284,15 +284,15 @@ void I_InitGraphics(void)
 
 void I_StartDisplay(void)
 {
-	_g_screen      = backBuffer;
+	_g_screen      = (uint16_t __far* )backBuffer;
 	_g_screen_byte = backBuffer;
 }
 
 
-void I_DrawBuffer(uint16_t __far* buffer)
+void I_DrawBuffer(uint8_t __far* buffer)
 {
-	uint16_t __far* src = buffer;
-	uint16_t __far* dst = screen;
+	uint8_t __far* src = buffer;
+	uint8_t __far* dst = screen;
 
 #if defined DISABLE_STATUS_BAR
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
@@ -300,8 +300,8 @@ void I_DrawBuffer(uint16_t __far* buffer)
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
 #endif
 		_fmemcpy(dst, src, SCREENWIDTH);
-		dst += (SCREENWIDTH_VGA / 2);
-		src += (SCREENWIDTH / 2);
+		dst += SCREENWIDTH_VGA;
+		src += SCREENWIDTH;
 	}
 }
 

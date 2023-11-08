@@ -59,7 +59,7 @@ void wipe_StartScreen(void)
 {
 	frontbuffer = Z_TryMallocStatic(1u * SCREENWIDTH * SCREENHEIGHT);
 	if (frontbuffer)
-		I_CopyBackBufferToBuffer(frontbuffer);
+		I_CopyBackBufferToBuffer((uint8_t __far*)frontbuffer);
 }
 
 
@@ -67,11 +67,11 @@ static boolean wipe_ScreenWipe(int32_t ticks)
 {
     boolean done = true;
 
-    uint16_t __far* backbuffer = I_GetBackBuffer();
+    uint16_t __far* backbuffer = (uint16_t __far*)I_GetBackBuffer();
 
     while (ticks--)
     {
-        I_DrawBuffer(frontbuffer);
+        I_DrawBuffer((uint8_t __far*)frontbuffer);
         for (int16_t i = 0; i < SCREENWIDTH / 2; i++)
         {
             if (wipe_y_lookup[i] < 0)
