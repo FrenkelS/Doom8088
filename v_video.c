@@ -86,11 +86,11 @@ void V_DrawRaw(const char *name, uint16_t offset)
 	if (W_IsLumpCached(num) || Z_IsEnoughFreeMemory(lumpLength))
 	{
 		const uint8_t __far* lump = W_GetLumpByNum(num);
-		_fmemcpy(&_g_screen[offset / 2], lump, lumpLength);
+		_fmemcpy(&_g_screen_byte[offset], lump, lumpLength);
 		Z_ChangeTagToCache(lump);
 	}
 	else
-		W_ReadLumpByName(name, &_g_screen[offset / 2]);
+		W_ReadLumpByName(name, &_g_screen_byte[offset]);
 }
 
 
@@ -105,9 +105,6 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
     static const int32_t   DXI = (((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH;
     static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
     static const int16_t   DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
-
-    byte __far* byte_topleft = (byte __far*)_g_screen;
-    static const int16_t byte_pitch = SCREENWIDTH;
 
     y -= patch->topoffset;
     x -= patch->leftoffset;
@@ -137,7 +134,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 
             int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
 
-            byte __far* dest = byte_topleft + (dc_yl * byte_pitch) + dc_x;
+            byte __far* dest = _g_screen_byte + (dc_yl * SCREENWIDTH) + dc_x;
 
             int16_t frac = 0;
 
@@ -147,7 +144,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
             while (count--)
             {
                 *dest = source[frac >> 8];
-                dest += byte_pitch;
+                dest += SCREENWIDTH;
                 frac += DYI;
             }
 
@@ -162,7 +159,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
     y -= patch->topoffset;
     x -= patch->leftoffset;
 
-    byte __far* desttop = (byte __far*)_g_screen;
+    byte __far* desttop = _g_screen_byte;
     desttop += (ScreenYToOffset(y) << 1) + x;
 
     int16_t width = patch->width;
@@ -220,13 +217,11 @@ void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
 //
 void V_FillRect(byte colour)
 {
-	_fmemset(_g_screen, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
+	_fmemset(_g_screen_byte, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
 }
 
 
 void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
-    byte __far * fb = (byte __far*)_g_screen;
-
-    fb[(ScreenYToOffset(y) << 1) + x] = color;
+    _g_screen_byte[(ScreenYToOffset(y) << 1) + x] = color;
 }
