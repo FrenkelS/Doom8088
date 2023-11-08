@@ -649,9 +649,9 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 	while (count--)
 	{
-		*d = color;
-		*(d+1) = color;
-		d += (SCREENWIDTH / 2);
+		*d++ = color;
+		*d   = color;
+		d += (SCREENWIDTH / 2)-1;
 	}
 }
 
