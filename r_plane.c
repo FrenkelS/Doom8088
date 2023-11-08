@@ -94,7 +94,7 @@ inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* sourc
 
     uint16_t __far* d = (uint16_t __far*) dest;
     *d++ = color;
-    *d++ = color;
+    *d   = color;
 }
 
 
