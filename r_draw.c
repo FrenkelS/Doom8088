@@ -642,12 +642,12 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 	const uint16_t color = (texture << 8) | texture;
 
-	uint16_t __far* dest = (uint16_t __far*)(_g_screen + ((ScreenYToOffset(dcvars->yl) + dcvars->x) << 1));
+	uint8_t __far* dest = _g_screen + ((dcvars->yl * (SCREENWIDTH / 2) + dcvars->x) << 1);
 
 	while (count--)
 	{
-		*dest = color;
-		dest += (SCREENWIDTH / 2);
+		*(uint16_t __far *)dest = color;
+		dest += SCREENWIDTH;
 	}
 }
 
