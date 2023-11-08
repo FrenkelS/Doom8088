@@ -577,7 +577,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     const byte __far* source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
-    uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+    uint16_t __far* dest = (uint16_t __far*)(_g_screen_byte + ((ScreenYToOffset(dcvars->yl) + dcvars->x) << 1));
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery) * dcvars->iscale) << COLEXTRABITS;
@@ -642,7 +642,7 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 	const uint16_t color = (texture << 8) | texture;
 
-	uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+	uint16_t __far* dest = (uint16_t __far*)(_g_screen_byte + ((ScreenYToOffset(dcvars->yl) + dcvars->x) << 1));
 
 	while (count--)
 	{
@@ -695,7 +695,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     const byte __far* colormap = &fullcolormap[6 * 256];
 
-    uint16_t __far* dest = _g_screen + ScreenYToOffset(dc_yl) + dcvars->x;
+    uint16_t __far* dest = (uint16_t __far*)(_g_screen_byte + ((ScreenYToOffset(dc_yl) + dcvars->x) << 1));
 
     static int16_t fuzzpos = 0;
 

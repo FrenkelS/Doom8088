@@ -232,7 +232,6 @@ extern visplane_t __far* _g_freetail;
 //******************************************************************************
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-extern uint16_t __far* _g_screen;
 extern uint8_t  __far* _g_screen_byte;
 
 //******************************************************************************
