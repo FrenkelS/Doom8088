@@ -48,9 +48,6 @@
 // VIDEO
 //
 
-#define ScreenYToOffset(x) (x * VIEWWINDOWWIDTH)
-
-
 void V_DrawBackground(void);
 
 void V_DrawRaw(const char *name, uint16_t offset);
