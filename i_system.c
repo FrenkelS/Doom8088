@@ -190,7 +190,7 @@ static uint8_t __far* screen;
 static uint8_t __far* backBuffer;
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-uint8_t  __far* _g_screen_byte;
+uint8_t  __far* _g_screen;
 
 static int8_t newpal;
 
@@ -283,7 +283,7 @@ void I_InitGraphics(void)
 
 void I_StartDisplay(void)
 {
-	_g_screen_byte = backBuffer;
+	_g_screen = backBuffer;
 }
 
 

@@ -232,7 +232,7 @@ extern visplane_t __far* _g_freetail;
 //******************************************************************************
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-extern uint8_t  __far* _g_screen_byte;
+extern uint8_t  __far* _g_screen;
 
 //******************************************************************************
 //wi_stuff.c

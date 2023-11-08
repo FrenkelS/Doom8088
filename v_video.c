@@ -56,7 +56,7 @@ void V_DrawBackground(void)
 {
     /* erase the entire screen to a tiled background */
     const byte __far* src = W_GetLumpByName("FLOOR4_8");
-    uint16_t __far* dest = (uint16_t __far*)_g_screen_byte;
+    uint16_t __far* dest = (uint16_t __far*)_g_screen;
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
     {
@@ -86,11 +86,11 @@ void V_DrawRaw(const char *name, uint16_t offset)
 	if (W_IsLumpCached(num) || Z_IsEnoughFreeMemory(lumpLength))
 	{
 		const uint8_t __far* lump = W_GetLumpByNum(num);
-		_fmemcpy(&_g_screen_byte[offset], lump, lumpLength);
+		_fmemcpy(&_g_screen[offset], lump, lumpLength);
 		Z_ChangeTagToCache(lump);
 	}
 	else
-		W_ReadLumpByName(name, &_g_screen_byte[offset]);
+		W_ReadLumpByName(name, &_g_screen[offset]);
 }
 
 
@@ -134,7 +134,7 @@ static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 
             int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
 
-            byte __far* dest = _g_screen_byte + (dc_yl * SCREENWIDTH) + dc_x;
+            byte __far* dest = _g_screen + (dc_yl * SCREENWIDTH) + dc_x;
 
             int16_t frac = 0;
 
@@ -159,7 +159,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
     y -= patch->topoffset;
     x -= patch->leftoffset;
 
-    byte __far* desttop = _g_screen_byte;
+    byte __far* desttop = _g_screen;
     desttop += (ScreenYToOffset(y) << 1) + x;
 
     int16_t width = patch->width;
@@ -217,11 +217,11 @@ void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
 //
 void V_FillRect(byte colour)
 {
-	_fmemset(_g_screen_byte, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
+	_fmemset(_g_screen, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
 }
 
 
 void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
-    _g_screen_byte[(ScreenYToOffset(y) << 1) + x] = color;
+    _g_screen[(ScreenYToOffset(y) << 1) + x] = color;
 }
