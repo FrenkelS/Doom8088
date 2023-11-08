@@ -56,13 +56,12 @@ void V_DrawBackground(void)
 {
     /* erase the entire screen to a tiled background */
     const byte __far* src = W_GetLumpByName("FLOOR4_8");
-    uint16_t __far* dest = (uint16_t __far*)_g_screen;
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
     {
         for(uint16_t x = 0; x < SCREENWIDTH; x+=64)
         {
-            uint16_t __far* d = &dest[ ScreenYToOffset(y) + (x >> 1)];
+            uint8_t __far* d = &_g_screen[y * SCREENWIDTH + x];
             const byte __far* s = &src[((y&63) * 64) + (x&63)];
 
             uint8_t len = 64;
@@ -159,8 +158,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
     y -= patch->topoffset;
     x -= patch->leftoffset;
 
-    byte __far* desttop = _g_screen;
-    desttop += (ScreenYToOffset(y) << 1) + x;
+    byte __far* desttop = _g_screen + (y * SCREENWIDTH) + x;
 
     int16_t width = patch->width;
 
@@ -172,7 +170,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
         while (column->topdelta != 0xff)
         {
             const byte __far* source = (const byte __far*)column + 3;
-            byte __far* dest = desttop + (ScreenYToOffset(column->topdelta) << 1);
+            byte __far* dest = desttop + (column->topdelta * SCREENWIDTH);
 
             uint16_t count = column->length;
 
@@ -223,5 +221,5 @@ void V_FillRect(byte colour)
 
 void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
-    _g_screen[(ScreenYToOffset(y) << 1) + x] = color;
+    _g_screen[y * SCREENWIDTH + x] = color;
 }
