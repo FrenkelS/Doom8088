@@ -202,7 +202,7 @@ uint8_t __far* I_GetBackBuffer(void)
 
 void I_CopyBackBufferToBuffer(uint8_t __far* buffer)
 {
-	_fmemcpy(buffer, backBuffer, 1u * SCREENWIDTH * SCREENHEIGHT);
+	_fmemcpy(buffer, backBuffer, SCREENWIDTH * SCREENHEIGHT);
 }
 
 
@@ -276,8 +276,8 @@ void I_InitGraphics(void)
 	__djgpp_nearptr_enable();
 	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 
-	backBuffer = Z_MallocStatic(1u * SCREENWIDTH * SCREENHEIGHT);
-	_fmemset(backBuffer, 0, 1u * SCREENWIDTH * SCREENHEIGHT);
+	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
+	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT);
 }
 
 
