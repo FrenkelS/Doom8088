@@ -60,15 +60,15 @@ void V_DrawBackground(void)
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
     {
-        for(uint16_t x = 0; x < 240; x+=64)
+        for(uint16_t x = 0; x < SCREENWIDTH; x+=64)
         {
             uint16_t __far* d = &dest[ ScreenYToOffset(y) + (x >> 1)];
             const byte __far* s = &src[((y&63) * 64) + (x&63)];
 
             uint8_t len = 64;
 
-            if( (240-x) < 64)
-                len = 240-x;
+            if (SCREENWIDTH - x < 64)
+                len = SCREENWIDTH - x;
 
             _fmemcpy(d, s, len);
         }
