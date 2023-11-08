@@ -558,11 +558,11 @@ const lighttable_t* R_LoadColorMap(int16_t lightlevel)
 #define COLEXTRABITS 9
 #define COLBITS (FRACBITS + COLEXTRABITS)
 
-inline static void R_DrawColumnPixel(uint16_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t frac)
+inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t frac)
 {
 	uint16_t color = colormap[source[frac>>COLBITS]];
 
-	*dest = (color | (color << 8));
+	*(uint16_t __far*)dest = (color | (color << 8));
 }
 
 
@@ -577,7 +577,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     const byte __far* source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
-    uint16_t __far* dest = (uint16_t __far*)(_g_screen + ((dcvars->yl * (SCREENWIDTH / 2) + dcvars->x) << 1));
+    uint8_t __far* dest = _g_screen + ((dcvars->yl * (SCREENWIDTH / 2) + dcvars->x) << 1);
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
     uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery) * dcvars->iscale) << COLEXTRABITS;
@@ -590,43 +590,43 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
 
     while (l--)
     {
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
     }
 
     switch (count & 15)
     {
-        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
-        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=(SCREENWIDTH / 2); frac+=fracstep;
+        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
         case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
     }
 }
@@ -695,14 +695,14 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     const byte __far* colormap = &fullcolormap[6 * 256];
 
-    uint16_t __far* dest = (uint16_t __far*)(_g_screen + ((dc_yl * (SCREENWIDTH / 2) + dcvars->x) << 1));
+    uint8_t __far* dest = _g_screen + ((dc_yl * (SCREENWIDTH / 2) + dcvars->x) << 1);
 
     static int16_t fuzzpos = 0;
 
     do
     {        
-        R_DrawColumnPixel(dest, (const byte __far*)&dest[fuzzoffset[fuzzpos]], colormap, 0);
-        dest += (SCREENWIDTH / 2);
+        R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 2], colormap, 0);
+        dest += SCREENWIDTH;
 
         fuzzpos++;
         if (fuzzpos >= FUZZTABLE)
