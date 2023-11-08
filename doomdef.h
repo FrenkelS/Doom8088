@@ -59,7 +59,7 @@
 #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings
 
 
-#define VIEWWINDOWWIDTH  120
+#define VIEWWINDOWWIDTH  60
 #define VIEWWINDOWHEIGHT 128
 
 // SCREENWIDTH and SCREENHEIGHT define the visible size
