@@ -54,7 +54,7 @@ static int16_t firstflat;
 #if defined FLAT_SPAN
 static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint16_t color)
 {
-	uint8_t __far* dest = _g_screen + ((ScreenYToOffset(y) + x1) << 1);
+	uint8_t __far* dest = _g_screen + (y * SCREENWIDTH) + (x1 << 1);
 
 	uint16_t count = x2 - x1;
 
@@ -110,7 +110,7 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_var
     const byte __far* source = dsvars->source;
     const byte *colormap = dsvars->colormap;
 
-    uint16_t __far* dest = (uint16_t __far*)(_g_screen + ((ScreenYToOffset(y) + x1) << 1));
+    uint16_t __far* dest = (uint16_t __far*)(_g_screen + (y * SCREENWIDTH) + (x1 << 1));
 
     const uint32_t step = dsvars->step;
     uint32_t position = dsvars->position;
