@@ -87,11 +87,14 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
 #else
 
 
-inline static void R_DrawSpanPixel(uint16_t __far* dest, const byte __far* source, const byte* colormap, uint32_t position)
+inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte* colormap, uint32_t position)
 {
     uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
+    color = color | (color << 8);
 
-    *dest = color | (color << 8);
+    uint16_t __far* d = (uint16_t __far*) dest;
+    *d++ = color;
+    *d++ = color;
 }
 
 
@@ -110,7 +113,7 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_var
     const byte __far* source = dsvars->source;
     const byte *colormap = dsvars->colormap;
 
-    uint16_t __far* dest = (uint16_t __far*)(_g_screen + (y * SCREENWIDTH) + (x1 << 2));
+    uint32_t __far* dest = (uint32_t __far*)(_g_screen + (y * SCREENWIDTH) + (x1 << 2));
 
     const uint32_t step = dsvars->step;
     uint32_t position = dsvars->position;
@@ -317,14 +320,14 @@ void R_ClearPlanes(void)
         floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
 
 
-    for (int8_t i = 0; i < MAXVISPLANES; i++)    // new code -- killough
+    for (int8_t i = 0; i < MAXVISPLANES; i++)
         for (*freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *freehead; )
             freehead = &(*freehead)->next;
 
     R_ClearOpenings();
 
 #if !defined FLAT_SPAN
-    static const fixed_t iprojection = 1092; //( (1 << FRACUNIT) / (VIEWWINDOWWIDTH / 2))
+    static const fixed_t iprojection = (1L << FRACBITS) / (VIEWWINDOWWIDTH / 2);
 
     basexscale = FixedMul(viewsin,iprojection);
     baseyscale = FixedMul(viewcos,iprojection);
