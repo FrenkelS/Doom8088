@@ -56,7 +56,7 @@ void V_DrawBackground(void)
 {
     /* erase the entire screen to a tiled background */
     const byte __far* src = W_GetLumpByName("FLOOR4_8");
-    uint16_t __far* dest = _g_screen;
+    uint16_t __far* dest = (uint16_t __far*)_g_screen_byte;
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
     {
