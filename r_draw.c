@@ -240,22 +240,16 @@ visplane_t __far*__far* freehead;
 // Constants
 //*****************************************
 
-//Approx Reciprocal of v
-#define FixedReciprocal(v) 0xffffffff/(v)
+static const int16_t CENTERX = VIEWWINDOWWIDTH  / 2;
+static const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
 
-static const int16_t centery = VIEWWINDOWHEIGHT / 2;
-static const int32_t centerxfrac = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
-static const int32_t centeryfrac = ((int32_t)(VIEWWINDOWHEIGHT / 2)) << FRACBITS;
+static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 
-static const fixed_t projection = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
+static const int16_t PROJECTIONYINT = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 1L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2);
+static const fixed_t PROJECTIONY    = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 1L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
 
-static const fixed_t projectiony = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 1L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
-
-static const int16_t pspritescale  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
-static const fixed_t pspriteiscale = FRACUNIT * SCREENWIDTH_VGA / VIEWWINDOWWIDTH;
-
-static const uint16_t pspriteyscale = (((int32_t)SCREENHEIGHT) << FRACBITS) / SCREENHEIGHT_VGA;
-static const fixed_t pspriteyiscale = FixedReciprocal((((int32_t)SCREENHEIGHT) << FRACBITS) / SCREENHEIGHT_VGA);
+static const int16_t  PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
+static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_VGA;
 
 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
@@ -304,6 +298,10 @@ fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 		return r.ll / b;
 	}
 }
+
+
+//Approx Reciprocal of v
+#define FixedReciprocal(v) 0xffffffff/(v)
 
 
 //
@@ -573,10 +571,10 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     const byte __far* source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
-    uint8_t __far* dest = _g_screen + (dcvars->yl * 80) + dcvars->x;
+    uint8_t __far* dest = _g_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
-    uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery) * dcvars->iscale) << COLEXTRABITS;
+    uint32_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) << COLEXTRABITS;
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
@@ -586,43 +584,43 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
 
     while (l--)
     {
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
     }
 
     switch (count & 15)
     {
-        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
-        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=80; frac+=fracstep;
+        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
         case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
     }
 }
@@ -638,12 +636,12 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 	const uint8_t color = texture;
 
-	uint8_t __far* dest = _g_screen + (dcvars->yl * 80) + dcvars->x;
+	uint8_t __far* dest = _g_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
 	while (count--)
 	{
 		*dest = color;
-		dest += 80;
+		dest += PLANEWIDTH;
 	}
 }
 
@@ -691,7 +689,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     const byte __far* colormap = &fullcolormap[6 * 256];
 
-    uint8_t __far* dest = _g_screen + (dc_yl * 80) + dcvars->x;
+    uint8_t __far* dest = _g_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
 
     static int16_t fuzzpos = 0;
 
@@ -699,7 +697,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
     {        
         //R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], colormap, 0);
         *dest = 0;
-        dest += 80;
+		dest += PLANEWIDTH;
 
         fuzzpos++;
         if (fuzzpos >= FUZZTABLE)
@@ -826,7 +824,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
     frac = vis->startfrac;
 
     spryscale = vis->scale;
-    sprtopscreen = centeryfrac - FixedMul(dcvars.texturemid, spryscale);
+    sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
 
     const patch_t __far* patch = W_GetLumpByNum(vis->lump_num);
@@ -950,7 +948,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 
         if (xc != SHRT_MAX) // dropoff overflow
         {
-            sprtopscreen = centeryfrac - FixedMul(dcvars.texturemid, spryscale);
+            sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
             dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
 
@@ -1108,16 +1106,15 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 
     const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
-    fixed_t       tx;
-    tx = psp->sx-160*FRACUNIT;
+    fixed_t tx = psp->sx - (SCREENWIDTH_VGA / 2) * FRACUNIT;
 
-    tx -= ((int32_t)patch->leftoffset)<<FRACBITS;
-    x1 = (centerxfrac + FixedMul (tx, pspritescale))>>FRACBITS;
+    tx -= ((int32_t)patch->leftoffset) << FRACBITS;
+    x1 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS);
 
-    tx += ((int32_t)patch->width)<<FRACBITS;
-    x2 = ((centerxfrac + FixedMul (tx, pspritescale) ) >>FRACBITS) - 1;
+    tx += ((int32_t)patch->width) << FRACBITS;
+    x2 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS) - 1;
 
-    topoffset = ((int32_t)patch->topoffset)<<FRACBITS;
+    topoffset = ((int32_t)patch->topoffset) << FRACBITS;
 
 
 
@@ -1136,17 +1133,17 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     vis->x1 = x1 < 0 ? 0 : x1;
     vis->x2 = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
     // proff 11/06/98: Added for high-res
-    vis->scale = pspriteyscale;
-    vis->iscale = pspriteyiscale;
+    vis->scale = PSPRITEYSCALE;
+    vis->iscale = FixedReciprocal(PSPRITEYSCALE);
 
     if (flip)
     {
-        vis->xiscale = - pspriteiscale;
-        vis->startfrac = (((int32_t)patch->width)<<FRACBITS)-1;
+        vis->xiscale = - FixedReciprocal(PSPRITESCALE);
+        vis->startfrac = (((int32_t)patch->width) << FRACBITS) - 1;
     }
     else
     {
-        vis->xiscale = pspriteiscale;
+        vis->xiscale = FixedReciprocal(PSPRITESCALE);
         vis->startfrac = 0;
     }
 
@@ -1299,7 +1296,7 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
   int32_t     den = FixedMul(rw_distance, finesine(anglea));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = FixedMul(projectiony, finesine(angleb));
+  fixed_t num = PROJECTIONYINT * finesine(angleb);
 
   return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
@@ -1363,18 +1360,20 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     else
         tx -= ((int32_t)patch->leftoffset) << FRACBITS;
 
-    const fixed_t xscale = FixedDiv(projection, tz);
+    const fixed_t xscale = FixedDiv(PROJECTION, tz);
 
-    fixed_t xl = (centerxfrac + FixedMul(tx,xscale));
+    fixed_t xl = CENTERX * FRACUNIT + FixedMul(tx,xscale);
+    const int16_t x1 = (xl >> FRACBITS);
 
     // off the side?
-    if (xl >> FRACBITS > VIEWWINDOWWIDTH)
+    if (x1 > VIEWWINDOWWIDTH)
     {
         Z_ChangeTagToCache(patch);
         return;
     }
 
-    fixed_t xr = (centerxfrac + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale)) - FRACUNIT;
+    fixed_t xr = CENTERX * FRACUNIT + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale) - FRACUNIT;
+    const int16_t x2 = (xr >> FRACBITS);
 
     // off the side?
     if (xr < 0)
@@ -1391,9 +1390,6 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     }
 
 
-    const int16_t x1 = (xl >> FRACBITS);
-    const int16_t x2 = (xr >> FRACBITS);
-
     // store information in a vissprite
     vissprite_t* vis = R_NewVisSprite ();
 
@@ -1404,7 +1400,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
         return;
     }
 
-    vis->scale           = FixedDiv(projectiony, tz);
+    vis->scale           = FixedDiv(PROJECTIONY, tz);
     vis->iscale          = tz >> 7;
     vis->lump_num        = sprframe->lump[rot];
     vis->patch_topoffset = patch->topoffset;
@@ -2192,10 +2188,10 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     worldbottom >>= 4;
 
     topstep = -FixedMul (rw_scalestep, worldtop);
-    topfrac = (centeryfrac>>4) - FixedMul (worldtop, rw_scale);
+    topfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldtop, rw_scale);
 
     bottomstep = -FixedMul (rw_scalestep,worldbottom);
-    bottomfrac = (centeryfrac>>4) - FixedMul (worldbottom, rw_scale);
+    bottomfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldbottom, rw_scale);
 
     if (backsector)
     {
@@ -2204,12 +2200,12 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 
         if (worldhigh < worldtop)
         {
-            pixhigh = (centeryfrac>>4) - FixedMul (worldhigh, rw_scale);
+            pixhigh = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldhigh, rw_scale);
             pixhighstep = -FixedMul (rw_scalestep,worldhigh);
         }
         if (worldlow > worldbottom)
         {
-            pixlow = (centeryfrac>>4) - FixedMul (worldlow, rw_scale);
+            pixlow = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldlow, rw_scale);
             pixlowstep = -FixedMul (rw_scalestep,worldlow);
         }
     }

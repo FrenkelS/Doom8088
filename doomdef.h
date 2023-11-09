@@ -68,6 +68,7 @@
 
 #define SCREENWIDTH_VGA  320
 #define SCREENHEIGHT_VGA 200
+#define PLANEWIDTH        80
 
 
 // The maximum number of players, multiplayer/networking.
