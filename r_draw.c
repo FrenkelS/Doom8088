@@ -244,9 +244,9 @@ static const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
 static const int32_t CENTERXFRAC = (VIEWWINDOWWIDTH  / 2L) << FRACBITS;
 static const int32_t CENTERYFRAC = (VIEWWINDOWHEIGHT / 2L) << FRACBITS;
 
-static const fixed_t projection = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
+static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 
-static const fixed_t projectiony = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
+static const fixed_t PROJECTIONY = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
 
 static const int16_t  PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
 static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_VGA;
@@ -1297,7 +1297,7 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
   int32_t     den = FixedMul(rw_distance, finesine(anglea));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = FixedMul(projectiony, finesine(angleb));
+  fixed_t num = FixedMul(PROJECTIONY, finesine(angleb));
 
   return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
@@ -1361,7 +1361,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     else
         tx -= ((int32_t)patch->leftoffset) << FRACBITS;
 
-    const fixed_t xscale = FixedDiv(projection, tz);
+    const fixed_t xscale = FixedDiv(PROJECTION, tz);
 
     fixed_t xl = CENTERXFRAC + FixedMul(tx,xscale);
 
@@ -1402,7 +1402,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
         return;
     }
 
-    vis->scale           = FixedDiv(projectiony, tz);
+    vis->scale           = FixedDiv(PROJECTIONY, tz);
     vis->iscale          = tz >> 7;
     vis->lump_num        = sprframe->lump[rot];
     vis->patch_topoffset = patch->topoffset;
