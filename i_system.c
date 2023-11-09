@@ -186,7 +186,9 @@ void I_StartTic(void)
 //
 
 static boolean isGraphicsModeSet = false;
-static uint8_t __far* screen;
+static uint8_t __far* screen0;
+static uint8_t __far* screen1;
+static int16_t activescreen;
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
 uint8_t  __far* _g_screen;
@@ -195,7 +197,7 @@ static int8_t newpal;
 
 uint8_t __far* I_GetBackBuffer(void)
 {
-	return screen;
+	return activescreen == 0 ? screen0 : screen1;
 }
 
 
@@ -239,6 +241,21 @@ static void I_UploadNewPalette(int8_t pal)
 }
 
 
+#define SC_INDEX                0x3c4
+#define SC_MAPMASK              2
+#define SC_MEMMODE              4
+
+#define CRTC_INDEX              0x3d4
+#define CRTC_STARTHIGH          12
+#define CRTC_UNDERLINE          20
+#define CRTC_MODE               23
+
+#define GC_INDEX                0x3ce
+#define GC_READMAP              4
+#define GC_MODE                 5
+#define GC_MISCELLANEOUS        6
+
+
 //
 // I_FinishUpdate
 //
@@ -253,7 +270,10 @@ void I_FinishUpdate (void)
 		newpal = NO_PALETTE_CHANGE;
 	}
 
-	//I_DrawBuffer(backBuffer);
+	// page flip
+	outp(CRTC_INDEX, CRTC_STARTHIGH);
+	outp(CRTC_INDEX + 1, activescreen);
+	activescreen = 0x40 - activescreen;
 }
 
 
@@ -266,28 +286,16 @@ void I_SetPalette (int8_t pal)
 }
 
 
-#define SC_INDEX                0x3c4
-#define SC_MAPMASK              2
-#define SC_MEMMODE              4
-
-#define CRTC_INDEX              0x3d4
-#define CRTC_UNDERLINE          20
-#define CRTC_MODE               23
-
-#define GC_INDEX                0x3ce
-#define GC_READMAP              4
-#define GC_MODE                 5
-#define GC_MISCELLANEOUS        6
-
-
 void I_InitGraphics(void)
 {	
 	I_SetScreenMode(0x13);
 	I_UploadNewPalette(0);
 	isGraphicsModeSet = true;
 
-	__djgpp_nearptr_enable();
-	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
+	__djgpp_nearptr_enable();	
+	screen0 = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
+	screen1 = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
+	activescreen = 0x40;
 
 	outp(SC_INDEX, SC_MEMMODE);
 	outp(SC_INDEX + 1, (inp(SC_INDEX + 1) & ~8) | 4);
@@ -300,7 +308,7 @@ void I_InitGraphics(void)
 
 	outpw(SC_INDEX, SC_MAPMASK | (15 << 8));
 
-	_fmemset(screen, 0, 0xffff);
+	_fmemset(screen0, 0, 0xffff);
 
 	outp(CRTC_INDEX, CRTC_UNDERLINE);
 	outp(CRTC_INDEX + 1,inp(CRTC_INDEX + 1) & ~0x40);
@@ -317,14 +325,14 @@ void I_InitGraphics(void)
 
 void I_StartDisplay(void)
 {
-	_g_screen = screen;
+	_g_screen = I_GetBackBuffer();
 }
 
 
 void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
-	uint8_t __far* dst = screen;
+	uint8_t __far* dst = I_GetBackBuffer();
 
 #if defined DISABLE_STATUS_BAR
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
