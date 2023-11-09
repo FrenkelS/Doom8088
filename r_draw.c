@@ -1109,10 +1109,10 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     fixed_t tx = psp->sx - (SCREENWIDTH_VGA / 2) * FRACUNIT;
 
     tx -= ((int32_t)patch->leftoffset) << FRACBITS;
-    x1 = (CENTERX * FRACUNIT + FixedMul(tx, PSPRITESCALE)) >> FRACBITS;
+    x1 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS);
 
     tx += ((int32_t)patch->width) << FRACBITS;
-    x2 = ((CENTERX * FRACUNIT + FixedMul(tx, PSPRITESCALE)) >> FRACBITS) - 1;
+    x2 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS) - 1;
 
     topoffset = ((int32_t)patch->topoffset) << FRACBITS;
 
@@ -1363,15 +1363,17 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     const fixed_t xscale = FixedDiv(PROJECTION, tz);
 
     fixed_t xl = CENTERX * FRACUNIT + FixedMul(tx,xscale);
+    const int16_t x1 = (xl >> FRACBITS);
 
     // off the side?
-    if (xl >> FRACBITS > VIEWWINDOWWIDTH)
+    if (x1 > VIEWWINDOWWIDTH)
     {
         Z_ChangeTagToCache(patch);
         return;
     }
 
     fixed_t xr = CENTERX * FRACUNIT + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale) - FRACUNIT;
+    const int16_t x2 = (xr >> FRACBITS);
 
     // off the side?
     if (xr < 0)
@@ -1387,9 +1389,6 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
         return;
     }
 
-
-    const int16_t x1 = (xl >> FRACBITS);
-    const int16_t x2 = (xr >> FRACBITS);
 
     // store information in a vissprite
     vissprite_t* vis = R_NewVisSprite ();
