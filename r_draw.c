@@ -240,9 +240,8 @@ visplane_t __far*__far* freehead;
 // Constants
 //*****************************************
 
+static const int16_t CENTERX = VIEWWINDOWWIDTH  / 2;
 static const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
-static const int32_t CENTERXFRAC = (VIEWWINDOWWIDTH  / 2L) << FRACBITS;
-static const int32_t CENTERYFRAC = (VIEWWINDOWHEIGHT / 2L) << FRACBITS;
 
 static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 
@@ -825,7 +824,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
     frac = vis->startfrac;
 
     spryscale = vis->scale;
-    sprtopscreen = CENTERYFRAC - FixedMul(dcvars.texturemid, spryscale);
+    sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
 
     const patch_t __far* patch = W_GetLumpByNum(vis->lump_num);
@@ -949,7 +948,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 
         if (xc != SHRT_MAX) // dropoff overflow
         {
-            sprtopscreen = CENTERYFRAC - FixedMul(dcvars.texturemid, spryscale);
+            sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
             dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
 
@@ -1110,10 +1109,10 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     fixed_t tx = psp->sx - (SCREENWIDTH_VGA / 2) * FRACUNIT;
 
     tx -= ((int32_t)patch->leftoffset) << FRACBITS;
-    x1 = (CENTERXFRAC + FixedMul(tx, PSPRITESCALE)) >> FRACBITS;
+    x1 = (CENTERX * FRACUNIT + FixedMul(tx, PSPRITESCALE)) >> FRACBITS;
 
     tx += ((int32_t)patch->width) << FRACBITS;
-    x2 = ((CENTERXFRAC + FixedMul(tx, PSPRITESCALE)) >> FRACBITS) - 1;
+    x2 = ((CENTERX * FRACUNIT + FixedMul(tx, PSPRITESCALE)) >> FRACBITS) - 1;
 
     topoffset = ((int32_t)patch->topoffset) << FRACBITS;
 
@@ -1363,7 +1362,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
 
     const fixed_t xscale = FixedDiv(PROJECTION, tz);
 
-    fixed_t xl = CENTERXFRAC + FixedMul(tx,xscale);
+    fixed_t xl = CENTERX * FRACUNIT + FixedMul(tx,xscale);
 
     // off the side?
     if (xl >> FRACBITS > VIEWWINDOWWIDTH)
@@ -1372,7 +1371,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
         return;
     }
 
-    fixed_t xr = CENTERXFRAC + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale) - FRACUNIT;
+    fixed_t xr = CENTERX * FRACUNIT + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale) - FRACUNIT;
 
     // off the side?
     if (xr < 0)
@@ -2190,10 +2189,10 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     worldbottom >>= 4;
 
     topstep = -FixedMul (rw_scalestep, worldtop);
-    topfrac = (CENTERYFRAC >> 4) - FixedMul(worldtop, rw_scale);
+    topfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldtop, rw_scale);
 
     bottomstep = -FixedMul (rw_scalestep,worldbottom);
-    bottomfrac = (CENTERYFRAC >> 4) - FixedMul(worldbottom, rw_scale);
+    bottomfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldbottom, rw_scale);
 
     if (backsector)
     {
@@ -2202,12 +2201,12 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 
         if (worldhigh < worldtop)
         {
-            pixhigh = (CENTERYFRAC >> 4) - FixedMul(worldhigh, rw_scale);
+            pixhigh = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldhigh, rw_scale);
             pixhighstep = -FixedMul (rw_scalestep,worldhigh);
         }
         if (worldlow > worldbottom)
         {
-            pixlow = (CENTERYFRAC >> 4) - FixedMul(worldlow, rw_scale);
+            pixlow = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldlow, rw_scale);
             pixlowstep = -FixedMul (rw_scalestep,worldlow);
         }
     }
