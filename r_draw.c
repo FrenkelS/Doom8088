@@ -240,7 +240,7 @@ visplane_t __far*__far* freehead;
 // Constants
 //*****************************************
 
-static const int16_t centery = VIEWWINDOWHEIGHT / 2;
+static const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
 static const int32_t centerxfrac = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
 static const int32_t centeryfrac = ((int32_t)(VIEWWINDOWHEIGHT / 2)) << FRACBITS;
 
@@ -576,7 +576,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     uint8_t __far* dest = _g_screen + ((dcvars->yl * (SCREENWIDTH / 2) + dcvars->x) << 1);
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
-    uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery) * dcvars->iscale) << COLEXTRABITS;
+    uint32_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) << COLEXTRABITS;
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
