@@ -240,7 +240,6 @@ visplane_t __far*__far* freehead;
 // Constants
 //*****************************************
 
-static const int16_t viewheight = VIEWWINDOWHEIGHT;
 static const int16_t centery = VIEWWINDOWHEIGHT / 2;
 static const int32_t centerxfrac = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
 static const int32_t centeryfrac = ((int32_t)(VIEWWINDOWHEIGHT / 2)) << FRACBITS;
@@ -681,8 +680,8 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
         dc_yl = 1;
 
     // .. and high.
-    if (dc_yh >= viewheight-1)
-        dc_yh = viewheight - 2;
+    if (dc_yh >= VIEWWINDOWHEIGHT - 1)
+        dc_yh = VIEWWINDOWHEIGHT - 2;
 
     int16_t count = (dc_yh - dc_yl) + 1;
 
@@ -741,7 +740,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
             yl = cclip_x + 1;
 
         // killough 3/2/98, 3/27/98: Failsafe against overflow/crash:
-        if (yl <= yh && yh < viewheight)
+        if (yl <= yh && yh < VIEWWINDOWHEIGHT)
         {
             dcvars->source =  (const byte __far*)column + 3;
 
@@ -1009,7 +1008,7 @@ static void R_DrawSprite (const vissprite_t* spr)
 
     for (int16_t x = spr->x1; x <= spr->x2; x++)
     {
-        clipbot[x] = viewheight;
+        clipbot[x] = VIEWWINDOWHEIGHT;
         cliptop[x] = -1;
     }
 
@@ -1058,7 +1057,7 @@ static void R_DrawSprite (const vissprite_t* spr)
         {
             for (int16_t x = r1; x <= r2; x++)
             {
-                if (clipbot[x] == viewheight)
+                if (clipbot[x] == VIEWWINDOWHEIGHT)
                     clipbot[x] = ds->sprbottomclip[x];
             }
         }
@@ -1849,7 +1848,7 @@ static void R_RenderSegLoop (int16_t rw_x)
 
             R_DrawSegTextureColumn(midtexture, texturecolumn, &dcvars);
 
-            cc_rwx = viewheight;
+            cc_rwx = VIEWWINDOWHEIGHT;
             fc_rwx = -1;
         }
         else
