@@ -249,10 +249,8 @@ static const fixed_t projection = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
 
 static const fixed_t projectiony = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
 
-static const int16_t pspritescale  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
-static const fixed_t pspriteiscale = FRACUNIT * SCREENWIDTH_VGA / VIEWWINDOWWIDTH;
-
-static const uint16_t PSPRITEYSCALE = (((int32_t)SCREENHEIGHT) << FRACBITS) / SCREENHEIGHT_VGA;
+static const int16_t  PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
+static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_VGA;
 
 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
@@ -1110,16 +1108,15 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 
     const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
-    fixed_t       tx;
-    tx = psp->sx-160*FRACUNIT;
+    fixed_t tx = psp->sx - (SCREENWIDTH_VGA / 2) * FRACUNIT;
 
-    tx -= ((int32_t)patch->leftoffset)<<FRACBITS;
-    x1 = (centerxfrac + FixedMul (tx, pspritescale))>>FRACBITS;
+    tx -= ((int32_t)patch->leftoffset) << FRACBITS;
+    x1 = (centerxfrac + FixedMul(tx, PSPRITESCALE)) >> FRACBITS;
 
-    tx += ((int32_t)patch->width)<<FRACBITS;
-    x2 = ((centerxfrac + FixedMul (tx, pspritescale) ) >>FRACBITS) - 1;
+    tx += ((int32_t)patch->width) << FRACBITS;
+    x2 = ((centerxfrac + FixedMul(tx, PSPRITESCALE)) >> FRACBITS) - 1;
 
-    topoffset = ((int32_t)patch->topoffset)<<FRACBITS;
+    topoffset = ((int32_t)patch->topoffset) << FRACBITS;
 
 
 
@@ -1143,12 +1140,12 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 
     if (flip)
     {
-        vis->xiscale = - pspriteiscale;
-        vis->startfrac = (((int32_t)patch->width)<<FRACBITS)-1;
+        vis->xiscale = - FixedReciprocal(PSPRITESCALE);
+        vis->startfrac = (((int32_t)patch->width) << FRACBITS) - 1;
     }
     else
     {
-        vis->xiscale = pspriteiscale;
+        vis->xiscale = FixedReciprocal(PSPRITESCALE);
         vis->startfrac = 0;
     }
 
