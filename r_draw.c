@@ -245,7 +245,8 @@ static const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
 
 static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 
-static const fixed_t PROJECTIONY = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
+static const int16_t PROJECTIONYINT = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2);
+static const fixed_t PROJECTIONY    = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
 
 static const int16_t  PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
 static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_VGA;
@@ -1296,7 +1297,7 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
   int32_t     den = FixedMul(rw_distance, finesine(anglea));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = FixedMul(PROJECTIONY, finesine(angleb));
+  fixed_t num = PROJECTIONYINT * finesine(angleb);
 
   return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
