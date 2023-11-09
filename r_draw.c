@@ -240,6 +240,9 @@ visplane_t __far*__far* freehead;
 // Constants
 //*****************************************
 
+//Approx Reciprocal of v
+#define FixedReciprocal(v) 0xffffffff/(v)
+
 static const int16_t viewheight = VIEWWINDOWHEIGHT;
 static const int16_t centery = VIEWWINDOWHEIGHT / 2;
 static const int32_t centerxfrac = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
@@ -249,11 +252,11 @@ static const fixed_t projection = ((int32_t)(VIEWWINDOWWIDTH / 2)) << FRACBITS;
 
 static const fixed_t projectiony = ((SCREENHEIGHT * (VIEWWINDOWWIDTH / 2L) * SCREENWIDTH_VGA) / SCREENHEIGHT_VGA) / (SCREENWIDTH / 2) * FRACUNIT;
 
-static const int16_t pspritescale = FRACUNIT * (SCREENWIDTH / 2) / SCREENWIDTH_VGA;
-static const fixed_t pspriteiscale = FRACUNIT * SCREENWIDTH_VGA / (SCREENWIDTH / 2);
+static const int16_t pspritescale  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
+static const fixed_t pspriteiscale = FRACUNIT * SCREENWIDTH_VGA / VIEWWINDOWWIDTH;
 
 static const uint16_t pspriteyscale = (((int32_t)SCREENHEIGHT) << FRACBITS) / SCREENHEIGHT_VGA;
-static const fixed_t pspriteyiscale = ((UINT32_MAX) / ((((int32_t)SCREENHEIGHT) << FRACBITS) / SCREENHEIGHT_VGA));
+static const fixed_t pspriteyiscale = FixedReciprocal((((int32_t)SCREENHEIGHT) << FRACBITS) / SCREENHEIGHT_VGA);
 
 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
@@ -302,10 +305,6 @@ fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 		return r.ll / b;
 	}
 }
-
-
-//Approx Reciprocal of v
-#define FixedReciprocal(v) 0xffffffff/(v)
 
 
 //
