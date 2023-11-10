@@ -1360,7 +1360,8 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     else
         tx -= ((int32_t)patch->leftoffset) << FRACBITS;
 
-    const fixed_t xscale = FixedDiv(PROJECTION, tz);
+    //const fixed_t xscale = FixedDiv(PROJECTION, tz);
+    const fixed_t xscale = PROJECTION / (tz >> FRACBITS);
 
     fixed_t xl = CENTERX * FRACUNIT + FixedMul(tx,xscale);
     const int16_t x1 = (xl >> FRACBITS);
@@ -1400,7 +1401,8 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
         return;
     }
 
-    vis->scale           = FixedDiv(PROJECTIONY, tz);
+    //vis->scale           = FixedDiv(PROJECTIONY, tz);
+    vis->scale           = PROJECTIONY / (tz >> FRACBITS);
     vis->iscale          = tz >> 7;
     vis->lump_num        = sprframe->lump[rot];
     vis->patch_topoffset = patch->topoffset;
