@@ -697,7 +697,7 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
     {        
         //R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], colormap, 0);
         *dest = 0;
-		dest += PLANEWIDTH;
+        dest += PLANEWIDTH;
 
         fuzzpos++;
         if (fuzzpos >= FUZZTABLE)
