@@ -639,6 +639,23 @@ void A_Look(mobj_t __far* actor)
     P_SetMobjState(actor, mobjinfo[actor->type].seestate);
 }
 
+
+/* The sound it makes when it attacks */
+static sfxenum_t getAttackSound(uint16_t type)
+{
+	switch (type)
+	{
+		case 1:
+			return sfx_pistol;
+		case 4:
+		case 5:
+			return sfx_sgtatk;
+		default:
+			return sfx_None;
+	}
+}
+
+
 //
 // A_Chase
 // Actor has a melee attack,
@@ -690,8 +707,9 @@ void A_Chase(mobj_t __far* actor)
     // check for melee attack
     if (mobjinfo[actor->type].meleestate && P_CheckMeleeRange(actor))
     {
-        if (mobjinfo[actor->type].attacksound)
-            S_StartSound(actor, mobjinfo[actor->type].attacksound);
+        sfxenum_t attacksound = getAttackSound(actor->type);
+        if (attacksound)
+            S_StartSound(actor, attacksound);
 
         P_SetMobjState(actor, mobjinfo[actor->type].meleestate);
         /* killough 8/98: remember an attack

@@ -543,7 +543,6 @@ typedef struct
   int16_t reactiontime; /* How many tics it waits after it wakes up
            before it will start to attack, in normal
            skills (halved for nightmare) */
-  sfxenum_t attacksound;  /* The sound it makes when it attacks */
   statenum_t painstate;    /* The state to indicate pain */
   uint8_t painchance;   /* A number that is checked against a random
            number 0-255 to see if the Thing is supposed

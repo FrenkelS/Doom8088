@@ -449,7 +449,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_PLAY_RUN1,    // seestate
     sfx_None,   // seesound
     0,    // reactiontime
-    sfx_None,   // attacksound
     S_PLAY_PAIN,    // painstate
     255,    // painchance
     sfx_plpain,   // painsound
@@ -474,7 +473,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_POSS_RUN1,    // seestate
     sfx_posit1,   // seesound
     8,    // reactiontime
-    sfx_pistol,   // attacksound
     S_POSS_PAIN,    // painstate
     200,    // painchance
     sfx_popain,   // painsound
@@ -499,7 +497,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_SPOS_RUN1,    // seestate
     sfx_posit2,   // seesound
     8,    // reactiontime
-    0,    // attacksound
     S_SPOS_PAIN,    // painstate
     170,    // painchance
     sfx_popain,   // painsound
@@ -524,7 +521,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_TROO_RUN1,    // seestate
     sfx_bgsit1,   // seesound
     8,    // reactiontime
-    0,    // attacksound
     S_TROO_PAIN,    // painstate
     200,    // painchance
     sfx_popain,   // painsound
@@ -549,7 +545,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_SARG_RUN1,    // seestate
     sfx_sgtsit,   // seesound
     8,    // reactiontime
-    sfx_sgtatk,   // attacksound
     S_SARG_PAIN,    // painstate
     180,    // painchance
     sfx_dmpain,   // painsound
@@ -574,7 +569,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_SARG_RUN1,    // seestate
     sfx_sgtsit,   // seesound
     8,    // reactiontime
-    sfx_sgtatk,   // attacksound
     S_SARG_PAIN,    // painstate
     180,    // painchance
     sfx_dmpain,   // painsound
@@ -599,7 +593,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_BOSS_RUN1,    // seestate
     sfx_brssit,   // seesound
     8,    // reactiontime
-    0,    // attacksound
     S_BOSS_PAIN,    // painstate
     50,   // painchance
     sfx_dmpain,   // painsound
@@ -624,7 +617,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_firsht,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -649,7 +641,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -674,7 +665,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_firsht,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -699,7 +689,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -724,7 +713,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -749,7 +737,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -774,7 +761,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -799,7 +785,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -824,7 +809,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -849,7 +833,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -874,7 +857,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -899,7 +881,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -924,7 +905,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -949,7 +929,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -974,7 +953,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -999,7 +977,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1024,7 +1001,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1049,7 +1025,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1074,7 +1049,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1099,7 +1073,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1124,7 +1097,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1149,7 +1121,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1174,7 +1145,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1199,7 +1169,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1224,7 +1193,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1249,7 +1217,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1274,7 +1241,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1299,7 +1265,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1324,7 +1289,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1349,7 +1313,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1374,7 +1337,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1399,7 +1361,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1424,7 +1385,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1449,7 +1409,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1474,7 +1433,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1499,7 +1457,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1524,7 +1481,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1549,7 +1505,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1574,7 +1529,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1599,7 +1553,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1624,7 +1577,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1649,7 +1601,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1674,7 +1625,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1699,7 +1649,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1724,7 +1673,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1749,7 +1697,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
@@ -1774,7 +1721,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // seestate
     sfx_None,   // seesound
     8,    // reactiontime
-    sfx_None,   // attacksound
     S_NULL,   // painstate
     0,    // painchance
     sfx_None,   // painsound
