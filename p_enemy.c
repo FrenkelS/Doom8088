@@ -924,29 +924,54 @@ void A_BruisAttack(mobj_t __far* actor)
   P_SpawnMissile(actor, actor->target, MT_BRUISERSHOT);  // launch a missile
 }
 
+/* The death sound. See also A_Scream() in p_enemy.c for some tweaking that goes on for certain monsters */
+sfxenum_t getDeathSound(uint16_t type)
+{
+	switch (type)
+	{
+		case 0:
+			return sfx_pldeth;
+		case 1:
+			return sfx_podth1;
+		case 2:
+			return sfx_podth2;
+		case 3:
+			return sfx_bgdth1;
+		case 4:
+		case 5:
+			return sfx_sgtdth;
+		case 6:
+			return sfx_brsdth;
+		case 7:
+		case 9:
+			return sfx_firxpl;
+		case 8:
+		case 10:
+			return sfx_barexp;
+		default:
+			return sfx_None;
+	}
+}
+
 
 void A_Scream(mobj_t __far* actor)
 {
-  sfxenum_t sound;
+  sfxenum_t sound = getDeathSound(actor->type);
 
-  switch (mobjinfo[actor->type].deathsound)
+  switch (sound)
     {
-    case 0:
+    case sfx_None:
       return;
 
     case sfx_podth1:
     case sfx_podth2:
-    case sfx_podth3:
+    //case sfx_podth3:
       sound = sfx_podth1 + P_Random()%3;
       break;
 
     case sfx_bgdth1:
-    case sfx_bgdth2:
+    //case sfx_bgdth2:
       sound = sfx_bgdth1 + P_Random()%2;
-      break;
-
-    default:
-      sound = mobjinfo[actor->type].deathsound;
       break;
     }
 

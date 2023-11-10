@@ -455,7 +455,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_PLAY_ATK1,    // missilestate
     S_PLAY_DIE1,    // deathstate
     S_PLAY_XDIE1,   // xdeathstate
-    sfx_pldeth,   // deathsound
     0,    // speed
     16*FRACUNIT,    // radius
     56*FRACUNIT,    // height
@@ -477,7 +476,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_POSS_ATK1,    // missilestate
     S_POSS_DIE1,    // deathstate
     S_POSS_XDIE1,   // xdeathstate
-    sfx_podth1,   // deathsound
     8,    // speed
     20*FRACUNIT,    // radius
     56*FRACUNIT,    // height
@@ -499,7 +497,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_SPOS_ATK1,    // missilestate
     S_SPOS_DIE1,    // deathstate
     S_SPOS_XDIE1,   // xdeathstate
-    sfx_podth2,   // deathsound
     8,    // speed
     20*FRACUNIT,    // radius
     56*FRACUNIT,    // height
@@ -521,7 +518,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_TROO_ATK1,    // missilestate
     S_TROO_DIE1,    // deathstate
     S_TROO_XDIE1,   // xdeathstate
-    sfx_bgdth1,   // deathsound
     8,    // speed
     20*FRACUNIT,    // radius
     56*FRACUNIT,    // height
@@ -543,7 +539,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     0,    // missilestate
     S_SARG_DIE1,    // deathstate
     S_NULL,   // xdeathstate
-    sfx_sgtdth,   // deathsound
     10,   // speed
     30*FRACUNIT,    // radius
     56*FRACUNIT,    // height
@@ -565,7 +560,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     0,    // missilestate
     S_SARG_DIE1,    // deathstate
     S_NULL,   // xdeathstate
-    sfx_sgtdth,   // deathsound
     10,   // speed
     30*FRACUNIT,    // radius
     56*FRACUNIT,    // height
@@ -587,7 +581,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_BOSS_ATK1,    // missilestate
     S_BOSS_DIE1,    // deathstate
     S_NULL,   // xdeathstate
-    sfx_brsdth,   // deathsound
     8,    // speed
     24*FRACUNIT,    // radius
     64*FRACUNIT,    // height
@@ -609,7 +602,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_BRBALLX1,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_firxpl,   // deathsound
     15*FRACUNIT,   // speed
     6*FRACUNIT,   // radius
     8*FRACUNIT,   // height
@@ -631,7 +623,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_BEXP,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_barexp,   // deathsound
     0,    // speed
     10*FRACUNIT,    // radius
     42*FRACUNIT,    // height
@@ -653,7 +644,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_TBALLX1,    // deathstate
     S_NULL,   // xdeathstate
-    sfx_firxpl,   // deathsound
     10*FRACUNIT,    // speed
     6*FRACUNIT,   // radius
     8*FRACUNIT,   // height
@@ -675,7 +665,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_EXPLODE1,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_barexp,   // deathsound
     20*FRACUNIT,    // speed
     11*FRACUNIT,    // radius
     8*FRACUNIT,   // height
@@ -697,7 +686,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -719,7 +707,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -741,7 +728,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -763,7 +749,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -785,7 +770,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -807,7 +791,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -829,7 +812,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -851,7 +833,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -873,7 +854,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -895,7 +875,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -917,7 +896,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -939,7 +917,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -961,7 +938,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -983,7 +959,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1005,7 +980,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1027,7 +1001,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1049,7 +1022,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1071,7 +1043,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1093,7 +1064,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1115,7 +1085,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1137,7 +1106,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1159,7 +1127,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1181,7 +1148,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1203,7 +1169,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1225,7 +1190,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1247,7 +1211,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1269,7 +1232,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1291,7 +1253,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1313,7 +1274,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1335,7 +1295,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1357,7 +1316,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     16*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1379,7 +1337,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     16*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1401,7 +1358,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     16*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1423,7 +1379,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1445,7 +1400,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     16*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1467,7 +1421,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1489,7 +1442,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1511,7 +1463,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1533,7 +1484,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1555,7 +1505,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1577,7 +1526,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1599,7 +1547,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height
@@ -1621,7 +1568,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_NULL,   // missilestate
     S_NULL,   // deathstate
     S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
     0,    // speed
     20*FRACUNIT,    // radius
     16*FRACUNIT,    // height

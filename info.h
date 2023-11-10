@@ -529,6 +529,8 @@ typedef enum {
  * sound doesn't apply (like lamps generally don't attack or whistle).
  */
 
+sfxenum_t getDeathSound(uint16_t type);
+
 typedef struct
 {
   int16_t doomednum;
@@ -556,9 +558,6 @@ typedef struct
   statenum_t deathstate;   /* What state begins the death sequence */
   statenum_t xdeathstate;  /* What state begins the horrible death sequence
            like when a rocket takes out a trooper */
-  sfxenum_t deathsound;   /* The death sound.  See also A_Scream() in
-           p_enemy.c for some tweaking that goes on
-           for certain monsters */
   int32_t speed;        /* How fast it moves.  Too fast and it can miss
            collision logic. */
   int32_t radius;       /* An often incorrect radius */

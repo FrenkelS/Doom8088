@@ -128,8 +128,9 @@ static void P_ExplodeMissile(mobj_t __far* mo)
 
   mo->flags &= ~MF_MISSILE;
 
-  if (mobjinfo[mo->type].deathsound)
-    S_StartSound (mo, mobjinfo[mo->type].deathsound);
+  sfxenum_t deathsound = getDeathSound(mo->type);
+  if (deathsound)
+    S_StartSound (mo, deathsound);
   }
 
 
