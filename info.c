@@ -445,7 +445,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_PLAYER
     -1,   // doomednum
     S_PLAY,   // spawnstate
-    100,    // spawnhealth
     S_PLAY_RUN1,    // seestate
     0,    // reactiontime
     S_PLAY_PAIN,    // painstate
@@ -465,7 +464,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_POSSESSED
     3004,   // doomednum
     S_POSS_STND,    // spawnstate
-    20,   // spawnhealth
     S_POSS_RUN1,    // seestate
     8,    // reactiontime
     S_POSS_PAIN,    // painstate
@@ -485,7 +483,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_SHOTGUY
     9,    // doomednum
     S_SPOS_STND,    // spawnstate
-    30,   // spawnhealth
     S_SPOS_RUN1,    // seestate
     8,    // reactiontime
     S_SPOS_PAIN,    // painstate
@@ -505,7 +502,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_TROOP
     3001,   // doomednum
     S_TROO_STND,    // spawnstate
-    60,   // spawnhealth
     S_TROO_RUN1,    // seestate
     8,    // reactiontime
     S_TROO_PAIN,    // painstate
@@ -525,7 +521,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_SERGEANT
     3002,   // doomednum
     S_SARG_STND,    // spawnstate
-    150,    // spawnhealth
     S_SARG_RUN1,    // seestate
     8,    // reactiontime
     S_SARG_PAIN,    // painstate
@@ -545,7 +540,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_SHADOWS
     58,   // doomednum
     S_SARG_STND,    // spawnstate
-    150,    // spawnhealth
     S_SARG_RUN1,    // seestate
     8,    // reactiontime
     S_SARG_PAIN,    // painstate
@@ -565,7 +559,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_BRUISER
     3003,   // doomednum
     S_BOSS_STND,    // spawnstate
-    1000,   // spawnhealth
     S_BOSS_RUN1,    // seestate
     8,    // reactiontime
     S_BOSS_PAIN,    // painstate
@@ -585,7 +578,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_BRUISERSHOT
     -1,   // doomednum
     S_BRBALL1,    // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -605,7 +597,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_BARREL
     2035,   // doomednum
     S_BAR1,   // spawnstate
-    20,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -625,7 +616,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_TROOPSHOT
     -1,   // doomednum
     S_TBALL1,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -645,7 +635,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_ROCKET
     -1,   // doomednum
     S_ROCKET,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -665,7 +654,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_PUFF
     -1,   // doomednum
     S_PUFF1,    // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -685,7 +673,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_BLOOD
     -1,   // doomednum
     S_BLOOD1,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -705,7 +692,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_TFOG
     -1,   // doomednum
     S_TFOG,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -725,7 +711,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_IFOG
     -1,   // doomednum
     S_IFOG,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -745,7 +730,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_TELEPORTMAN
     14,   // doomednum
     S_NULL,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -765,7 +749,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC0
     2018,   // doomednum
     S_ARM1,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -785,7 +768,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC1
     2019,   // doomednum
     S_ARM2,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -805,7 +787,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC2
     2014,   // doomednum
     S_BON1,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -825,7 +806,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC3
     2015,   // doomednum
     S_BON2,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -845,7 +825,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC4
     5,    // doomednum
     S_BKEY,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -865,7 +844,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC5
     13,   // doomednum
     S_RKEY,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -885,7 +863,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC6
     6,    // doomednum
     S_YKEY,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -905,7 +882,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC10
     2011,   // doomednum
     S_STIM,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -925,7 +901,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC11
     2012,   // doomednum
     S_MEDI,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -945,7 +920,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC12
     2013,   // doomednum
     S_SOUL,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -965,7 +939,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_INS
     2024,   // doomednum
     S_PINS,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -985,7 +958,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC14
     2025,   // doomednum
     S_SUIT,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1005,7 +977,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC15
     2026,   // doomednum
     S_PMAP,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1025,7 +996,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC16
     2045,   // doomednum
     S_PVIS,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1045,7 +1015,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_CLIP
     2007,   // doomednum
     S_CLIP,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1065,7 +1034,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC17
     2048,   // doomednum
     S_AMMO,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1085,7 +1053,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC18
     2010,   // doomednum
     S_ROCK,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1105,7 +1072,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC19
     2046,   // doomednum
     S_BROK,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1125,7 +1091,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC22
     2008,   // doomednum
     S_SHEL,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1145,7 +1110,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC23
     2049,   // doomednum
     S_SBOX,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1165,7 +1129,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC24
     8,    // doomednum
     S_BPAK,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1185,7 +1148,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_CHAINGUN
     2002,   // doomednum
     S_MGUN,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1205,7 +1167,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC26
     2005,   // doomednum
     S_CSAW,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1225,7 +1186,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC27
     2003,   // doomednum
     S_LAUN,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1245,7 +1205,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_SHOTGUN
     2001,   // doomednum
     S_SHOT,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1265,7 +1224,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC31
     2028,   // doomednum
     S_COLU,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1285,7 +1243,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC43
     46,   // doomednum
     S_REDTORCH,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1305,7 +1262,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC48
     48,   // doomednum
     S_TECHPILLAR,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1325,7 +1281,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC49
     34,   // doomednum
     S_CANDLESTIK,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1345,7 +1300,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC50
     35,   // doomednum
     S_CANDELABRA,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1365,7 +1319,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC62
     15,   // doomednum
     S_PLAY_DIE7,    // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1385,7 +1338,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC63
     18,   // doomednum
     S_POSS_DIE5,    // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1405,7 +1357,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC64
     21,   // doomednum
     S_SARG_DIE6,    // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1425,7 +1376,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC66
     20,   // doomednum
     S_TROO_DIE5,    // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1445,7 +1395,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC67
     19,   // doomednum
     S_SPOS_DIE5,    // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1465,7 +1414,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC68
     10,   // doomednum
     S_PLAY_XDIE9,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1485,7 +1433,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC69
     12,   // doomednum
     S_PLAY_XDIE9,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate
@@ -1505,7 +1452,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_MISC71
     24,   // doomednum
     S_GIBS,   // spawnstate
-    1000,   // spawnhealth
     S_NULL,   // seestate
     8,    // reactiontime
     S_NULL,   // painstate

@@ -570,7 +570,7 @@ static boolean P_LookForTargets(mobj_t __far* actor, boolean allaround)
 
 
 /* The sound it makes when waking */
-sfxenum_t getSeeSound(uint16_t type)
+sfxenum_t getSeeSound(mobjtype_t type)
 {
 	switch (type)
 	{
@@ -661,7 +661,7 @@ void A_Look(mobj_t __far* actor)
 
 
 /* The sound it makes when it attacks */
-static sfxenum_t getAttackSound(uint16_t type)
+static sfxenum_t getAttackSound(mobjtype_t type)
 {
 	switch (type)
 	{
@@ -677,7 +677,7 @@ static sfxenum_t getAttackSound(uint16_t type)
 
 
 /* What sound it makes wandering around, once in a while.  Chance is 3/256 it will. */
-static sfxenum_t getActiveSound(uint16_t type)
+static sfxenum_t getActiveSound(mobjtype_t type)
 {
 	switch (type)
 	{
@@ -944,8 +944,9 @@ void A_BruisAttack(mobj_t __far* actor)
   P_SpawnMissile(actor, actor->target, MT_BRUISERSHOT);  // launch a missile
 }
 
+
 /* The death sound. See also A_Scream() in p_enemy.c for some tweaking that goes on for certain monsters */
-sfxenum_t getDeathSound(uint16_t type)
+sfxenum_t getDeathSound(mobjtype_t type)
 {
 	switch (type)
 	{
@@ -1005,7 +1006,7 @@ void A_XScream(mobj_t __far* actor)
 
 
 /* The sound it emits when it feels pain */
-static sfxenum_t getPainSound(uint16_t type)
+static sfxenum_t getPainSound(mobjtype_t type)
 {
 	switch (type)
 	{

@@ -548,7 +548,7 @@ static void P_KillMobj(mobj_t __far* source, mobj_t __far* target)
         AM_Stop();    // don't die in auto map; switch view prior to dying
     }
 
-  if (target->health < -mobjinfo[target->type].spawnhealth && mobjinfo[target->type].xdeathstate)
+  if (target->health < - getSpawnHealth(target->type) && mobjinfo[target->type].xdeathstate)
     P_SetMobjState (target, mobjinfo[target->type].xdeathstate);
   else
     P_SetMobjState (target, mobjinfo[target->type].deathstate);

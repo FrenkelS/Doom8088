@@ -899,6 +899,30 @@ static mobj_t __far* P_NewMobj()
     return mobj;
 }
 
+
+/* The initial hit points for this Thing */
+int16_t getSpawnHealth(mobjtype_t type)
+{
+	switch (type)
+	{
+		case 0:
+			return 100;
+		case 1:
+		case 8:
+			return 20;
+		case 2:
+			return 30;
+		case 3:
+			return 60;
+		case 4:
+		case 5:
+			return 150;
+		default:
+			return 1000;
+	}
+}
+
+
 mobj_t __far* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
 {
     const state_t*    st;
@@ -917,7 +941,7 @@ mobj_t __far* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
     if (type == MT_PLAYER)         // Except in old demos, players
         mobj->flags |= MF_FRIEND;    // are always friends.
 
-    mobj->health = info->spawnhealth;
+    mobj->health = getSpawnHealth(type);
 
     if (_g_gameskill != sk_nightmare)
         mobj->reactiontime = info->reactiontime;
