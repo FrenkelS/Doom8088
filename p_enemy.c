@@ -621,12 +621,12 @@ void A_Look(mobj_t __far* actor)
         {
         case sfx_posit1:
         case sfx_posit2:
-        case sfx_posit3:
+        //case sfx_posit3:
             sound = sfx_posit1+P_Random()%3;
             break;
 
         case sfx_bgsit1:
-        case sfx_bgsit2:
+        //case sfx_bgsit2:
             sound = sfx_bgsit1+P_Random()%2;
             break;
 
@@ -897,12 +897,12 @@ void A_Scream(mobj_t __far* actor)
 
     case sfx_podth1:
     case sfx_podth2:
-    case sfx_podth3:
+    //case sfx_podth3:
       sound = sfx_podth1 + P_Random()%3;
       break;
 
     case sfx_bgdth1:
-    case sfx_bgdth2:
+    //case sfx_bgdth2:
       sound = sfx_bgdth1 + P_Random()%2;
       break;
 
