@@ -656,6 +656,26 @@ static sfxenum_t getAttackSound(uint16_t type)
 }
 
 
+/* What sound it makes wandering around, once in a while.  Chance is 3/256 it will. */
+static sfxenum_t getActiveSound(uint16_t type)
+{
+	switch (type)
+	{
+		case 1:
+		case 2:
+			return sfx_posact;
+		case 3:
+			return sfx_bgact;
+		case 4:
+		case 5:
+		case 6:
+			return sfx_dmact;
+		default:
+			return sfx_None;
+	}
+}
+
+
 //
 // A_Chase
 // Actor has a melee attack,
@@ -778,8 +798,9 @@ void A_Chase(mobj_t __far* actor)
         P_NewChaseDir(actor);
 
     // make active sound
-    if (mobjinfo[actor->type].activesound && P_Random()<3)
-        S_StartSound(actor, mobjinfo[actor->type].activesound);
+    sfxenum_t activesound = getActiveSound(actor->type);
+    if (activesound && P_Random() < 3)
+        S_StartSound(actor, activesound);
 }
 
 //

@@ -569,8 +569,6 @@ typedef struct
            seem to retreat when shot because they have
            very little mass and are moved by impact */
   int16_t damage;       /* If this is a missile, how much does it hurt? */
-  sfxenum_t activesound;  /* What sound it makes wandering around, once
-           in a while.  Chance is 3/256 it will. */
   uint32_t flags;  /* Bit masks for lots of things.  See p_mobj.h */
 } mobjinfo_t;
 

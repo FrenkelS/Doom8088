@@ -462,7 +462,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     56*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SOLID|MF_SHOOTABLE|MF_DROPOFF|MF_PICKUP    // flags
   },
 
@@ -486,7 +485,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     56*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_posact,   // activesound
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL   // flags
   },
 
@@ -510,7 +508,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     56*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_posact,   // activesound
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL   // flags
   },
 
@@ -534,7 +531,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     56*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_bgact,    // activesound
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL   // flags
   },
 
@@ -558,7 +554,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     56*FRACUNIT,    // height
     400,    // mass
     0,    // damage
-    sfx_dmact,    // activesound
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL   // flags
   },
 
@@ -582,7 +577,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     56*FRACUNIT,    // height
     400,    // mass
     0,    // damage
-    sfx_dmact,    // activesound
     MF_SOLID|MF_SHOOTABLE|MF_SHADOW|MF_COUNTKILL   // flags
   },
 
@@ -606,7 +600,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     64*FRACUNIT,    // height
     1000,   // mass
     0,    // damage
-    sfx_dmact,    // activesound
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL   // flags
   },
 
@@ -630,7 +623,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8*FRACUNIT,   // height
     100,    // mass
     8,    // damage
-    sfx_None,   // activesound
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY   // flags
   },
 
@@ -654,7 +646,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     42*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SOLID|MF_SHOOTABLE|MF_NOBLOOD   // flags
   },
 
@@ -678,7 +669,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8*FRACUNIT,   // height
     100,    // mass
     3,    // damage
-    sfx_None,   // activesound
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY // flags
   },
 
@@ -702,7 +692,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8*FRACUNIT,   // height
     100,    // mass
     20,   // damage
-    sfx_None,   // activesound
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY   // flags
   },
 
@@ -726,7 +715,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_NOBLOCKMAP|MF_NOGRAVITY // flags
   },
 
@@ -750,7 +738,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_NOBLOCKMAP    // flags
   },
 
@@ -774,7 +761,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_NOBLOCKMAP|MF_NOGRAVITY // flags
   },
 
@@ -798,7 +784,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_NOBLOCKMAP|MF_NOGRAVITY // flags
   },
 
@@ -822,7 +807,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_NOBLOCKMAP|MF_NOSECTOR    // flags
   },
 
@@ -846,7 +830,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -870,7 +853,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -894,7 +876,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL|MF_COUNTITEM    // flags
   },
 
@@ -918,7 +899,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL|MF_COUNTITEM    // flags
   },
 
@@ -942,7 +922,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL    // flags
   },
 
@@ -966,7 +945,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL    // flags
   },
 
@@ -990,7 +968,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL    // flags
   },
 
@@ -1014,7 +991,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1038,7 +1014,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1062,7 +1037,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL|MF_COUNTITEM    // flags
   },
 
@@ -1086,7 +1060,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL|MF_COUNTITEM    // flags
   },
 
@@ -1110,7 +1083,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1134,7 +1106,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL|MF_COUNTITEM    // flags
   },
 
@@ -1158,7 +1129,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL|MF_COUNTITEM    // flags
   },
 
@@ -1182,7 +1152,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1206,7 +1175,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1230,7 +1198,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1254,7 +1221,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1278,7 +1244,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1302,7 +1267,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1326,7 +1290,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1350,7 +1313,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1374,7 +1336,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1398,7 +1359,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1422,7 +1382,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SPECIAL   // flags
   },
 
@@ -1446,7 +1405,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SOLID   // flags
   },
 
@@ -1470,7 +1428,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SOLID   // flags
   },
 
@@ -1494,7 +1451,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SOLID   // flags
   },
 
@@ -1518,7 +1474,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   },
 
@@ -1542,7 +1497,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     MF_SOLID   // flags
   },
 
@@ -1566,7 +1520,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   },
 
@@ -1590,7 +1543,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   },
 
@@ -1614,7 +1566,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   },
 
@@ -1638,7 +1589,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   },
 
@@ -1662,7 +1612,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   },
 
@@ -1686,7 +1635,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   },
 
@@ -1710,7 +1658,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   },
 
@@ -1734,7 +1681,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     16*FRACUNIT,    // height
     100,    // mass
     0,    // damage
-    sfx_None,   // activesound
     0    // flags
   }
 
