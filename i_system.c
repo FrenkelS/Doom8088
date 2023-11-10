@@ -186,9 +186,7 @@ void I_StartTic(void)
 //
 
 static boolean isGraphicsModeSet = false;
-static uint8_t __far* screen0;
-static uint8_t __far* screen1;
-static int16_t activescreen;
+static uint8_t __far* screen;
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
 uint8_t  __far* _g_screen;
@@ -197,7 +195,7 @@ static int8_t newpal;
 
 uint8_t __far* I_GetBackBuffer(void)
 {
-	return activescreen == 0 ? screen0 : screen1;
+	return screen;
 }
 
 
@@ -272,8 +270,8 @@ void I_FinishUpdate (void)
 
 	// page flip
 	outp(CRTC_INDEX, CRTC_STARTHIGH);
-	outp(CRTC_INDEX + 1, activescreen);
-	activescreen = 0x40 - activescreen;
+	outp(CRTC_INDEX + 1, D_FP_SEG(screen) >> 4);
+	screen = (uint8_t __far*) (((uint32_t) screen + 0x04000000) & 0xa400ffff); // flip between segments A000 and A400
 }
 
 
@@ -293,9 +291,7 @@ void I_InitGraphics(void)
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();	
-	screen0 = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
-	screen1 = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
-	activescreen = 0x40;
+	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
 
 	outp(SC_INDEX, SC_MEMMODE);
 	outp(SC_INDEX + 1, (inp(SC_INDEX + 1) & ~8) | 4);
@@ -308,7 +304,7 @@ void I_InitGraphics(void)
 
 	outpw(SC_INDEX, SC_MAPMASK | (15 << 8));
 
-	_fmemset(screen0, 0, 0xffff);
+	_fmemset(screen, 0, 0xffff);
 
 	outp(CRTC_INDEX, CRTC_UNDERLINE);
 	outp(CRTC_INDEX + 1,inp(CRTC_INDEX + 1) & ~0x40);
@@ -325,14 +321,14 @@ void I_InitGraphics(void)
 
 void I_StartDisplay(void)
 {
-	_g_screen = I_GetBackBuffer();
+	_g_screen = screen;
 }
 
 
 void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
-	uint8_t __far* dst = I_GetBackBuffer();
+	uint8_t __far* dst = screen;
 
 #if defined DISABLE_STATUS_BAR
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
