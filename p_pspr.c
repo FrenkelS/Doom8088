@@ -720,7 +720,7 @@ void A_FireMissile(player_t *player, pspdef_t *psp)
 
 	S_StartSound(player->mo, sfx_rlaunc);
 	player->ammo[weaponinfo[player->readyweapon].ammo]--;
-	P_SpawnPlayerMissile(player->mo, MT_ROCKET);
+	P_SpawnPlayerMissile(player->mo);
 }
 
 

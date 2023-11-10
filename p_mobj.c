@@ -1320,7 +1320,7 @@ mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_
 // Tries to aim at a nearby monster
 //
 
-void P_SpawnPlayerMissile(mobj_t __far* source, mobjtype_t type)
+void P_SpawnPlayerMissile(mobj_t __far* source)
 {
 	mobj_t __far* th;
 	fixed_t x, y, z, slope = 0;
@@ -1351,7 +1351,7 @@ void P_SpawnPlayerMissile(mobj_t __far* source, mobjtype_t type)
 	y = source->y;
 	z = source->z + 4 * 8 * FRACUNIT;
 
-	th = P_SpawnMobj(x,y,z, type);
+	th = P_SpawnMobj(x,y,z, MT_ROCKET);
 
 	if (mobjinfo[th->type].seesound)
 		S_StartSound(th, mobjinfo[th->type].seesound);
