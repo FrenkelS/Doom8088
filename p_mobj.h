@@ -257,9 +257,9 @@ typedef struct mobj_s
 
     int16_t             health;
 
-    uint16_t            type;
+    mobjtype_t          type;
 
-    int32_t             tics;   // state tic counter
+    int16_t             tics;   // state tic counter
     const state_t*      state;
     uint32_t            flags;
 
