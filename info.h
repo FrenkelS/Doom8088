@@ -529,6 +529,7 @@ typedef enum {
  * sound doesn't apply (like lamps generally don't attack or whistle).
  */
 
+sfxenum_t getSeeSound(uint16_t type);
 sfxenum_t getDeathSound(uint16_t type);
 
 typedef struct
@@ -541,7 +542,6 @@ typedef struct
            first created */
   int16_t spawnhealth;  /* The initial hit points for this Thing */
   statenum_t seestate;     /* The state when it sees you or wakes up */
-  sfxenum_t seesound;     /* The sound it makes when waking */
   int16_t reactiontime; /* How many tics it waits after it wakes up
            before it will start to attack, in normal
            skills (halved for nightmare) */

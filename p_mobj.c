@@ -1284,8 +1284,9 @@ mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_
 
   th = P_SpawnMobj (source->x,source->y,source->z + 4*8*FRACUNIT,type);
 
-  if (mobjinfo[th->type].seesound)
-    S_StartSound (th, mobjinfo[th->type].seesound);
+  sfxenum_t seesound = getSeeSound(th->type);
+  if (seesound)
+    S_StartSound(th, seesound);
 
   th->target = source;    // where it came from
   an = R_PointToAngle2 (source->x, source->y, dest->x, dest->y);
@@ -1354,8 +1355,9 @@ void P_SpawnPlayerMissile(mobj_t __far* source)
 
 	th = P_SpawnMobj(x,y,z, MT_ROCKET);
 
-	if (mobjinfo[th->type].seesound)
-		S_StartSound(th, mobjinfo[th->type].seesound);
+	sfxenum_t seesound = getSeeSound(th->type);
+	if (seesound)
+		S_StartSound(th, seesound);
 
 	th->target = source;
 	th->angle  = an;

@@ -569,6 +569,30 @@ static boolean P_LookForTargets(mobj_t __far* actor, boolean allaround)
 }
 
 
+/* The sound it makes when waking */
+sfxenum_t getSeeSound(uint16_t type)
+{
+	switch (type)
+	{
+		case 1:
+			return sfx_posit1;
+		case 2:
+			return sfx_posit2;
+		case 3:
+			return sfx_bgsit1;
+		case 4:
+		case 5:
+			return sfx_sgtsit;
+		case 6:
+			return sfx_brssit;
+		case 7:
+		case 9:
+			return sfx_firsht;
+		default:
+			return sfx_None;
+	}
+}
+
 
 //
 // ACTION ROUTINES
@@ -614,24 +638,20 @@ void A_Look(mobj_t __far* actor)
 
     // go into chase state
 
-    if (mobjinfo[actor->type].seesound)
+    sfxenum_t sound = getSeeSound(actor->type);
+    if (sound)
     {
-        sfxenum_t sound;
-        switch (mobjinfo[actor->type].seesound)
+        switch (sound)
         {
         case sfx_posit1:
         case sfx_posit2:
-        case sfx_posit3:
+        //case sfx_posit3:
             sound = sfx_posit1+P_Random()%3;
             break;
 
         case sfx_bgsit1:
-        case sfx_bgsit2:
+        //case sfx_bgsit2:
             sound = sfx_bgsit1+P_Random()%2;
-            break;
-
-        default:
-            sound = mobjinfo[actor->type].seesound;
             break;
         }
         S_StartSound(actor, sound);
