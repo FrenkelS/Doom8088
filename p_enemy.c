@@ -958,10 +958,33 @@ void A_XScream(mobj_t __far* actor)
   S_StartSound(actor, sfx_slop);
 }
 
+
+/* The sound it emits when it feels pain */
+static sfxenum_t getPainSound(uint16_t type)
+{
+	switch (type)
+	{
+		case 0:
+			return sfx_plpain;
+		case 1:
+		case 2:
+		case 3:
+			return sfx_popain;
+		case 4:
+		case 5:
+		case 6:
+			return sfx_dmpain;
+		default:
+			return sfx_None;
+	}
+}
+
+
 void A_Pain(mobj_t __far* actor)
 {
-  if (mobjinfo[actor->type].painsound)
-    S_StartSound(actor, mobjinfo[actor->type].painsound);
+  sfxenum_t painsound = getPainSound(actor->type);
+  if (painsound)
+    S_StartSound(actor, painsound);
 }
 
 void A_Fall(mobj_t __far* actor)

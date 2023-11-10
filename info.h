@@ -550,7 +550,6 @@ typedef struct
            has absolutely nothing to do with the chance
            it will get hurt, just the chance of it
            reacting visibly. */
-  sfxenum_t painsound;    /* The sound it emits when it feels pain */
   statenum_t meleestate;   /* Melee==close attack */
   statenum_t missilestate; /* What states to use when it's in the air, if
            in fact it is ever used as a missile */

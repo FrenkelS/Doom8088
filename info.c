@@ -451,7 +451,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     0,    // reactiontime
     S_PLAY_PAIN,    // painstate
     255,    // painchance
-    sfx_plpain,   // painsound
     S_NULL,   // meleestate
     S_PLAY_ATK1,    // missilestate
     S_PLAY_DIE1,    // deathstate
@@ -474,7 +473,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_POSS_PAIN,    // painstate
     200,    // painchance
-    sfx_popain,   // painsound
     0,    // meleestate
     S_POSS_ATK1,    // missilestate
     S_POSS_DIE1,    // deathstate
@@ -497,7 +495,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_SPOS_PAIN,    // painstate
     170,    // painchance
-    sfx_popain,   // painsound
     0,    // meleestate
     S_SPOS_ATK1,    // missilestate
     S_SPOS_DIE1,    // deathstate
@@ -520,7 +517,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_TROO_PAIN,    // painstate
     200,    // painchance
-    sfx_popain,   // painsound
     S_TROO_ATK1,    // meleestate
     S_TROO_ATK1,    // missilestate
     S_TROO_DIE1,    // deathstate
@@ -543,7 +539,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_SARG_PAIN,    // painstate
     180,    // painchance
-    sfx_dmpain,   // painsound
     S_SARG_ATK1,    // meleestate
     0,    // missilestate
     S_SARG_DIE1,    // deathstate
@@ -566,7 +561,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_SARG_PAIN,    // painstate
     180,    // painchance
-    sfx_dmpain,   // painsound
     S_SARG_ATK1,    // meleestate
     0,    // missilestate
     S_SARG_DIE1,    // deathstate
@@ -589,7 +583,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_BOSS_PAIN,    // painstate
     50,   // painchance
-    sfx_dmpain,   // painsound
     S_BOSS_ATK1,    // meleestate
     S_BOSS_ATK1,    // missilestate
     S_BOSS_DIE1,    // deathstate
@@ -612,7 +605,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_BRBALLX1,   // deathstate
@@ -635,7 +627,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_BEXP,   // deathstate
@@ -658,7 +649,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_TBALLX1,    // deathstate
@@ -681,7 +671,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_EXPLODE1,   // deathstate
@@ -704,7 +693,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -727,7 +715,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -750,7 +737,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -773,7 +759,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -796,7 +781,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -819,7 +803,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -842,7 +825,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -865,7 +847,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -888,7 +869,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -911,7 +891,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -934,7 +913,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -957,7 +935,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -980,7 +957,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1003,7 +979,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1026,7 +1001,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1049,7 +1023,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1072,7 +1045,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1095,7 +1067,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1118,7 +1089,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1141,7 +1111,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1164,7 +1133,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1187,7 +1155,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1210,7 +1177,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1233,7 +1199,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1256,7 +1221,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1279,7 +1243,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1302,7 +1265,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1325,7 +1287,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1348,7 +1309,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1371,7 +1331,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1394,7 +1353,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1417,7 +1375,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1440,7 +1397,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1463,7 +1419,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1486,7 +1441,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1509,7 +1463,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1532,7 +1485,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1555,7 +1507,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1578,7 +1529,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1601,7 +1551,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1624,7 +1573,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1647,7 +1595,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
@@ -1670,7 +1617,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     8,    // reactiontime
     S_NULL,   // painstate
     0,    // painchance
-    sfx_None,   // painsound
     S_NULL,   // meleestate
     S_NULL,   // missilestate
     S_NULL,   // deathstate
