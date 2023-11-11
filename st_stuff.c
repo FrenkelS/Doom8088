@@ -53,9 +53,6 @@
 #include "globdata.h"
 
 
-#define DISABLE_STATUS_BAR
-
-
 //
 // Typedefs of widgets
 //
