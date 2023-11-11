@@ -292,7 +292,7 @@ void I_InitGraphics(void)
 	I_UploadNewPalette(0);
 	isGraphicsModeSet = true;
 
-	__djgpp_nearptr_enable();	
+	__djgpp_nearptr_enable();
 	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
 
 	outp(SC_INDEX, SC_MEMMODE);
