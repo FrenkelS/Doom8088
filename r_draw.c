@@ -56,9 +56,6 @@
 #include "globdata.h"
 
 
-#define FLAT_WALL
-
-
 visplane_t __far* _g_visplanes[MAXVISPLANES];
 visplane_t __far* _g_freetail;
 

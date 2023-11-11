@@ -32,9 +32,6 @@
 #include "globdata.h"
 
 
-#define FLAT_SPAN
-
-
 static int16_t firstflat;
 
 
