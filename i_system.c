@@ -37,9 +37,6 @@
 #include "globdata.h"
 
 
-#define DISABLE_STATUS_BAR
-
-
 static void I_SetScreenMode(uint16_t mode);
 static void NORETURN_PRE I_Quit(void) NORETURN_POST;
 

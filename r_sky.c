@@ -30,9 +30,6 @@
 #include "globdata.h"
 
 
-#define FLAT_SKY
-
-
 int16_t skyflatnum;
 static int16_t skytexture;
 
