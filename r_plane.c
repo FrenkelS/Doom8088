@@ -84,14 +84,9 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
 #else
 
 
-inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte* colormap, uint32_t position)
+inline static void R_DrawSpanPixel(uint8_t __far* dest, const byte __far* source, const byte* colormap, uint32_t position)
 {
-    uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
-    color = color | (color << 8);
-
-    uint16_t __far* d = (uint16_t __far*) dest;
-    *d++ = color;
-    *d   = color;
+    *dest = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
 }
 
 
@@ -110,7 +105,7 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_var
     const byte __far* source = dsvars->source;
     const byte *colormap = dsvars->colormap;
 
-    uint32_t __far* dest = (uint32_t __far*)(_g_screen + (y * SCREENWIDTH) + (x1 << 2));
+    uint8_t __far* dest = _g_screen + (y * PLANEWIDTH) + x1;
 
     const uint32_t step = dsvars->step;
     uint32_t position = dsvars->position;

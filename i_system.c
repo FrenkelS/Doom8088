@@ -267,8 +267,13 @@ void I_FinishUpdate (void)
 
 	// page flip
 	outp(CRTC_INDEX, CRTC_STARTHIGH);
+#if defined _M_I86
 	outp(CRTC_INDEX + 1, D_FP_SEG(screen) >> 4);
 	screen = (uint8_t __far*) (((uint32_t) screen + 0x04000000) & 0xa400ffff); // flip between segments A000 and A400
+#else
+	outp(CRTC_INDEX + 1, (D_FP_SEG(screen) >> 4) & 0xf0);
+	screen = (uint8_t __far*) (((uint32_t) screen + 0x4000) & 0xfffa4fff);
+#endif
 }
 
 
@@ -299,7 +304,8 @@ void I_InitGraphics(void)
 	outp(GC_INDEX, GC_MISCELLANEOUS);
 	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~2);
 
-	outpw(SC_INDEX, SC_MAPMASK | (15 << 8));
+	outp(SC_INDEX, SC_MAPMASK);
+	outp(SC_INDEX + 1, 15);
 
 	_fmemset(screen, 0, 0xffff);
 
@@ -310,9 +316,6 @@ void I_InitGraphics(void)
 	outp(CRTC_INDEX + 1, inp(CRTC_INDEX + 1) | 0x40);
 
 	outp(GC_INDEX, GC_READMAP);
-
-	outp(SC_INDEX, SC_MAPMASK);
-	outp(SC_INDEX + 1, 15);
 }
 
 

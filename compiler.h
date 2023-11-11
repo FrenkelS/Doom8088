@@ -70,7 +70,6 @@ typedef uint32_t segment_t;
 //but it does inline inportb, outportb and outportw
 #define inp(port)			inportb(port)
 #define outp(port,data)		outportb(port,data)
-#define outpw(port,data)	outportw(port,data)
 
 #define __interrupt
 
