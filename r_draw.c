@@ -1778,8 +1778,8 @@ static void R_RenderSegLoop (int16_t rw_x)
     {
         // mark floor / ceiling areas
 
-        int32_t yh = bottomfrac>>HEIGHTBITS;
-        int32_t yl = (topfrac+HEIGHTUNIT-1)>>HEIGHTBITS;
+        int16_t yh = bottomfrac>>HEIGHTBITS;
+        int16_t yl = (topfrac+HEIGHTUNIT-1)>>HEIGHTBITS;
 
         int16_t cc_rwx = ceilingclip[rw_x];
         int16_t fc_rwx = floorclip[rw_x];
