@@ -48,42 +48,7 @@ static int16_t firstflat;
 //  and the inner loop has to step in texture space u and v.
 //
 
-#if defined FLAT_SPAN
-static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, uint16_t color)
-{
-	uint8_t __far* dest = _g_screen + (y * SCREENWIDTH) + (x1 << 2);
-
-	uint16_t count = x2 - x1;
-
-	_fmemset(dest, color, count * 4);
-}
-
-
-//
-// R_MakeSpans
-//
-
-static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16_t b2, uint16_t color)
-{
-	static byte spanstart[VIEWWINDOWHEIGHT];
-
-	for (; t1 < t2 && t1 <= b1; t1++)
-		R_DrawSpan(t1, spanstart[t1], x, color);
-
-	for (; b1 > b2 && b1 >= t1; b1--)
-		R_DrawSpan(b1, spanstart[b1], x, color);
-
-	while (t2 < t1 && t2 <= b2)
-		spanstart[t2++] = x;
-
-	while (b2 > b1 && b2 >= t2)
-		spanstart[b2--] = x;
-}
-
-
-#else
-
-
+#if !defined FLAT_SPAN
 inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte* colormap, uint32_t position)
 {
     uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
@@ -254,16 +219,23 @@ static void R_DoDrawPlane(visplane_t __far* pl)
         else
         {
             // regular flat
+#if defined FLAT_SKY
+            draw_column_vars_t dcvars;
+            for (int16_t x = pl->minx; x <= pl->maxx; x++)
+            {
+                if (pl->top[x] <= pl->bottom[x])
+                {
+                    dcvars.x = x;
+                    dcvars.yl = pl->top[x];
+                    dcvars.yh = pl->bottom[x];
+                    R_DrawColumnFlat(pl->picnum, &dcvars);
+                }
+            }
+#else
             const int16_t stop = pl->maxx + 1;
 
             pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
 
-#if defined FLAT_SPAN
-            for (register int16_t x = pl->minx; x <= stop; x++)
-            {
-                R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], pl->picnum);
-            }
-#else
             draw_span_vars_t dsvars;
 
             dsvars.source   = W_GetLumpByNum(firstflat + flattranslation[pl->picnum]);
