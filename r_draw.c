@@ -261,20 +261,6 @@ union int64_u {
 typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
 
 
-inline static CONSTFUNC fixed_t CONSTFUNC FixedMul2(fixed_t a, fixed_t b)
-{
-	uint16_t alw = a;
-	uint16_t ahw = a >> FRACBITS;
-	uint16_t blw = b;
-	uint16_t bhw = b >> FRACBITS;
-
-	uint32_t ll = (uint32_t) alw * blw;
-	 int32_t lh = ( int32_t) alw * bhw;
-	 int32_t hl = ( int32_t) ahw * blw;
-	uint32_t hh = (uint32_t) ahw * bhw;
-	return (ll >> FRACBITS) + lh + hl + (hh << FRACBITS);
-}
-
 #if defined __WATCOMC__
 //
 #else
@@ -282,13 +268,16 @@ inline
 #endif
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 {
-	if (a >= 0 && b >= 0) {
-		return FixedMul2(a, b);
-	} else {
-		union int64_u r;
-		r.ll = (int64_t)a * b;
-		return r.s.dw; // r.ll >> FRACBITS;
-	}
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+	uint16_t blw = b;
+	 int16_t bhw = b >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * blw;
+	uint32_t lh = (uint32_t) alw * bhw;
+	uint32_t hl = (uint32_t) ahw * blw;
+	uint32_t hh = (uint32_t) ahw * bhw;
+	return (ll >> FRACBITS) + lh + hl + (hh << FRACBITS);
 }
 
 
