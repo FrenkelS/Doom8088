@@ -305,6 +305,13 @@ fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 #define FixedReciprocal(v) 0xffffffff/(v)
 
 
+//Approx fixed point divide of a/b using reciprocal. -> a * (1/b).
+inline static CONSTFUNC fixed_t FixedApproxDiv(fixed_t a, fixed_t b)
+{
+	return FixedMul(a, FixedReciprocal(b));
+}
+
+
 //
 // R_PointOnSide
 // Traverse BSP (sub) tree,
@@ -365,7 +372,7 @@ static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
     if (den == 0)
         return SLOPERANGE;
 
-    const uint16_t ans = FixedDiv(num << 3, den) >> FRACBITS;
+    const uint16_t ans = FixedApproxDiv(num << 3, den) >> FRACBITS;
 
     return (ans <= SLOPERANGE) ? ans : SLOPERANGE;
 }
@@ -486,7 +493,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
         dy = t;
     }
 
-    return FixedDiv(dx, finesine((tantoangle(FixedDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT));
+    return FixedApproxDiv(dx, finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT));
 }
 
 
@@ -1305,7 +1312,7 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 // proff 11/06/98: Changed for high-res
   fixed_t num = VIEWWINDOWHEIGHT * finesine(angleb);
 
-  return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
+  return den > num>>16 ? (num = FixedApproxDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
 }
 
