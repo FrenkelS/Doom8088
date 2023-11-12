@@ -307,7 +307,7 @@ void I_InitGraphics(void)
 	outp(SC_INDEX, SC_MAPMASK);
 	outp(SC_INDEX + 1, 15);
 
-	_fmemset(screen, 0, 0xffff);
+	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
 
 	outp(CRTC_INDEX, CRTC_UNDERLINE);
 	outp(CRTC_INDEX + 1,inp(CRTC_INDEX + 1) & ~0x40);
