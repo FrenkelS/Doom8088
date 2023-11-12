@@ -219,7 +219,7 @@ static void R_DoDrawPlane(visplane_t __far* pl)
         else
         {
             // regular flat
-#if defined FLAT_SKY
+#if defined FLAT_SPAN
             draw_column_vars_t dcvars;
             for (int16_t x = pl->minx; x <= pl->maxx; x++)
             {
