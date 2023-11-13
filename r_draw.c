@@ -277,10 +277,6 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 		uint32_t ll = (uint32_t) alw * blw;
 		uint32_t hl = (uint32_t) ahw * blw;
 		return (ll >> FRACBITS) + hl;
-	} else if (ahw == 0) {
-		uint32_t ll = (uint32_t) alw * blw;
-		uint32_t lh = (uint32_t) alw * bhw;
-		return (ll >> FRACBITS) + lh;
 	} else {
 		uint32_t ll = (uint32_t) alw * blw;
 		uint32_t lh = (uint32_t) alw * bhw;
@@ -1007,7 +1003,7 @@ static PUREFUNC boolean R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t __far
     if ((ldy ^ ldx ^ x ^ y) < 0)
         return (ldy ^ x) < 0;          // (left is negative)
 
-    return FixedMul(y, ldx>>FRACBITS) >= FixedMul(ldy>>FRACBITS, x);
+    return FixedMul(y, ldx>>FRACBITS) >= FixedMul(x, ldy>>FRACBITS);
 }
 
 
@@ -1848,7 +1844,7 @@ static void R_RenderSegLoop (int16_t rw_x)
         if (segtextured)
         {
             // calculate texture offset
-            texturecolumn = (rw_offset - FixedMul(finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT), rw_distance)) >> FRACBITS;
+            texturecolumn = (rw_offset - FixedMul(rw_distance, finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT))) >> FRACBITS;
 
             dcvars.x = rw_x;
 

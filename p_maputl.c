@@ -164,9 +164,9 @@ static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
 {
   fixed_t den;
-  return (den = FixedMul(v1->dy>>8, v2->dx) - FixedMul(v1->dx>>8, v2->dy)) ?
-    FixedDiv(FixedMul((v1->x - v2->x)>>8, v1->dy) +
-             FixedMul((v2->y - v1->y)>>8, v1->dx), den) : 0;
+  return (den = FixedMul(v2->dx, v1->dy>>8) - FixedMul(v2->dy, v1->dx>>8)) ?
+    FixedDiv(FixedMul(v1->dy, (v1->x - v2->x)>>8) +
+             FixedMul(v1->dx, (v2->y - v1->y)>>8), den) : 0;
 }
 
 //
