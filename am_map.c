@@ -230,11 +230,11 @@ static void AM_findMinMaxBoundaries(void)
     max_w = (max_x >>= FRACTOMAPBITS) - (min_x >>= FRACTOMAPBITS);//e6y
     max_h = (max_y >>= FRACTOMAPBITS) - (min_y >>= FRACTOMAPBITS);//e6y
 
-    a = FixedDiv(f_w<<FRACBITS, max_w);
-    b = FixedDiv(f_h<<FRACBITS, max_h);
+    a = FixedApproxDiv(f_w<<FRACBITS, max_w);
+    b = FixedApproxDiv(f_h<<FRACBITS, max_h);
 
     min_scale_mtof = a < b ? a : b;
-    max_scale_mtof = FixedDiv(f_h<<FRACBITS, 2*PLAYERRADIUS);
+    max_scale_mtof = FixedApproxDiv(f_h<<FRACBITS, 2*PLAYERRADIUS);
 }
 
 //
@@ -309,10 +309,10 @@ static void AM_initVariables(void)
 static void AM_LevelInit(void)
 {
     AM_findMinMaxBoundaries();
-    scale_mtof = FixedDiv(min_scale_mtof, (int32_t) (0.7*FRACUNIT));
+    scale_mtof = FixedApproxDiv(min_scale_mtof, (int32_t) (0.7*FRACUNIT));
     if (scale_mtof > max_scale_mtof)
         scale_mtof = min_scale_mtof;
-    scale_ftom = FixedDiv(FRACUNIT, scale_mtof);
+    scale_ftom = FixedReciprocal(scale_mtof);
 }
 
 //
@@ -366,7 +366,7 @@ static void AM_Start(void)
 static void AM_minOutWindowScale(void)
 {
     scale_mtof = min_scale_mtof;
-    scale_ftom = FixedDiv(FRACUNIT, scale_mtof);
+    scale_ftom = FixedReciprocal(scale_mtof);
     AM_activateNewScale();
 }
 
@@ -380,7 +380,7 @@ static void AM_minOutWindowScale(void)
 static void AM_maxOutWindowScale(void)
 {
     scale_mtof = max_scale_mtof;
-    scale_ftom = FixedDiv(FRACUNIT, scale_mtof);
+    scale_ftom = FixedReciprocal(scale_mtof);
     AM_activateNewScale();
 }
 
@@ -535,7 +535,7 @@ static void AM_changeWindowScale(void)
 {
     // Change the scaling multipliers
     scale_mtof = FixedMul(scale_mtof, mtof_zoommul);
-    scale_ftom = FixedDiv(FRACUNIT, scale_mtof);
+    scale_ftom = FixedReciprocal(scale_mtof);
 
     if (scale_mtof < min_scale_mtof)
         AM_minOutWindowScale();

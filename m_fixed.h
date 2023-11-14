@@ -66,10 +66,14 @@ typedef int32_t fixed_t;
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b);
 
 
+//Approx Reciprocal of v
+#define FixedReciprocal(v) 0xffffffff/(v)
+
+
 /*
- * Fixed Point Division
+ * Fixed Point Division approximation
  */
 
-fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b);
+fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b);
 
 #endif

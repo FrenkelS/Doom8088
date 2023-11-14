@@ -181,7 +181,7 @@ void T_VerticalDoor(vldoor_t __far* door)
       // Old code: if (door->lighttag && door->topheight - door->sector->floorheight)
       if (door->lighttag && door->topheight - door->sector->floorheight)
         EV_LightTurnOnPartway(door->line,
-                              FixedDiv(door->sector->ceilingheight -
+                              FixedApproxDiv(door->sector->ceilingheight -
                                        door->sector->floorheight,
                                        door->topheight -
                                        door->sector->floorheight));
@@ -270,7 +270,7 @@ void T_VerticalDoor(vldoor_t __far* door)
       // Old code: if (door->lighttag && door->topheight - door->sector->floorheight)
       if (door->lighttag && door->topheight - door->sector->floorheight)
         EV_LightTurnOnPartway(door->line,
-                              FixedDiv(door->sector->ceilingheight -
+                              FixedApproxDiv(door->sector->ceilingheight -
                                        door->sector->floorheight,
                                        door->topheight -
                                        door->sector->floorheight));

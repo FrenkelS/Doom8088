@@ -249,18 +249,6 @@ static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
 
 
-union int64_u {
-	int64_t ll;
-	PACKEDATTR_PRE struct {
-		int16_t wl;
-		fixed_t dw;
-		int16_t wh;
-	} PACKEDATTR_POST s;
-};
-
-typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
-
-
 #if defined __WATCOMC__
 //
 #else
@@ -291,32 +279,13 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 }
 
 
+//Approx fixed point divide of a/b using reciprocal. -> a * (1/b).
 #if defined __WATCOMC__
 //
 #else
 inline
 #endif
-fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
-{
-	if (((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b))
-		return ((a ^ b) >> 31) ^ INT32_MAX;
-	else {
-		union int64_u r;
-		// r.ll = (int64_t)a << FRACBITS;
-		r.s.wl = 0;
-		r.s.dw = a;
-		r.s.wh = (a < 0) ? 0xffff : 0x0000;
-		return r.ll / b;
-	}
-}
-
-
-//Approx Reciprocal of v
-#define FixedReciprocal(v) 0xffffffff/(v)
-
-
-//Approx fixed point divide of a/b using reciprocal. -> a * (1/b).
-inline static CONSTFUNC fixed_t FixedApproxDiv(fixed_t a, fixed_t b)
+fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 {
 	return FixedMul(a, FixedReciprocal(b));
 }
