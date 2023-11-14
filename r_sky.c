@@ -31,16 +31,14 @@
 
 
 int16_t skyflatnum;
-static int16_t skytexture;
+static int16_t skypatchnum;
+static uint16_t skywidthmask;
 
 
-#define ANGLETOSKYSHIFT         22
-
-void R_DrawSky(visplane_t __far* pl)
+static void R_DrawSkyFlat(visplane_t __far* pl)
 {
 	draw_column_vars_t dcvars;
 
-#if defined FLAT_SKY
 	for (int16_t x = pl->minx; x <= pl->maxx; x++)
 	{
 		if (pl->top[x] != 0xff &&  pl->top[x] <= pl->bottom[x])
@@ -48,11 +46,29 @@ void R_DrawSky(visplane_t __far* pl)
 			dcvars.x = x;
 			dcvars.yl = pl->top[x];
 			dcvars.yh = pl->bottom[x];
-			R_DrawColumnFlat(skytexture, &dcvars);
+			R_DrawColumnFlat(skypatchnum, &dcvars);
 		}
 	}
+}
+
+
+#define ANGLETOSKYSHIFT         22
+
+void R_DrawSky(visplane_t __far* pl)
+{
+#if defined FLAT_SKY
+	R_DrawSkyFlat(pl);
 #else
+
+	const patch_t __far* patch = W_TryGetLumpByNum(skypatchnum);
+	if (patch == NULL)
+	{
+		R_DrawSkyFlat(pl);
+		return;
+	}
+
 	// Normal Doom sky, only one allowed per level
+	draw_column_vars_t dcvars;
 	dcvars.texturemid = 100 * FRACUNIT;    // Default y-offset
 
 	// Sky is always drawn full bright, i.e. colormaps[0] is used.
@@ -64,26 +80,21 @@ void R_DrawSky(visplane_t __far* pl)
 
 	dcvars.iscale = (FRACUNIT * 200) / (VIEWWINDOWHEIGHT + 16);
 
-	const texture_t __far* tex = R_GetTexture(skytexture);
-
-	// killough 10/98: Use sky scrolling offset
 	for (int16_t x = pl->minx; (dcvars.x = x) <= pl->maxx; x++)
 	{
 		if ((dcvars.yl = pl->top[x]) != -1 && dcvars.yl <= (dcvars.yh = pl->bottom[x])) // dropoff overflow
 		{
 			int16_t xc = (viewangle + xtoviewangle(x)) >> ANGLETOSKYSHIFT;
+			int16_t x_c = xc & skywidthmask;
 
-			int16_t patch_num;
-			int16_t x_c;
-			R_GetColumn(tex, xc, &patch_num, &x_c);
-			const patch_t  __far* patch  = W_GetLumpByNum(patch_num);
 			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
 
 			dcvars.source = (const byte __far*)column + 3;
 			R_DrawColumn(&dcvars);
-			Z_ChangeTagToCache(patch);
 		}
 	}
+
+	Z_ChangeTagToCache(patch);
 #endif
 }
 
@@ -91,7 +102,10 @@ void R_DrawSky(visplane_t __far* pl)
 // Set the sky map.
 void R_InitSky(void)
 {
-	skytexture = R_CheckTextureNumForName("SKY1");
+	int16_t skytexture = R_CheckTextureNumForName("SKY1");
+	const texture_t __far* tex = R_GetTexture(skytexture);
+	skypatchnum  = tex->patches[0].patch_num;
+	skywidthmask = tex->widthmask;
 
 	// First thing, we have a dummy sky texture name,
 	//  a flat. The data is in the WAD only because
