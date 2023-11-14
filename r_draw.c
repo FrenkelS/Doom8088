@@ -841,7 +841,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 }
 
 
-void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16_t* patch_num, int16_t* x_c)
+static void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16_t* patch_num, int16_t* x_c)
 {
     const uint8_t patchcount = texture->patchcount;
     const uint16_t widthmask = texture->widthmask;
