@@ -2,9 +2,12 @@ mkdir GCCIA16
 
 unset CFLAGS
 
-ia16-elf-gcc -c i_system.c -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c r_draw.c   -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c tables.c   -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY"
+
+ia16-elf-gcc -c i_system.c $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 
 export CFLAGS="-march=i8088 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops"
 #export CFLAGS="$CFLAGS -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
@@ -34,7 +37,8 @@ export GLOBOBJS+=" p_genlin.c"
 export GLOBOBJS+=" p_inter.c"
 export GLOBOBJS+=" p_lights.c"
 export GLOBOBJS+=" p_map.c"
-export GLOBOBJS+=" p_maputl.c"
+#export GLOBOBJS+=" p_maputl.c"
+export GLOBOBJS+=" p_maputl.o"
 export GLOBOBJS+=" p_mobj.c"
 export GLOBOBJS+=" p_plats.c"
 export GLOBOBJS+=" p_pspr.c"
@@ -62,8 +66,9 @@ export GLOBOBJS+=" wi_stuff.c"
 export GLOBOBJS+=" z_bmallo.c"
 export GLOBOBJS+=" z_zone.c"
 
-ia16-elf-gcc $GLOBOBJS $CFLAGS -o GCCIA16/DOOM8088.EXE
+ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
 rm i_system.o
+rm p_maputl.o
 rm r_draw.o
 rm tables.o

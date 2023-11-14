@@ -53,9 +53,6 @@
 #include "globdata.h"
 
 
-//#define DISABLE_STATUS_BAR
-
-
 //
 // Typedefs of widgets
 //
@@ -710,7 +707,7 @@ static void ST_drawWidgets(void)
 
 static void ST_refreshBackground(void)
 {
-	const uint16_t st_offset = (SCREENHEIGHT - ST_SCALED_HEIGHT) * SCREENWIDTH;
+	static const uint16_t st_offset = (SCREENHEIGHT - ST_HEIGHT) * SCREENWIDTH;
 	V_DrawRaw("STBAR", st_offset);
 }
 

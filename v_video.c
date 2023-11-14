@@ -56,19 +56,18 @@ void V_DrawBackground(void)
 {
     /* erase the entire screen to a tiled background */
     const byte __far* src = W_GetLumpByName("FLOOR4_8");
-    uint16_t __far* dest = _g_screen;
 
     for(uint8_t y = 0; y < SCREENHEIGHT; y++)
     {
-        for(uint16_t x = 0; x < 240; x+=64)
+        for(uint16_t x = 0; x < SCREENWIDTH; x+=64)
         {
-            uint16_t __far* d = &dest[ ScreenYToOffset(y) + (x >> 1)];
+            uint8_t __far* d = &_g_screen[y * SCREENWIDTH + x];
             const byte __far* s = &src[((y&63) * 64) + (x&63)];
 
             uint8_t len = 64;
 
-            if( (240-x) < 64)
-                len = 240-x;
+            if (SCREENWIDTH - x < 64)
+                len = SCREENWIDTH - x;
 
             _fmemcpy(d, s, len);
         }
@@ -101,86 +100,54 @@ void V_DrawRaw(const char *name, uint16_t offset)
 
 static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
 {
+    static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
+    static const int32_t   DXI = (((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH;
+    static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
+    static const int16_t   DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
+
     y -= patch->topoffset;
     x -= patch->leftoffset;
 
+    const int16_t left   = ( x * DX ) >> FRACBITS;
+    const int16_t right  = ((x + patch->width)  * DX) >> FRACBITS;
+    const int16_t bottom = ((y + patch->height) * DY) >> FRACBITS;
+
     int32_t   col = 0;
 
-    const int32_t   DX  = (((int32_t)240)<<FRACBITS) / 320;
-    const int32_t   DXI = (((int32_t)320)<<FRACBITS) / 240;
-    const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / 200;
-    const int32_t   DYI = (((int32_t)200)<<FRACBITS) / SCREENHEIGHT;
-
-    byte __far* byte_topleft = (byte __far*)_g_screen;
-    const int32_t byte_pitch = (SCREENPITCH * 2);
-
-    const int32_t left = ( x * DX ) >> FRACBITS;
-    const int32_t right =  ((x + patch->width) *  DX) >> FRACBITS;
-    const int32_t bottom = ((y + patch->height) * DY) >> FRACBITS;
-
-    for (int32_t dc_x=left; dc_x<right; dc_x++, col+=DXI)
+    for (int16_t dc_x = left; dc_x < right; dc_x++, col += DXI)
     {
-        int16_t colindex = (col>>FRACBITS);
-
-        if(dc_x < 0)
+        if (dc_x < 0)
             continue;
-
-        const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[colindex]);
-
-        if (dc_x >= 240)
+        else if (dc_x >= SCREENWIDTH)
             break;
+
+        const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> FRACBITS]);
 
         // step through the posts in a column
         while (column->topdelta != 0xff)
         {
-            const byte __far* source = (const byte __far*)column + 3;
-            const int32_t topdelta = column->topdelta;
-
-            int32_t dc_yl = (((y + topdelta) * DY) >> FRACBITS);
-            int32_t dc_yh = (((y + topdelta + column->length) * DY) >> FRACBITS);
+            int16_t dc_yl = (((y + column->topdelta) * DY) >> FRACBITS);
 
             if ((dc_yl >= SCREENHEIGHT) || (dc_yl > bottom))
                 break;
 
-            int32_t count = (dc_yh - dc_yl);
+            int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
 
-            byte __far* dest = byte_topleft + (dc_yl*byte_pitch) + dc_x;
+            byte __far* dest = _g_screen + (dc_yl * SCREENWIDTH) + dc_x;
 
-            const fixed_t fracstep = DYI;
-            fixed_t frac = 0;
+            int16_t frac = 0;
 
-            // Inner loop that does the actual texture mapping,
-            //  e.g. a DDA-lile scaling.
-            // This is as fast as it gets.
+            const byte __far* source = (const byte __far*)column + 3;
+
+            int16_t count = dc_yh - dc_yl;
             while (count--)
             {
-                uint16_t color = source[frac >> FRACBITS];
-
-                //The GBA must write in 16bits.
-                if((uint32_t)dest & 1)
-                {
-                    //Odd addreses, we combine existing pixel with new one.
-                    uint16_t __far* dest16 = (uint16_t __far*)(dest - 1);
-
-
-                    uint16_t old = *dest16;
-
-                    *dest16 = (old & 0xff) | (color << 8);
-                }
-                else
-                {
-                    uint16_t __far* dest16 = (uint16_t __far*)dest;
-
-                    uint16_t old = *dest16;
-
-                    *dest16 = ((color & 0xff) | (old & 0xff00));
-                }
-
-                dest += byte_pitch;
-                frac += fracstep;
+                *dest = source[frac >> 8];
+                dest += SCREENWIDTH;
+                frac += DYI;
             }
 
-            column = (const column_t __far*)((const byte __far*)column + column->length + 4 );
+            column = (const column_t __far*)((const byte __far*)column + column->length + 4);
         }
     }
 }
@@ -191,8 +158,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
     y -= patch->topoffset;
     x -= patch->leftoffset;
 
-    byte __far* desttop = (byte __far*)_g_screen;
-    desttop += (ScreenYToOffset(y) << 1) + x;
+    byte __far* desttop = _g_screen + (y * SCREENWIDTH) + x;
 
     int16_t width = patch->width;
 
@@ -204,14 +170,14 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
         while (column->topdelta != 0xff)
         {
             const byte __far* source = (const byte __far*)column + 3;
-            byte __far* dest = desttop + (ScreenYToOffset(column->topdelta) << 1);
+            byte __far* dest = desttop + (column->topdelta * SCREENWIDTH);
 
             uint16_t count = column->length;
 
             while (count--)
             {
                 *dest = *source++;
-                dest += (SCREENWIDTH * 2);
+                dest += SCREENWIDTH;
             }
 
             column = (const column_t __far*)((const byte __far*)column + column->length + 4);
@@ -249,13 +215,11 @@ void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
 //
 void V_FillRect(byte colour)
 {
-	_fmemset(_g_screen, colour, SCREENWIDTH * 2 * (SCREENHEIGHT - ST_HEIGHT));
+	_fmemset(_g_screen, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
 }
 
 
 void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
-    byte __far * fb = (byte __far*)_g_screen;
-
-    fb[(ScreenYToOffset(y) << 1) + x] = color;
+    _g_screen[y * SCREENWIDTH + x] = color;
 }

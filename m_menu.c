@@ -94,8 +94,6 @@ typedef struct menu_s
 //
 int16_t _g_alwaysRun;
 
-int16_t _g_highDetail;
-
 uint16_t _g_gamma;
 
 static boolean messageToPrint;  // true = message to be printed
@@ -147,7 +145,6 @@ static void M_EndGame(int16_t choice);
 
 static void M_ChangeMessages(int16_t choice);
 static void M_ChangeAlwaysRun(int16_t choice);
-static void M_ChangeDetail(int16_t choice);
 static void M_ChangeGamma(int16_t choice);
 static void M_SfxVol(int16_t choice);
 static void M_MusicVol(int16_t choice);
@@ -521,7 +518,6 @@ enum
   endgame,
   messages,
   alwaysrun,
-  detail,
   gamma,
   soundvol,
   opt_end
@@ -535,8 +531,7 @@ static const menuitem_t OptionsMenu[]=
   {1,"M_ENDGAM", M_EndGame},
   {1,"M_MESSG",  M_ChangeMessages},
   {1,"M_ARUN",   M_ChangeAlwaysRun},
-  {1,"M_DETAIL", M_ChangeDetail},
-  {2,"M_GAMMA",   M_ChangeGamma},
+  {2,"M_GAMMA",  M_ChangeGamma},
   {1,"M_SVOL",   M_Sound}
 };
 
@@ -553,7 +548,6 @@ static const menu_t OptionsDef =
 // M_Options
 //
 static const char msgNames[2][9]  = {"M_MSGOFF","M_MSGON"};
-static const char detailNames[2][9]  = {"M_GDLOW","M_GDHIGH"};
 
 
 static void M_DrawOptions(void)
@@ -565,8 +559,6 @@ static void M_DrawOptions(void)
   V_DrawNamePatch(OptionsDef.x + 120, OptionsDef.y+LINEHEIGHT*messages, msgNames[showMessages]);
 
   V_DrawNamePatch(OptionsDef.x + 146, OptionsDef.y+LINEHEIGHT*alwaysrun, msgNames[_g_alwaysRun]);
-
-  V_DrawNamePatch(OptionsDef.x + 176, OptionsDef.y+LINEHEIGHT*detail, detailNames[_g_highDetail]);
 
   M_DrawThermo(OptionsDef.x + 158, OptionsDef.y+LINEHEIGHT*gamma+2,6,_g_gamma);
 }
@@ -727,20 +719,6 @@ static void M_ChangeAlwaysRun(int16_t choice)
       _g_player.message = RUNOFF; // Ty 03/27/98 - externalized
     else
       _g_player.message = RUNON ; // Ty 03/27/98 - externalized
-
-    G_SaveSettings();
-}
-
-static void M_ChangeDetail(int16_t choice)
-{
-    UNUSED(choice);
-
-    _g_highDetail = 1 - _g_highDetail;
-
-    if (!_g_highDetail)
-      _g_player.message = LOWDETAIL; // Ty 03/27/98 - externalized
-    else
-      _g_player.message = HIGHDETAIL ; // Ty 03/27/98 - externalized
 
     G_SaveSettings();
 }

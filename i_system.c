@@ -183,22 +183,22 @@ void I_StartTic(void)
 //
 
 static boolean isGraphicsModeSet = false;
-static uint16_t __far* screen;
-static uint16_t __far* backBuffer;
+static uint8_t __far* screen;
+static uint8_t __far* backBuffer;
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-uint16_t __far* _g_screen;
+uint8_t  __far* _g_screen;
 
 
-uint16_t __far* I_GetBackBuffer(void)
+uint8_t __far* I_GetBackBuffer(void)
 {
 	return backBuffer;
 }
 
 
-void I_CopyBackBufferToBuffer(uint16_t __far* buffer)
+void I_CopyBackBufferToBuffer(uint8_t __far* buffer)
 {
-	_fmemcpy(buffer, backBuffer, SCREENWIDTH * SCREENHEIGHT * 2u);
+	_fmemcpy(buffer, backBuffer, SCREENWIDTH * SCREENHEIGHT);
 }
 
 
@@ -222,14 +222,14 @@ void I_FinishUpdate (void)
 
 void I_InitGraphics(void)
 {	
-	I_SetScreenMode(8); // 4 = 320x200x4, 6 = 640x200x2, 8 = 160x200x16
+	I_SetScreenMode(6); // 4 = 320x200x4, 6 = 640x200x2, 8 = 160x200x16
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
-	screen = D_MK_FP(0xb800, 10 * 80 + __djgpp_conventional_base);
+	screen = D_MK_FP(0xb800, 10 * 80 + 10 + __djgpp_conventional_base);
 
-	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
-	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT * sizeof(uint16_t));
+	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
+	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT);
 }
 
 
@@ -239,31 +239,32 @@ void I_StartDisplay(void)
 }
 
 
-void I_DrawBuffer(uint16_t __far* buffer)
+void I_DrawBuffer(uint8_t __far* buffer)
 {
-	uint8_t __far* src = (uint8_t __far*) buffer;
-	uint8_t __far* dst = (uint8_t __far*) screen;
+	uint8_t __far* src = buffer;
+	uint8_t __far* dst = screen;
 
+#if defined DISABLE_STATUS_BAR
+	for (uint_fast8_t y = 0; y < 80 - 16; y++) {
+#else
 	for (uint_fast8_t y = 0; y < 80; y++) {
-		for (uint_fast8_t x = 0; x < 80; x++) {
+#endif
+		for (uint_fast8_t x = 0; x < 60; x++) {
 			*dst++ = *src;
-			src++;
-			src++;
-			src++;
+			src+=4;
 		}
 
-		dst += 0x2000 - 80;
+		dst += 0x2000 - 60;
 
-		for (uint_fast8_t x = 0; x < 80; x++) {
+		for (uint_fast8_t x = 0; x < 60; x++) {
 			uint8_t b = *src;
 			*dst++ = (b << 4 | b >> 4);
-			src++;
-			src++;
-			src++;
+			src+=4;
 		}
 
-		dst -= 0x2000;
+		dst -= 0x2000 - 20;
 	}
+
 }
 
 

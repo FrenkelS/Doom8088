@@ -319,7 +319,7 @@ static void D_UpdateFPS()
     if(timenow >= (fps_timebefore + TICRATE))
     {
         uint32_t tics_elapsed = timenow - fps_timebefore;
-        fixed_t f_realfps = FixedDiv((fps_frames*(TICRATE*10)) << FRACBITS, tics_elapsed <<FRACBITS);
+        fixed_t f_realfps = FixedApproxDiv((fps_frames*(TICRATE*10)) << FRACBITS, tics_elapsed <<FRACBITS);
 
         _g_fps_framerate = (f_realfps >> FRACBITS);
 
@@ -503,8 +503,6 @@ static void D_DoomMainSetup(void)
 
     printf("ST_Init: Init status bar.\n");
     ST_Init();
-
-    _g_highDetail = 0;
 
     G_LoadSettings();
 

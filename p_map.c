@@ -601,8 +601,8 @@ static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mob
       {
         // Get the thing's position along the source linedef
         fixed_t pos = D_abs(line->dx) > D_abs(line->dy) ?
-          FixedDiv(thing->x - line->v1.x, line->dx) :
-          FixedDiv(thing->y - line->v1.y, line->dy) ;
+          FixedApproxDiv(thing->x - line->v1.x, line->dx) :
+          FixedApproxDiv(thing->y - line->v1.y, line->dy) ;
 
         // Get the angle between the two linedefs, for rotating
         // orientation and momentum. Rotate 180 degrees, and flip
@@ -1696,7 +1696,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
 
         if (LN_FRONTSECTOR(li)->floorheight != LN_BACKSECTOR(li)->floorheight)
         {
-            slope = FixedDiv (_g_openbottom - shootz , dist);
+            slope = FixedApproxDiv (_g_openbottom - shootz , dist);
 
             if (slope > bottomslope)
                 bottomslope = slope;
@@ -1704,7 +1704,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
 
         if (LN_FRONTSECTOR(li)->ceilingheight != LN_BACKSECTOR(li)->ceilingheight)
         {
-            slope = FixedDiv (_g_opentop - shootz , dist);
+            slope = FixedApproxDiv (_g_opentop - shootz , dist);
             if (slope < topslope)
                 topslope = slope;
         }
@@ -1733,12 +1733,12 @@ static boolean PTR_AimTraverse (intercept_t* in)
     // check angles to see if the thing can be aimed at
 
     dist = FixedMul (attackrange, in->frac);
-    thingtopslope = FixedDiv (th->z+th->height - shootz , dist);
+    thingtopslope = FixedApproxDiv (th->z+th->height - shootz , dist);
 
     if (thingtopslope < bottomslope)
         return true;    // shot over the thing
 
-    thingbottomslope = FixedDiv (th->z - shootz, dist);
+    thingbottomslope = FixedApproxDiv (th->z - shootz, dist);
 
     if (thingbottomslope > topslope)
         return true;    // shot under the thing
@@ -1966,16 +1966,16 @@ static boolean PTR_ShootTraverse (intercept_t* in)
       dist = FixedMul(attackrange, in->frac);
 
       if ((LN_FRONTSECTOR(li)->floorheight==LN_BACKSECTOR(li)->floorheight ||
-         (slope = FixedDiv(_g_openbottom - shootz , dist)) <= aimslope) &&
+         (slope = FixedApproxDiv(_g_openbottom - shootz , dist)) <= aimslope) &&
          (LN_FRONTSECTOR(li)->ceilingheight==LN_BACKSECTOR(li)->ceilingheight ||
-         (slope = FixedDiv (_g_opentop - shootz , dist)) >= aimslope))
+         (slope = FixedApproxDiv (_g_opentop - shootz , dist)) >= aimslope))
         return true;      // shot continues
     }
 
     // hit line
     // position a bit closer
 
-    frac = in->frac - FixedDiv(4 * FRACUNIT, attackrange);
+    frac = in->frac - FixedApproxDiv(4 * FRACUNIT, attackrange);
     x = _g_trace.x + FixedMul(_g_trace.dx, frac);
     y = _g_trace.y + FixedMul(_g_trace.dy, frac);
     z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
@@ -2019,12 +2019,12 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   // check angles to see if the thing can be aimed at
 
   dist = FixedMul (attackrange, in->frac);
-  thingtopslope = FixedDiv (th->z+th->height - shootz , dist);
+  thingtopslope = FixedApproxDiv (th->z+th->height - shootz , dist);
 
   if (thingtopslope < aimslope)
     return true;  // shot over the thing
 
-  thingbottomslope = FixedDiv (th->z - shootz, dist);
+  thingbottomslope = FixedApproxDiv (th->z - shootz, dist);
 
   if (thingbottomslope > aimslope)
     return true;  // shot under the thing
@@ -2032,7 +2032,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   // hit thing
   // position a bit closer
 
-  frac = in->frac - FixedDiv (10*FRACUNIT,attackrange);
+  frac = in->frac - FixedApproxDiv (10*FRACUNIT,attackrange);
 
   x = _g_trace.x + FixedMul(_g_trace.dx, frac);
   y = _g_trace.y + FixedMul(_g_trace.dy, frac);

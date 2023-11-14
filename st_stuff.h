@@ -42,7 +42,6 @@
 // Size of statusbar.
 
 #define ST_HEIGHT 32
-#define ST_SCALED_HEIGHT ST_HEIGHT
 
 
 //

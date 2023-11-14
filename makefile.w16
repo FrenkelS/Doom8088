@@ -32,10 +32,10 @@
 #
 # --------------------------------------------------------------------------
 
-#CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
-#CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99
-CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
-CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99
+#CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR
+#CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR
+CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR
+CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR
 
 GLOBOBJS = &
  a_taskmn.obj &
@@ -99,6 +99,9 @@ WC16\DOOM16WC.EXE : $(GLOBOBJS)
 
 
 i_system.obj : i_system.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
+p_maputl.obj : p_maputl.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
 r_draw.obj : r_draw.c

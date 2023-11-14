@@ -42,11 +42,6 @@
 #include "config.h"
 #endif
 
-// killough 4/25/98: Make gcc extensions mean nothing on other compilers
-#ifndef __GNUC__
-#define __attribute__(x)
-#endif
-
 #include <stdint.h>
 
 // This must come first, since it redefines malloc(), free(), etc. -- killough:
@@ -64,14 +59,15 @@
 #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings
 
 
+#define VIEWWINDOWWIDTH  60
+#define VIEWWINDOWHEIGHT 128
+
 // SCREENWIDTH and SCREENHEIGHT define the visible size
-#define SCREENWIDTH 120
+#define SCREENWIDTH  240u
 #define SCREENHEIGHT 160
-#define SCREENPITCH SCREENWIDTH //In shorts.
-// SCREENPITCH is the size of one line in the buffer and
-// can be bigger than the SCREENWIDTH depending on the size
-// of one pixel (8, 16 or 32 bit) and the padding at the
-// end of the line caused by hardware considerations
+
+#define SCREENWIDTH_VGA  320
+#define SCREENHEIGHT_VGA 200
 
 
 // The maximum number of players, multiplayer/networking.
@@ -101,21 +97,6 @@ typedef enum {
 //
 // Difficulty/skill settings/filters.
 //
-// These are Thing flags
-
-// Skill flags.
-#define MTF_EASY                1
-#define MTF_NORMAL              2
-#define MTF_HARD                4
-// Deaf monsters/do not react to sound.
-#define MTF_AMBUSH              8
-
-/* killough 11/98 */
-#define MTF_NOTSINGLE          16
-#define MTF_NOTDM              32
-#define MTF_NOTCOOP            64
-#define MTF_FRIEND            128
-#define MTF_RESERVED          256
 
 typedef enum {
   sk_none=-1, //jff 3/24/98 create unpicked skill setting

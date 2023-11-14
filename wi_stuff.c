@@ -248,13 +248,13 @@ static void WI_drawLF(void)
   /* cph - get the graphic lump name and use it */
   WI_levelNameLump(wbs->last, lname);
   // CPhipps - patch drawing updated
-  V_DrawNamePatch((320 - V_NamePatchWidth(lname))/2, y, lname);
+  V_DrawNamePatch((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
 
   // draw "Finished!"
   y += (5*V_NamePatchHeight(lname))/4;
 
   // CPhipps - patch drawing updated
-  V_DrawNamePatch((320 - V_NamePatchWidth(finished))/2, y, finished);
+  V_DrawNamePatch((SCREENWIDTH_VGA - V_NamePatchWidth(finished))/2, y, finished);
 }
 
 
@@ -274,13 +274,13 @@ static void WI_drawEL(void)
 
   // draw "Entering"
   // CPhipps - patch drawing updated
-  V_DrawNamePatch((320 - V_NamePatchWidth(entering))/2, y, entering);
+  V_DrawNamePatch((SCREENWIDTH_VGA - V_NamePatchWidth(entering))/2, y, entering);
 
   // draw level
   y += (5*V_NamePatchHeight(lname))/4;
 
   // CPhipps - patch drawing updated
-  V_DrawNamePatch((320 - V_NamePatchWidth(lname))/2, y, lname);
+  V_DrawNamePatch((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
 }
 
 
@@ -311,7 +311,7 @@ static void WI_drawOnLnode(int8_t n, const char* const c[])
 		bottom = top + patch->height;
 		Z_ChangeTagToCache(patch);
 
-		if (0 <= left && right < 320 && 0 <= top && bottom < 200)
+		if (0 <= left && right < SCREENWIDTH_VGA && 0 <= top && bottom < SCREENHEIGHT_VGA)
 		{
 			fits = true;
 		}
@@ -495,18 +495,18 @@ static void WI_initNoState(void)
 static void WI_drawTimeStats(int32_t cnt_time, int32_t cnt_total_time, int32_t cnt_par)
 {
   V_DrawNamePatch(SP_TIMEX, SP_TIMEY, time1);
-  WI_drawTime(320/2 - SP_TIMEX, SP_TIMEY, cnt_time);
+  WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, SP_TIMEY, cnt_time);
 
-  V_DrawNamePatch(SP_TIMEX, (SP_TIMEY+200)/2, total);
-  WI_drawTime(320/2 - SP_TIMEX, (SP_TIMEY+200)/2, cnt_total_time);
+  V_DrawNamePatch(SP_TIMEX, (SP_TIMEY + SCREENHEIGHT_VGA) / 2, total);
+  WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, (SP_TIMEY + SCREENHEIGHT_VGA) / 2, cnt_total_time);
 
   // Ty 04/11/98: redid logic: should skip only if with pwad but
   // without deh patch
   // killough 2/22/98: skip drawing par times on pwads
   // Ty 03/17/98: unless pars changed with deh patch
 
-  V_DrawNamePatch(320/2 + SP_TIMEX, SP_TIMEY, par);
-  WI_drawTime(320 - SP_TIMEX, SP_TIMEY, cnt_par);
+  V_DrawNamePatch(SCREENWIDTH_VGA / 2 + SP_TIMEX, SP_TIMEY, par);
+  WI_drawTime(SCREENWIDTH_VGA - SP_TIMEX, SP_TIMEY, cnt_par);
 }
 
 // ====================================================================
@@ -769,15 +769,15 @@ static void WI_drawStats(void)
 
 	V_DrawNamePatch(SP_STATSX, SP_STATSY, kills);
 	if (cnt_kills)
-		WI_drawPercent(320 - SP_STATSX, SP_STATSY, cnt_kills);
+		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY, cnt_kills);
 
 	V_DrawNamePatch(SP_STATSX, SP_STATSY + lineHeight, items);
 	if (cnt_items)
-		WI_drawPercent(320 - SP_STATSX, SP_STATSY + lineHeight, cnt_items);
+		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + lineHeight, cnt_items);
 
 	V_DrawNamePatch(SP_STATSX, SP_STATSY + 2 * lineHeight, sp_secret);
 	if (cnt_secret)
-		WI_drawPercent(320 - SP_STATSX, SP_STATSY + 2 * lineHeight, cnt_secret);
+		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + 2 * lineHeight, cnt_secret);
 
 	WI_drawTimeStats(cnt_time, cnt_total_time, cnt_par);
 }

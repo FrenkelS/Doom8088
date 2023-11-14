@@ -86,8 +86,6 @@ extern boolean    _g_message_dontfuckwithme;
 //
 extern int16_t _g_alwaysRun;
 
-extern int16_t _g_highDetail;
-
 extern boolean _g_menuactive;    // The menus are up
 
 extern char _g_savegamestrings[8][8];
@@ -234,7 +232,7 @@ extern visplane_t __far* _g_freetail;
 //******************************************************************************
 
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
-extern uint16_t __far* _g_screen;
+extern uint8_t  __far* _g_screen;
 
 //******************************************************************************
 //wi_stuff.c

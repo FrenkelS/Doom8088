@@ -71,9 +71,6 @@
 #define RUNOFF      "Take your time."
 #define RUNON       "In a hurry, marine?"
 
-#define HIGHDETAIL  "High Detail."
-#define LOWDETAIL   "Low Detail."
-
 #define ENDGAME     "are you sure you want to\nend the game?\n\n"PRESSYN
 
 

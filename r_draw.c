@@ -56,9 +56,6 @@
 #include "globdata.h"
 
 
-#define FLAT_WALL
-
-
 visplane_t __far* _g_visplanes[MAXVISPLANES];
 visplane_t __far* _g_freetail;
 
@@ -66,22 +63,22 @@ visplane_t __far* _g_freetail;
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
 
 
-#define MAXOPENINGS (SCREENWIDTH*16)
+#define MAXOPENINGS (VIEWWINDOWWIDTH*16)
 
 static int16_t openings[MAXOPENINGS];
 static int16_t* lastopening;
 
 
-static const int8_t viewangletoxTable[2039];
+static const int8_t viewangletoxTable[2027];
 
 static int8_t viewangletox(int16_t viewangle)
 {
-	if (viewangle < 1034)		//    0 <= viewangle < 1034
-		return 120;
+	if (viewangle < 1046)		//    0 <= viewangle < 1046
+		return VIEWWINDOWWIDTH;
 	else if (3073 <= viewangle)	// 3073 <= viewangle < 4096
 		return 0;
-	else						// 1034 <= viewangle < 3073
-		return viewangletoxTable[viewangle - 1034];
+	else						// 1046 <= viewangle < 3073
+		return viewangletoxTable[viewangle - 1046];
 }
 
 
@@ -106,38 +103,38 @@ static fixed_t finetangent(int16_t x)
 }
 
 
-int16_t floorclip[SCREENWIDTH];
-int16_t ceilingclip[SCREENWIDTH];
+int16_t floorclip[VIEWWINDOWWIDTH];
+int16_t ceilingclip[VIEWWINDOWWIDTH];
 
 
-static int16_t screenheightarray[SCREENWIDTH] =
+static int16_t screenheightarray[VIEWWINDOWWIDTH] =
 {
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
 
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128,
-	128, 128, 128, 128, 128, 128,	128, 128, 128, 128, 128, 128
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT
 };
 
-static int16_t negonearray[SCREENWIDTH] =
+static int16_t negonearray[VIEWWINDOWWIDTH] =
 {
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1,
 
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1,		-1, -1, -1, -1, -1, -1
+	-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1
 };
 
 
@@ -152,7 +149,7 @@ fixed_t  viewx, viewy, viewz;
 
 angle_t  viewangle;
 
-static byte solidcol[SCREENWIDTH];
+static byte solidcol[VIEWWINDOWWIDTH];
 
 static const seg_t     __far* curline;
 static side_t    __far* sidedef;
@@ -232,8 +229,6 @@ static int32_t      worldlow;
 
 static lighttable_t current_colormap[256];
 
-int16_t highDetail = 0;
-
 
 uint16_t validcount = 1;         // increment every time a check is made
 visplane_t __far*__far* freehead;
@@ -242,35 +237,16 @@ visplane_t __far*__far* freehead;
 // Constants
 //*****************************************
 
-static const int16_t viewheight = SCREENHEIGHT-ST_SCALED_HEIGHT;
-static const int16_t centery = (SCREENHEIGHT-ST_SCALED_HEIGHT)/2;
-static const int32_t centerxfrac = ((int32_t)(SCREENWIDTH/2)) << FRACBITS;
-static const int32_t centeryfrac = ((int32_t)((SCREENHEIGHT-ST_SCALED_HEIGHT)/2)) << FRACBITS;
+static const int16_t CENTERX = VIEWWINDOWWIDTH  / 2;
+static const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
 
-static const fixed_t projection = ((int32_t)(SCREENWIDTH/2)) << FRACBITS;
+static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 
-static const fixed_t projectiony = ((SCREENHEIGHT * (SCREENWIDTH/2L) * 320) / 200) / SCREENWIDTH * FRACUNIT;
-
-static const int16_t pspritescale = FRACUNIT*SCREENWIDTH/320;
-static const fixed_t pspriteiscale = FRACUNIT*320/SCREENWIDTH;
-
-static const uint16_t pspriteyscale = (((int32_t)SCREENHEIGHT) << FRACBITS) / 200;
-static const fixed_t pspriteyiscale = ((UINT32_MAX) / ((((int32_t)SCREENHEIGHT) << FRACBITS) / 200));
+static const int16_t  PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
+static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_VGA;
 
 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
-
-
-union int64_u {
-	int64_t ll;
-	PACKEDATTR_PRE struct {
-		int16_t wl;
-		fixed_t dw;
-		int16_t wh;
-	} PACKEDATTR_POST s;
-};
-
-typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
 
 
 #if defined __WATCOMC__
@@ -280,34 +256,39 @@ inline
 #endif
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 {
-	union int64_u r;
-	r.ll = (int64_t)a * b;
-	return r.s.dw; // r.ll >> FRACBITS;
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+	uint16_t blw = b;
+	 int16_t bhw = b >> FRACBITS;
+
+	if (bhw == 0) {
+		uint32_t ll = (uint32_t) alw * blw;
+		uint32_t hl = (uint32_t) ahw * blw;
+		return (ll >> FRACBITS) + hl;
+	} else if (ahw == 0) {
+		uint32_t ll = (uint32_t) alw * blw;
+		uint32_t lh = (uint32_t) alw * bhw;
+		return (ll >> FRACBITS) + lh;
+	} else {
+		uint32_t ll = (uint32_t) alw * blw;
+		uint32_t lh = (uint32_t) alw * bhw;
+		uint32_t hl = (uint32_t) ahw * blw;
+		uint32_t hh = (uint32_t) ahw * bhw;
+		return (ll >> FRACBITS) + lh + hl + (hh << FRACBITS);
+	}
 }
 
 
+//Approx fixed point divide of a/b using reciprocal. -> a * (1/b).
 #if defined __WATCOMC__
 //
 #else
 inline
 #endif
-fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
+fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 {
-	if (((uint32_t)D_abs(a)>>14) >= (uint32_t)D_abs(b))
-		return (a >> 31) ^ (b >> 31) ^ INT32_MAX;
-	else {
-		union int64_u r;
-		// r.ll = (int64_t)a << FRACBITS;
-		r.s.wl = 0;
-		r.s.dw = a;
-		r.s.wh = (a < 0) ? 0xffff : 0x0000;
-		return r.ll / b;
-	}
+	return FixedMul(a, FixedReciprocal(b));
 }
-
-
-//Approx Reciprocal of v
-#define FixedReciprocal(v) 0xffffffff/(v)
 
 
 //
@@ -370,7 +351,7 @@ static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
     if (den == 0)
         return SLOPERANGE;
 
-    const uint16_t ans = FixedDiv(num << 3, den) >> FRACBITS;
+    const uint16_t ans = FixedApproxDiv(num << 3, den) >> FRACBITS;
 
     return (ans <= SLOPERANGE) ? ans : SLOPERANGE;
 }
@@ -491,7 +472,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
         dy = t;
     }
 
-    return FixedDiv(dx, finesine((tantoangle(FixedDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT));
+    return FixedApproxDiv(dx, finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT));
 }
 
 
@@ -560,11 +541,9 @@ const lighttable_t* R_LoadColorMap(int16_t lightlevel)
 #define COLEXTRABITS 9
 #define COLBITS (FRACBITS + COLEXTRABITS)
 
-inline static void R_DrawColumnPixel(uint16_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t frac)
+inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t frac)
 {
-	uint16_t color = colormap[source[frac>>COLBITS]];
-
-	*dest = (color | (color << 8));
+	*dest = colormap[source[frac>>COLBITS]];
 }
 
 
@@ -579,10 +558,10 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     const byte __far* source   = dcvars->source;
     const byte __far* colormap = dcvars->colormap;
 
-    uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+    uint8_t __far* dest = _g_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 
     const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
-    uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery) * dcvars->iscale) << COLEXTRABITS;
+    uint32_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) << COLEXTRABITS;
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
@@ -642,87 +621,20 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	const uint16_t color = (texture << 8) | texture;
+	const uint16_t color = texture;
 
-	uint16_t __far* dest = _g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x;
+	uint8_t __far* dest = _g_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
+	uint16_t __far* d = (uint16_t __far*) dest;
 
-	uint16_t l = count >> 4;
-
-	while (l--)
+	while (count--)
 	{
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-	}
-
-	switch (count & 15)
-	{
-		case 15:	*dest = color; dest += SCREENWIDTH;
-		case 14:	*dest = color; dest += SCREENWIDTH;
-		case 13:	*dest = color; dest += SCREENWIDTH;
-		case 12:	*dest = color; dest += SCREENWIDTH;
-		case 11:	*dest = color; dest += SCREENWIDTH;
-		case 10:	*dest = color; dest += SCREENWIDTH;
-		case  9:	*dest = color; dest += SCREENWIDTH;
-		case  8:	*dest = color; dest += SCREENWIDTH;
-		case  7:	*dest = color; dest += SCREENWIDTH;
-		case  6:	*dest = color; dest += SCREENWIDTH;
-		case  5:	*dest = color; dest += SCREENWIDTH;
-		case  4:	*dest = color; dest += SCREENWIDTH;
-		case  3:	*dest = color; dest += SCREENWIDTH;
-		case  2:	*dest = color; dest += SCREENWIDTH;
-		case  1:	*dest = color;
+		*dest = color;
+		dest += SCREENWIDTH;
 	}
 }
 
 
-static void R_DrawColumnHiRes(const draw_column_vars_t *dcvars)
-{
-    int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
-
-    const byte __far* source   = dcvars->source;
-    const byte __far* colormap = dcvars->colormap;
-
-    volatile uint8_t __far* dest = (uint8_t __far*)(_g_screen + ScreenYToOffset(dcvars->yl) + dcvars->x);
-    dest += dcvars->odd_pixel;
-
-    const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
-    uint32_t frac = (dcvars->texturemid + (dcvars->yl - centery)*dcvars->iscale) << COLEXTRABITS;
-
-    // Inner loop that does the actual texture mapping,
-    //  e.g. a DDA-lile scaling.
-    // This is as fast as it gets.
-
-    while(count--)
-    {
-        *dest = colormap[source[frac>>COLBITS]];
-
-        dest += SCREENWIDTH*2;
-        frac += fracstep;
-    }
-}
-
-#define FUZZOFF (SCREENWIDTH)
+#define FUZZOFF (VIEWWINDOWWIDTH)
 #define FUZZTABLE 50
 
 static const int8_t fuzzoffset[FUZZTABLE] =
@@ -754,8 +666,8 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
         dc_yl = 1;
 
     // .. and high.
-    if (dc_yh >= viewheight-1)
-        dc_yh = viewheight - 2;
+    if (dc_yh >= VIEWWINDOWHEIGHT - 1)
+        dc_yh = VIEWWINDOWHEIGHT - 2;
 
     int16_t count = (dc_yh - dc_yl) + 1;
 
@@ -765,13 +677,14 @@ static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 
     const byte __far* colormap = &fullcolormap[6 * 256];
 
-    uint16_t __far* dest = _g_screen + ScreenYToOffset(dc_yl) + dcvars->x;
+    uint8_t __far* dest = _g_screen + (dc_yl * SCREENWIDTH) + (dcvars->x << 2);
 
     static int16_t fuzzpos = 0;
 
     do
     {        
-        R_DrawColumnPixel(dest, (const byte __far*)&dest[fuzzoffset[fuzzpos]], colormap, 0); dest += SCREENWIDTH;
+        R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], colormap, 0);
+        dest += SCREENWIDTH;
 
         fuzzpos++;
         if (fuzzpos >= FUZZTABLE)
@@ -813,7 +726,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
             yl = cclip_x + 1;
 
         // killough 3/2/98, 3/27/98: Failsafe against overflow/crash:
-        if (yl <= yh && yh < viewheight)
+        if (yl <= yh && yh < VIEWWINDOWHEIGHT)
         {
             dcvars->source =  (const byte __far*)column + 3;
 
@@ -822,8 +735,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
             dcvars->yh = yh;
             dcvars->yl = yl;
 
-            // Drawn by either R_DrawColumn, R_DrawColumnHiRes
-            //  or (SHADOW) R_DrawFuzzColumn.
+            // Drawn by either R_DrawColumn or (SHADOW) R_DrawFuzzColumn.
             colfunc (dcvars);
         }
 
@@ -882,7 +794,6 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     R_DrawColumn_f colfunc = R_DrawColumn;
     draw_column_vars_t dcvars;
-    boolean hires = false;
 
     R_SetDefaultDrawColumnVars(&dcvars);
 
@@ -893,13 +804,6 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     if (!dcvars.colormap)   // NULL colormap = shadow draw
         colfunc = R_DrawFuzzColumn;    // killough 3/14/98
-    else
-    {
-        hires = highDetail;
-
-        if(hires)
-            colfunc = R_DrawColumnHiRes;
-    }
 
     // proff 11/06/98: Changed for high-res
     dcvars.iscale = vis->iscale;
@@ -907,47 +811,24 @@ static void R_DrawVisSprite(const vissprite_t *vis)
     frac = vis->startfrac;
 
     spryscale = vis->scale;
-    sprtopscreen = centeryfrac - FixedMul(dcvars.texturemid, spryscale);
+    sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
 
     const patch_t __far* patch = W_GetLumpByNum(vis->lump_num);
 
-    fixed_t xiscale = vis->xiscale;
-
-    if(hires)
-        xiscale >>= 1;
-
     dcvars.x = vis->x1;
-    dcvars.odd_pixel = 0;
 
-    while(dcvars.x < SCREENWIDTH)
+    while (dcvars.x < VIEWWINDOWWIDTH)
     {
         const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column);
 
-        frac += xiscale;
-
-        if(((frac >> FRACBITS) >= patch->width) || frac < 0)
-            break;
-
-        dcvars.odd_pixel = 1;
-
-        if(!hires)
-            dcvars.x++;
-
-        if(dcvars.x >= SCREENWIDTH)
-            break;
-
-        const column_t __far* column2 = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
-        R_DrawMaskedColumn(colfunc, &dcvars, column2);
-
-        frac += xiscale;
+        frac += vis->xiscale;
 
         if(((frac >> FRACBITS) >= patch->width) || frac < 0)
             break;
 
         dcvars.x++;
-        dcvars.odd_pixel = 0;
     }
 
     Z_ChangeTagToCache(patch);
@@ -1054,7 +935,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 
         if (xc != SHRT_MAX) // dropoff overflow
         {
-            sprtopscreen = centeryfrac - FixedMul(dcvars.texturemid, spryscale);
+            sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
             dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
 
@@ -1095,7 +976,7 @@ static PUREFUNC boolean R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t __far
     if ((ldy ^ ldx ^ x ^ y) < 0)
         return (ldy ^ x) < 0;          // (left is negative)
 
-    return FixedMul(y, ldx>>FRACBITS) >= FixedMul(ldy>>FRACBITS, x);
+    return FixedMul(y, ldx>>FRACBITS) >= FixedMul(x, ldy>>FRACBITS);
 }
 
 
@@ -1113,7 +994,7 @@ static void R_DrawSprite (const vissprite_t* spr)
 
     for (int16_t x = spr->x1; x <= spr->x2; x++)
     {
-        clipbot[x] = viewheight;
+        clipbot[x] = VIEWWINDOWHEIGHT;
         cliptop[x] = -1;
     }
 
@@ -1162,7 +1043,7 @@ static void R_DrawSprite (const vissprite_t* spr)
         {
             for (int16_t x = r1; x <= r2; x++)
             {
-                if (clipbot[x] == viewheight)
+                if (clipbot[x] == VIEWWINDOWHEIGHT)
                     clipbot[x] = ds->sprbottomclip[x];
             }
         }
@@ -1212,21 +1093,20 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 
     const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
-    fixed_t       tx;
-    tx = psp->sx-160*FRACUNIT;
+    fixed_t tx = psp->sx - (SCREENWIDTH_VGA / 2) * FRACUNIT;
 
-    tx -= ((int32_t)patch->leftoffset)<<FRACBITS;
-    x1 = (centerxfrac + FixedMul (tx, pspritescale))>>FRACBITS;
+    tx -= ((int32_t)patch->leftoffset) << FRACBITS;
+    x1 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS);
 
-    tx += ((int32_t)patch->width)<<FRACBITS;
-    x2 = ((centerxfrac + FixedMul (tx, pspritescale) ) >>FRACBITS) - 1;
+    tx += ((int32_t)patch->width) << FRACBITS;
+    x2 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS) - 1;
 
-    topoffset = ((int32_t)patch->topoffset)<<FRACBITS;
+    topoffset = ((int32_t)patch->topoffset) << FRACBITS;
 
 
 
     // off the side
-    if (x2 < 0 || x1 > SCREENWIDTH)
+    if (x2 < 0 || x1 > VIEWWINDOWWIDTH)
     {
         Z_ChangeTagToCache(patch);
         return;
@@ -1238,19 +1118,19 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     vis->texturemid = (((int32_t)BASEYCENTER)<<FRACBITS) /* +  FRACUNIT/2 */ -
             (psp->sy-topoffset);
     vis->x1 = x1 < 0 ? 0 : x1;
-    vis->x2 = x2 >= SCREENWIDTH ? SCREENWIDTH-1 : x2;
+    vis->x2 = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
     // proff 11/06/98: Added for high-res
-    vis->scale = pspriteyscale;
-    vis->iscale = pspriteyiscale;
+    vis->scale = PSPRITEYSCALE;
+    vis->iscale = FixedReciprocal(PSPRITEYSCALE);
 
     if (flip)
     {
-        vis->xiscale = - pspriteiscale;
-        vis->startfrac = (((int32_t)patch->width)<<FRACBITS)-1;
+        vis->xiscale = - FixedReciprocal(PSPRITESCALE);
+        vis->startfrac = (((int32_t)patch->width) << FRACBITS) - 1;
     }
     else
     {
-        vis->xiscale = pspriteiscale;
+        vis->xiscale = FixedReciprocal(PSPRITESCALE);
         vis->startfrac = 0;
     }
 
@@ -1299,20 +1179,18 @@ static void R_DrawPlayerSprites(void)
 //
 // R_SortVisSprites
 //
-// Rewritten by Lee Killough to avoid using unnecessary
-// linked lists, and to use faster sorting algorithm.
-//
 static int compare (const void* l, const void* r)
 {
 	const vissprite_t* vl = *(const vissprite_t**)l;
 	const vissprite_t* vr = *(const vissprite_t**)r;
 
-	if (vr->scale < vl->scale)
-		return -1;
-	else if (vr->scale > vl->scale)
-		return 1;
-	else
+	fixed_t diff = vr->scale - vl->scale;
+	if (!diff)
 		return 0;
+	else if (diff < 0)
+		return -1;
+	else
+		return 1;
 }
 
 #define MAXVISSPRITES 96
@@ -1347,14 +1225,11 @@ static void R_DrawMasked(void)
 
     // draw all vissprites back to front
     for (int8_t i = num_vissprite; --i >= 0; )
-        R_DrawSprite(vissprite_ptrs[i]);         // killough
+        R_DrawSprite(vissprite_ptrs[i]);
 
     // render any remaining masked mid textures
 
-    // Modified by Lee Killough:
-    // (pointer check was originally nonportable
-    // and buggy, by going past LEFT end of array):
-    for (ds=ds_p ; ds-- > drawsegs ; )  // new -- killough
+    for (ds=ds_p ; ds-- > drawsegs ; )
         if (ds->maskedtexturecol)
             R_RenderMaskedSegRange(ds, ds->x1, ds->x2);
 
@@ -1408,9 +1283,9 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
   int32_t     den = FixedMul(rw_distance, finesine(anglea));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = FixedMul(projectiony, finesine(angleb));
+  fixed_t num = VIEWWINDOWHEIGHT * finesine(angleb);
 
-  return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
+  return den > num>>16 ? (num = FixedApproxDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
 }
 
@@ -1472,18 +1347,21 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     else
         tx -= ((int32_t)patch->leftoffset) << FRACBITS;
 
-    const fixed_t xscale = FixedDiv(projection, tz);
+    //const fixed_t xscale = FixedDiv(PROJECTION, tz);
+    const fixed_t xscale = PROJECTION / (tz >> FRACBITS);
 
-    fixed_t xl = (centerxfrac + FixedMul(tx,xscale));
+    fixed_t xl = CENTERX * FRACUNIT + FixedMul(tx,xscale);
+    const int16_t x1 = (xl >> FRACBITS);
 
     // off the side?
-    if (xl > (((int32_t)SCREENWIDTH) << FRACBITS))
+    if (x1 > VIEWWINDOWWIDTH)
     {
         Z_ChangeTagToCache(patch);
         return;
     }
 
-    fixed_t xr = (centerxfrac + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale)) - FRACUNIT;
+    fixed_t xr = CENTERX * FRACUNIT + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale) - FRACUNIT;
+    const int16_t x2 = (xr >> FRACBITS);
 
     // off the side?
     if (xr < 0)
@@ -1500,9 +1378,6 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     }
 
 
-    const int16_t x1 = (xl >> FRACBITS);
-    const int16_t x2 = (xr >> FRACBITS);
-
     // store information in a vissprite
     vissprite_t* vis = R_NewVisSprite ();
 
@@ -1513,7 +1388,8 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
         return;
     }
 
-    vis->scale           = FixedDiv(projectiony, tz);
+    //vis->scale           = FixedDiv(PROJECTIONY, tz);
+    vis->scale           = (VIEWWINDOWHEIGHT * FRACUNIT) / (tz >> FRACBITS);
     vis->iscale          = tz >> 7;
     vis->lump_num        = sprframe->lump[rot];
     vis->patch_topoffset = patch->topoffset;
@@ -1522,7 +1398,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     vis->gz              = fz;
     vis->texturemid      = (fz + (((int32_t)patch->topoffset) << FRACBITS)) - viewz;
     vis->x1              = x1 < 0 ? 0 : x1;
-    vis->x2              = x2 >= SCREENWIDTH ? SCREENWIDTH-1 : x2;
+    vis->x2              = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
 
 
     const fixed_t iscale = FixedReciprocal(xscale);
@@ -1639,7 +1515,7 @@ static visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int16_t lig
     check->height = height;
     check->picnum = picnum;
     check->lightlevel = lightlevel;
-    check->minx = SCREENWIDTH; // Was SCREENWIDTH -- killough 11/98
+    check->minx = VIEWWINDOWWIDTH;
     check->maxx = -1;
 
     _fmemset(check->top, -1, sizeof(check->top));
@@ -1775,26 +1651,19 @@ static uint16_t FindColumnCacheItem(int16_t texture, uint32_t column)
 }
 
 
-static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int32_t texcolumn, uint32_t iscale)
+static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int16_t texcolumn, uint16_t iscale)
 {
-    uint16_t colmask;
+    uint16_t colmask = 0xfffe;
 
-    if(!highDetail)
+    if (tex->width > 8)
     {
-        colmask = 0xfffe;
-
-        if(tex->width > 8)
-        {
-            if(iscale > (((int32_t)4) << FRACBITS))
-                colmask = 0xfff0;
-            else if(iscale > (((int32_t)3) << FRACBITS))
-                colmask = 0xfff8;
-            else if (iscale > (((int32_t)2) << FRACBITS))
-                colmask = 0xfffc;
-        }
+        if (iscale > 4)
+            colmask = 0xfff0;
+        else if (iscale > 3)
+            colmask = 0xfff8;
+        else if (iscale > 2)
+            colmask = 0xfffc;
     }
-    else
-        colmask = 0xffff;
 
 
     const int32_t xc = (texcolumn & colmask) & tex->widthmask;
@@ -1867,7 +1736,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int16_t texcolumn, draw_colu
     }
     else
     {
-        dcvars->source = R_ComposeColumn(texture, tex, texcolumn, dcvars->iscale);
+        dcvars->source = R_ComposeColumn(texture, tex, texcolumn, dcvars->iscale >> FRACBITS);
         R_DrawColumn (dcvars);
     }
 }
@@ -1896,8 +1765,8 @@ static void R_RenderSegLoop (int16_t rw_x)
     {
         // mark floor / ceiling areas
 
-        int32_t yh = bottomfrac>>HEIGHTBITS;
-        int32_t yl = (topfrac+HEIGHTUNIT-1)>>HEIGHTBITS;
+        int16_t yh = bottomfrac>>HEIGHTBITS;
+        int16_t yl = (topfrac+HEIGHTUNIT-1)>>HEIGHTBITS;
 
         int16_t cc_rwx = ceilingclip[rw_x];
         int16_t fc_rwx = floorclip[rw_x];
@@ -1948,7 +1817,7 @@ static void R_RenderSegLoop (int16_t rw_x)
         if (segtextured)
         {
             // calculate texture offset
-            texturecolumn = (rw_offset - FixedMul(finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT), rw_distance)) >> FRACBITS;
+            texturecolumn = (rw_offset - FixedMul(rw_distance, finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT))) >> FRACBITS;
 
             dcvars.x = rw_x;
 
@@ -1966,7 +1835,7 @@ static void R_RenderSegLoop (int16_t rw_x)
 
             R_DrawSegTextureColumn(midtexture, texturecolumn, &dcvars);
 
-            cc_rwx = viewheight;
+            cc_rwx = VIEWWINDOWHEIGHT;
             fc_rwx = -1;
         }
         else
@@ -2308,10 +2177,10 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     worldbottom >>= 4;
 
     topstep = -FixedMul (rw_scalestep, worldtop);
-    topfrac = (centeryfrac>>4) - FixedMul (worldtop, rw_scale);
+    topfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldtop, rw_scale);
 
     bottomstep = -FixedMul (rw_scalestep,worldbottom);
-    bottomfrac = (centeryfrac>>4) - FixedMul (worldbottom, rw_scale);
+    bottomfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldbottom, rw_scale);
 
     if (backsector)
     {
@@ -2320,12 +2189,12 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 
         if (worldhigh < worldtop)
         {
-            pixhigh = (centeryfrac>>4) - FixedMul (worldhigh, rw_scale);
+            pixhigh = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldhigh, rw_scale);
             pixhighstep = -FixedMul (rw_scalestep,worldhigh);
         }
         if (worldlow > worldbottom)
         {
-            pixlow = (centeryfrac>>4) - FixedMul (worldlow, rw_scale);
+            pixlow = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldlow, rw_scale);
             pixlowstep = -FixedMul (rw_scalestep,worldlow);
         }
     }
@@ -2468,7 +2337,7 @@ static void R_RecalcLineFlags(void)
 // Replaces the old R_Clip*WallSegment functions. It draws bits of walls in those
 // columns which aren't solid, and updates the solidcol[] array appropriately
 
-static void R_ClipWallSegment(int8_t first, int8_t last, boolean solid)
+static void R_ClipWallSegment(int8_t first, int8_t last, const boolean solid)
 {
     byte *p;
     while (first < last)
@@ -2839,7 +2708,7 @@ static void R_ClearDrawSegs(void)
 
 static void R_ClearClipSegs (void)
 {
-    memset(solidcol, 0, SCREENWIDTH);
+    memset(solidcol, 0, VIEWWINDOWWIDTH);
 }
 
 
@@ -2870,8 +2739,6 @@ static void R_SetupFrame (player_t *player)
         fixedcolormap = 0;
 
     validcount++;
-
-    highDetail = _g_highDetail;
 }
 
 
@@ -2897,136 +2764,67 @@ void R_RenderPlayerView (player_t* player)
 }
 
 
-static const int8_t viewangletoxTable[2039] =
+static const int8_t viewangletoxTable[2027] =
 {
-    119,119,119,119,119,119,119,
-    119,119,119,119,119,118,118,118,118,118,118,118,118,118,118,118,
-    117,117,117,117,117,117,117,117,117,117,117,116,116,116,116,116,
-    116,116,116,116,116,116,116,115,115,115,115,115,115,115,115,115,
-    115,115,115,114,114,114,114,114,114,114,114,114,114,114,114,113,
-    113,113,113,113,113,113,113,113,113,113,113,112,112,112,112,112,
-    112,112,112,112,112,112,112,112,111,111,111,111,111,111,111,111,
-    111,111,111,111,111,110,110,110,110,110,110,110,110,110,110,110,
-    110,110,109,109,109,109,109,109,109,109,109,109,109,109,109,108,
-    108,108,108,108,108,108,108,108,108,108,108,108,107,107,107,107,
-    107,107,107,107,107,107,107,107,107,107,106,106,106,106,106,106,
-    106,106,106,106,106,106,106,106,105,105,105,105,105,105,105,105,
-    105,105,105,105,105,105,104,104,104,104,104,104,104,104,104,104,
-    104,104,104,104,103,103,103,103,103,103,103,103,103,103,103,103,
-    103,103,102,102,102,102,102,102,102,102,102,102,102,102,102,102,
-    102,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,
-    100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,99,
-    99,99,99,99,99,99,99,99,99,99,99,99,99,99,98,98,
-    98,98,98,98,98,98,98,98,98,98,98,98,98,98,97,97,
-    97,97,97,97,97,97,97,97,97,97,97,97,97,97,96,96,
-    96,96,96,96,96,96,96,96,96,96,96,96,96,96,95,95,
-    95,95,95,95,95,95,95,95,95,95,95,95,95,95,94,94,
-    94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,93,
-    93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,
-    92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,
-    92,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,
-    91,91,90,90,90,90,90,90,90,90,90,90,90,90,90,90,
-    90,90,90,90,89,89,89,89,89,89,89,89,89,89,89,89,
-    89,89,89,89,89,88,88,88,88,88,88,88,88,88,88,88,
-    88,88,88,88,88,88,88,87,87,87,87,87,87,87,87,87,
-    87,87,87,87,87,87,87,87,87,86,86,86,86,86,86,86,
-    86,86,86,86,86,86,86,86,86,86,86,86,85,85,85,85,
-    85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,84,
-    84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,
-    84,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,
-    83,83,83,83,82,82,82,82,82,82,82,82,82,82,82,82,
-    82,82,82,82,82,82,82,82,81,81,81,81,81,81,81,81,
-    81,81,81,81,81,81,81,81,81,81,81,80,80,80,80,80,
-    80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,79,
-    79,79,79,79,79,79,79,79,79,79,79,79,79,79,79,79,
-    79,79,79,78,78,78,78,78,78,78,78,78,78,78,78,78,
-    78,78,78,78,78,78,78,77,77,77,77,77,77,77,77,77,
-    77,77,77,77,77,77,77,77,77,77,77,76,76,76,76,76,
-    76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,75,
-    75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,
-    75,75,75,75,74,74,74,74,74,74,74,74,74,74,74,74,
-    74,74,74,74,74,74,74,74,74,73,73,73,73,73,73,73,
-    73,73,73,73,73,73,73,73,73,73,73,73,73,72,72,72,
-    72,72,72,72,72,72,72,72,72,72,72,72,72,72,72,72,
-    72,72,71,71,71,71,71,71,71,71,71,71,71,71,71,71,
-    71,71,71,71,71,71,71,70,70,70,70,70,70,70,70,70,
-    70,70,70,70,70,70,70,70,70,70,70,70,70,69,69,69,
-    69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,
-    69,69,68,68,68,68,68,68,68,68,68,68,68,68,68,68,
-    68,68,68,68,68,68,68,67,67,67,67,67,67,67,67,67,
-    67,67,67,67,67,67,67,67,67,67,67,67,67,66,66,66,
-    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
-    66,66,66,65,65,65,65,65,65,65,65,65,65,65,65,65,
-    65,65,65,65,65,65,65,65,64,64,64,64,64,64,64,64,
-    64,64,64,64,64,64,64,64,64,64,64,64,64,64,63,63,
-    63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,
-    63,63,63,63,62,62,62,62,62,62,62,62,62,62,62,62,
-    62,62,62,62,62,62,62,62,62,61,61,61,61,61,61,61,
-    61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,60,
-    60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,
-    60,60,60,60,60,59,59,59,59,59,59,59,59,59,59,59,
-    59,59,59,59,59,59,59,59,59,59,58,58,58,58,58,58,
-    58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,
-    57,57,57,57,57,57,57,57,57,57,57,57,57,57,57,57,
-    57,57,57,57,57,57,56,56,56,56,56,56,56,56,56,56,
-    56,56,56,56,56,56,56,56,56,56,56,55,55,55,55,55,
-    55,55,55,55,55,55,55,55,55,55,55,55,55,55,55,55,
-    55,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,
-    54,54,54,54,54,54,54,53,53,53,53,53,53,53,53,53,
-    53,53,53,53,53,53,53,53,53,53,53,53,52,52,52,52,
-    52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,
-    52,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
-    51,51,51,51,51,51,51,50,50,50,50,50,50,50,50,50,
-    50,50,50,50,50,50,50,50,50,50,50,50,49,49,49,49,
-    49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,
-    49,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,
-    48,48,48,48,48,47,47,47,47,47,47,47,47,47,47,47,
-    47,47,47,47,47,47,47,47,47,47,46,46,46,46,46,46,
-    46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,45,
-    45,45,45,45,45,45,45,45,45,45,45,45,45,45,45,45,
-    45,45,45,44,44,44,44,44,44,44,44,44,44,44,44,44,
-    44,44,44,44,44,44,44,43,43,43,43,43,43,43,43,43,
-    43,43,43,43,43,43,43,43,43,43,43,42,42,42,42,42,
-    42,42,42,42,42,42,42,42,42,42,42,42,42,42,42,41,
-    41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,
-    41,41,41,40,40,40,40,40,40,40,40,40,40,40,40,40,
-    40,40,40,40,40,40,39,39,39,39,39,39,39,39,39,39,
-    39,39,39,39,39,39,39,39,39,39,38,38,38,38,38,38,
-    38,38,38,38,38,38,38,38,38,38,38,38,38,37,37,37,
-    37,37,37,37,37,37,37,37,37,37,37,37,37,37,37,36,
-    36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,
-    36,36,35,35,35,35,35,35,35,35,35,35,35,35,35,35,
-    35,35,35,35,35,34,34,34,34,34,34,34,34,34,34,34,
-    34,34,34,34,34,34,34,33,33,33,33,33,33,33,33,33,
-    33,33,33,33,33,33,33,33,33,32,32,32,32,32,32,32,
-    32,32,32,32,32,32,32,32,32,32,31,31,31,31,31,31,
-    31,31,31,31,31,31,31,31,31,31,31,31,30,30,30,30,
-    30,30,30,30,30,30,30,30,30,30,30,30,30,29,29,29,
-    29,29,29,29,29,29,29,29,29,29,29,29,29,29,28,28,
-    28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,27,
-    27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,
-    26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,
-    25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
-    24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-    22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,21,
-    21,21,21,21,21,21,21,21,21,21,21,21,21,21,20,20,
-    20,20,20,20,20,20,20,20,20,20,20,20,20,19,19,19,
-    19,19,19,19,19,19,19,19,19,19,19,19,18,18,18,18,
-    18,18,18,18,18,18,18,18,18,18,17,17,17,17,17,17,
-    17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16,
-    16,16,16,16,16,16,15,15,15,15,15,15,15,15,15,15,
-    15,15,15,15,14,14,14,14,14,14,14,14,14,14,14,14,
-    14,14,13,13,13,13,13,13,13,13,13,13,13,13,13,12,
-    12,12,12,12,12,12,12,12,12,12,12,12,11,11,11,11,
-    11,11,11,11,11,11,11,11,11,10,10,10,10,10,10,10,
-    10,10,10,10,10,10,9,9,9,9,9,9,9,9,9,9,
-    9,9,9,8,8,8,8,8,8,8,8,8,8,8,8,7,
-    7,7,7,7,7,7,7,7,7,7,7,6,6,6,6,6,
-    6,6,6,6,6,6,6,5,5,5,5,5,5,5,5,5,
-    5,5,5,4,4,4,4,4,4,4,4,4,4,4,3,3,
-    3,3,3,3,3,3,3,3,3,2,2,2,2,2,2,2,
-    2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1
+    59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59,
+    58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58,
+    57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57,
+    56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
+    55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+    54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+    53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53,
+    52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
+    51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51,
+    50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+    49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49,
+    48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
+    47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+    46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46,
+    45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
+    44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44,
+    43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
+    42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42,
+    41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+    40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40,
+    39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+    38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+    37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37,
+    36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
+    35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35,
+    34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34,
+    33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33,
+    32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+    31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31,
+    30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30,
+    29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+    28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+    27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+    26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
+    25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
+    24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
+    23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+    22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
+    21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
+    20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+    19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+    18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
+    17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+    15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+    14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+    13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+    12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+    11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+    10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 };
 
 

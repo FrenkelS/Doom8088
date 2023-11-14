@@ -317,11 +317,11 @@ static uint16_t finesine_part_2(int16_t x)
 {
 	x = 4095 - x;
 	switch (x) {
-		case  273: return 13646;
-		case  771: return 36556;
-		case  883: return 41088;
-		case 1080: return 48304;
-		case 1827: return 64600;
+		case  273: return 13646; // 13647
+		case  771: return 36556; // 36555
+		case  883: return 41088; // 41087
+		case 1080: return 48304; // 48305
+		case 1827: return 64600; // 64601
 		default: return finesineTable_part_1[x];
 	}
 }
@@ -330,10 +330,10 @@ static fixed_t finesine_part_3(int16_t x)
 {
 	x -= 4096;
 	switch (x) {
-		case   51: return  -2588;
-		case  863: return -40299;
-		case 1078: return -48236;
-		case 1080: return -48304;
+		case   51: return  -2588; //  -2587
+		case  863: return -40299; // -40300
+		case 1078: return -48236; // -48237
+		case 1080: return -48304; // -48305
 		default: return 0xffff0000 | -finesineTable_part_1[x];
 	}
 }
@@ -342,16 +342,16 @@ static fixed_t finesine_part_4(int16_t x)
 {
 	x = 8191 - x;
 	switch (x) {
-		case   51: return  -2588;
-		case  114: return  -5747;
-		case  244: return -12217;
-		case  455: return -22432;
-		case  771: return -36556;
-		case  795: return -37550;
-		case  863: return -40299;
-		case 1021: return -46251;
-		case 1051: return -47307;
-		case 1469: return -59189;
+		case   51: return  -2588; //  -2587
+		case  114: return  -5747; //  -5748
+		case  244: return -12217; // -12218
+		case  455: return -22432; // -22433
+		case  771: return -36556; // -36555
+		case  795: return -37550; // -37551
+		case  863: return -40299; // -40300
+		case 1021: return -46251; // -46252
+		case 1051: return -47307; // -47308
+		case 1469: return -59189; // -59190
 		default: return 0xffff0000 | -finesineTable_part_1[x];
 	}
 }
@@ -365,18 +365,18 @@ static uint16_t finecosine_part_4(int16_t x)
 {
 	x -= 6144;
 	switch (x) {
-		case   70: return  3542;
-		case  114: return  5747;
-		case  455: return 22432;
-		case  629: return 30427;
-		case  631: return 30516;
-		case  771: return 36556;
-		case  863: return 40299;
-		case 1067: return 47861;
-		case 1133: return 50064;
-		case 1259: return 53912;
-		case 1273: return 54309;
-		case 1827: return 64600;
+		case   70: return  3542; //  3541
+		case  114: return  5747; //  5748
+		case  455: return 22432; // 22433
+		case  629: return 30427; // 30426
+		case  631: return 30516; // 30515
+		case  771: return 36556; // 36555
+		case  863: return 40299; // 40300
+		case 1067: return 47861; // 47860
+		case 1133: return 50064; // 50065
+		case 1259: return 53912; // 53911
+		case 1273: return 54309; // 54308
+		case 1827: return 64600; // 64601
 		default: return finesineTable_part_1[x];
 	}
 }
@@ -409,24 +409,24 @@ fixed_t finecosine(int16_t x)
 }
 
 
-static const uint16_t xtoviewangleTable[SCREENWIDTH + 1] =
+static const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
 {
-	0x2008, 0x1FB0, 0x1F50, 0x1EF8, 0x1EA0, 0x1E40, 0x1DE0, 0x1D80,
-	0x1D20, 0x1CB8, 0x1C50, 0x1BE8, 0x1B80, 0x1B18, 0x1AA8, 0x1A38,
-	0x19C8, 0x1958, 0x18E8, 0x1870, 0x17F8, 0x1780, 0x1708, 0x1688,
-	0x1608, 0x1588, 0x1508, 0x1480, 0x13F8, 0x1370, 0x12E8, 0x1258,
-	0x11D0, 0x1140, 0x10B0, 0x1018, 0x0F80, 0x0EF0, 0x0E58, 0x0DB8,
-	0x0D20, 0x0C80, 0x0BE0, 0x0B40, 0x0AA0, 0x0A00, 0x0958, 0x08B0,
-	0x0810, 0x0768, 0x06C0, 0x0610, 0x0568, 0x04C0, 0x0410, 0x0360,
-	0x02B8, 0x0208, 0x0158, 0x00B0, 0x0000, 0xFF50, 0xFEA8, 0xFDF8,
-	0xFD48, 0xFCA0, 0xFBF0, 0xFB40, 0xFA98, 0xF9F0, 0xF940, 0xF898,
-	0xF7F0, 0xF750, 0xF6A8, 0xF600, 0xF560, 0xF4C0, 0xF420, 0xF380,
-	0xF2E0, 0xF248, 0xF1A8, 0xF110, 0xF080, 0xEFE8, 0xEF50, 0xEEC0,
-	0xEE30, 0xEDA8, 0xED18, 0xEC90, 0xEC08, 0xEB80, 0xEAF8, 0xEA78,
-	0xE9F8, 0xE978, 0xE8F8, 0xE880, 0xE808, 0xE790, 0xE718, 0xE6A8,
-	0xE638, 0xE5C8, 0xE558, 0xE4E8, 0xE480, 0xE418, 0xE3B0, 0xE348,
-	0xE2E0, 0xE280, 0xE220, 0xE1C0, 0xE160, 0xE108, 0xE0B0, 0xE050,
-	0xC000
+	0x2008, 0x1F50, 0x1EA0, 0x1DE0,
+	0x1D20, 0x1C50, 0x1B80, 0x1AA8,
+	0x19C8, 0x18E8, 0x17F8, 0x1708,
+	0x1608, 0x1508, 0x13F8, 0x12E8,
+	0x11D0, 0x10B0, 0x0F80, 0x0E58,
+	0x0D20, 0x0BE0, 0x0AA0, 0x0958,
+	0x0810, 0x06C0, 0x0568, 0x0410,
+	0x02B8, 0x0158, 0x0000, 0xFEA8,
+	0xFD48, 0xFBF0, 0xFA98, 0xF940,
+	0xF7F0, 0xF6A8, 0xF560, 0xF420,
+	0xF2E0, 0xF1A8, 0xF080, 0xEF50,
+	0xEE30, 0xED18, 0xEC08, 0xEAF8,
+	0xE9F8, 0xE8F8, 0xE808, 0xE718,
+	0xE638, 0xE558, 0xE480, 0xE3B0,
+	0xE2E0, 0xE220, 0xE160, 0xE0B0,
+	0xDFF8
 };
 
 angle_t xtoviewangle(int16_t x)

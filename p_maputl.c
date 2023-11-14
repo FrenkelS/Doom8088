@@ -150,6 +150,30 @@ static void P_MakeDivline(const line_t __far* li, divline_t *dl)
   dl->dy = li->dy;
 }
 
+
+union int64_u {
+	int64_t ll;
+	PACKEDATTR_PRE struct {
+		int16_t wl;
+		fixed_t dw;
+		int16_t wh;
+	} PACKEDATTR_POST s;
+};
+
+typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
+
+
+static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
+{
+	union int64_u r;
+	// r.ll = (int64_t)a << FRACBITS;
+	r.s.wl = 0;
+	r.s.dw = a;
+	r.s.wh = (a < 0) ? 0xffff : 0x0000;
+	return r.ll / b;
+}
+
+
 //
 // P_InterceptVector
 // Returns the fractional intercept point
@@ -164,9 +188,9 @@ static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
 {
   fixed_t den;
-  return (den = FixedMul(v1->dy>>8, v2->dx) - FixedMul(v1->dx>>8, v2->dy)) ?
-    FixedDiv(FixedMul((v1->x - v2->x)>>8, v1->dy) +
-             FixedMul((v2->y - v1->y)>>8, v1->dx), den) : 0;
+  return (den = FixedMul(v2->dx, v1->dy>>8) - FixedMul(v2->dy, v1->dx>>8)) ?
+    FixedDiv(FixedMul(v1->dy, (v1->x - v2->x)>>8) +
+             FixedMul(v1->dx, (v2->y - v1->y)>>8), den) : 0;
 }
 
 //
@@ -608,14 +632,14 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
     {
       mapxstep = 1;
       partial = FRACUNIT - ((x1>>MAPBTOFRAC)&(FRACUNIT-1));
-      ystep = FixedDiv (y2-y1,D_abs(x2-x1));
+      ystep = FixedApproxDiv (y2-y1,D_abs(x2-x1));
     }
   else
     if (xt2 < xt1)
       {
         mapxstep = -1;
         partial = (x1>>MAPBTOFRAC)&(FRACUNIT-1);
-        ystep = FixedDiv (y2-y1,D_abs(x2-x1));
+        ystep = FixedApproxDiv (y2-y1,D_abs(x2-x1));
       }
     else
       {
@@ -630,14 +654,14 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
     {
       mapystep = 1;
       partial = FRACUNIT - ((y1>>MAPBTOFRAC)&(FRACUNIT-1));
-      xstep = FixedDiv (x2-x1,D_abs(y2-y1));
+      xstep = FixedApproxDiv (x2-x1,D_abs(y2-y1));
     }
   else
     if (yt2 < yt1)
       {
         mapystep = -1;
         partial = (y1>>MAPBTOFRAC)&(FRACUNIT-1);
-        xstep = FixedDiv (x2-x1,D_abs(y2-y1));
+        xstep = FixedApproxDiv (x2-x1,D_abs(y2-y1));
       }
     else
       {

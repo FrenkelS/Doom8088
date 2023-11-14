@@ -137,9 +137,7 @@
 #define MF_JUSTHIT      (uint32_t)(0x0000000000000040)
 // Will take at least one step before attacking.
 #define MF_JUSTATTACKED (uint32_t)(0x0000000000000080)
-// On level spawning (initial position),
-//  hang from ceiling instead of stand on floor.
-#define MF_SPAWNCEILING (uint32_t)(0x0000000000000100)
+
 // Don't apply gravity (every tic),
 //  that is, object will float, keeping current height
 //  or changing it actively.
@@ -152,8 +150,7 @@
 #define MF_PICKUP       (uint32_t)(0x0000000000000800)
 // Player cheat. ???
 #define MF_NOCLIP       (uint32_t)(0x0000000000001000)
-// Player: keep info about sliding along walls.
-#define MF_SLIDE        (uint32_t)(0x0000000000002000)
+
 // Allow moves to any height, no gravity.
 // For active floaters, e.g. cacodemons, pain elementals.
 #define MF_FLOAT        (uint32_t)(0x0000000000004000)
@@ -192,7 +189,7 @@
 // Neither a cacodemon nor a missile.
 #define MF_SKULLFLY     (uint32_t)(0x0000000001000000)
 
-#define MF_POOLED      (uint32_t)(0x0000000010000000)
+#define MF_POOLED       (uint32_t)(0x0000000010000000)
 
 #define MF_FRIEND       (uint32_t)(0x0000000080000000)
 
@@ -260,9 +257,9 @@ typedef struct mobj_s
 
     int16_t             health;
 
-    uint16_t            type;
+    mobjtype_t          type;
 
-    int32_t             tics;   // state tic counter
+    int16_t             tics;   // state tic counter
     const state_t*      state;
     uint32_t            flags;
 
@@ -322,7 +319,7 @@ void    P_MobjThinker(mobj_t __far* mobj);
 void    P_SpawnPuff(fixed_t x, fixed_t y, fixed_t z);
 void    P_SpawnBlood(fixed_t x, fixed_t y, fixed_t z, int16_t damage);
 mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_t type);
-void    P_SpawnPlayerMissile(mobj_t __far* source, mobjtype_t type);
+void    P_SpawnPlayerMissile(mobj_t __far* source);
 void    P_SpawnMapThing (const mapthing_t __far* mthing);
 
 struct player_s* P_MobjIsPlayer(const mobj_t __far* mobj);

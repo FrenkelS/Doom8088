@@ -184,8 +184,6 @@ typedef struct gba_save_settings_t
     uint32_t showMessages;
     uint32_t musicVolume;
     uint32_t soundVolume;
-	uint32_t highDetail;
-
 } gba_save_settings_t;
 
 static const uint32_t settings_cookie = 0xbaddead1;
@@ -883,7 +881,6 @@ void G_SaveSettings()
 
     settings.musicVolume = snd_MusicVolume;
     settings.soundVolume = snd_SfxVolume;
-	settings.highDetail = _g_highDetail;
 
     SaveSRAM((byte __far*)&settings, sizeof(settings), settings_sram_offset);
 }
@@ -903,8 +900,6 @@ void G_LoadSettings()
 
         snd_SfxVolume   = (settings.soundVolume > 15) ? 15 : settings.soundVolume;
         snd_MusicVolume = (settings.musicVolume > 15) ? 15 : settings.musicVolume;
-		_g_highDetail = (settings.highDetail > 0) ? 1 : 0;
-		highDetail = _g_highDetail;
 		
         I_SetPalette(0);
 

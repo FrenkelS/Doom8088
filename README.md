@@ -14,16 +14,15 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=JPz
 
 **What's special?:**
  - No textures
- - No status bar
  - No sound and music
  - No saving and loading
  - No multiplayer
  - No PWADs
- - No screen resizing, but there are high and low graphic detail modes
+ - No screen resizing
  - Rotating overlaid automap
  - Supports only Doom 1 Episode 1
  - Only demo3 is in sync
- - Lots of crashes due to memory issues
+ - Some crashes due to memory issues
 
 ## Controls:
 |Action      |GBA   |DOS                     |
