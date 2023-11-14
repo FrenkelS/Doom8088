@@ -225,7 +225,16 @@ const void __far* PUREFUNC W_GetLumpByNum(int16_t num)
 }
 
 
-boolean PUREFUNC W_IsLumpCached(int16_t num)
+static boolean PUREFUNC W_IsLumpCached(int16_t num)
 {
 	return lumpcache[num] != NULL;
+}
+
+
+const void __far* PUREFUNC W_TryGetLumpByNum(int16_t num)
+{
+	if (W_IsLumpCached(num) || Z_IsEnoughFreeMemory(W_LumpLength(num)))
+		return W_GetLumpByNum(num);
+	else
+		return NULL;
 }

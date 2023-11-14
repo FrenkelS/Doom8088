@@ -80,11 +80,11 @@ void V_DrawBackground(void)
 void V_DrawRaw(const char *name, uint16_t offset)
 {
 	int16_t num = W_GetNumForName(name);
-	int32_t lumpLength = W_LumpLength(num);
+	const uint8_t __far* lump = W_TryGetLumpByNum(num);
 
-	if (W_IsLumpCached(num) || Z_IsEnoughFreeMemory(lumpLength))
+	if (lump != NULL)
 	{
-		const uint8_t __far* lump = W_GetLumpByNum(num);
+		int32_t lumpLength = W_LumpLength(num);	
 		_fmemcpy(&_g_screen[offset], lump, lumpLength);
 		Z_ChangeTagToCache(lump);
 	}

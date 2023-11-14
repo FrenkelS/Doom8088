@@ -35,13 +35,10 @@ static int16_t skypatchnum;
 static uint16_t skywidthmask;
 
 
-#define ANGLETOSKYSHIFT         22
-
-void R_DrawSky(visplane_t __far* pl)
+static void R_DrawSkyFlat(visplane_t __far* pl)
 {
 	draw_column_vars_t dcvars;
 
-#if defined FLAT_SKY
 	for (int16_t x = pl->minx; x <= pl->maxx; x++)
 	{
 		if (pl->top[x] != 0xff &&  pl->top[x] <= pl->bottom[x])
@@ -52,8 +49,26 @@ void R_DrawSky(visplane_t __far* pl)
 			R_DrawColumnFlat(skypatchnum, &dcvars);
 		}
 	}
+}
+
+
+#define ANGLETOSKYSHIFT         22
+
+void R_DrawSky(visplane_t __far* pl)
+{
+#if defined FLAT_SKY
+	R_DrawSkyFlat(pl);
 #else
+
+	const patch_t __far* patch = W_TryGetLumpByNum(skypatchnum);
+	if (patch == NULL)
+	{
+		R_DrawSkyFlat(pl);
+		return;
+	}
+
 	// Normal Doom sky, only one allowed per level
+	draw_column_vars_t dcvars;
 	dcvars.texturemid = 100 * FRACUNIT;    // Default y-offset
 
 	// Sky is always drawn full bright, i.e. colormaps[0] is used.
@@ -64,8 +79,6 @@ void R_DrawSky(visplane_t __far* pl)
 		dcvars.colormap = fullcolormap;
 
 	dcvars.iscale = (FRACUNIT * 200) / (VIEWWINDOWHEIGHT + 16);
-
-	const patch_t __far* patch = W_GetLumpByNum(skypatchnum);
 
 	for (int16_t x = pl->minx; (dcvars.x = x) <= pl->maxx; x++)
 	{
