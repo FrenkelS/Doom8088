@@ -226,7 +226,7 @@ void I_InitGraphics(void)
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
-	screen = D_MK_FP(0xb800, 10 * 80 + 10 + __djgpp_conventional_base);
+	screen = D_MK_FP(0xb800, (((200 - SCREENHEIGHT) / 2) / 2) * 80 + (80 - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
 	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT);
@@ -245,26 +245,25 @@ void I_DrawBuffer(uint8_t __far* buffer)
 	uint8_t __far* dst = screen;
 
 #if defined DISABLE_STATUS_BAR
-	for (uint_fast8_t y = 0; y < 80 - 16; y++) {
+	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++) {
 #else
-	for (uint_fast8_t y = 0; y < 80; y++) {
+	for (uint_fast8_t y = 0; y < SCREENHEIGHT / 2; y++) {
 #endif
-		for (uint_fast8_t x = 0; x < 60; x++) {
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
 			*dst++ = *src;
 			src+=4;
 		}
 
-		dst += 0x2000 - 60;
+		dst += 0x2000 - VIEWWINDOWWIDTH;
 
-		for (uint_fast8_t x = 0; x < 60; x++) {
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
 			uint8_t b = *src;
 			*dst++ = (b << 4 | b >> 4);
 			src+=4;
 		}
 
-		dst -= 0x2000 - 20;
+		dst -= 0x2000 - (80 - VIEWWINDOWWIDTH);
 	}
-
 }
 
 
