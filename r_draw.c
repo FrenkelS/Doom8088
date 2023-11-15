@@ -207,7 +207,7 @@ static int16_t      rw_lightlevel;
 
 static int16_t      *maskedtexturecol; // dropoff overflow
 
-fixed_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
+int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
 
 int16_t       __far* texturetranslation;
 
@@ -919,7 +919,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
     {
         dcvars.texturemid = frontsector->floorheight > backsector->floorheight
                 ? frontsector->floorheight : backsector->floorheight;
-        dcvars.texturemid = dcvars.texturemid + textureheight[texnum] - viewz;
+        dcvars.texturemid = dcvars.texturemid + ((int32_t)textureheight[texnum] << FRACBITS) - viewz;
     }
     else
     {
@@ -2047,13 +2047,13 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 
         if (linedef->flags & ML_DONTPEGBOTTOM)
         {         // bottom of texture at bottom
-            fixed_t vtop = frontsector->floorheight + textureheight[sidedef->midtexture];
+            fixed_t vtop = frontsector->floorheight + ((int32_t)textureheight[sidedef->midtexture] << FRACBITS);
             rw_midtexturemid = vtop - viewz;
         }
         else        // top of texture at top
             rw_midtexturemid = worldtop;
 
-        rw_midtexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), textureheight[midtexture]);
+        rw_midtexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), ((int32_t)textureheight[midtexture] << FRACBITS));
 
         ds_p->silhouette = SIL_BOTH;
         ds_p->sprtopclip = screenheightarray;
@@ -2135,8 +2135,8 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         {
             toptexture = texturetranslation[sidedef->toptexture];
             rw_toptexturemid = linedef->flags & ML_DONTPEGTOP ? worldtop :
-                                                                        backsector->ceilingheight+textureheight[sidedef->toptexture]-viewz;
-            rw_toptexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), textureheight[toptexture]);
+                                                                        backsector->ceilingheight + ((int32_t)textureheight[sidedef->toptexture] << FRACBITS) - viewz;
+            rw_toptexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), ((int32_t)textureheight[toptexture] << FRACBITS));
         }
 
         if (worldlow > worldbottom) // bottom texture
@@ -2144,7 +2144,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
             bottomtexture = texturetranslation[sidedef->bottomtexture];
             rw_bottomtexturemid = linedef->flags & ML_DONTPEGBOTTOM ? worldtop : worldlow;
 
-            rw_bottomtexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), textureheight[bottomtexture]);
+            rw_bottomtexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), ((int32_t)textureheight[bottomtexture] << FRACBITS));
         }
 
         // allocate space for masked texture tables

@@ -72,7 +72,7 @@ extern const lighttable_t __far* fullcolormap;
 extern const lighttable_t __far* colormaps;
 extern const lighttable_t __far* fixedcolormap;
 
-extern fixed_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
+extern int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
 
 extern int16_t       __far* texturetranslation;
 
