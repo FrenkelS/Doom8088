@@ -75,7 +75,6 @@ static int16_t P_DivlineSide(fixed_t x, fixed_t y, const divline_t *node)
 // Returns true
 //  if strace crosses the given subsector successfully.
 //
-// killough 4/19/98: made static and cleaned up
 
 static boolean P_CrossSubsector(int16_t num)
 {
@@ -157,14 +156,14 @@ static boolean P_CrossSubsector(int16_t num)
 
         if (front->floorheight != back->floorheight)
         {
-            fixed_t slope = FixedApproxDiv(openbottom - los.sightzstart , frac);
+            fixed_t slope = frac != 0 ? FixedApproxDiv(openbottom - los.sightzstart, frac) : INT32_MAX;
             if (slope > los.bottomslope)
                 los.bottomslope = slope;
         }
 
         if (front->ceilingheight != back->ceilingheight)
         {
-            fixed_t slope = FixedApproxDiv(opentop - los.sightzstart , frac);
+            fixed_t slope = frac != 0 ? FixedApproxDiv(opentop - los.sightzstart, frac) : INT32_MAX;
             if (slope < los.topslope)
                 los.topslope = slope;
         }
