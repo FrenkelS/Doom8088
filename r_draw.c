@@ -1948,18 +1948,18 @@ void R_ClearOpenings(void)
 
 
 /* CPhipps -
- * FixedMod - returns a % b, guaranteeing 0<=a<b
+ * Mod - returns a % b, guaranteeing 0 <= a < b
  * (notice that the C standard for % does not guarantee this)
  */
 
-inline static fixed_t CONSTFUNC FixedMod(fixed_t a, fixed_t b)
+inline static int16_t CONSTFUNC Mod(int16_t a, int16_t b)
 {
     if(!a)
         return 0;
 
     if (b & (b-1))
     {
-        fixed_t r = a % b;
+        int16_t r = a % b;
         return ((r<0) ? r+b : r);
     }
     else
@@ -2053,7 +2053,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         else        // top of texture at top
             rw_midtexturemid = worldtop;
 
-        rw_midtexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), ((int32_t)textureheight[midtexture] << FRACBITS));
+        rw_midtexturemid += ((int32_t)Mod(sidedef->rowoffset, textureheight[midtexture])) << FRACBITS;
 
         ds_p->silhouette = SIL_BOTH;
         ds_p->sprtopclip = screenheightarray;
@@ -2136,7 +2136,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
             toptexture = texturetranslation[sidedef->toptexture];
             rw_toptexturemid = linedef->flags & ML_DONTPEGTOP ? worldtop :
                                                                         backsector->ceilingheight + ((int32_t)textureheight[sidedef->toptexture] << FRACBITS) - viewz;
-            rw_toptexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), ((int32_t)textureheight[toptexture] << FRACBITS));
+            rw_toptexturemid += ((int32_t)Mod(sidedef->rowoffset, textureheight[toptexture])) << FRACBITS;
         }
 
         if (worldlow > worldbottom) // bottom texture
@@ -2144,7 +2144,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
             bottomtexture = texturetranslation[sidedef->bottomtexture];
             rw_bottomtexturemid = linedef->flags & ML_DONTPEGBOTTOM ? worldtop : worldlow;
 
-            rw_bottomtexturemid += FixedMod( (((int32_t)sidedef->rowoffset) << FRACBITS), ((int32_t)textureheight[bottomtexture] << FRACBITS));
+            rw_bottomtexturemid += ((int32_t)Mod(sidedef->rowoffset, textureheight[bottomtexture])) << FRACBITS;
         }
 
         // allocate space for masked texture tables
