@@ -64,5 +64,6 @@ void WI_Start(wbstartstruct_t*   wbstartstruct);
 void WI_End(void);
 
 int16_t V_NumPatchWidth(int16_t num);
+int16_t V_NumPatchWidthDontCache(int16_t num);
 
 #endif

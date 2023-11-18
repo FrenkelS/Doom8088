@@ -25,6 +25,7 @@
 
 #include "r_defs.h"
 #include "r_main.h"
+#include "w_wad.h"
 
 
 #define FLAT_SKY_COLOR 100
