@@ -226,14 +226,16 @@ static void I_UploadNewPalette(int8_t pal)
 	else
 		lumpName[7] = '0' + _g_gamma;
 
-	const uint8_t __far* palette_lump = W_GetLumpByName(lumpName);
+	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
+	if (palette_lump != NULL)
+	{
+		const byte __far* palette = &palette_lump[pal * 256 * 3];
+		outp(PEL_WRITE_ADR, 0);
+		for (int_fast16_t i = 0; i < 256 * 3; i++)
+			outp(PEL_DATA, (*palette++) >> 2);
 
-	const byte __far* palette = &palette_lump[pal * 256 * 3];
-	outp(PEL_WRITE_ADR, 0);
-	for (int_fast16_t i = 0; i < 256 * 3; i++)
-		outp(PEL_DATA, (*palette++) >> 2);
-
-	Z_ChangeTagToCache(palette_lump);
+		Z_ChangeTagToCache(palette_lump);
+	}
 }
 
 
