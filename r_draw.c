@@ -1704,17 +1704,14 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
         {
             const texpatch_t __far* patch = &tex->patches[i];
 
-            const patch_t __far* realpatch = W_TryGetLumpByNum(patch->patch_num);
-            if (realpath == NULL)
-                return NULL;
-
             const int16_t x1 = patch->originx;
 
             if (xc < x1)
-            {
-                Z_ChangeTagToCache(realpatch);
                 continue;
-            }
+
+            const patch_t __far* realpatch = W_TryGetLumpByNum(patch->patch_num);
+            if (realpath == NULL)
+                return NULL;
 
             const int16_t x2 = x1 + realpatch->width;
 
