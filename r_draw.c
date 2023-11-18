@@ -861,7 +861,7 @@ static void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16
             if (xc < x1)
                 continue;
 
-            const int16_t x2 = x1 + V_NumPatchWidth(patch->patch_num);
+            const int16_t x2 = x1 + V_NumPatchWidthDontCache(patch->patch_num);
 
             if (xc < x2)
             {
