@@ -411,7 +411,6 @@ static void P_LoadSideDefs2(int16_t lump)
     {
         register const mapsidedef_t __far* msd = (const mapsidedef_t __far*) data + i;
         register side_t __far* sd = _g_sides + i;
-        register sector_t __far* sec;
 
         sd->textureoffset = msd->textureoffset;
         sd->rowoffset     = msd->rowoffset;
@@ -423,7 +422,7 @@ static void P_LoadSideDefs2(int16_t lump)
             printf("P_LoadSideDefs2: sidedef %i has out-of-range sector num %u\n", i, sector_num);
             sector_num = 0;
         }
-        sd->sector = sec = &_g_sectors[sector_num];
+        sd->sector = &_g_sectors[sector_num];
 
         sd->midtexture    = msd->midtexture;
         sd->toptexture    = msd->toptexture;

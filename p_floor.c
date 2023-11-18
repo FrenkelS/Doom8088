@@ -741,7 +741,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 
       case raiseToTexture:
         {
-          fixed_t minsize = 32000L << FRACBITS; /* jff 3/13/98 no ovf */
+          int16_t minsize = 32000; /* jff 3/13/98 no ovf */
           side_t __far*     side;
 
           floor->direction = 1;
@@ -765,7 +765,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
           }
           {
             floor->floordestheight =
-              (floor->sector->floorheight>>FRACBITS) + (minsize>>FRACBITS);
+              (floor->sector->floorheight>>FRACBITS) + minsize;
             if (floor->floordestheight>32000)
               floor->floordestheight = 32000;        //jff 3/13/98 do not
             floor->floordestheight<<=FRACBITS;       // allow height overflow
