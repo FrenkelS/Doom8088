@@ -569,9 +569,7 @@ boolean P_CheckTag(const line_t __far* line)
 
 static void P_UpdateAnimatedTexture(void)
 {
-	uint16_t t = _g_leveltime >> 3;
-
-	int16_t pic = animated_texture_basepic + (t % 3);
+	int16_t pic = animated_texture_basepic + ((_g_leveltime >> 3) % 3);
 
 	for (int16_t i = animated_texture_basepic; i < animated_texture_basepic + 3; i++)
 		texturetranslation[i] = pic;
