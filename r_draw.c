@@ -861,7 +861,7 @@ static void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16
             if (xc < x1)
                 continue;
 
-            const int16_t x2 = x1 + V_NumPatchWidth(patch->patch_num);
+            const int16_t x2 = x1 + V_NumPatchWidthDontCache(patch->patch_num);
 
             if (xc < x2)
             {
@@ -1626,7 +1626,7 @@ static void R_DrawColumnInCache(const column_t __far* patch, byte* cache, int16_
 
 #define CACHE_HASH(c, t) (((c >> 1) ^ t) & CACHE_KEY_MASK)
 
-static byte columnCache[128*128];
+static byte __far columnCache[128*128];
 static uint32_t columnCacheEntries[128];
 
 static uint16_t FindColumnCacheItem(int16_t texture, uint32_t column)
@@ -1657,7 +1657,7 @@ static uint16_t FindColumnCacheItem(int16_t texture, uint32_t column)
 }
 
 
-static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int16_t texcolumn, uint16_t iscale)
+static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int16_t texcolumn, uint16_t iscale)
 {
     uint16_t colmask = 0xfffe;
 
@@ -1676,12 +1676,12 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far*
 
     uint16_t cachekey = FindColumnCacheItem(texture, xc);
 
-    byte* colcache = &columnCache[cachekey*128];
+    byte __far* colcache = &columnCache[cachekey*128];
     uint32_t cacheEntry = columnCacheEntries[cachekey];
 
     //total++;
 
-    if(cacheEntry != CACHE_ENTRY(xc, texture))
+    if (cacheEntry != CACHE_ENTRY(xc, texture))
     {
         //misses++;
         byte tmpCache[128];
@@ -1696,7 +1696,9 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far*
         {
             const texpatch_t __far* patch = &tex->patches[i];
 
-            const patch_t __far* realpatch = W_GetLumpByNum(patch->patch_num);
+            const patch_t __far* realpatch = W_TryGetLumpByNum(patch->patch_num);
+            if (realpath == NULL)
+                return NULL;
 
             const int16_t x1 = patch->originx;
 
@@ -1718,7 +1720,7 @@ static const byte* R_ComposeColumn(const int16_t texture, const texture_t __far*
         } while(++i < patchcount);
 
         //Block copy will drop low 2 bits of len.
-        memcpy(colcache, tmpCache, (tex->height + 3) & ~3);
+        _fmemcpy(colcache, tmpCache, (tex->height + 3) & ~3);
     }
 
     return colcache;
@@ -1733,17 +1735,29 @@ static void R_DrawSegTextureColumn(int16_t texture, int16_t texcolumn, draw_colu
         int16_t patch_num;
         int16_t x_c;
         R_GetColumn(tex, texcolumn, &patch_num, &x_c);
-        const patch_t __far* patch = W_GetLumpByNum(patch_num);
-        const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
 
-        dcvars->source = (const byte __far*)column + 3;
-        R_DrawColumn (dcvars);
-        Z_ChangeTagToCache(patch);
+        const patch_t __far* patch = W_TryGetLumpByNum(patch_num);
+        if (patch == NULL)
+            R_DrawColumnFlat(texture, dcvars);
+        else
+        {
+            const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
+
+            dcvars->source = (const byte __far*)column + 3;
+            R_DrawColumn (dcvars);
+            Z_ChangeTagToCache(patch);
+        }
     }
     else
     {
-        dcvars->source = R_ComposeColumn(texture, tex, texcolumn, dcvars->iscale >> FRACBITS);
-        R_DrawColumn (dcvars);
+        const byte __far* source = R_ComposeColumn(texture, tex, texcolumn, dcvars->iscale >> FRACBITS);
+        if (source == NULL)
+            R_DrawColumnFlat(texture, dcvars);
+        else
+        {
+            dcvars->source = source;
+            R_DrawColumn (dcvars);
+        }
     }
 }
 #endif
