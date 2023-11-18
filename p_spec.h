@@ -650,7 +650,6 @@ boolean EV_DoGenLockedDoor(const line_t __far* line);
 
 // at game start
 void P_InitPicAnims(void);
-void P_InitAnimatedFlat(void);
 
 void P_InitSwitchList
 ( void );

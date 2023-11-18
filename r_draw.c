@@ -530,6 +530,14 @@ const lighttable_t* R_LoadColorMap(int16_t lightlevel)
     return current_colormap;
 }
 
+
+byte R_GetColorMapColor(int16_t lightlevel, int16_t color)
+{
+	const lighttable_t* colormap = R_LoadColorMap(lightlevel);
+	return colormap[color];
+}
+
+
 //
 // A column is a vertical slice/span from a wall texture that,
 //  given the DOOM style restrictions on the view orientation,
