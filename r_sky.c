@@ -25,10 +25,9 @@
 
 #include "r_defs.h"
 #include "r_main.h"
-#include "st_stuff.h"
 
-#include "globdata.h"
 
+#define FLAT_SKY_COLOR 100
 
 int16_t skyflatnum;
 static int16_t skypatchnum;
@@ -46,7 +45,7 @@ static void R_DrawSkyFlat(visplane_t __far* pl)
 			dcvars.x = x;
 			dcvars.yl = pl->top[x];
 			dcvars.yh = pl->bottom[x];
-			R_DrawColumnFlat(skypatchnum, &dcvars);
+			R_DrawColumnFlat(FLAT_SKY_COLOR, &dcvars);
 		}
 	}
 }
