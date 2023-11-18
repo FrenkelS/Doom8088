@@ -863,7 +863,7 @@ static void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16
             if (xc < x1)
                 continue;
 
-            const int16_t x2 = x1 + V_NumPatchWidthDontCache(patch->patch_num);
+            const int16_t x2 = x1 + V_NumPatchWidth(patch->patch_num);
 
             if (xc < x2)
             {
@@ -1703,9 +1703,7 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
             if (xc < x1)
                 continue;
 
-            const patch_t __far* realpatch = W_TryGetLumpByNum(patch->patch_num);
-            if (realpath == NULL)
-                return NULL;
+            const patch_t __far* realpatch = W_GetLumpByNum(patch->patch_num);
 
             const int16_t x2 = x1 + realpatch->width;
 
