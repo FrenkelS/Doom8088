@@ -5,7 +5,6 @@ unset CFLAGS
 export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY"
 
 ia16-elf-gcc -c i_system.c $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 
@@ -37,8 +36,7 @@ export GLOBOBJS+=" p_genlin.c"
 export GLOBOBJS+=" p_inter.c"
 export GLOBOBJS+=" p_lights.c"
 export GLOBOBJS+=" p_map.c"
-#export GLOBOBJS+=" p_maputl.c"
-export GLOBOBJS+=" p_maputl.o"
+export GLOBOBJS+=" p_maputl.c"
 export GLOBOBJS+=" p_mobj.c"
 export GLOBOBJS+=" p_plats.c"
 export GLOBOBJS+=" p_pspr.c"
@@ -69,6 +67,5 @@ export GLOBOBJS+=" z_zone.c"
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
 rm i_system.o
-rm p_maputl.o
 rm r_draw.o
 rm tables.o
