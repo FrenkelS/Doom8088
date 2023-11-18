@@ -82,13 +82,13 @@ static int8_t viewangletox(int16_t viewangle)
 }
 
 
-static const angle_t tantoangleTable[2049];
+static const angle_t __far tantoangleTable[2049];
 
 #define tantoangle(t) tantoangleTable[t]
 
 
-static const uint16_t finetangentTable_part_3[1024];
-static const fixed_t  finetangentTable_part_4[1024];
+static const uint16_t __far finetangentTable_part_3[1024];
+static const fixed_t  __far finetangentTable_part_4[1024];
 
 static fixed_t finetangent(int16_t x)
 {
@@ -2839,7 +2839,7 @@ static const int8_t viewangletoxTable[2027] =
 //
 // Effective size is 2049;
 // The +1 size is to handle the case when x==y without additional checking.
-static const angle_t tantoangleTable[2049] =
+static const angle_t __far tantoangleTable[2049] =
 {
     0,333772,667544,1001315,1335086,1668857,2002626,2336395,
     2670163,3003929,3337694,3671457,4005219,4338979,4672736,5006492,
@@ -3103,7 +3103,7 @@ static const angle_t tantoangleTable[2049] =
 
 // Tangens LUT.
 // Should work with BAM fairly well (12 of 16bit, effectively, by shifting).
-static const uint16_t finetangentTable_part_3[1024] =
+static const uint16_t __far finetangentTable_part_3[1024] =
 {
     25,75,125,175,226,276,326,376,
     427,477,527,578,628,678,728,779,
@@ -3235,7 +3235,7 @@ static const uint16_t finetangentTable_part_3[1024] =
     64786,64885,64985,65085,65185,65285,65385,65485
 };
 
-static const fixed_t finetangentTable_part_4[1024] =
+static const fixed_t __far finetangentTable_part_4[1024] =
 {
     65586,65686,65787,65888,65989,66091,66192,66294,
     66396,66498,66600,66702,66804,66907,67010,67113,
