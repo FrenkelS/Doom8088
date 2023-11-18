@@ -108,7 +108,7 @@ boolean twoSided(int16_t sector, int16_t line)
 //
 static int16_t P_FindShortestTextureAround(int16_t secnum)
 {
-  int32_t minsize = 32000L << FRACBITS; //jff 3/13/98 prevent overflow in height calcs
+  int16_t minsize = 32000; //jff 3/13/98 prevent overflow in height calcs
   side_t __far*     side;
   int16_t i;
   sector_t __far* sec = &_g_sectors[secnum];
@@ -127,7 +127,7 @@ static int16_t P_FindShortestTextureAround(int16_t secnum)
           minsize = textureheight[side->bottomtexture];
     }
   }
-  return minsize >> FRACBITS;
+  return minsize;
 }
 
 
@@ -460,7 +460,7 @@ manual_floor:
 //
 static int16_t P_FindShortestUpperAround(int16_t secnum)
 {
-  int32_t minsize = 32000L << FRACBITS; //jff 3/13/98 prevent overflow in height calcs
+  int16_t minsize = 32000; //jff 3/13/98 prevent overflow in height calcs
   side_t __far*     side;
   int16_t i;
   sector_t __far* sec = &_g_sectors[secnum];
@@ -479,7 +479,7 @@ static int16_t P_FindShortestUpperAround(int16_t secnum)
           minsize = textureheight[side->toptexture];
     }
   }
-  return minsize >> FRACBITS;
+  return minsize;
 }
 
 

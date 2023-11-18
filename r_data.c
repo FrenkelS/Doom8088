@@ -164,7 +164,7 @@ static void R_LoadTexture(int16_t texture_num)
             break;
     }
 
-    textureheight[texture_num] = ((int32_t)texture->height) << FRACBITS;
+    textureheight[texture_num] = texture->height;
 
     texturetranslation[texture_num] = texture_num;
 

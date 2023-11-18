@@ -165,6 +165,9 @@ typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
 
 static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 {
+	if (a == 0 || b == 0)
+		return 0;
+
 	union int64_u r;
 	// r.ll = (int64_t)a << FRACBITS;
 	r.s.wl = 0;
@@ -187,10 +190,8 @@ static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
  *  in compatibility mode. */
 fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
 {
-  fixed_t den;
-  return (den = FixedMul(v2->dx, v1->dy>>8) - FixedMul(v2->dy, v1->dx>>8)) ?
-    FixedDiv(FixedMul(v1->dy, (v1->x - v2->x)>>8) +
-             FixedMul(v1->dx, (v2->y - v1->y)>>8), den) : 0;
+	return FixedDiv(FixedMul(v1->dy, (v1->x - v2->x) >> 8) + FixedMul(v1->dx, (v2->y - v1->y) >> 8),
+	                FixedMul(v2->dx, v1->dy >> 8) - FixedMul(v2->dy, v1->dx >> 8));
 }
 
 //
