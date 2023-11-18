@@ -80,8 +80,6 @@ static int16_t  animated_texture_basepic;
 //
 void P_InitPicAnims (void)
 {
-	P_InitAnimatedFlat();
-
 	animated_texture_basepic = R_CheckTextureNumForName ("SLADRIP1");
 	                           R_CheckTextureNumForName ("SLADRIP3");
 }

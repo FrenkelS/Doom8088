@@ -37,6 +37,14 @@ static int16_t  animated_flat_basepic;
 static int16_t __far* flattranslation;             // for global animation
 
 
+#if defined FLAT_SPAN
+static int16_t animated_flat_basepic_color[3];
+#else
+static fixed_t planeheight;
+static fixed_t basexscale, baseyscale;
+#endif
+
+
 //
 // R_DrawSpan
 // With DOOM style restrictions on view orientation,
@@ -158,9 +166,6 @@ static fixed_t distscale(uint8_t x)
 }
 
 
-static fixed_t planeheight;
-static fixed_t basexscale, baseyscale;
-
 static void R_MapPlane(uint16_t y, uint16_t x1, uint16_t x2, draw_span_vars_t *dsvars)
 {    
     const fixed_t distance = FixedMul(planeheight, yslope(y));
@@ -217,10 +222,7 @@ static void R_DoDrawPlane(visplane_t __far* pl)
 #if defined FLAT_SPAN
             draw_column_vars_t dcvars;
 
-            const byte __far   *source   = W_GetLumpByNum(firstflat + flattranslation[pl->picnum]);
-            const lighttable_t *colormap = R_LoadColorMap(pl->lightlevel);
-            uint16_t color = colormap[source[(64 / 2) * 64 + (64 / 2)]];
-            Z_ChangeTagToCache(source);
+            byte color = R_GetColorMapColor(pl->lightlevel, flattranslation[pl->picnum]);
 
             for (int16_t x = pl->minx; x <= pl->maxx; x++)
             {
@@ -320,8 +322,26 @@ void R_InitFlats(void)
 
 	flattranslation = Z_MallocStatic((numflats + 1) * sizeof(*flattranslation));
 
+	animated_flat_basepic = R_FlatNumForName("NUKAGE1");
+
+#if defined FLAT_SPAN
+	byte __far* source = Z_MallocStatic(64 * 64);
+
+	for (int16_t i = 0; i < numflats; i++)
+	{
+		W_ReadLumpByNum(firstflat + i, source);
+		flattranslation[i] = source[(64 / 2) * 64 + (64 / 2)];
+	}
+
+	Z_Free(source);
+
+	animated_flat_basepic_color[0] = flattranslation[animated_flat_basepic + 0];
+	animated_flat_basepic_color[1] = flattranslation[animated_flat_basepic + 1];
+	animated_flat_basepic_color[2] = flattranslation[animated_flat_basepic + 2];
+#else
 	for (int16_t i = 0; i < numflats; i++)
 		flattranslation[i] = i;
+#endif
 }
 
 
@@ -338,17 +358,15 @@ int16_t R_FlatNumForName(const char *name)
 }
 
 
-void P_InitAnimatedFlat(void)
-{
-	animated_flat_basepic = R_FlatNumForName("NUKAGE1");
-	                        R_FlatNumForName("NUKAGE3");
-}
-
-
 void P_UpdateAnimatedFlat(void)
 {
+#if defined FLAT_SPAN
+	int16_t pic = animated_flat_basepic_color[(_g_leveltime >> 3) % 3];
+#else
 	int16_t pic = animated_flat_basepic + ((_g_leveltime >> 3) % 3);
+#endif
 
-	for (int16_t i = animated_flat_basepic; i < animated_flat_basepic + 3; i++)
-		flattranslation[i] = pic;
+	flattranslation[animated_flat_basepic + 0] = pic;
+	flattranslation[animated_flat_basepic + 1] = pic;
+	flattranslation[animated_flat_basepic + 2] = pic;
 }

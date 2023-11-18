@@ -181,9 +181,8 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 }
 
 
-void W_ReadLumpByName(const char *name, void __far* ptr)
+void W_ReadLumpByNum(int16_t num, void __far* ptr)
 {
-	int16_t num = W_GetNumForName(name);
 	const filelump_t __far* lump = &fileinfo[num];
 	fseek(fileWAD, lump->filepos, SEEK_SET);
 	_ffread(ptr, lump->size, fileWAD);

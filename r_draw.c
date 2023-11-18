@@ -530,6 +530,14 @@ const lighttable_t* R_LoadColorMap(int16_t lightlevel)
     return current_colormap;
 }
 
+
+byte R_GetColorMapColor(int16_t lightlevel, int16_t color)
+{
+	const lighttable_t* colormap = R_LoadColorMap(lightlevel);
+	return colormap[color];
+}
+
+
 //
 // A column is a vertical slice/span from a wall texture that,
 //  given the DOOM style restrictions on the view orientation,
@@ -1690,17 +1698,14 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
         {
             const texpatch_t __far* patch = &tex->patches[i];
 
-            const patch_t __far* realpatch = W_TryGetLumpByNum(patch->patch_num);
-            if (realpath == NULL)
-                return NULL;
-
             const int16_t x1 = patch->originx;
 
             if (xc < x1)
-            {
-                Z_ChangeTagToCache(realpatch);
                 continue;
-            }
+
+            const patch_t __far* realpatch = W_TryGetLumpByNum(patch->patch_num);
+            if (realpath == NULL)
+                return NULL;
 
             const int16_t x2 = x1 + realpatch->width;
 
