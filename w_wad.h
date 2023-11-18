@@ -42,14 +42,17 @@
 
 void W_Init(void);
 
-int16_t           PUREFUNC W_GetNumForName( const char *name);
+int16_t           PUREFUNC W_GetNumForName(const char *name);
 const char __far* PUREFUNC W_GetNameForNum(       int16_t num);
 int32_t           PUREFUNC W_LumpLength(          int16_t num);
+boolean           PUREFUNC W_IsLumpCached(        int16_t num);
+int16_t                    W_GetFirstInt16(       int16_t num);
 const void __far* PUREFUNC W_GetLumpByNum(        int16_t num);
 const void __far* PUREFUNC W_TryGetLumpByNum(     int16_t num);
 const void __far* PUREFUNC W_GetLumpByNumAutoFree(int16_t num);
-void                       W_ReadLumpByName(const char *name, void __far* ptr);
+void                       W_ReadLumpByNum(       int16_t num, void __far* ptr);
 
-#define W_GetLumpByName(x) W_GetLumpByNum(W_GetNumForName(x))
+#define W_GetLumpByName(x)    W_GetLumpByNum(W_GetNumForName(x))
+#define W_ReadLumpByName(x,p) W_ReadLumpByNum(W_GetNumForName(x),p)
 
 #endif

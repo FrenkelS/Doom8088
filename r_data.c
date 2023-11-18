@@ -140,7 +140,7 @@ static void R_LoadTexture(int16_t texture_num)
 
         //Check for patch overlaps.
         int16_t l1 = patch->originx;
-        int16_t r1 = l1 + V_NumPatchWidth(patch->patch_num);
+        int16_t r1 = l1 + V_NumPatchWidthDontCache(patch->patch_num);
 
         for (uint8_t k = j + 1; k < texture->patchcount; k++)
         {
@@ -151,7 +151,7 @@ static void R_LoadTexture(int16_t texture_num)
 
             //Check for patch overlaps.
             int16_t l2 = p2->originx;
-            int16_t r2 = l2 + V_NumPatchWidth(p2->patch_num);
+            int16_t r2 = l2 + V_NumPatchWidthDontCache(p2->patch_num);
 
             if (r1 > l2 && l1 < r2)
             {
@@ -289,5 +289,5 @@ void R_Init(void)
   R_InitFlats();
   R_InitSky();
   R_InitSpriteLumps();
-  R_InitColormaps();                    // killough 3/20/98
+  R_InitColormaps();
 }

@@ -181,9 +181,8 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 }
 
 
-void W_ReadLumpByName(const char *name, void __far* ptr)
+void W_ReadLumpByNum(int16_t num, void __far* ptr)
 {
-	int16_t num = W_GetNumForName(name);
 	const filelump_t __far* lump = &fileinfo[num];
 	fseek(fileWAD, lump->filepos, SEEK_SET);
 	_ffread(ptr, lump->size, fileWAD);
@@ -214,6 +213,18 @@ static void __far* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void __far*__far
 }
 
 
+int16_t W_GetFirstInt16(int16_t num)
+{
+	const filelump_t __far* lump = &fileinfo[num];
+
+	int16_t firstInt16;
+
+	fseek(fileWAD, lump->filepos, SEEK_SET);
+	fread(&firstInt16, sizeof(int16_t), 1, fileWAD);
+	return firstInt16;;
+}
+
+
 const void __far* PUREFUNC W_GetLumpByNum(int16_t num)
 {
 	if (lumpcache[num])
@@ -225,7 +236,7 @@ const void __far* PUREFUNC W_GetLumpByNum(int16_t num)
 }
 
 
-static boolean PUREFUNC W_IsLumpCached(int16_t num)
+boolean PUREFUNC W_IsLumpCached(int16_t num)
 {
 	return lumpcache[num] != NULL;
 }

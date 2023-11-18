@@ -194,6 +194,14 @@ int16_t V_NumPatchWidth(int16_t num)
 	return width;
 }
 
+int16_t V_NumPatchWidthDontCache(int16_t num)
+{
+	if (W_IsLumpCached(num))
+		return V_NumPatchWidth(num);
+	else
+		return W_GetFirstInt16(num);
+}
+
 static int16_t V_NamePatchWidth(const char *name)
 {
 	return V_NumPatchWidth(W_GetNumForName(name));

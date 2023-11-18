@@ -627,15 +627,15 @@ void P_SetupLevel(int16_t map)
 
     lumpnum = W_GetNumForName(lumpname);
 
-    P_LoadVertexes  (lumpnum + ML_VERTEXES);
-    P_LoadSectors   (lumpnum + ML_SECTORS);
-    P_LoadSideDefs  (lumpnum + ML_SIDEDEFS);
     P_LoadLineDefs  (lumpnum + ML_LINEDEFS);
+    P_LoadSegs      (lumpnum + ML_SEGS);
+    P_LoadSideDefs  (lumpnum + ML_SIDEDEFS);
+    P_LoadSectors   (lumpnum + ML_SECTORS);
     P_LoadSideDefs2 (lumpnum + ML_SIDEDEFS);
-    P_LoadBlockMap  (lumpnum + ML_BLOCKMAP);
     P_LoadSubsectors(lumpnum + ML_SSECTORS);
     P_LoadNodes     (lumpnum + ML_NODES);
-    P_LoadSegs      (lumpnum + ML_SEGS);
+    P_LoadBlockMap  (lumpnum + ML_BLOCKMAP);
+    P_LoadVertexes  (lumpnum + ML_VERTEXES);
     P_LoadReject    (lumpnum + ML_REJECT);
 
     P_GroupLines();
