@@ -1842,20 +1842,26 @@ static void R_DrawColumnInCache(const column_t __far* patch, byte* cache, int16_
 #define CACHE_STRIDE (128 / CACHE_WAYS)
 #define CACHE_KEY_MASK (CACHE_STRIDE-1)
 
-#define CACHE_ENTRY(c, t) ((c << 16 | t))
+static uint32_t CACHE_ENTRY(int16_t column, int16_t texture)
+{
+	return (uint32_t)column << 16 | texture;
+}
 
-#define CACHE_HASH(c, t) (((c >> 1) ^ t) & CACHE_KEY_MASK)
+static uint16_t CACHE_HASH(int16_t column, int16_t texture)
+{
+	return ((column >> 1) ^ texture) & CACHE_KEY_MASK;
+}
 
 static byte __far columnCache[128*128];
 static uint32_t columnCacheEntries[128];
 
-static uint16_t FindColumnCacheItem(int16_t texture, uint32_t column)
+static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 {
     uint32_t cx = CACHE_ENTRY(column, texture);
 
     uint16_t key = CACHE_HASH(column, texture);
 
-    uint32_t* cc = (uint32_t*)&columnCacheEntries[key];
+    uint32_t* cc = &columnCacheEntries[key];
 
     uint16_t i = key;
 
@@ -1892,7 +1898,7 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
     }
 
 
-    const int32_t xc = (texcolumn & colmask) & tex->widthmask;
+    const int16_t xc = (texcolumn & colmask) & tex->widthmask;
 
     uint16_t cachekey = FindColumnCacheItem(texture, xc);
 
@@ -1906,9 +1912,6 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
         //misses++;
         byte tmpCache[128];
 
-
-        columnCacheEntries[cachekey] = CACHE_ENTRY(xc, texture);
-
         uint8_t i = 0;
         uint8_t patchcount = tex->patchcount;
 
@@ -1921,7 +1924,9 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
             if (xc < x1)
                 continue;
 
-            const patch_t __far* realpatch = W_GetLumpByNum(patch->patch_num);
+            const patch_t __far* realpatch = W_TryGetLumpByNum(patch->patch_num);
+            if (realpatch == NULL)
+                return NULL;
 
             const int16_t x2 = x1 + realpatch->width;
 
@@ -1936,6 +1941,8 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
 
         //Block copy will drop low 2 bits of len.
         _fmemcpy(colcache, tmpCache, (tex->height + 3) & ~3);
+
+        columnCacheEntries[cachekey] = CACHE_ENTRY(xc, texture);
     }
 
     return colcache;
