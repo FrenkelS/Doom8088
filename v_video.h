@@ -52,15 +52,15 @@ void V_DrawBackground(void);
 
 void V_DrawRaw(const char *name, uint16_t offset);
 
-// V_DrawNumPatch - Draws the patch from lump num
-void V_DrawNumPatch(int16_t x, int16_t y, int16_t lump);
-void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t lump);
+// V_DrawNumPatchScaled - Draws the patch from lump num
+void V_DrawNumPatchScaled(int16_t x, int16_t y, int16_t lump);
+void V_DrawNumPatchNotScaled(int16_t x, int16_t y, int16_t lump);
 
-void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch);
+void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch);
 
 
-// V_DrawNamePatch - Draws the patch from lump "name"
-void V_DrawNamePatch(int16_t x, int16_t y, const char *name);
+// V_DrawNamePatchScaled - Draws the patch from lump "name"
+#define V_DrawNamePatchScaled(x,y,name) V_DrawNumPatchScaled(x,y,W_GetNumForName(name))
 
 
 void V_FillRect(byte colour);
