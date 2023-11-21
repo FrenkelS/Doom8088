@@ -2073,7 +2073,9 @@ static void R_RenderSegLoop (int16_t rw_x)
         if (segtextured)
         {
             // calculate texture offset
+#if !defined ONE_WALL_TEXTURE
             texturecolumn = (rw_offset - FixedMul(rw_distance, finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT))) >> FRACBITS;
+#endif
 
 //            dcvars.x = rw_x;
 
