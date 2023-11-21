@@ -1842,9 +1842,9 @@ static void R_DrawColumnInCache(const column_t __far* patch, byte* cache, int16_
 #define CACHE_STRIDE (128 / CACHE_WAYS)
 #define CACHE_KEY_MASK (CACHE_STRIDE-1)
 
-static uint32_t CACHE_ENTRY(int16_t column, int16_t texture)
+static uint16_t CACHE_ENTRY(int16_t column, int16_t texture)
 {
-	return (uint32_t)column << 16 | texture;
+	return column | (texture << 8);
 }
 
 static uint16_t CACHE_HASH(int16_t column, int16_t texture)
@@ -1853,21 +1853,21 @@ static uint16_t CACHE_HASH(int16_t column, int16_t texture)
 }
 
 static byte __far columnCache[128*128];
-static uint32_t columnCacheEntries[128];
+static uint16_t columnCacheEntries[128];
 
 static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 {
-    uint32_t cx = CACHE_ENTRY(column, texture);
+    uint16_t cx = CACHE_ENTRY(column, texture);
 
     uint16_t key = CACHE_HASH(column, texture);
 
-    uint32_t* cc = &columnCacheEntries[key];
+    uint16_t* cc = &columnCacheEntries[key];
 
     uint16_t i = key;
 
     do
     {
-        uint32_t cy = *cc;
+        uint16_t cy = *cc;
 
         if((cy == cx) || (cy == 0))
             return i;
@@ -1903,7 +1903,7 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
     uint16_t cachekey = FindColumnCacheItem(texture, xc);
 
     byte __far* colcache = &columnCache[cachekey*128];
-    uint32_t cacheEntry = columnCacheEntries[cachekey];
+    uint16_t cacheEntry = columnCacheEntries[cachekey];
 
     //total++;
 
