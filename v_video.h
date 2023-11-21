@@ -60,7 +60,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch);
 
 
 // V_DrawNamePatch - Draws the patch from lump "name"
-void V_DrawNamePatch(int16_t x, int16_t y, const char *name);
+#define V_DrawNamePatch(x,y,name) V_DrawNumPatch(x,y,W_GetNumForName(name))
 
 
 void V_FillRect(byte colour);
