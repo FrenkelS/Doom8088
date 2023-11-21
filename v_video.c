@@ -93,12 +93,7 @@ void V_DrawRaw(const char *name, uint16_t offset)
 }
 
 
-/*
- * This function draws at GBA resolution (ie. not pixel doubled)
- * so the st bar and menus don't look like garbage.
- */
-
-static void V_DrawPatch(int16_t x, int16_t y, const patch_t __far* patch)
+static void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
     static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
     static const int32_t   DXI = (((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH;
@@ -189,15 +184,7 @@ void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
 void V_DrawNumPatch(int16_t x, int16_t y, int16_t num)
 {
 	const patch_t __far* patch = W_GetLumpByNum(num);
-	V_DrawPatch(x, y, patch);
-	Z_ChangeTagToCache(patch);
-}
-
-
-void V_DrawNamePatch(int16_t x, int16_t y, const char *name)
-{
-	const patch_t __far* patch = W_GetLumpByName(name);
-	V_DrawPatch(x, y, patch);
+	V_DrawPatchScaled(x, y, patch);
 	Z_ChangeTagToCache(patch);
 }
 
