@@ -194,7 +194,7 @@ static void F_TextWrite (void)
 		c = toupper(c);
 		if (HU_FONTSTART <= c && c <= HU_FONTEND) {
 			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
-			V_DrawPatchNoScale(cx, cy, patch);
+			V_DrawPatchNotScaled(cx, cy, patch);
 			cx += patch->width;
 			Z_ChangeTagToCache(patch);
 		} else {

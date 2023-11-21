@@ -619,7 +619,7 @@ static void STlib_updateMultIcon(st_multicon_t* mi)
         return;
 
     if (*mi->inum != -1)  // killough 2/16/98: redraw only if != -1
-		V_DrawNumPatchNoScale(mi->x, mi->y, mi->p[*mi->inum]);
+		V_DrawNumPatchNotScaled(mi->x, mi->y, mi->p[*mi->inum]);
 
     mi->oldinum = *mi->inum;
 
@@ -669,13 +669,13 @@ static void STlib_drawNum(st_number_t* n)
 
   // in the special case of 0, you draw 0
   if (!num)
-    V_DrawNumPatchNoScale(x - w, n->y, n->p[0]);
+    V_DrawNumPatchNotScaled(x - w, n->y, n->p[0]);
 
   // draw the new number
   while (num && numdigits--)
   {
     x -= w;
-    V_DrawNumPatchNoScale(x, n->y, n->p[num % 10]);
+    V_DrawNumPatchNotScaled(x, n->y, n->p[num % 10]);
     num /= 10;
   }
 }
