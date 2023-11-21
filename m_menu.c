@@ -372,13 +372,13 @@ static void M_DrawSaveLoad(const char* name)
 		//
 		int16_t x = LoadDef.x;
 		const int16_t y = 27 + 13 * i + 7;
-		V_DrawPatchNoScale(x - 8, y, lpatch);
+		V_DrawPatchNotScaled(x - 8, y, lpatch);
 		for (j = 0; j < 12; j++)
 		{
-			V_DrawPatchNoScale(x, y, mpatch);
+			V_DrawPatchNotScaled(x, y, mpatch);
 			x += 8;
 		}
-		V_DrawPatchNoScale(x, y, rpatch);
+		V_DrawPatchNotScaled(x, y, rpatch);
 
 		M_WriteText(LoadDef.x, y - 7, _g_savegamestrings[i]);
 	}
@@ -1204,7 +1204,7 @@ static void M_WriteText (int16_t x, int16_t y, const char __far* string)
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
 			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
-			V_DrawPatchNoScale(cx, cy, patch);
+			V_DrawPatchNotScaled(cx, cy, patch);
 			cx += patch->width;
 			Z_ChangeTagToCache(patch);
 		} else {

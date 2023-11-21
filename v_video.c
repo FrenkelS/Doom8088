@@ -148,7 +148,7 @@ static void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 }
 
 
-void V_DrawPatchNoScale(int16_t x, int16_t y, const patch_t __far* patch)
+void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
     y -= patch->topoffset;
     x -= patch->leftoffset;
@@ -189,10 +189,10 @@ void V_DrawNumPatch(int16_t x, int16_t y, int16_t num)
 }
 
 
-void V_DrawNumPatchNoScale(int16_t x, int16_t y, int16_t num)
+void V_DrawNumPatchNotScaled(int16_t x, int16_t y, int16_t num)
 {
 	const patch_t __far* patch = W_GetLumpByNum(num);
-	V_DrawPatchNoScale(x, y, patch);
+	V_DrawPatchNotScaled(x, y, patch);
 	Z_ChangeTagToCache(patch);
 }
 

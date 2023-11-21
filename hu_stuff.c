@@ -302,19 +302,19 @@ static void HUlib_drawTextLine(hu_textline_t* l)
 		{
 			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
 			int16_t w = patch->width;
-			if (x + w > 240)
+			if (x + w > SCREENWIDTH)
 			{
 				Z_ChangeTagToCache(patch);
 				break;
 			}
-			V_DrawPatchNoScale(x, y, patch);
+			V_DrawPatchNotScaled(x, y, patch);
 			Z_ChangeTagToCache(patch);
 			x += w;
 		}
 		else
 		{
 			x += HU_FONT_SPACE_WIDTH;
-			if (x >= 240)
+			if (x >= SCREENWIDTH)
 				break;
 		}
 	}
