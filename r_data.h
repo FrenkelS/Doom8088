@@ -48,6 +48,7 @@ typedef struct
 {
   int16_t originx, originy;  // Block origin, which has already accounted
   int16_t patch_num;    // for the internal origin of the patch.
+  int16_t patch_width;
 } texpatch_t;
 
 //

@@ -47,7 +47,6 @@
 #include "r_main.h"
 #include "r_things.h"
 #include "m_fixed.h"
-#include "v_video.h"
 #include "st_stuff.h"
 #include "i_system.h"
 #include "g_game.h"
@@ -869,7 +868,7 @@ static void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16
             if (xc < x1)
                 continue;
 
-            const int16_t x2 = x1 + V_NumPatchWidth(patch->patch_num);
+            const int16_t x2 = x1 + patch->patch_width;
 
             if (xc < x2)
             {

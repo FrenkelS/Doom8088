@@ -127,7 +127,8 @@ static void R_LoadTexture(int16_t texture_num)
         uint64_t pnameint = *(uint64_t __far*)&pnames[mpatch->patch * 8];
         char* pname = (char*)&pnameint;
 
-        patch->patch_num = W_GetNumForName(pname);
+        patch->patch_num   = W_GetNumForName(pname);
+        patch->patch_width = V_NumPatchWidthDontCache(patch->patch_num);
     }
 
     pnames -= 4;
@@ -140,7 +141,7 @@ static void R_LoadTexture(int16_t texture_num)
 
         //Check for patch overlaps.
         int16_t l1 = patch->originx;
-        int16_t r1 = l1 + V_NumPatchWidthDontCache(patch->patch_num);
+        int16_t r1 = l1 + patch->patch_width;
 
         for (uint8_t k = j + 1; k < texture->patchcount; k++)
         {
@@ -151,7 +152,7 @@ static void R_LoadTexture(int16_t texture_num)
 
             //Check for patch overlaps.
             int16_t l2 = p2->originx;
-            int16_t r2 = l2 + V_NumPatchWidthDontCache(p2->patch_num);
+            int16_t r2 = l2 + p2->patch_width;
 
             if (r1 > l2 && l1 < r2)
             {
