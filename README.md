@@ -10,19 +10,25 @@ Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286, and wi
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
 Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
-Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=JPz3jZ-B7jQ).
+Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=DQr-xqS3n4c).
 
 **What's special?:**
- - No textures
+ - No texture mapped floors and ceilings
+ - No light diminishing
  - No sound and music
  - No saving and loading
  - No multiplayer
  - No PWADs
  - No screen resizing
+ - No mouse and joystick support
  - Rotating overlaid automap
  - Supports only Doom 1 Episode 1
  - Only demo3 is in sync
- - Some crashes due to memory issues
+
+**Known bugs:**
+ - Some crashes and lockups due to memory issues and divisions by zero
+ - When there's not enough memory for a texture, one color is drawn
+ - E1M6 is too big to fit in the memory
 
 ## Controls:
 |Action      |GBA   |DOS                     |
