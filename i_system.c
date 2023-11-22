@@ -222,7 +222,7 @@ void I_FinishUpdate (void)
 
 void I_InitGraphics(void)
 {	
-	I_SetScreenMode(8); // 4 = 320x200x4, 6 = 640x200x2, 8 = 160x200x16
+	I_SetScreenMode(6); // 4 = 320x200x4, 6 = 640x200x2, 8 = 160x200x16
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();

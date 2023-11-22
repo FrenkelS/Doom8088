@@ -723,7 +723,7 @@ void G_WorldDone (void)
 static void G_DoWorldDone (void)
 {
     _g_gamestate = GS_LEVEL;
-    _g_gamemap = 8;//_g_wminfo.next+1;
+    _g_gamemap = _g_wminfo.next+1;
     G_DoLoadLevel();
     _g_gameaction = ga_nothing;
 }
