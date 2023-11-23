@@ -1972,7 +1972,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     // hit line
     // position a bit closer
 
-    frac = in->frac - FixedApproxDiv(4 * FRACUNIT, attackrange);
+    frac = in->frac - 4 * FixedReciprocal(attackrange);
     x = _g_trace.x + FixedMul(_g_trace.dx, frac);
     y = _g_trace.y + FixedMul(_g_trace.dy, frac);
     z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
@@ -2029,7 +2029,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
   // hit thing
   // position a bit closer
 
-  frac = in->frac - FixedApproxDiv (10*FRACUNIT,attackrange);
+  frac = in->frac - 10 * FixedReciprocal(attackrange);
 
   x = _g_trace.x + FixedMul(_g_trace.dx, frac);
   y = _g_trace.y + FixedMul(_g_trace.dy, frac);
