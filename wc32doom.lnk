@@ -7,8 +7,8 @@ option stack=65536
 option stub=wstub
 option static
 debug all
-libpath %WATCOM%\lib386
-libpath %WATCOM%\lib386\dos
+libpath %WATCOM%/lib386
+libpath %WATCOM%/lib386/dos
 lib noemu387.lib
 format os2 le
 name DOOM32WC
