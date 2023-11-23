@@ -25,64 +25,231 @@
 # --------------------------------------------------------------------------
 
 CCOPTS = -omaxtnrih -ol+ -oe=32 -zp1 -bt=dos -D__far= -3r -j -zq -zc -wx -za99
+CCOPTS += -DFLAT_SPAN
 
-GLOBOBJS = &
- a_taskmn.obj &
- am_map.obj &
- d_items.obj &
- d_main.obj &
- f_finale.obj &
- f_wipe.obj &
- g_game.obj &
- hu_stuff.obj &
- i_audio.obj &
- i_main.obj &
- i_system.obj &
- info.obj &
- m_cheat.obj &
- m_menu.obj &
- m_random.obj &
- p_ceilng.obj &
- p_doors.obj &
- p_enemy.obj &
- p_floor.obj &
- p_genlin.obj &
- p_inter.obj &
- p_lights.obj &
- p_map.obj &
- p_maputl.obj &
- p_mobj.obj &
- p_plats.obj &
- p_pspr.obj &
- p_setup.obj &
- p_sight.obj &
- p_spec.obj &
- p_switch.obj &
- p_telept.obj &
- p_tick.obj &
- p_user.obj &
- r_data.obj &
- r_draw.obj &
- r_plane.obj &
- r_sky.obj &
- r_things.obj &
- s_sound.obj &
- sounds.obj &
- st_stuff.obj &
- tables.obj &
- v_video.obj &
- w_wad.obj &
- wi_stuff.obj &
- z_bmallo.obj &
- z_zone.obj
+GLOBOBJS = WC32/a_taskmn.obj &
+	 WC32/am_map.obj &
+	 WC32/d_items.obj &
+	 WC32/d_main.obj &
+	 WC32/f_finale.obj &
+	 WC32/f_wipe.obj &
+	 WC32/g_game.obj &
+	 WC32/hu_stuff.obj &
+	 WC32/i_audio.obj &
+	 WC32/i_main.obj &
+	 WC32/i_system.obj &
+	 WC32/info.obj &
+	 WC32/m_cheat.obj &
+	 WC32/m_menu.obj &
+	 WC32/m_random.obj &
+	 WC32/p_ceilng.obj &
+	 WC32/p_doors.obj &
+	 WC32/p_enemy.obj &
+	 WC32/p_floor.obj &
+	 WC32/p_genlin.obj &
+	 WC32/p_inter.obj &
+	 WC32/p_lights.obj &
+	 WC32/p_map.obj &
+	 WC32/p_maputl.obj &
+	 WC32/p_mobj.obj &
+	 WC32/p_plats.obj &
+	 WC32/p_pspr.obj &
+	 WC32/p_setup.obj &
+	 WC32/p_sight.obj &
+	 WC32/p_spec.obj &
+	 WC32/p_switch.obj &
+	 WC32/p_telept.obj &
+	 WC32/p_tick.obj &
+	 WC32/p_user.obj &
+	 WC32/r_data.obj &
+	 WC32/r_draw.obj &
+	 WC32/r_plane.obj &
+	 WC32/r_sky.obj &
+	 WC32/r_things.obj &
+	 WC32/s_sound.obj &
+	 WC32/sounds.obj &
+	 WC32/st_stuff.obj &
+	 WC32/tables.obj &
+	 WC32/v_video.obj &
+	 WC32/w_wad.obj &
+	 WC32/wi_stuff.obj &
+	 WC32/z_bmallo.obj &
+	 WC32/z_zone.obj
 
-WC32\DOOM32WC.EXE : $(GLOBOBJS)
- cd WC32
- wlink @..\wc32doom.lnk
- wstrip DOOM32WC.EXE
- cd..
+WC32/DOOM32WC.exe : $(GLOBOBJS)
+	cd WC32
+	wlink @../wc32doom.lnk
+	wstrip DOOM32WC.exe
+	cp ../Release/DOOM1.WAD DOOM1.WAD
+	cp ../Release/timedemo.bat timedemo.bat
+	cd ..
 
-.obj : WC32
+#.obj : WC32
+#
+#.c.obj :
+#	wcc386 $(CCOPTS) $[* /fo=WC32\$^&
+#	wcc386 $(CCOPTS) $[* -fo=WC32/WC32/$^&
+#	wcc386 $(CCOPTS) $< -fo=WC32/WC32/$0
 
-.c.obj :
- wcc386 $(CCOPTS) $[* /fo=WC32\$^&
+#%.obj : %.c
+#	wcc386 $(CCOPTS) $^ -fo=WC32/$@
+#	wcc386 $(CCOPTS) %.c -fo=WC32/%.obj
+#	wcc386 $(CCOPTS) $< -fo=WC32/$0
+
+#a_taskmn.obj: a_taskmn.c 
+#	wcc386 $(CCOPTS) a_taskmn.c -fo=WC32/a_taskmn.obj
+
+#SOURCES = $(wildcard *.c) 
+#OBJECTS = $(wildcard *.obj) 
+#OBJECTS = $(SOURCES:%.c=%.o)
+
+#$(OBJECTS): %.o : %.c 
+
+
+
+# This obviously shouldn't be necessary, but "should" is a four-letter word. 
+
+WC32/a_taskmn.obj: a_taskmn.c
+	wcc386 $(CCOPTS) a_taskmn.c -fo=WC32/a_taskmn.obj
+
+WC32/am_map.obj: am_map.c
+	wcc386 $(CCOPTS) am_map.c -fo=WC32/am_map.obj
+
+WC32/d_items.obj: d_items.c
+	wcc386 $(CCOPTS) d_items.c -fo=WC32/d_items.obj
+
+WC32/d_main.obj: d_main.c
+	wcc386 $(CCOPTS) d_main.c -fo=WC32/d_main.obj
+
+WC32/f_finale.obj: f_finale.c
+	wcc386 $(CCOPTS) f_finale.c -fo=WC32/f_finale.obj
+
+WC32/f_wipe.obj: f_wipe.c
+	wcc386 $(CCOPTS) f_wipe.c -fo=WC32/f_wipe.obj
+
+WC32/g_game.obj: g_game.c
+	wcc386 $(CCOPTS) g_game.c -fo=WC32/g_game.obj
+
+WC32/hu_stuff.obj: hu_stuff.c
+	wcc386 $(CCOPTS) hu_stuff.c -fo=WC32/hu_stuff.obj
+
+WC32/i_audio.obj: i_audio.c
+	wcc386 $(CCOPTS) i_audio.c -fo=WC32/i_audio.obj
+
+WC32/i_main.obj: i_main.c
+	wcc386 $(CCOPTS) i_main.c -fo=WC32/i_main.obj
+
+WC32/i_system.obj: i_system.c
+	wcc386 $(CCOPTS) i_system.c -fo=WC32/i_system.obj
+
+WC32/info.obj: info.c
+	wcc386 $(CCOPTS) info.c -fo=WC32/info.obj
+
+WC32/m_cheat.obj: m_cheat.c
+	wcc386 $(CCOPTS) m_cheat.c -fo=WC32/m_cheat.obj
+
+WC32/m_menu.obj: m_menu.c
+	wcc386 $(CCOPTS) m_menu.c -fo=WC32/m_menu.obj
+
+WC32/m_random.obj: m_random.c
+	wcc386 $(CCOPTS) m_random.c -fo=WC32/m_random.obj
+
+WC32/p_ceilng.obj: p_ceilng.c
+	wcc386 $(CCOPTS) p_ceilng.c -fo=WC32/p_ceilng.obj
+
+WC32/p_doors.obj: p_doors.c
+	wcc386 $(CCOPTS) p_doors.c -fo=WC32/p_doors.obj
+
+WC32/p_enemy.obj: p_enemy.c
+	wcc386 $(CCOPTS) p_enemy.c -fo=WC32/p_enemy.obj
+
+WC32/p_floor.obj: p_floor.c
+	wcc386 $(CCOPTS) p_floor.c -fo=WC32/p_floor.obj
+
+WC32/p_genlin.obj: p_genlin.c
+	wcc386 $(CCOPTS) p_genlin.c -fo=WC32/p_genlin.obj
+
+WC32/p_inter.obj: p_inter.c
+	wcc386 $(CCOPTS) p_inter.c -fo=WC32/p_inter.obj
+
+WC32/p_lights.obj: p_lights.c
+	wcc386 $(CCOPTS) p_lights.c -fo=WC32/p_lights.obj
+
+WC32/p_map.obj: p_map.c
+	wcc386 $(CCOPTS) p_map.c -fo=WC32/p_map.obj
+
+WC32/p_maputl.obj: p_maputl.c
+	wcc386 $(CCOPTS) p_maputl.c -fo=WC32/p_maputl.obj
+
+WC32/p_mobj.obj: p_mobj.c
+	wcc386 $(CCOPTS) p_mobj.c -fo=WC32/p_mobj.obj
+
+WC32/p_plats.obj: p_plats.c
+	wcc386 $(CCOPTS) p_plats.c -fo=WC32/p_plats.obj
+
+WC32/p_pspr.obj: p_pspr.c
+	wcc386 $(CCOPTS) p_pspr.c -fo=WC32/p_pspr.obj
+
+WC32/p_setup.obj: p_setup.c
+	wcc386 $(CCOPTS) p_setup.c -fo=WC32/p_setup.obj
+
+WC32/p_sight.obj: p_sight.c
+	wcc386 $(CCOPTS) p_sight.c -fo=WC32/p_sight.obj
+
+WC32/p_spec.obj: p_spec.c
+	wcc386 $(CCOPTS) p_spec.c -fo=WC32/p_spec.obj
+
+WC32/p_switch.obj: p_switch.c
+	wcc386 $(CCOPTS) p_switch.c -fo=WC32/p_switch.obj
+
+WC32/p_telept.obj: p_telept.c
+	wcc386 $(CCOPTS) p_telept.c -fo=WC32/p_telept.obj
+
+WC32/p_tick.obj: p_tick.c
+	wcc386 $(CCOPTS) p_tick.c -fo=WC32/p_tick.obj
+
+WC32/p_user.obj: p_user.c
+	wcc386 $(CCOPTS) p_user.c -fo=WC32/p_user.obj
+
+WC32/r_data.obj: r_data.c
+	wcc386 $(CCOPTS) r_data.c -fo=WC32/r_data.obj
+
+WC32/r_draw.obj: r_draw.c
+	wcc386 $(CCOPTS) r_draw.c -fo=WC32/r_draw.obj
+
+WC32/r_plane.obj: r_plane.c
+	wcc386 $(CCOPTS) r_plane.c -fo=WC32/r_plane.obj
+
+WC32/r_sky.obj: r_sky.c
+	wcc386 $(CCOPTS) r_sky.c -fo=WC32/r_sky.obj
+
+WC32/r_things.obj: r_things.c
+	wcc386 $(CCOPTS) r_things.c -fo=WC32/r_things.obj
+
+WC32/s_sound.obj: s_sound.c
+	wcc386 $(CCOPTS) s_sound.c -fo=WC32/s_sound.obj
+
+WC32/sounds.obj: sounds.c
+	wcc386 $(CCOPTS) sounds.c -fo=WC32/sounds.obj
+
+WC32/st_stuff.obj: st_stuff.c
+	wcc386 $(CCOPTS) st_stuff.c -fo=WC32/st_stuff.obj
+
+WC32/tables.obj: tables.c
+	wcc386 $(CCOPTS) tables.c -fo=WC32/tables.obj
+
+WC32/v_video.obj: v_video.c
+	wcc386 $(CCOPTS) v_video.c -fo=WC32/v_video.obj
+
+WC32/w_wad.obj: w_wad.c
+	wcc386 $(CCOPTS) w_wad.c -fo=WC32/w_wad.obj
+
+WC32/wi_stuff.obj: wi_stuff.c
+	wcc386 $(CCOPTS) wi_stuff.c -fo=WC32/wi_stuff.obj
+
+WC32/z_bmallo.obj: z_bmallo.c
+	wcc386 $(CCOPTS) z_bmallo.c -fo=WC32/z_bmallo.obj
+
+WC32/z_zone.obj: z_zone.c
+	wcc386 $(CCOPTS) z_zone.c -fo=WC32/z_zone.obj
+

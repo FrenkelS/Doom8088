@@ -639,12 +639,57 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	uint8_t __far* dest = _g_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 	uint16_t __far* d = (uint16_t __far*) dest;
 
-	while (count--)
-	{
-		*d++ = color;
-		*d   = color;
-		d += (SCREENWIDTH / 2) - 1;
-	}
+//	while (count--)
+//	{
+//		*d++ = color;
+//		*d   = color;
+//		d += (SCREENWIDTH / 2) - 1;
+//	}
+	
+	uint16_t l = count >> 4;
+	
+	while( l-- ) { 
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+	} 
+	
+	switch( count & 15 ) { 
+		case 15: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 14: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 13: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 12: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		
+		case 11: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 10: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 9: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 8: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		
+		case 7: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 6: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 5: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 4: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		
+		case 3: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 2: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 1: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+	} 
 }
 
 
@@ -1796,9 +1841,12 @@ static void R_RenderSegLoop (int16_t rw_x)
 
         // no space above wall?
         int16_t bottom,top = cc_rwx+1;
+        
+        dcvars.x = rw_x;
 
         if (yl < top)
             yl = top;
+
 
         if (markceiling)
         {
@@ -1809,9 +1857,15 @@ static void R_RenderSegLoop (int16_t rw_x)
 
             if (top <= bottom)
             {
+	            #if !defined FLAT_SPAN
                 ceilingplane->top[rw_x] = top;
                 ceilingplane->bottom[rw_x] = bottom;
                 ceilingplane->modified = true;
+                #else
+                dcvars.yl = top;
+                dcvars.yh = bottom;
+                R_DrawColumnFlat( 0, &dcvars );
+                #endif
             }
             // SoM: this should be set here
             cc_rwx = bottom;
@@ -1828,9 +1882,15 @@ static void R_RenderSegLoop (int16_t rw_x)
 
             if (++top <= bottom)
             {
+                #if !defined FLAT_SPAN
                 floorplane->top[rw_x] = top;
                 floorplane->bottom[rw_x] = bottom;
                 floorplane->modified = true;
+                #else
+                dcvars.yl = top;
+                dcvars.yh = bottom;
+                R_DrawColumnFlat( 0, &dcvars );
+                #endif
             }
             // SoM: This should be set here to prevent overdraw
             fc_rwx = top;
@@ -1842,7 +1902,7 @@ static void R_RenderSegLoop (int16_t rw_x)
             // calculate texture offset
             texturecolumn = (rw_offset - FixedMul(rw_distance, finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT))) >> FRACBITS;
 
-            dcvars.x = rw_x;
+//            dcvars.x = rw_x;
 
             dcvars.iscale = FixedReciprocal((uint32_t)rw_scale);
         }
@@ -2223,6 +2283,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     }
 
     // render it
+    #if !defined FLAT_SPAN
     if (markceiling)
     {
         if (ceilingplane)   // killough 4/11/98: add NULL ptr checks
@@ -2247,6 +2308,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         else
             markfloor = 0;
     }
+    #endif
 
     didsolidcol = false;
     R_RenderSegLoop(rw_x);
@@ -2497,6 +2559,7 @@ static void R_Subsector(int16_t num)
     count = sub->numlines;
     line = &_g_segs[sub->firstline];
 
+//	#if !defined FLAT_SPAN
     if(frontsector->floorheight < viewz)
     {
         floorplane = R_FindPlane(frontsector->floorheight,
@@ -2521,6 +2584,10 @@ static void R_Subsector(int16_t num)
     {
         ceilingplane = NULL;
     }
+//    #else
+//    floorplane = NULL; 
+//    ceilingplane = NULL; 
+//    #endif
 
     R_AddSprites(sub, frontsector->lightlevel);
     while (count--)
@@ -2775,13 +2842,19 @@ void R_RenderPlayerView (player_t* player)
     // Clear buffers.
     R_ClearClipSegs ();
     R_ClearDrawSegs ();
+//    #if !defined FLAT_SPAN
     R_ClearPlanes ();
+//    #else
+//    R_ClearOpenings(); 
+//    #endif
     R_ClearSprites ();
 
     // The head node is the last node output.
     R_RenderBSPNode (numnodes-1);
 
+    #if !defined FLAT_SPAN
     R_DrawPlanes ();
+    #endif
 
     R_DrawMasked ();
 }
