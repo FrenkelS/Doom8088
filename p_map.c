@@ -1948,7 +1948,6 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   mobj_t __far* th;
 
-  fixed_t slope;
   fixed_t dist;
   fixed_t thingtopslope;
   fixed_t thingbottomslope;
@@ -1963,12 +1962,10 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     if (li->flags & ML_TWOSIDED)
     {  // crosses a two sided (really 2s) line
       P_LineOpening (li);
-      dist = FixedMul(attackrange, in->frac);
+      fixed_t t = FixedMul(aimslope, FixedMul(attackrange, in->frac)) + shootz;
 
-      if ((LN_FRONTSECTOR(li)->floorheight==LN_BACKSECTOR(li)->floorheight ||
-         (slope = FixedApproxDiv(_g_openbottom - shootz , dist)) <= aimslope) &&
-         (LN_FRONTSECTOR(li)->ceilingheight==LN_BACKSECTOR(li)->ceilingheight ||
-         (slope = FixedApproxDiv (_g_opentop - shootz , dist)) >= aimslope))
+      if ((LN_FRONTSECTOR(li)->floorheight   == LN_BACKSECTOR(li)->floorheight   || _g_openbottom <= t) &&
+          (LN_FRONTSECTOR(li)->ceilingheight == LN_BACKSECTOR(li)->ceilingheight || _g_opentop    >= t))
         return true;      // shot continues
     }
 
