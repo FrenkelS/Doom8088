@@ -32,7 +32,7 @@
 void Z_Init(void);
 void Z_Shutdown(void);
 boolean Z_IsEnoughFreeMemory(uint16_t size);
-void __far* Z_TryMallocStatic(int32_t size);
+void __far* Z_TryMallocStatic(uint16_t size);
 void __far* Z_MallocStatic(int32_t size);
 void __far* Z_MallocStaticWithUser(int32_t size, void __far*__far* user); 
 void __far* Z_MallocLevel(int32_t size, void __far*__far* user);
