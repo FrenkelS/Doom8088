@@ -209,8 +209,11 @@ static void F_TextWrite (void)
 //
 void F_Drawer (void)
 {
-    if (!finalestage)
-        F_TextWrite ();
-    else
-        V_DrawRaw("HELP2", 0);
+	if (!finalestage)
+		F_TextWrite ();
+	else
+	{
+		int16_t num = W_GetNumForName("HELP2");
+		V_DrawRaw(num, 0);
+	}
 }

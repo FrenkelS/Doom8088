@@ -355,7 +355,8 @@ void D_PageTicker(void)
 
 static void D_PageDrawer(void)
 {
-	V_DrawRaw("TITLEPIC", 0);
+	int16_t num = W_GetNumForName("TITLEPIC");
+	V_DrawRaw(num, 0);
 }
 
 //
