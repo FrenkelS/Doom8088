@@ -233,6 +233,9 @@ static int32_t      worldhigh;
 static int32_t      worldlow;
 
 static lighttable_t current_colormap[256];
+//const lighttable_t __far* current_colormap;
+	// Copied colormap is presumably for GBA.
+	// ... but might be relevant to 8088, if it avoids far pointers. Hmm. 
 
 
 uint16_t validcount = 1;         // increment every time a check is made
@@ -532,6 +535,8 @@ const lighttable_t* R_LoadColorMap(int16_t lightlevel)
         current_colormap_ptr = lm;
     }
 
+//	current_colormap = R_ColourMap(lightlevel); 
+		// 3904 realtics versus 
     return current_colormap;
 }
 
@@ -2826,24 +2831,6 @@ static void R_Subsector(int16_t num)
 		// Which would also explain "R_ColourMap." David A. Palmer operated out of Sheffield, England. 
 	floorflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->floorpic) ] ]; 
 	ceilingflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->ceilingpic) ] ]; 
-	// Still completely the wrong color. pl->picnum is frontsector->floorpic. What is going on here? 
-	
-//	int16_t firstflat        = W_GetNumForName("F_START") + 1;
-//	
-//	byte __far* source = Z_MallocStatic(64 * 64);
-//
-//	for (int16_t i = 0; i < numflats; i++)
-//	{
-//		W_ReadLumpByNum( firstflat + frontsector->floorpic, source);
-//		floorflatcolor = current_colormap[ source[(64 / 2) * 64 + (64 / 2)] ];
-//	}
-//
-//	floorflatcolor = current_colormap[ flattranslation[ ((int16_t)(frontsector->floorpic)) + firstflat ] ]; 
-//
-//	Z_Free(source);
-	// That - finally - is correct. And obviously slow as hell. 
-	// Can't just move R_InitFlats to r_draw.c, for some reason. 
-	
     #endif
 
     R_AddSprites(sub, frontsector->lightlevel);
