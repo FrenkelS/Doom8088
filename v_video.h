@@ -50,7 +50,7 @@
 
 void V_DrawBackground(void);
 
-void V_DrawRaw(const char *name, uint16_t offset);
+void V_DrawRaw(int16_t num, uint16_t offset);
 
 // V_DrawNumPatchScaled - Draws the patch from lump num
 void V_DrawNumPatchScaled(int16_t x, int16_t y, int16_t lump);
