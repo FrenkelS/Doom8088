@@ -67,7 +67,7 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b);
 
 
 //Approx Reciprocal of v
-#define FixedReciprocal(v) 0xffffffff/(v)
+#define FixedReciprocal(v) (0xffffffff/(v))
 
 
 /*

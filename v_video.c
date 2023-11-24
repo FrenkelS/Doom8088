@@ -77,9 +77,8 @@ void V_DrawBackground(void)
 }
 
 
-void V_DrawRaw(const char *name, uint16_t offset)
+void V_DrawRaw(int16_t num, uint16_t offset)
 {
-	int16_t num = W_GetNumForName(name);
 	const uint8_t __far* lump = W_TryGetLumpByNum(num);
 
 	if (lump != NULL)
@@ -89,7 +88,7 @@ void V_DrawRaw(const char *name, uint16_t offset)
 		Z_ChangeTagToCache(lump);
 	}
 	else
-		W_ReadLumpByName(name, &_g_screen[offset]);
+		W_ReadLumpByNum(num, &_g_screen[offset]);
 }
 
 
