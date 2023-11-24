@@ -550,7 +550,7 @@ void __far* Z_MallocStaticWithUser(uint16_t size, void __far*__far* user)
 }
 
 
-void __far* Z_MallocLevel(int32_t size, void __far*__far* user)
+void __far* Z_MallocLevel(uint16_t size, void __far*__far* user)
 {
 	return Z_Malloc(size, PU_LEVEL, user);
 }
