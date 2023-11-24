@@ -556,7 +556,7 @@ void __far* Z_MallocLevel(uint16_t size, void __far*__far* user)
 }
 
 
-void __far* Z_CallocLevel(int32_t size)
+void __far* Z_CallocLevel(uint16_t size)
 {
     void __far* ptr = Z_Malloc(size, PU_LEVEL, NULL);
     _fmemset(ptr, 0, size);
