@@ -83,7 +83,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 	if (lump != NULL)
 	{
-		int32_t lumpLength = W_LumpLength(num);	
+		uint16_t lumpLength = W_LumpLength(num);
 		_fmemcpy(&_g_screen[offset], lump, lumpLength);
 		Z_ChangeTagToCache(lump);
 	}

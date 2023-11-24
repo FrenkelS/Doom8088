@@ -76,7 +76,7 @@
 
 
 static const byte __far* demobuffer;   /* cph - only used for playback */
-static int32_t demolength; // check for overrun (missing DEMOMARKER)
+static uint16_t demolength; // check for overrun (missing DEMOMARKER)
 
 static const byte __far* demo_p;
 
