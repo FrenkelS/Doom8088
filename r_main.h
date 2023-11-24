@@ -78,6 +78,8 @@ extern int16_t       __far* texturetranslation;
 
 extern fixed_t  viewcos, viewsin;
 
+static int16_t __far* flattranslation; 		// Moved from r_plane for FLAT_SPAN in r_draw. (mindbleach)
+
 
 //
 // Utility functions.
