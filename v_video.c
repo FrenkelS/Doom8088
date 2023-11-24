@@ -89,7 +89,7 @@ void V_DrawRaw(const char *name, uint16_t offset)
 		Z_ChangeTagToCache(lump);
 	}
 	else
-		W_ReadLumpByName(name, &_g_screen[offset]);
+		W_ReadLumpByNum(num, &_g_screen[offset]);
 }
 
 

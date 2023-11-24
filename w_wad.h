@@ -53,6 +53,5 @@ const void __far* PUREFUNC W_GetLumpByNumAutoFree(int16_t num);
 void                       W_ReadLumpByNum(       int16_t num, void __far* ptr);
 
 #define W_GetLumpByName(x)    W_GetLumpByNum(W_GetNumForName(x))
-#define W_ReadLumpByName(x,p) W_ReadLumpByNum(W_GetNumForName(x),p)
 
 #endif

@@ -369,7 +369,8 @@ static void I_Quit(void)
 {
 	I_Shutdown();
 
-	W_ReadLumpByName("ENDOOM", D_MK_FP(0xb800, __djgpp_conventional_base));
+	int16_t lumpnum = W_GetNumForName("ENDOOM");
+	W_ReadLumpByNum(lumpnum, D_MK_FP(0xb800, __djgpp_conventional_base));
 
 	union REGS regs;
 	regs.h.ah = 2;
