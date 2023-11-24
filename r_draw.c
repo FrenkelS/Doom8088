@@ -56,8 +56,17 @@
 #include "globdata.h"
 
 
+//#if !defined FLAT_SPAN
 visplane_t __far* _g_visplanes[MAXVISPLANES];
 visplane_t __far* _g_freetail;
+//#else
+//visplane_t __far* _g_visplanes[10]; 
+//visplane_t __far* _g_freetail;
+//	// Flat spans don't need visplanes. This saves memory and time. 
+//	// Allocating 1 is a stopgap for FLAT_SPAN eliding all related functions in several files. 
+//	// Nope, still have to modify globdata.h as well. Frig. 
+//	// Nnnope, won't start properly. MAXVISPLANES is probably referenced elsewhere. 
+//#endif 
 
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
@@ -233,9 +242,6 @@ static int32_t      worldhigh;
 static int32_t      worldlow;
 
 static lighttable_t current_colormap[256];
-//const lighttable_t __far* current_colormap;
-	// Copied colormap is presumably for GBA.
-	// ... but might be relevant to 8088, if it avoids far pointers. Hmm. 
 
 
 uint16_t validcount = 1;         // increment every time a check is made
@@ -535,8 +541,9 @@ const lighttable_t* R_LoadColorMap(int16_t lightlevel)
         current_colormap_ptr = lm;
     }
 
-//	current_colormap = R_ColourMap(lightlevel); 
-		// 3904 realtics versus 
+	// Global "const lighttable_t __far* current_colormap" and "current_colormap = R_ColourMap(lightlevel)"
+		// benchmark 3904 realtics versus 3928... on 386, via Watcom. 
+	// Copying to "fast memory" might still make sense on 8088. It can be a near pointer. 
     return current_colormap;
 }
 
@@ -2031,7 +2038,6 @@ static void R_RenderSegLoop (int16_t rw_x)
                 #else
                 dcvars.yl = top;
                 dcvars.yh = bottom;
-//                R_DrawColumnFlat( frontsector->ceilingpic, &dcvars );
                 R_DrawColumnFlat( ceilingflatcolor, &dcvars );
                 #endif
             }
@@ -2057,60 +2063,7 @@ static void R_RenderSegLoop (int16_t rw_x)
                 #else
                 dcvars.yl = top;
                 dcvars.yh = bottom;
-//                R_DrawColumnFlat( 0, &dcvars );
-//                R_DrawColumnFlat( frontsector->floorpic, &dcvars );
-//                R_DrawColumnFlat( 
-//                	(byte) R_GetColorMapColor( frontsector->lightlevel, 
-//                		flattranslation[ frontsector->floorpic ] ), 
-//                	&dcvars );
-                	// That is impressively wrong, for what's basically copy-pasted code. 
-                	// We pass frontsector->floorpic into picnum for R_FindPlane. 
-                	// Then byte color = R_GetColorMapColor(pl->lightlevel, flattranslation[pl->picnum]).
-                	// Just checked - this version did have correct floor colors, before I futzed with it. 
-                	// Sending 0 for lightlevel somehow turns most of the walls black. 
-                	// Sending flattranslation[ 0 ]... it's not even consistent. What even? 
-                	// There are spots where you can stand still and the colors -cycle.- 
-                	// It almost suggests overdraw. But how on Earth would the top / bottom values be stale? 
-                	// frontsector itself might be stale. 
-                	// ... except this happens when we're -not- using it. 
-                	// Seems rock-solid, when using it. Wrong - but consistently wrong. 
-                	// flattranslation's just an int16_t pointer / array. No wacky indirection. 
-                	// It still might point somewhere stupid. 
-                	// But it's initialized from index zero. R_InitFlats is called unconditionally in r_data's init function. 
-                	// Quite frankly - the fuck? 
-//                R_DrawColumnFlat( 
-//                	(byte) rw_x, 
-//                	&dcvars );
-                	// That looks exactly as you'd expect - no apparent overdraw, every column consistent. 
-//                R_DrawColumnFlat( 
-//                	//(byte) flattranslation[ frontsector->floorpic ], 
-//                	(byte) frontsector->lightlevel, 
-//                	&dcvars );
-                	// flattranslation[ frontsector->floorpic ] is constant per-surface. Wrong colors, though. 
-                	// frontsector->lightlevel is constant per-sector and looks plausible, if you know the palette order. 
-//                R_DrawColumnFlat( 
-//                	(byte) R_GetColorMapColor( frontsector->lightlevel, 
-//                		15 ), 
-//                	&dcvars );
-                	// Okay, that's elucidating. Constant non-black color, with frontsector light level, 
-                		// has a "bottomless pit" look to it. 
-                	// Colors extend from the wall to the bottom of the screen. (Well, to the HUD.) 
-                	// Colors obey ortho brightness tinting. Even when the linedef has no wall? Weird. 
-                	// That is so almost correct. So R_GetColorMapColor is probably not the issue? 
-                	// And frontsector->lightlevel is kinda-sorta wrong, for this application. Annoying. 
-                	// Might have to move where that gets modified. 
-                	// Walked backwards - R_Subsector uses frontsector->lightlevel for visplanes, 
-                		// and I don't -think- anything fucks with that between there and here. 
-//                R_DrawColumnFlat( 
-//                	(byte) R_GetColorMapColor( (frontsector->lightlevel) + 15, 
-//                		(flattranslation[ frontsector->floorpic ]) + 15 ), 
-//                	&dcvars );
-                	// Once again, inconsistent based on player position / angle, and wrong throughout. 
-                	// This should be constant per subsector. 
-                	// Cache it there, definitely before we've fucked with linedef brightness. 
                 R_DrawColumnFlat( floorflatcolor, &dcvars );
-	                // That's still completely wrong. And still crashes sometimes on E1M1. What even. 
-	                // ... and then some segment floor colors are different, after a crash. 
                 #endif
             }
             // SoM: This should be set here to prevent overdraw
@@ -2541,6 +2494,12 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 //        	markfloor = 0; 
 //    }
 	// No planes with flat spans. - mindbleach 
+//	R_LoadColorMap( frontsector->lightlevel ); 
+//	floorflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->floorpic) ] ]; 
+//	ceilingflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->ceilingpic) ] ]; 
+		// This is already too late - frontsector->lightlevel gets modified for ortho walls. 
+		// R_ColourMap quietly checks global curline. 
+		// Meh. Minimal performance difference doing this in R_Subsector. 
     #endif
 
     didsolidcol = false;
@@ -2818,19 +2777,14 @@ static void R_Subsector(int16_t num)
         ceilingplane = NULL;
     }
     #else
-//    floorplane = NULL; 
-//    ceilingplane = NULL; 
-	// Cache subsector brightness for flat-color floor spans. Avoids per-column lookups. 
-	// Actually - cache color byte directly. 
-//	floorflatcolor = R_GetColorMapColor( frontsector->lightlevel, flattranslation[ frontsector->floorpic ] );
-//	ceilingflatcolor = R_GetColorMapColor( frontsector->lightlevel, flattranslation[ frontsector->ceilingpic ] );
-	// This should almost certainly check for the existence of floorpic / ceilingpic first. 
+	// Cache floor / ceiling color for flat spans. Avoids per-column lookups. 
 	R_LoadColorMap( frontsector->lightlevel ); 
 		// R_GetColorMapColor copies a row of the colormap to a fixed location, for some reason. 
 		// This might be GBADoom heritage - the ARM7TDMI had some high-speed RAM areas. 
 		// Which would also explain "R_ColourMap." David A. Palmer operated out of Sheffield, England. 
 	floorflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->floorpic) ] ]; 
 	ceilingflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->ceilingpic) ] ]; 
+	// This should almost certainly check for the existence of floorpic / ceilingpic first. 
     #endif
 
     R_AddSprites(sub, frontsector->lightlevel);

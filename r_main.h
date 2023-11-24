@@ -40,7 +40,11 @@
 #include "r_data.h"
 
 
+#if !defined FLAT_SPAN
 #define MAXVISPLANES 32    /* must be a power of 2 */
+#else
+#define MAXVISPLANES 2    // Stopgap for FLAT_SPAN ignoring visplanes completely. 
+#endif
 
 
 typedef struct {
