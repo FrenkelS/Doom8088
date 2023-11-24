@@ -35,7 +35,7 @@ boolean Z_IsEnoughFreeMemory(uint16_t size);
 void __far* Z_TryMallocStatic(uint16_t size);
 void __far* Z_MallocStatic(uint16_t size);
 void __far* Z_MallocStaticWithUser(uint16_t size, void __far*__far* user); 
-void __far* Z_MallocLevel(int32_t size, void __far*__far* user);
+void __far* Z_MallocLevel(uint16_t size, void __far*__far* user);
 void __far* Z_CallocLevel(int32_t size);
 void __far* Z_CallocLevSpec(int32_t size);
 void Z_ChangeTagToStatic(const void __far* ptr);
