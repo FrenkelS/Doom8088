@@ -572,7 +572,7 @@ void __far* Z_CallocLevSpec(int32_t size)
 }
 
 
-boolean Z_IsEnoughFreeMemory(int32_t size)
+boolean Z_IsEnoughFreeMemory(uint16_t size)
 {
 	const uint8_t __far* ptr = Z_TryMallocStatic(size);
 	if (ptr)
