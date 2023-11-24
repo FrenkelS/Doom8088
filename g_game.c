@@ -188,7 +188,7 @@ typedef struct gba_save_settings_t
 
 static const uint32_t settings_cookie = 0xbaddead1;
 
-static const uint32_t settings_sram_offset = sizeof(gba_save_data_t) * 8;
+static const uint16_t settings_sram_offset = sizeof(gba_save_data_t) * 8;
 
 //
 // G_BuildTiccmd
@@ -736,7 +736,7 @@ static void G_DoWorldDone (void)
 #define MIN_MAXPLAYERS 4
 
 
-inline static void LoadSRAM(byte __far* eeprom, uint32_t size, uint32_t offset)
+inline static void LoadSRAM(byte __far* eeprom, uint16_t size, uint16_t offset)
 {
 	UNUSED(eeprom);
 	UNUSED(size);
@@ -749,7 +749,7 @@ inline static void LoadSRAM(byte __far* eeprom, uint32_t size, uint32_t offset)
 //
 void G_UpdateSaveGameStrings()
 {
-    uint32_t savebuffersize = sizeof(gba_save_data_t) * 8;
+    uint16_t savebuffersize = sizeof(gba_save_data_t) * 8;
 
 
     byte __far* loadbuffer = Z_MallocStatic(savebuffersize);
@@ -786,7 +786,7 @@ void G_LoadGame(int16_t slot)
 
 static void G_DoLoadGame(void)
 {
-    uint32_t savebuffersize = sizeof(gba_save_data_t) * 8;
+    uint16_t savebuffersize = sizeof(gba_save_data_t) * 8;
 
 
     byte __far* loadbuffer = Z_MallocStatic(savebuffersize);
@@ -829,7 +829,7 @@ void G_SaveGame(int16_t slot)
 }
 
 
-inline static void SaveSRAM(const byte __far* eeprom, uint32_t size, uint32_t offset)
+inline static void SaveSRAM(const byte __far* eeprom, uint16_t size, uint16_t offset)
 {
 	UNUSED(eeprom);
 	UNUSED(size);
@@ -839,7 +839,7 @@ inline static void SaveSRAM(const byte __far* eeprom, uint32_t size, uint32_t of
 
 static void G_DoSaveGame(void)
 {
-    uint32_t savebuffersize = sizeof(gba_save_data_t) * 8;
+    uint16_t savebuffersize = sizeof(gba_save_data_t) * 8;
 
     byte __far* savebuffer = Z_MallocStatic(savebuffersize);
 

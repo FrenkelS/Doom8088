@@ -538,7 +538,7 @@ void __far* Z_TryMallocStatic(uint16_t size)
 }
 
 
-void __far* Z_MallocStatic(int32_t size)
+void __far* Z_MallocStatic(uint16_t size)
 {
 	return Z_Malloc(size, PU_STATIC, NULL);
 }
