@@ -159,8 +159,13 @@ static sector_t  __far* frontsector;
 static sector_t  __far* backsector;
 static drawseg_t *ds_p;
 
+#if !defined FLAT_SPAN
 static visplane_t __far* floorplane;
 static visplane_t __far* ceilingplane;
+#else
+byte floorflatcolor; 		// Per-subsector cached flat colors. 
+byte ceilingflatcolor; 
+#endif
 static int32_t             rw_angle1;
 
 static angle_t         rw_normalangle; // angle to line origin
@@ -184,11 +189,6 @@ static boolean  maskedtexture;
 static int16_t      toptexture;
 static int16_t      bottomtexture;
 static int16_t      midtexture;
-
-#if defined FLAT_SPAN
-byte floorflatcolor; 		// Per-subsector cached flat colors. 
-byte ceilingflatcolor; 
-#endif
 
 static fixed_t  rw_midtexturemid;
 static fixed_t  rw_toptexturemid;
@@ -589,6 +589,9 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     //  e.g. a DDA-lile scaling.
     // This is as fast as it gets.
 
+    // With Watcom, in 32-bit, on fake 386, this is 20% faster than calling R_DrawColumnPixel. 
+    // Even one naive while(count--) loop was 10% faster than calling R_DrawColumnPixel. 
+    // 16-bit writes obviously should be faster than 8-bit writes, but timedemo says they aren't. - mindbleach
 	uint16_t color; 
     while( count > 8 ) { 
     	color = colormap[ source[ frac >> COLBITS ] ];
@@ -657,20 +660,6 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     	
     	count -= 8; 
     } 
-    
-//    while( count-- ) { 
-//    	color = colormap[ source[ frac >> COLBITS ] ];
-//    	*dest++ = color; 
-//    	*dest++ = color; 
-//    	*dest++ = color; 
-//    	*dest = color; 
-//    	dest += ( SCREENWIDTH - 3 ); 
-//    	frac += fracstep; 
-//    } 
-    // Possibly spurious, since I'm testing with Watcom on fake 386 - but that's considerably faster. 
-    // demo3 finishes in 4370 realtics versus 5005. 4469, with 16-bit writes. "Assume nothing." 
-    // Unrolled 4x: 4072. Unrolled 8x: 3976, which is diminishing returns. 2% difference. 
-    // 8x and switch: 3933. Definitely better - probably not worth the binary size, on 8088. 
     
     switch( count ) { 
     	case 8:
@@ -742,53 +731,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     	*dest++ = color; 
     	*dest++ = color; 
     	*dest = color; 
-//    	dest += ( SCREENWIDTH - 3 ); 
-//    	frac += fracstep; 
     } 
-
-//    uint16_t l = count >> 4;
-//
-//    while (l--)
-//    {
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//    }
-//
-//    switch (count & 15)
-//    {
-//        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-//        case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
-//    }
 }
 
 
