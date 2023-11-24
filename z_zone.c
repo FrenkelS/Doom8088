@@ -425,7 +425,7 @@ static uint32_t Z_GetTotalFreeMemory(void)
 #define MINFRAGMENT		64
 
 
-static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
+static void __far* Z_TryMalloc(uint16_t size, int8_t tag, void __far*__far* user)
 {
     size = (size + (PARAGRAPH_SIZE - 1)) & ~(PARAGRAPH_SIZE - 1);
 
@@ -486,7 +486,7 @@ static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
     {
         // there will be a free fragment after the allocated block
         segment_t base_segment     = pointerToSegment(base);
-        segment_t newblock_segment = base_segment + size / PARAGRAPH_SIZE;
+        segment_t newblock_segment = base_segment + (size / PARAGRAPH_SIZE);
 
         memblock_t __far* newblock = segmentToPointer(newblock_segment);
         newblock->size = newblock_size;
@@ -524,7 +524,7 @@ static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
 }
 
 
-static void __far* Z_Malloc(int32_t size, int8_t tag, void __far*__far* user) {
+static void __far* Z_Malloc(uint16_t size, int8_t tag, void __far*__far* user) {
 	void __far* ptr = Z_TryMalloc(size, tag, user);
 	if (!ptr)
 		I_Error ("Z_Malloc: failed to allocate %li B, max free block %li B, total free %li", size, Z_GetLargestFreeBlockSize(), Z_GetTotalFreeMemory());
@@ -532,31 +532,31 @@ static void __far* Z_Malloc(int32_t size, int8_t tag, void __far*__far* user) {
 }
 
 
-void __far* Z_TryMallocStatic(int32_t size)
+void __far* Z_TryMallocStatic(uint16_t size)
 {
 	return Z_TryMalloc(size, PU_STATIC, NULL);
 }
 
 
-void __far* Z_MallocStatic(int32_t size)
+void __far* Z_MallocStatic(uint16_t size)
 {
 	return Z_Malloc(size, PU_STATIC, NULL);
 }
 
 
-void __far* Z_MallocStaticWithUser(int32_t size, void __far*__far* user)
+void __far* Z_MallocStaticWithUser(uint16_t size, void __far*__far* user)
 {
 	return Z_Malloc(size, PU_STATIC, user);
 }
 
 
-void __far* Z_MallocLevel(int32_t size, void __far*__far* user)
+void __far* Z_MallocLevel(uint16_t size, void __far*__far* user)
 {
 	return Z_Malloc(size, PU_LEVEL, user);
 }
 
 
-void __far* Z_CallocLevel(int32_t size)
+void __far* Z_CallocLevel(uint16_t size)
 {
     void __far* ptr = Z_Malloc(size, PU_LEVEL, NULL);
     _fmemset(ptr, 0, size);
@@ -564,7 +564,7 @@ void __far* Z_CallocLevel(int32_t size)
 }
 
 
-void __far* Z_CallocLevSpec(int32_t size)
+void __far* Z_CallocLevSpec(uint16_t size)
 {
 	void __far* ptr = Z_Malloc(size, PU_LEVSPEC, NULL);
 	_fmemset(ptr, 0, size);
@@ -572,7 +572,7 @@ void __far* Z_CallocLevSpec(int32_t size)
 }
 
 
-boolean Z_IsEnoughFreeMemory(int32_t size)
+boolean Z_IsEnoughFreeMemory(uint16_t size)
 {
 	const uint8_t __far* ptr = Z_TryMallocStatic(size);
 	if (ptr)
