@@ -532,7 +532,7 @@ static void __far* Z_Malloc(int32_t size, int8_t tag, void __far*__far* user) {
 }
 
 
-void __far* Z_TryMallocStatic(int32_t size)
+void __far* Z_TryMallocStatic(uint16_t size)
 {
 	return Z_TryMalloc(size, PU_STATIC, NULL);
 }
