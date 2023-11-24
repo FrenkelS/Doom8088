@@ -584,18 +584,163 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
     // This is as fast as it gets.
-    
-    while( count-- ) { 
-    	uint16_t color = colormap[ source[ frac >> COLBITS ] ];
+
+	uint16_t color; 
+    while( count > 8 ) { 
+    	color = colormap[ source[ frac >> COLBITS ] ];
     	*dest++ = color; 
     	*dest++ = color; 
     	*dest++ = color; 
     	*dest = color; 
     	dest += ( SCREENWIDTH - 3 ); 
     	frac += fracstep; 
+    	
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	count -= 8; 
     } 
+    
+//    while( count-- ) { 
+//    	color = colormap[ source[ frac >> COLBITS ] ];
+//    	*dest++ = color; 
+//    	*dest++ = color; 
+//    	*dest++ = color; 
+//    	*dest = color; 
+//    	dest += ( SCREENWIDTH - 3 ); 
+//    	frac += fracstep; 
+//    } 
     // Possibly spurious, since I'm testing with Watcom on fake 386 - but that's considerably faster. 
     // demo3 finishes in 4370 realtics versus 5005. 4469, with 16-bit writes. "Assume nothing." 
+    // Unrolled 4x: 4072. Unrolled 8x: 3976, which is diminishing returns. 2% difference. 
+    // 8x and switch: 3933. Definitely better - probably not worth the binary size, on 8088. 
+    
+    switch( count ) { 
+    	case 8:
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	case 7:
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	case 6:
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	case 5:
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	case 4:
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	case 3:
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	case 2:
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+    	dest += ( SCREENWIDTH - 3 ); 
+    	frac += fracstep; 
+    	
+    	case 1:
+    	color = colormap[ source[ frac >> COLBITS ] ];
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest++ = color; 
+    	*dest = color; 
+//    	dest += ( SCREENWIDTH - 3 ); 
+//    	frac += fracstep; 
+    } 
 
 //    uint16_t l = count >> 4;
 //
@@ -2679,8 +2824,26 @@ static void R_Subsector(int16_t num)
 		// R_GetColorMapColor copies a row of the colormap to a fixed location, for some reason. 
 		// This might be GBADoom heritage - the ARM7TDMI had some high-speed RAM areas. 
 		// Which would also explain "R_ColourMap." David A. Palmer operated out of Sheffield, England. 
-	floorflatcolor = current_colormap[ flattranslation[ frontsector->floorpic ] ]; 
-	ceilingflatcolor = current_colormap[ flattranslation[ frontsector->ceilingpic ] ]; 
+	floorflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->floorpic) ] ]; 
+	ceilingflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->ceilingpic) ] ]; 
+	// Still completely the wrong color. pl->picnum is frontsector->floorpic. What is going on here? 
+	
+//	int16_t firstflat        = W_GetNumForName("F_START") + 1;
+//	
+//	byte __far* source = Z_MallocStatic(64 * 64);
+//
+//	for (int16_t i = 0; i < numflats; i++)
+//	{
+//		W_ReadLumpByNum( firstflat + frontsector->floorpic, source);
+//		floorflatcolor = current_colormap[ source[(64 / 2) * 64 + (64 / 2)] ];
+//	}
+//
+//	floorflatcolor = current_colormap[ flattranslation[ ((int16_t)(frontsector->floorpic)) + firstflat ] ]; 
+//
+//	Z_Free(source);
+	// That - finally - is correct. And obviously slow as hell. 
+	// Can't just move R_InitFlats to r_draw.c, for some reason. 
+	
     #endif
 
     R_AddSprites(sub, frontsector->lightlevel);

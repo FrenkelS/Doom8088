@@ -34,7 +34,7 @@
 
 static int16_t firstflat;
 static int16_t  animated_flat_basepic;
-//static int16_t __far* flattranslation;             // for global animation (Moved to r_main.h for FLAT_SPAN in r_draw - mindbleach)
+int16_t __far* flattranslation;             // for global animation (Extern'd in r_main.h for FLAT_SPAN in r_draw - mindbleach)
 
 
 #if defined FLAT_SPAN
