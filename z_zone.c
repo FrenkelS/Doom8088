@@ -564,7 +564,7 @@ void __far* Z_CallocLevel(uint16_t size)
 }
 
 
-void __far* Z_CallocLevSpec(int32_t size)
+void __far* Z_CallocLevSpec(uint16_t size)
 {
 	void __far* ptr = Z_Malloc(size, PU_LEVSPEC, NULL);
 	_fmemset(ptr, 0, size);
