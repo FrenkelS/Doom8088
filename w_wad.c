@@ -64,7 +64,8 @@
 typedef struct
 {
   int32_t  filepos;
-  int32_t  size;
+  uint16_t size;
+  int16_t  filler;        // always zero
   char name[8];
 } filelump_t;
 
@@ -150,7 +151,7 @@ const char __far* PUREFUNC W_GetNameForNum(int16_t num)
 // Returns the buffer size needed to load the given lump.
 //
 
-int32_t PUREFUNC W_LumpLength(int16_t num)
+uint16_t PUREFUNC W_LumpLength(int16_t num)
 {
 	return fileinfo[num].size;
 }
