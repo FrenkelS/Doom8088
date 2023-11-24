@@ -115,6 +115,8 @@ typedef struct
           (ST_FACESTRIDE*ST_NUMPAINFACES+ST_NUMEXTRAFACES)
 
 
+static int16_t statusbarnum;
+
 // 0-9, tall numbers
 static int16_t tallnum[10];
 
@@ -708,7 +710,7 @@ static void ST_drawWidgets(void)
 static void ST_refreshBackground(void)
 {
 	static const uint16_t st_offset = (SCREENHEIGHT - ST_HEIGHT) * SCREENWIDTH;
-	V_DrawRaw("STBAR", st_offset);
+	V_DrawRaw(statusbarnum, st_offset);
 }
 
 
@@ -792,14 +794,16 @@ void ST_Drawer(void)
 
 
 //
-// ST_loadGraphics
+// ST_loadData
 //
 // CPhipps - Loads graphics needed for status bar
 //
-static void ST_loadGraphics(void)
+static void ST_loadData(void)
 {
     int8_t  i, facenum;
     char namebuf[9];
+
+    statusbarnum = W_GetNumForName("STBAR");
 
     // Load the numbers, tall and short
     for (i=0;i<10;i++)
@@ -855,10 +859,6 @@ static void ST_loadGraphics(void)
     faces[facenum++] = W_GetNumForName("STFDEAD0");
 }
 
-static void ST_loadData(void)
-{
-  ST_loadGraphics();
-}
 
 static void ST_initData(void)
 {
