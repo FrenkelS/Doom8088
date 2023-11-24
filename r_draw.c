@@ -56,17 +56,10 @@
 #include "globdata.h"
 
 
-//#if !defined FLAT_SPAN
 visplane_t __far* _g_visplanes[MAXVISPLANES];
 visplane_t __far* _g_freetail;
-//#else
-//visplane_t __far* _g_visplanes[10]; 
-//visplane_t __far* _g_freetail;
-//	// Flat spans don't need visplanes. This saves memory and time. 
-//	// Allocating 1 is a stopgap for FLAT_SPAN eliding all related functions in several files. 
-//	// Nope, still have to modify globdata.h as well. Frig. 
-//	// Nnnope, won't start properly. MAXVISPLANES is probably referenced elsewhere. 
-//#endif 
+	// FLAT_SPAN will make these irrelevant, but many files and functions reference them. 
+	// As a stopgap to free some memory: MAXVISPLANES is set to 2 in r_main.h. 
 
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
@@ -2482,24 +2475,6 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         else
             markfloor = 0;
     }
-    #else 
-//    if (markceiling)
-//    {
-//        if (!ceilingplane)
-//        	markceiling = 0; 
-//    }
-//    if (markfloor)
-//    {
-//        if (!floorplane)
-//        	markfloor = 0; 
-//    }
-	// No planes with flat spans. - mindbleach 
-//	R_LoadColorMap( frontsector->lightlevel ); 
-//	floorflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->floorpic) ] ]; 
-//	ceilingflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->ceilingpic) ] ]; 
-		// This is already too late - frontsector->lightlevel gets modified for ortho walls. 
-		// R_ColourMap quietly checks global curline. 
-		// Meh. Minimal performance difference doing this in R_Subsector. 
     #endif
 
     didsolidcol = false;
@@ -2777,14 +2752,12 @@ static void R_Subsector(int16_t num)
         ceilingplane = NULL;
     }
     #else
-	// Cache floor / ceiling color for flat spans. Avoids per-column lookups. 
+	// Find span color per-subsector instead of per-column. - mindbleach
 	R_LoadColorMap( frontsector->lightlevel ); 
-		// R_GetColorMapColor copies a row of the colormap to a fixed location, for some reason. 
-		// This might be GBADoom heritage - the ARM7TDMI had some high-speed RAM areas. 
-		// Which would also explain "R_ColourMap." David A. Palmer operated out of Sheffield, England. 
+		// R_GetColorMapColor copies a colormap row to a fixed location. GBA heritage? 
 	floorflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->floorpic) ] ]; 
 	ceilingflatcolor = current_colormap[ flattranslation[ (int16_t)(frontsector->ceilingpic) ] ]; 
-	// This should almost certainly check for the existence of floorpic / ceilingpic first. 
+	// This should probably check if floorpic / ceilingpic exist. 
     #endif
 
     R_AddSprites(sub, frontsector->lightlevel);
@@ -3042,8 +3015,6 @@ void R_RenderPlayerView (player_t* player)
     R_ClearDrawSegs ();
 //    #if !defined FLAT_SPAN
     R_ClearPlanes ();
-//    #else
-//    R_ClearOpenings(); 
 //    #endif
     R_ClearSprites ();
 
