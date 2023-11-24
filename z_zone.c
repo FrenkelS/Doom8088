@@ -425,7 +425,7 @@ static uint32_t Z_GetTotalFreeMemory(void)
 #define MINFRAGMENT		64
 
 
-static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
+static void __far* Z_TryMalloc(uint16_t size, int8_t tag, void __far*__far* user)
 {
     size = (size + (PARAGRAPH_SIZE - 1)) & ~(PARAGRAPH_SIZE - 1);
 
@@ -486,7 +486,7 @@ static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
     {
         // there will be a free fragment after the allocated block
         segment_t base_segment     = pointerToSegment(base);
-        segment_t newblock_segment = base_segment + size / PARAGRAPH_SIZE;
+        segment_t newblock_segment = base_segment + (size / PARAGRAPH_SIZE);
 
         memblock_t __far* newblock = segmentToPointer(newblock_segment);
         newblock->size = newblock_size;
@@ -524,7 +524,7 @@ static void __far* Z_TryMalloc(int32_t size, int8_t tag, void __far*__far* user)
 }
 
 
-static void __far* Z_Malloc(int32_t size, int8_t tag, void __far*__far* user) {
+static void __far* Z_Malloc(uint16_t size, int8_t tag, void __far*__far* user) {
 	void __far* ptr = Z_TryMalloc(size, tag, user);
 	if (!ptr)
 		I_Error ("Z_Malloc: failed to allocate %li B, max free block %li B, total free %li", size, Z_GetLargestFreeBlockSize(), Z_GetTotalFreeMemory());
