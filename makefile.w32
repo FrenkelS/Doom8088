@@ -86,4 +86,3 @@ WC32\DOOM32WC.EXE : $(GLOBOBJS)
 
 .c.obj :
  wcc386 $(CCOPTS) $[* /fo=WC32\$^&
-

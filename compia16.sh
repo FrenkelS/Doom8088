@@ -13,8 +13,6 @@ export CFLAGS="-march=i286 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse
 #export CFLAGS="$CFLAGS -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
 #export CFLAGS="$CFLAGS -Wall -Wextra"
 
-export WATCOM_INCLUDES="-isystem /home/thomas/Documents/Dev/8088/watcom2023/h/"
-
 export GLOBOBJS="  a_taskmn.c"
 export GLOBOBJS+=" am_map.c"
 export GLOBOBJS+=" d_items.c"
@@ -67,7 +65,7 @@ export GLOBOBJS+=" wi_stuff.c"
 export GLOBOBJS+=" z_bmallo.c"
 export GLOBOBJS+=" z_zone.c"
 
-ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS $WATCOM_INCLUDES -o GCCIA16/DOOM8088.EXE
+ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
 rm i_system.o
 rm r_draw.o
