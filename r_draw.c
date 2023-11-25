@@ -59,6 +59,7 @@ visplane_t __far* _g_visplanes[MAXVISPLANES];
 visplane_t __far* _g_freetail;
 	// FLAT_SPAN will make these irrelevant, but many files and functions reference them. 
 	// As a stopgap to free some memory: MAXVISPLANES is set to 2 in r_main.h. 
+	// Unfortunately this does break skies. 
 
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
@@ -593,145 +594,145 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
     // Even one naive while(count--) loop was 10% faster than calling R_DrawColumnPixel. 
     // 16-bit writes obviously should be faster than 8-bit writes, but timedemo says they aren't. - mindbleach
 	uint16_t color; 
-    while( count > 8 ) { 
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	count -= 8; 
-    } 
-    
-    switch( count ) { 
-    	case 8:
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	case 7:
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	case 6:
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	case 5:
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	case 4:
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	case 3:
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	case 2:
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    	dest += ( SCREENWIDTH - 3 ); 
-    	frac += fracstep; 
-    	
-    	case 1:
-    	color = colormap[ source[ frac >> COLBITS ] ];
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest++ = color; 
-    	*dest = color; 
-    } 
+	while( count > 8 ) { 
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		count -= 8; 
+	} 
+
+	switch( count ) { 
+		case 8:
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		case 7:
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		case 6:
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		case 5:
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		case 4:
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		case 3:
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		case 2:
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+		dest += ( SCREENWIDTH - 3 ); 
+		frac += fracstep; 
+
+		case 1:
+		color = colormap[ source[ frac >> COLBITS ] ];
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest++ = color; 
+		*dest = color; 
+	} 
 }
 
 
@@ -748,56 +749,55 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	uint8_t __far* dest = _g_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 	uint16_t __far* d = (uint16_t __far*) dest;
 
-//	while (count--)
-//	{
-//		*d++ = color;
-//		*d   = color;
-//		d += (SCREENWIDTH / 2) - 1;
-//	}
+	// Benchmarks: 
+		// Naive while(count--), 4044 realtics. 
+		// Unrolled 8x in 8-bit, 3956 realtics. 
+		// Unrolled 8x in 16-bit, 3880 realtics. 
+		// Unrolled 4x in 16-bit, 3887 realtics. 
 	
 	uint16_t l = count >> 4;
 	
 	while( l-- ) { 
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
 		
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
 		
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
 		
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
 	} 
 	
 	switch( count & 15 ) { 
-		case 15: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 14: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 13: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 12: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 15: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 14: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 13: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 12: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
 		
-		case 11: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 10: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 9: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 8: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 11: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 10: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 9: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 8: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
 		
-		case 7: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 6: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 5: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 4: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 7: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 6: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 5: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 4: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
 		
-		case 3: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 2: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
-		case 1: *d++ = color; *d   = color; d += (SCREENWIDTH / 2) - 1;
+		case 3: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 2: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 1: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
 	} 
 }
 
