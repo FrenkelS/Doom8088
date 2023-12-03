@@ -582,7 +582,7 @@ static void R_ResetPlanes()
 {
     memset(_g_visplanes, 0, sizeof(_g_visplanes));
     _g_freetail = NULL;
-    freehead = &_g_freetail;
+    _g_freehead = &_g_freetail;
 }
 
 

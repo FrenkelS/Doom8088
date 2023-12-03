@@ -225,6 +225,7 @@ extern thinker_t _g_thinkerclasscap;
 
 extern visplane_t __far* _g_visplanes[MAXVISPLANES];
 extern visplane_t __far* _g_freetail;
+extern visplane_t __far*__far* _g_freehead;
 
 
 //******************************************************************************
@@ -252,7 +253,6 @@ extern int16_t showMessages;    // Show messages has default, 0 = off, 1 = on
 
 
 extern uint16_t validcount;         // increment every time a check is made
-extern visplane_t __far*__far* freehead;
 
 
 //

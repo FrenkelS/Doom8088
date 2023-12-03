@@ -298,8 +298,8 @@ void R_ClearPlanes(void)
 
 
     for (int8_t i = 0; i < MAXVISPLANES; i++)
-        for (*freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *freehead; )
-            freehead = &(*freehead)->next;
+        for (*_g_freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *_g_freehead; )
+            _g_freehead = &(*_g_freehead)->next;
 
     R_ClearOpenings();
 

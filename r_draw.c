@@ -57,6 +57,7 @@
 
 visplane_t __far* _g_visplanes[MAXVISPLANES];
 visplane_t __far* _g_freetail;
+visplane_t __far*__far* _g_freehead;
 
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
@@ -230,7 +231,6 @@ static lighttable_t current_colormap[256];
 
 
 uint16_t validcount = 1;         // increment every time a check is made
-visplane_t __far*__far* freehead;
 
 //*****************************************
 // Constants
@@ -1489,7 +1489,7 @@ static visplane_t __far* new_visplane(uint16_t hash)
     else
     {
         if (!(_g_freetail = _g_freetail->next))
-            freehead = &_g_freetail;
+            _g_freehead = &_g_freetail;
     }
 
     check->next = _g_visplanes[hash];
