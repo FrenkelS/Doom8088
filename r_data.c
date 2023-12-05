@@ -270,14 +270,6 @@ static void R_InitTextures()
 
 
 //
-// R_InitColormaps
-//
-static void R_InitColormaps (void)
-{
-	colormaps = W_GetLumpByName("COLORMAP"); // Never freed
-}
-
-//
 // R_Init
 // Locates all the lumps
 //  that will be used by all views

@@ -189,8 +189,7 @@ static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
 const lighttable_t __far* fullcolormap;
-const lighttable_t __far* colormaps;
-
+static const lighttable_t __far* colormaps;
 const lighttable_t __far* fixedcolormap;
 
 static int16_t extralight;                           // bumped light from gun blasts
@@ -756,6 +755,15 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
     }
 
     dcvars->texturemid = basetexturemid;
+}
+
+
+//
+// R_InitColormaps
+//
+void R_InitColormaps(void)
+{
+	colormaps = W_GetLumpByName("COLORMAP"); // Never freed
 }
 
 
