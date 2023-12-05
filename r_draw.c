@@ -612,11 +612,48 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	uint8_t __far* dest = _g_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 	uint16_t __far* d = (uint16_t __far*) dest;
 
-	while (count--)
+	uint16_t l = count >> 4;
+
+	while (l--)
 	{
-		*d++ = color;
-		*d   = color;
-		d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+	}
+
+	switch (count & 15)
+	{
+		case 15: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 14: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 13: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 12: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 11: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case 10: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  9: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  8: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  7: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  6: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  5: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  4: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  3: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  2: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		case  1: *d++ = color; *d = color;
 	}
 }
 
