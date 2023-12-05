@@ -226,8 +226,6 @@ static fixed_t  pixlowstep;
 static int32_t      worldhigh;
 static int32_t      worldlow;
 
-static lighttable_t current_colormap[256];
-
 
 uint16_t validcount = 1;         // increment every time a check is made
 
@@ -485,7 +483,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
 #define NUMCOLORMAPS 32
 
 
-static const lighttable_t __far* R_ColourMap(int16_t lightlevel)
+const lighttable_t __far* R_LoadColorMap(int16_t lightlevel)
 {
     if (fixedcolormap)
         return fixedcolormap;
@@ -510,29 +508,6 @@ static const lighttable_t __far* R_ColourMap(int16_t lightlevel)
 
         return fullcolormap + cm*256;
     }
-}
-
-
-const lighttable_t* R_LoadColorMap(int16_t lightlevel)
-{
-    static const lighttable_t __far* current_colormap_ptr = NULL;
-
-    const lighttable_t __far* lm = R_ColourMap(lightlevel);
-
-    if(current_colormap_ptr != lm)
-    {
-        _fmemcpy(current_colormap, lm, 256);
-        current_colormap_ptr = lm;
-    }
-
-    return current_colormap;
-}
-
-
-byte R_GetColorMapColor(int16_t lightlevel, int16_t color)
-{
-	const lighttable_t* colormap = R_LoadColorMap(lightlevel);
-	return colormap[color];
 }
 
 
@@ -973,7 +948,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
         }
     }
 
-    curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_ColourMap doesn't try using it for other things */
+    curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_LoadColorMap doesn't try using it for other things */
 }
 
 
@@ -1448,9 +1423,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     else if (thing->frame & FF_FULLBRIGHT)
         vis->colormap = fullcolormap;     // full bright  // killough 3/20/98
     else
-    {      // diminished light
-        vis->colormap = R_ColourMap(lightlevel);
-    }
+        vis->colormap = R_LoadColorMap(lightlevel); // diminished light
 }
 
 //
@@ -2543,7 +2516,7 @@ static void R_Subsector(int16_t num)
     {
         R_AddLine (line);
         line++;
-        curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_ColourMap doesn't try using it for other things */
+        curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_LoadColorMap doesn't try using it for other things */
     }
 }
 

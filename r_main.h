@@ -86,8 +86,7 @@ angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2);
 subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 
 void R_InitColormaps(void);
-const lighttable_t* R_LoadColorMap(int16_t lightlevel);
-byte R_GetColorMapColor(int16_t lightlevel, int16_t color);
+const lighttable_t __far* R_LoadColorMap(int16_t lightlevel);
 
 //
 // REFRESH - the actual rendering functions.
