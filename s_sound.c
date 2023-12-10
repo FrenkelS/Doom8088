@@ -97,7 +97,7 @@ int16_t snd_MusicVolume = 15;
 
 
 // number of channels available
-static const int16_t numChannels = 8;
+static const int16_t numChannels = 1;
 
 //
 // Internals.

@@ -42,6 +42,8 @@
 // Init at program start...
 void I_InitSound(void);
 
+void I_ShutdownSound(void);
+
 //
 //  SFX I/O
 //
@@ -67,10 +69,6 @@ void I_PlaySong(musicenum_t handle, boolean looping);
 
 // Stops a song over 3 seconds.
 void I_StopSong(musicenum_t handle);
-
-
-#define MUSIC_BUFFER_SAMPLES 2048
-#define MAX_CHANNELS    8
 
 
 #endif

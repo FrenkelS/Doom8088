@@ -15,12 +15,13 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=DQr
 **What's special?:**
  - No texture mapped floors and ceilings
  - No light diminishing
- - No sound and music
+ - No music
  - No saving and loading
  - No multiplayer
  - No PWADs
  - No screen resizing
  - No mouse and joystick support
+ - PC speaker sound effects
  - Rotating overlaid automap
  - Supports only Doom 1 Episode 1
  - Only demo3 is in sync

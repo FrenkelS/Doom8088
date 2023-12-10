@@ -63,13 +63,6 @@
 #include <string.h>
 
 
-static void I_Init(void)
-{
-	if (!(nomusicparm && nosfxparm))
-		I_InitSound();
-}
-
-
 static void tprintf(void)
 {
 	union REGS regs;
@@ -103,8 +96,7 @@ int main(int argc, const char * const * argv)
 
 	I_InitTimer();
 
-	//Call this before Z_Init as maxmod uses malloc.
-	I_Init();
+	I_InitSound();
 
 	printf("Z_Init: Init zone memory allocation daemon.\n");
 	Z_Init();                  /* 1/18/98 killough: start up memory stuff first */

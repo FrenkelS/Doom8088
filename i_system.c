@@ -353,6 +353,8 @@ static void I_Shutdown(void)
 	if (isGraphicsModeSet)
 		I_SetScreenMode(3);
 
+	I_ShutdownSound();
+
 	if (isTimerSet)
 		I_ShutdownTimer();
 
