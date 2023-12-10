@@ -70,21 +70,21 @@ static int32_t mus_playing;
 
 // when to clip out sounds
 // Does not fit the large outdoor areas.
-#define S_CLIPPING_DIST (((int32_t)1200)<<FRACBITS)
+#define S_CLIPPING_DIST (1200L<<FRACBITS)
 
 // Distance tp origin when sounds should be maxed out.
 // This should relate to movement clipping resolution
 // (see BLOCKMAP handling).
 // Originally: (200*0x10000).
 
-#define S_CLOSE_DIST (((int32_t)160)<<FRACBITS)
+#define S_CLOSE_DIST (160L<<FRACBITS)
 #define S_ATTENUATOR ((S_CLIPPING_DIST-S_CLOSE_DIST)>>FRACBITS)
 
 // Adjustable by menu.
 #define NORM_PRIORITY 64
 #define NORM_SEP      128
 
-#define S_STEREO_SWING		(96*0x10000)
+#define S_STEREO_SWING		(96L<<FRACBITS)
 
 
 // These are not used, but should be (menu).
@@ -391,7 +391,7 @@ void S_StartMusic(int32_t m_id)
 }
 
 
-void S_ChangeMusic(int32_t musicnum, int32_t looping)
+void S_ChangeMusic(int32_t musicnum, boolean looping)
 {
     //jff 1/22/98 return if music is not enabled
     if (nomusicparm)
