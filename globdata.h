@@ -268,9 +268,9 @@ extern spritedef_t __far* sprites;
 // These are not used, but should be (menu).
 // Maximum volume of a sound effect.
 // Internal default is max out of 0-15.
-extern int32_t snd_SfxVolume;
+extern int16_t snd_SfxVolume;
 
 // Maximum volume of music. Useless so far.
-extern int32_t snd_MusicVolume;
+extern int16_t snd_MusicVolume;
 
 #endif // GLOBAL_DATA_H
