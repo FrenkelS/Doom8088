@@ -68,9 +68,6 @@ void I_PlaySong(musicenum_t handle, boolean looping);
 // Stops a song over 3 seconds.
 void I_StopSong(musicenum_t handle);
 
-// CPhipps - put these in config file
-extern const int32_t snd_samplerate;
-
 
 #define MUSIC_BUFFER_SAMPLES 2048
 #define MAX_CHANNELS    8
