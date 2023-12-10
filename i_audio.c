@@ -109,7 +109,7 @@ void I_InitSound(void)
     printf("I_InitSound: sound ready\n");
 }
 
-void I_PlaySong(int32_t handle, boolean looping)
+void I_PlaySong(musicenum_t handle, boolean looping)
 {
 	UNUSED(looping);
 
@@ -118,7 +118,7 @@ void I_PlaySong(int32_t handle, boolean looping)
 }
 
 
-void I_StopSong(int32_t handle)
+void I_StopSong(musicenum_t handle)
 {
 	UNUSED(handle);
 }

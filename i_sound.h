@@ -63,10 +63,10 @@ void I_SetMusicVolume(int32_t volume);
 //  plays a song, and when the song is done,
 //  starts playing it again in an endless loop.
 // Horrible thing to do, considering.
-void I_PlaySong(int32_t handle, boolean looping);
+void I_PlaySong(musicenum_t handle, boolean looping);
 
 // Stops a song over 3 seconds.
-void I_StopSong(int32_t handle);
+void I_StopSong(musicenum_t handle);
 
 // CPhipps - put these in config file
 extern const int32_t snd_samplerate;

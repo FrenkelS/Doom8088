@@ -65,7 +65,7 @@ typedef struct
 static channel_t *channels;
 
 // music currently being played
-static int32_t mus_playing;
+static musicenum_t mus_playing;
 
 
 // when to clip out sounds
@@ -157,7 +157,7 @@ void S_Stop(void)
 //
 void S_Start(void)
 {
-    int32_t mnum;
+    musicenum_t mnum;
 
     // kill all playing sounds at start of level
     //  (trust me - a good idea)
@@ -382,7 +382,7 @@ void S_SetSfxVolume(int32_t volume)
 
 // Starts some music with the music id found in sounds.h.
 //
-void S_StartMusic(int32_t m_id)
+void S_StartMusic(musicenum_t m_id)
 {
     //jff 1/22/98 return if music is not enabled
     if (nomusicparm)
@@ -391,14 +391,14 @@ void S_StartMusic(int32_t m_id)
 }
 
 
-void S_ChangeMusic(int32_t musicnum, boolean looping)
+void S_ChangeMusic(musicenum_t musicnum, boolean looping)
 {
     //jff 1/22/98 return if music is not enabled
     if (nomusicparm)
         return;
 
-    if (musicnum <= mus_None || musicnum >= NUMMUSIC)
-        I_Error("S_ChangeMusic: Bad music number %ld", musicnum);
+    if (!(mus_None < musicnum && musicnum < NUMMUSIC))
+        I_Error("S_ChangeMusic: Bad music number %d", musicnum);
 
     if (mus_playing == musicnum)
         return;
