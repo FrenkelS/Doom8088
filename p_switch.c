@@ -482,17 +482,11 @@ static boolean EV_DoLockedDoor(const line_t __far* line, vldoor_e type, mobj_t _
 // Only the front sides of lines are usable.
 // Dispatches to the appropriate linedef function handler.
 //
-// Passed the thing using the line, the line being used, and the side used
+// Passed the thing using the line and the line being used
 // Returns true if a thinker was created
 //
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t side)
+boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line)
 {
-
-  // e6y
-  // b.m. side test was broken in boom201
-  if (side) //jff 6/1/98 fix inadvertent deletion of side test
-    return false;
-
   //jff 02/04/98 add check here for generalized floor/ceil mover
   {
     // pointer to line function is NULL by default, set non-null if
@@ -578,12 +572,10 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
       switch((LN_SPECIAL(line) & TriggerType) >> TriggerTypeShift)
       {
         case PushOnce:
-          if (!side)
             if (linefunc(line))
               LN_SPECIAL(line) = 0;
           return true;
         case PushMany:
-          if (!side)
             linefunc(line);
           return true;
         case SwitchOnce:
@@ -954,7 +946,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
           case 174:
             // Teleport
             // 174 S1  EV_Teleport(side,thing)
-            if (EV_Teleport(line,side,thing))
+            if (EV_Teleport(line,0,thing))
               P_ChangeSwitchTexture(line,false);
             break;
 
@@ -989,7 +981,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
           case 209:
             // killough 1/31/98: silent teleporter
             //jff 209 S1 SilentTeleport
-            if (EV_SilentTeleport(line, side, thing))
+            if (EV_SilentTeleport(line, 0, thing))
               P_ChangeSwitchTexture(line,false);
             break;
 
@@ -1172,7 +1164,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
           case 195:
             // Teleport
             // 195 SR  EV_Teleport(side,thing)
-            if (EV_Teleport(line,side,thing))
+            if (EV_Teleport(line,0,thing))
               P_ChangeSwitchTexture(line,true);
             break;
 
@@ -1200,7 +1192,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t 
           case 210:
             // killough 1/31/98: silent teleporter
             //jff 210 SR SilentTeleport
-            if (EV_SilentTeleport(line, side, thing))
+            if (EV_SilentTeleport(line, 0, thing))
               P_ChangeSwitchTexture(line,true);
             break;
 

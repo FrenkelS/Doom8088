@@ -654,7 +654,7 @@ void P_UpdateSpecials(void);
 void P_UpdateAnimatedFlat(void);
 
 // when needed
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line, int16_t side);
+boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line);
 
 // p_lights
 

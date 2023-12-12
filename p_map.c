@@ -2116,10 +2116,6 @@ void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slo
 
 static boolean PTR_UseTraverse (intercept_t* in)
   {
-  int16_t side;
-
-
-
   if (!LN_SPECIAL(in->d.line))
     {
     P_LineOpening (in->d.line);
@@ -2136,13 +2132,8 @@ static boolean PTR_UseTraverse (intercept_t* in)
     return true;
     }
 
-  side = 0;
-  if (P_PointOnLineSide (usething->x, usething->y, in->d.line) == 1)
-    side = 1;
-
-  //  return false;   // don't use back side
-
-  P_UseSpecialLine (usething, in->d.line, side);
+  if (P_PointOnLineSide (usething->x, usething->y, in->d.line) != 1)
+    P_UseSpecialLine (usething, in->d.line);
 
   return false;
 }

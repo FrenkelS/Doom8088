@@ -280,7 +280,7 @@ static boolean P_Move(mobj_t __far* actor)
 
       boolean good = false;
       for ( ; _g_numspechit--; )
-        if (P_UseSpecialLine(actor, _g_spechit[_g_numspechit], 0))
+        if (P_UseSpecialLine(actor, _g_spechit[_g_numspechit]))
           good = true;
 
       /* cph - compatibility maze here
