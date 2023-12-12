@@ -639,22 +639,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->floordestheight = P_FindHighestFloorSurrounding(sec);
         break;
 
-        //jff 02/03/30 support lowering floor by 24 absolute
-      case lowerFloor24:
-        floor->direction = -1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = floor->sector->floorheight + 24 * FRACUNIT;
-        break;
-
-        //jff 02/03/30 support lowering floor by 32 absolute (fast)
-      case lowerFloor32Turbo:
-        floor->direction = -1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED*4;
-        floor->floordestheight = floor->sector->floorheight + 32 * FRACUNIT;
-        break;
-
       case lowerFloorToLowest:
         floor->direction = -1;
         floor->sector = sec;
@@ -711,14 +695,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->sector = sec;
         floor->speed = FLOORSPEED;
         floor->floordestheight = floor->sector->floorheight + 24 * FRACUNIT;
-        break;
-
-        // jff 2/03/30 support straight raise by 32 (fast)
-      case raiseFloor32Turbo:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED*4;
-        floor->floordestheight = floor->sector->floorheight + 32 * FRACUNIT;
         break;
 
       case raiseFloor512:

@@ -324,12 +324,6 @@ typedef enum
   //jff 02/03/98 lower floor to next lowest neighbor
   lowerFloorToNearest,
 
-  //jff 02/03/98 lower floor 24 absolute
-  lowerFloor24,
-
-  //jff 02/03/98 lower floor 32 absolute
-  lowerFloor32Turbo,
-
   // raise floor to shortest height texture around it
   raiseToTexture,
 
@@ -338,9 +332,6 @@ typedef enum
   lowerAndChange,
 
   raiseFloor24,
-
-  //jff 02/03/98 raise floor 32 absolute
-  raiseFloor32Turbo,
 
   raiseFloor24AndChange,
   raiseFloorCrush,
