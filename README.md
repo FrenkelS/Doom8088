@@ -29,7 +29,6 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
 **Known bugs:**
  - Some crashes and lockups due to memory issues and divisions by zero
  - When there's not enough memory for a texture, one color is drawn
- - E1M6 is too big to fit in the memory
 
 ## Controls:
 |Action      |GBA   |DOS                     |
