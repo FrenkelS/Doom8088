@@ -179,8 +179,8 @@ typedef PACKEDATTR_PRE struct line_s
     uint16_t sidenum[2];        // Visual appearance: SideDefs.
     fixed_t bbox[4];        //Line bounding box.
 
-    uint16_t flags;           // Animation related.
-    int16_t const_special;
+    uint8_t flags;           // Animation related.
+    int8_t const_special;
     int16_t tag;
     int8_t slopetype; // To aid move clipping.
 
