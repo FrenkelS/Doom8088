@@ -294,7 +294,7 @@ static boolean PIT_CheckLine (const line_t __far* ld)
     {
       blockline = ld;
       return tmunstuck && !untouched(ld) &&
-  FixedMul(tmx-tmthing->x,ld->dy) > FixedMul(tmy-tmthing->y,ld->dx);
+  FixedMul(tmx-tmthing->x,ld->dy>>FRACBITS) > FixedMul(tmy-tmthing->y,ld->dx>>FRACBITS);
     }
 
   // killough 8/10/98: allow bouncing objects to pass through as missiles
@@ -600,7 +600,7 @@ static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mob
     if ((l=_g_lines+i) != line && LN_BACKSECTOR(l))
       {
         // Get the thing's position along the source linedef
-        fixed_t pos = D_abs(line->dx) > D_abs(line->dy) ?
+        fixed_t pos = abs(line->dx>>FRACBITS) > abs(line->dy>>FRACBITS) ?
           FixedApproxDiv(thing->x - line->v1.x, line->dx) :
           FixedApproxDiv(thing->y - line->v1.y, line->dy) ;
 
@@ -661,10 +661,10 @@ static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mob
 
         // Make sure we are on correct side of exit linedef.
         while (P_PointOnLineSide(x, y, l) != side && --fudge>=0)
-          if (D_abs(l->dx) > D_abs(l->dy))
-            y -= (l->dx < 0) != side ? -1 : 1;
+          if (abs(l->dx>>FRACBITS) > abs(l->dy>>FRACBITS))
+            y -= (l->dx>>FRACBITS < 0) != side ? -1 : 1;
           else
-            x += (l->dy < 0) != side ? -1 : 1;
+            x += (l->dy>>FRACBITS < 0) != side ? -1 : 1;
 
         // Attempt to teleport, aborting if blocked
         if (!P_TeleportMove(thing, x, y, false)) /* killough 8/9/98 */

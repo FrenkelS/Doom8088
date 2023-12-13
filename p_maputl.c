@@ -83,8 +83,8 @@ fixed_t CONSTFUNC P_AproxDistance(fixed_t dx, fixed_t dy)
 int16_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* line)
 {
   return
-    !line->dx ? x <= line->v1.x ? line->dy > 0 : line->dy < 0 :
-    !line->dy ? y <= line->v1.y ? line->dx < 0 : line->dx > 0 :
+    !(line->dx>>FRACBITS) ? x <= line->v1.x ? line->dy>>FRACBITS > 0 : line->dy>>FRACBITS < 0 :
+    !(line->dy>>FRACBITS) ? y <= line->v1.y ? line->dx>>FRACBITS < 0 : line->dx>>FRACBITS > 0 :
     //FixedMul(y-line->v1.y, line->dx>>FRACBITS) >= FixedMul(line->dy>>FRACBITS, x-line->v1.x);
     ((y - line->v1.y) >> 8) * (line->dx >> FRACBITS) >= (line->dy >> FRACBITS) * ((x - line->v1.x) >> 8);
 }
@@ -106,11 +106,11 @@ int16_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
     case ST_HORIZONTAL:
         return
                 (tmbox[BOXBOTTOM] > ld->v1.y) == (p = tmbox[BOXTOP] > ld->v1.y) ?
-                    p ^ (ld->dx < 0) : -1;
+                    p ^ (ld->dx>>FRACBITS < 0) : -1;
     case ST_VERTICAL:
         return
                 (tmbox[BOXLEFT] < ld->v1.x) == (p = tmbox[BOXRIGHT] < ld->v1.x) ?
-                    p ^ (ld->dy < 0) : -1;
+                    p ^ (ld->dy>>FRACBITS < 0) : -1;
     case ST_POSITIVE:
         return
                 P_PointOnLineSide(tmbox[BOXRIGHT], tmbox[BOXBOTTOM], ld) ==
