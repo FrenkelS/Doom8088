@@ -187,7 +187,7 @@ static void P_HitSlideLine(const line_t __far* ld)
 
     side = P_PointOnLineSide (slidemo->x, slidemo->y, ld);
 
-    lineangle = R_PointToAngle2 (0,0, ld->dx, ld->dy);
+    lineangle = R_PointToAngle2 (0,0, (fixed_t)ld->dx<<FRACBITS, (fixed_t)ld->dy<<FRACBITS);
     if (side == 1)
         lineangle += ANG180;
 

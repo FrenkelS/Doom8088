@@ -150,7 +150,7 @@ boolean EV_SilentTeleport(const line_t __far* line, int16_t side, mobj_t __far* 
           // teleporter linedef causes thing to exit in the direction
           // indicated by the exit thing.
           angle_t angle =
-            R_PointToAngle2(0, 0, line->dx, line->dy) - m->angle + ANG90;
+            R_PointToAngle2(0, 0, (fixed_t)line->dx<<FRACBITS, (fixed_t)line->dy<<FRACBITS) - m->angle + ANG90;
 
           // Sine, cosine of angle adjustment
           fixed_t s = finesine(  angle>>ANGLETOFINESHIFT);

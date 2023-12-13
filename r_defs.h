@@ -174,7 +174,7 @@ typedef PACKEDATTR_PRE struct line_s
     vertex_t v2;     // Vertices, from v1 to v2.
     uint16_t lineno;         //line number.
 
-    fixed_t dx, dy;        // Precalculated v2 - v1 for side checking.
+    int16_t dx, dy;        // Precalculated v2 - v1 for side checking.
 
     uint16_t sidenum[2];        // Visual appearance: SideDefs.
     fixed_t bbox[4];        //Line bounding box.
