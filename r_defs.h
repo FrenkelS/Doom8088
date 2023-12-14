@@ -142,13 +142,11 @@ typedef struct
 //
 // Move clipping aid for LineDefs.
 //
-typedef enum
-{
-  ST_HORIZONTAL,
-  ST_VERTICAL,
-  ST_POSITIVE,
-  ST_NEGATIVE
-} slopetype_t;
+
+#define ST_HORIZONTAL	0
+#define ST_VERTICAL		1
+#define ST_POSITIVE		2
+#define ST_NEGATIVE		3
 
 typedef enum
 {                 // cph:
@@ -170,24 +168,23 @@ typedef struct linedata_s
     int16_t r_flags;
 } linedata_t;
 
-typedef struct line_s
+typedef PACKEDATTR_PRE struct line_s
 {
     vertex_t v1;
     vertex_t v2;     // Vertices, from v1 to v2.
     uint16_t lineno;         //line number.
-    uint16_t filler;
 
-    fixed_t dx, dy;        // Precalculated v2 - v1 for side checking.
+    int16_t dx, dy;        // Precalculated v2 - v1 for side checking.
 
     uint16_t sidenum[2];        // Visual appearance: SideDefs.
     fixed_t bbox[4];        //Line bounding box.
 
-    uint16_t flags;           // Animation related.
-    int16_t const_special;
+    uint8_t flags;           // Animation related.
+    int8_t const_special;
     int16_t tag;
-    int16_t slopetype; // To aid move clipping.
+    int8_t slopetype; // To aid move clipping.
 
-} line_t;
+} PACKEDATTR_POST line_t;
 
 #define LN_FRONTSECTOR(l) (_g_sides[(l)->sidenum[0]].sector)
 #define LN_BACKSECTOR(l) ((l)->sidenum[1] != NO_INDEX ? _g_sides[(l)->sidenum[1]].sector : NULL)

@@ -85,7 +85,7 @@ int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep)
 //	 || id == sfx_sawidl)
 //		return -1;
 
-	int16_t lumpnum = 1008; // TODO should be W_GetNumForName("DPPISTOL") - 1;
+	int16_t lumpnum = 999; // TODO should be W_GetNumForName("DPPISTOL") - 1;
 	if (id < sfx_chgun)
 		lumpnum += id;
 	else if (id == sfx_chgun)
