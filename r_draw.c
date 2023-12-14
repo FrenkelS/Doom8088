@@ -364,11 +364,8 @@ static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
 //
 
 
-CONSTFUNC angle_t R_PointToAngle2(fixed_t vx, fixed_t vy, fixed_t x, fixed_t y)
+CONSTFUNC angle_t R_PointToAngle3(fixed_t x, fixed_t y)
 {
-    x -= vx;
-    y -= vy;
-
     if ( (!x) && (!y) )
         return 0;
 
@@ -445,10 +442,7 @@ CONSTFUNC angle_t R_PointToAngle2(fixed_t vx, fixed_t vy, fixed_t x, fixed_t y)
     }
 }
 
-static CONSTFUNC angle_t R_PointToAngle(fixed_t x, fixed_t y)
-{
-    return R_PointToAngle2(viewx, viewy, x, y);
-}
+#define R_PointToAngle(x,y) R_PointToAngle3((x)-viewx,(y)-viewy)
 
 
 // killough 5/2/98: move from r_main.c, made static, simplified
