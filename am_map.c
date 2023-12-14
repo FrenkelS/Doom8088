@@ -214,17 +214,27 @@ static void AM_findMinMaxBoundaries(void)
     min_x = min_y =  INT32_MAX;
     max_x = max_y = -INT32_MAX;
 
-    for (i=0;i<_g_numvertexes;i++)
+    for (i=0;i<_g_numlines;i++)
     {
-        if (_g_vertexes[i].x < min_x)
-            min_x = _g_vertexes[i].x;
-        else if (_g_vertexes[i].x > max_x)
-            max_x = _g_vertexes[i].x;
+        if (_g_lines[i].v1.x < min_x)
+            min_x = _g_lines[i].v1.x;
+        else if (_g_lines[i].v1.x > max_x)
+            max_x = _g_lines[i].v1.x;
 
-        if (_g_vertexes[i].y < min_y)
-            min_y = _g_vertexes[i].y;
-        else if (_g_vertexes[i].y > max_y)
-            max_y = _g_vertexes[i].y;
+        if (_g_lines[i].v2.x < min_x)
+            min_x = _g_lines[i].v2.x;
+        else if (_g_lines[i].v2.x > max_x)
+            max_x = _g_lines[i].v2.x;
+
+        if (_g_lines[i].v1.y < min_y)
+            min_y = _g_lines[i].v1.y;
+        else if (_g_lines[i].v1.y > max_y)
+            max_y = _g_lines[i].v1.y;
+
+        if (_g_lines[i].v2.y < min_y)
+            min_y = _g_lines[i].v2.y;
+        else if (_g_lines[i].v2.y > max_y)
+            max_y = _g_lines[i].v2.y;
     }
 
     max_w = (max_x >>= FRACTOMAPBITS) - (min_x >>= FRACTOMAPBITS);//e6y

@@ -144,9 +144,6 @@ extern divline_t _g_trace;
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
 //
 
-extern int16_t      _g_numvertexes;
-extern const vertex_t __far* _g_vertexes;
-
 extern const seg_t    __far* _g_segs;
 
 extern int16_t      _g_numsectors;

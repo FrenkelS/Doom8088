@@ -60,9 +60,6 @@
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
 //
 
-int16_t      _g_numvertexes;
-const vertex_t __far* _g_vertexes;
-
 const seg_t    __far* _g_segs;
 
 int16_t      _g_numsectors;
@@ -125,7 +122,6 @@ enum {
   ML_THINGS,            // Monsters, items..
   ML_LINEDEFS,          // LineDefs, from editing
   ML_SIDEDEFS,          // SideDefs, from editing
-  ML_VERTEXES,          // Vertices, edited and BSP splits generated
   ML_SEGS,              // LineSegs, from LineDefs split by BSP
   ML_SSECTORS,          // SubSectors, list of LineSegs
   ML_NODES,             // BSP nodes
@@ -134,22 +130,6 @@ enum {
   ML_BLOCKMAP           // LUT, motion clipping, walls/grid element
 };
 
-
-//
-// P_LoadVertexes
-//
-// killough 5/3/98: reformatted, cleaned up
-//
-static void P_LoadVertexes (int16_t lump)
-{
-  // Determine number of lumps:
-  //  total lump length / vertex record length.
-  _g_numvertexes = W_LumpLength(lump) / sizeof(vertex_t);
-
-  // Allocate zone memory for buffer.
-  _g_vertexes = W_GetLumpByNumAutoFree(lump);
-
-}
 
 //
 // P_LoadSegs
@@ -635,7 +615,6 @@ void P_SetupLevel(int16_t map)
     P_LoadSubsectors(lumpnum + ML_SSECTORS);
     P_LoadNodes     (lumpnum + ML_NODES);
     P_LoadBlockMap  (lumpnum + ML_BLOCKMAP);
-    P_LoadVertexes  (lumpnum + ML_VERTEXES);
     P_LoadReject    (lumpnum + ML_REJECT);
 
     P_GroupLines();
