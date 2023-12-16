@@ -462,7 +462,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
         dy = t;
     }
 
-    return FixedApproxDiv(dx, finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT));
+    return (dx / finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT)) << FRACBITS;
 }
 
 
