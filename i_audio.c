@@ -60,70 +60,78 @@
 
 #include "m_fixed.h"
 
+#include "a_pcfx.h"
+
 #include "globdata.h"
 
-//#define __arm__
+
+#define MAX_CHANNELS    1
 
 
-//
-// This function adds a sound to the
-//  list of currently active sounds,
-//  which is maintained as a given number
-//  (eight, usually) of internal channels.
-//
-static void addsfx(sfxenum_t sfxid, int16_t channel, int32_t volume, int16_t sep)
+int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep)
 {
-	UNUSED(sfxid);
-	UNUSED(channel);
-	UNUSED(volume);
+	UNUSED(vol);
 	UNUSED(sep);
-}
 
-//
-// Starting a sound means adding it
-//  to the current list of active sounds
-//  in the internal channels.
-// As the SFX info struct contains
-//  e.g. a pointer to the raw data,
-//  it is ignored.
-// As our sound handling does not handle
-//  priority, it is ignored.
-// Pitching (that is, increased speed of playback)
-//  is set, but currently not used by mixing.
-//
-int16_t I_StartSound(sfxenum_t id, int16_t channel, int32_t vol, int16_t sep)
-{
 	if (!(0 <= channel && channel < MAX_CHANNELS))
 		return -1;
 
-    addsfx(id, channel, vol, sep);
+//	// hacks out certain PC sounds
+//	if (id == sfx_posact
+//	 || id == sfx_bgact
+//	 || id == sfx_dmact
+//	 || id == sfx_dmpain
+//	 || id == sfx_popain
+//	 || id == sfx_sawidl)
+//		return -1;
+
+	int16_t lumpnum = 999; // TODO should be W_GetNumForName("DPPISTOL") - 1;
+	if (id < sfx_chgun)
+		lumpnum += id;
+	else if (id == sfx_chgun)
+		lumpnum += sfx_pistol;
+	else
+		lumpnum += id - 1;
+
+	const void __far* soundpatch = W_GetLumpByNum(lumpnum);
+	PCFX_Play(soundpatch);
+	Z_ChangeTagToCache(soundpatch);
 
 	return channel;
 }
 
-//static SDL_AudioSpec audio;
 
 void I_InitSound(void)
 {
-	// Finished initialization.
-    printf("I_InitSound: sound ready\n");
-}
-
-void I_PlaySong(int32_t handle, int32_t looping)
-{
-	UNUSED(looping);
-
-	if(handle == mus_None)
+	if (nomusicparm && nosfxparm)
 		return;
+
+	PCFX_Init();
+
+	// Finished initialization.
+	printf("I_InitSound: sound ready\n");
 }
 
 
-void I_StopSong(int32_t handle)
+void I_ShutdownSound(void)
+{
+	PCFX_Shutdown();
+}
+
+
+void I_PlaySong(musicenum_t handle, boolean looping)
+{
+	UNUSED(handle);
+	UNUSED(looping);
+}
+
+
+void I_StopSong(musicenum_t handle)
 {
 	UNUSED(handle);
 }
 
-void I_SetMusicVolume(int32_t volume)
+void I_SetMusicVolume(int16_t volume)
 {
 	UNUSED(volume);
 }

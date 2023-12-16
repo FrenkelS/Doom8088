@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "doomtype.h"
 #include "compiler.h"
+#include "doomdef.h"
 #include "a_taskmn.h"
 
 
@@ -51,7 +52,7 @@ typedef struct
 } task_t;
 
 
-#define MAX_TASKS 1
+#define MAX_TASKS 2
 #define MAX_SERVICE_RATE 0x10000L
 
 static task_t tasks[MAX_TASKS];
@@ -75,9 +76,6 @@ static boolean isTS_Installed = false;
 
    Sets the rate of the 8253 timer.
 ---------------------------------------------------------------------*/
-
-#define LOBYTE(w)	(((uint8_t *)&w)[0])
-#define HIBYTE(w)	(((uint8_t *)&w)[1])
 
 static void TS_SetClockSpeed(int32_t speed)
 {

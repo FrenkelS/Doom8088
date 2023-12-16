@@ -57,6 +57,7 @@
 
 visplane_t __far* _g_visplanes[MAXVISPLANES];
 visplane_t __far* _g_freetail;
+visplane_t __far*__far* _g_freehead;
 
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
@@ -188,8 +189,7 @@ static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
 const lighttable_t __far* fullcolormap;
-const lighttable_t __far* colormaps;
-
+static const lighttable_t __far* colormaps;
 const lighttable_t __far* fixedcolormap;
 
 static int16_t extralight;                           // bumped light from gun blasts
@@ -226,11 +226,8 @@ static fixed_t  pixlowstep;
 static int32_t      worldhigh;
 static int32_t      worldlow;
 
-static lighttable_t current_colormap[256];
-
 
 uint16_t validcount = 1;         // increment every time a check is made
-visplane_t __far*__far* freehead;
 
 //*****************************************
 // Constants
@@ -350,7 +347,7 @@ static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
     if (den == 0)
         return SLOPERANGE;
 
-    const uint16_t ans = FixedApproxDiv(num << 3, den) >> FRACBITS;
+    const uint16_t ans = (num << 3) / den;//FixedApproxDiv(num << 3, den) >> FRACBITS;
 
     return (ans <= SLOPERANGE) ? ans : SLOPERANGE;
 }
@@ -367,11 +364,8 @@ static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
 //
 
 
-CONSTFUNC angle_t R_PointToAngle2(fixed_t vx, fixed_t vy, fixed_t x, fixed_t y)
+CONSTFUNC angle_t R_PointToAngle3(fixed_t x, fixed_t y)
 {
-    x -= vx;
-    y -= vy;
-
     if ( (!x) && (!y) )
         return 0;
 
@@ -448,10 +442,7 @@ CONSTFUNC angle_t R_PointToAngle2(fixed_t vx, fixed_t vy, fixed_t x, fixed_t y)
     }
 }
 
-static CONSTFUNC angle_t R_PointToAngle(fixed_t x, fixed_t y)
-{
-    return R_PointToAngle2(viewx, viewy, x, y);
-}
+#define R_PointToAngle(x,y) R_PointToAngle3((x)-viewx,(y)-viewy)
 
 
 // killough 5/2/98: move from r_main.c, made static, simplified
@@ -471,7 +462,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
         dy = t;
     }
 
-    return FixedApproxDiv(dx, finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT));
+    return (dx / finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT)) << FRACBITS;
 }
 
 
@@ -486,7 +477,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
 #define NUMCOLORMAPS 32
 
 
-static const lighttable_t __far* R_ColourMap(int16_t lightlevel)
+const lighttable_t __far* R_LoadColorMap(int16_t lightlevel)
 {
     if (fixedcolormap)
         return fixedcolormap;
@@ -511,29 +502,6 @@ static const lighttable_t __far* R_ColourMap(int16_t lightlevel)
 
         return fullcolormap + cm*256;
     }
-}
-
-
-const lighttable_t* R_LoadColorMap(int16_t lightlevel)
-{
-    static const lighttable_t __far* current_colormap_ptr = NULL;
-
-    const lighttable_t __far* lm = R_ColourMap(lightlevel);
-
-    if(current_colormap_ptr != lm)
-    {
-        _fmemcpy(current_colormap, lm, 256);
-        current_colormap_ptr = lm;
-    }
-
-    return current_colormap;
-}
-
-
-byte R_GetColorMapColor(int16_t lightlevel, int16_t color)
-{
-	const lighttable_t* colormap = R_LoadColorMap(lightlevel);
-	return colormap[color];
 }
 
 
@@ -753,6 +721,15 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
 }
 
 
+//
+// R_InitColormaps
+//
+void R_InitColormaps(void)
+{
+	colormaps = W_GetLumpByName("COLORMAP"); // Never freed
+}
+
+
 static void R_SetDefaultDrawColumnVars(draw_column_vars_t *dcvars)
 {
 	dcvars->x           = 0;
@@ -959,7 +936,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
         }
     }
 
-    curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_ColourMap doesn't try using it for other things */
+    curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_LoadColorMap doesn't try using it for other things */
 }
 
 
@@ -1434,9 +1411,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     else if (thing->frame & FF_FULLBRIGHT)
         vis->colormap = fullcolormap;     // full bright  // killough 3/20/98
     else
-    {      // diminished light
-        vis->colormap = R_ColourMap(lightlevel);
-    }
+        vis->colormap = R_LoadColorMap(lightlevel); // diminished light
 }
 
 //
@@ -1483,7 +1458,7 @@ static visplane_t __far* new_visplane(uint16_t hash)
     else
     {
         if (!(_g_freetail = _g_freetail->next))
-            freehead = &_g_freetail;
+            _g_freehead = &_g_freetail;
     }
 
     check->next = _g_visplanes[hash];
@@ -2529,7 +2504,7 @@ static void R_Subsector(int16_t num)
     {
         R_AddLine (line);
         line++;
-        curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_ColourMap doesn't try using it for other things */
+        curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_LoadColorMap doesn't try using it for other things */
     }
 }
 

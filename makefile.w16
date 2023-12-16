@@ -38,6 +38,7 @@ CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
 CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
 
 GLOBOBJS = &
+ a_pcfx.obj &
  a_taskmn.obj &
  am_map.obj &
  d_items.obj &

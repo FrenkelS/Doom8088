@@ -280,7 +280,7 @@ static boolean P_Move(mobj_t __far* actor)
 
       boolean good = false;
       for ( ; _g_numspechit--; )
-        if (P_UseSpecialLine(actor, _g_spechit[_g_numspechit], 0))
+        if (P_UseSpecialLine(actor, _g_spechit[_g_numspechit]))
           good = true;
 
       /* cph - compatibility maze here
@@ -415,10 +415,10 @@ static boolean PIT_AvoidDropoff(const line_t __far* line)
       // and the other must be a tall dropoff (more than 24).
 
       if (back == floorz && front < floorz - FRACUNIT*24)
-  angle = R_PointToAngle2(0,0,line->dx,line->dy);   // front side dropoff
+  angle = R_PointToAngle2(0,0,(fixed_t)line->dx<<FRACBITS,(fixed_t)line->dy<<FRACBITS);   // front side dropoff
       else
   if (front == floorz && back < floorz - FRACUNIT*24)
-    angle = R_PointToAngle2(line->dx,line->dy,0,0); // back side dropoff
+    angle = R_PointToAngle2((fixed_t)line->dx<<FRACBITS,(fixed_t)line->dy<<FRACBITS,0,0); // back side dropoff
   else
     return true;
 

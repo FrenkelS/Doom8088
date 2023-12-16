@@ -144,9 +144,6 @@ extern divline_t _g_trace;
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
 //
 
-extern int16_t      _g_numvertexes;
-extern const vertex_t __far* _g_vertexes;
-
 extern const seg_t    __far* _g_segs;
 
 extern int16_t      _g_numsectors;
@@ -225,6 +222,7 @@ extern thinker_t _g_thinkerclasscap;
 
 extern visplane_t __far* _g_visplanes[MAXVISPLANES];
 extern visplane_t __far* _g_freetail;
+extern visplane_t __far*__far* _g_freehead;
 
 
 //******************************************************************************
@@ -252,7 +250,6 @@ extern int16_t showMessages;    // Show messages has default, 0 = off, 1 = on
 
 
 extern uint16_t validcount;         // increment every time a check is made
-extern visplane_t __far*__far* freehead;
 
 
 //
@@ -268,9 +265,9 @@ extern spritedef_t __far* sprites;
 // These are not used, but should be (menu).
 // Maximum volume of a sound effect.
 // Internal default is max out of 0-15.
-extern int32_t snd_SfxVolume;
+extern int16_t snd_SfxVolume;
 
 // Maximum volume of music. Useless so far.
-extern int32_t snd_MusicVolume;
+extern int16_t snd_MusicVolume;
 
 #endif // GLOBAL_DATA_H
