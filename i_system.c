@@ -189,7 +189,6 @@ static uint8_t __far* backBuffer;
 // The screen is [SCREENWIDTH*SCREENHEIGHT];
 uint8_t  __far* _g_screen;
 
-static int8_t newpal;
 
 uint8_t __far* I_GetBackBuffer(void)
 {
@@ -211,69 +210,23 @@ static void I_SetScreenMode(uint16_t mode)
 }
 
 
-#define PEL_WRITE_ADR   0x3c8
-#define PEL_DATA        0x3c9
-
-static void I_UploadNewPalette(int8_t pal)
-{
-	// This is used to replace the current 256 colour cmap with a new one
-	// Used by 256 colour PseudoColor modes
-
-	char lumpName[9] = "PLAYPAL0";
-
-	if(_g_gamma == 0)
-		lumpName[7] = 0;
-	else
-		lumpName[7] = '0' + _g_gamma;
-
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
-	if (palette_lump != NULL)
-	{
-		const byte __far* palette = &palette_lump[pal * 256 * 3];
-		outp(PEL_WRITE_ADR, 0);
-		for (int_fast16_t i = 0; i < 256 * 3; i++)
-			outp(PEL_DATA, (*palette++) >> 2);
-
-		Z_ChangeTagToCache(palette_lump);
-	}
-}
-
-
 //
 // I_FinishUpdate
 //
 
-#define NO_PALETTE_CHANGE 100
-
 void I_FinishUpdate (void)
 {
-	if (newpal != NO_PALETTE_CHANGE)
-	{
-		I_UploadNewPalette(newpal);
-		newpal = NO_PALETTE_CHANGE;
-	}
-
 	I_DrawBuffer(backBuffer);
-}
-
-
-//
-// I_SetPalette
-//
-void I_SetPalette (int8_t pal)
-{
-	newpal = pal;
 }
 
 
 void I_InitGraphics(void)
 {	
-	I_SetScreenMode(0x13);
-	I_UploadNewPalette(0);
+	I_SetScreenMode(6); // 4 = 320x200x4, 6 = 640x200x2, 8 = 160x200x16
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
-	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	screen = D_MK_FP(0xb800, (((200 - SCREENHEIGHT) / 2) / 2) * 80 + (80 - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
 	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT);
@@ -292,13 +245,24 @@ void I_DrawBuffer(uint8_t __far* buffer)
 	uint8_t __far* dst = screen;
 
 #if defined DISABLE_STATUS_BAR
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
+	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++) {
 #else
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
+	for (uint_fast8_t y = 0; y < SCREENHEIGHT / 2; y++) {
 #endif
-		_fmemcpy(dst, src, SCREENWIDTH);
-		dst += SCREENWIDTH_VGA;
-		src += SCREENWIDTH;
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
+			*dst++ = *src;
+			src+=4;
+		}
+
+		dst += 0x2000 - VIEWWINDOWWIDTH;
+
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
+			uint8_t b = *src;
+			*dst++ = (b << 4 | b >> 4);
+			src+=4;
+		}
+
+		dst -= 0x2000 - (80 - VIEWWINDOWWIDTH);
 	}
 }
 
