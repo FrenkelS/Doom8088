@@ -10,6 +10,7 @@ set CFLAGS=%CFLAGS% -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-l
 set CFLAGS=%CFLAGS% -D__far=
 
 @set GLOBOBJS=
+@set GLOBOBJS=%GLOBOBJS% a_pcfx.c
 @set GLOBOBJS=%GLOBOBJS% a_taskmn.c
 @set GLOBOBJS=%GLOBOBJS% am_map.c
 @set GLOBOBJS=%GLOBOBJS% d_items.c

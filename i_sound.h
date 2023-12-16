@@ -42,13 +42,15 @@
 // Init at program start...
 void I_InitSound(void);
 
+void I_ShutdownSound(void);
+
 //
 //  SFX I/O
 //
 
 
 // Starts a sound in a particular sound channel.
-int16_t I_StartSound(sfxenum_t id, int16_t channel, int32_t vol, int16_t sep);
+int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep);
 
 
 //
@@ -56,32 +58,17 @@ int16_t I_StartSound(sfxenum_t id, int16_t channel, int32_t vol, int16_t sep);
 //
 
 // Volume.
-void I_SetMusicVolume(int32_t volume);
+void I_SetMusicVolume(int16_t volume);
 
 
 // Called by anything that wishes to start music.
 //  plays a song, and when the song is done,
 //  starts playing it again in an endless loop.
 // Horrible thing to do, considering.
-void I_PlaySong(int32_t handle, int32_t looping);
+void I_PlaySong(musicenum_t handle, boolean looping);
 
 // Stops a song over 3 seconds.
-void I_StopSong(int32_t handle);
-
-// CPhipps - put these in config file
-extern const int32_t snd_samplerate;
-
-
-typedef struct
-{
-    const char* data;
-    const char* enddata;
-    int32_t vol;
-
-} channel_info_t;
-
-#define MUSIC_BUFFER_SAMPLES 2048
-#define MAX_CHANNELS    8
+void I_StopSong(musicenum_t handle);
 
 
 #endif

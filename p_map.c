@@ -600,20 +600,20 @@ static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mob
     if ((l=_g_lines+i) != line && LN_BACKSECTOR(l))
       {
         // Get the thing's position along the source linedef
-        fixed_t pos = D_abs(line->dx) > D_abs(line->dy) ?
-          FixedApproxDiv(thing->x - line->v1.x, line->dx) :
-          FixedApproxDiv(thing->y - line->v1.y, line->dy) ;
+        fixed_t pos = abs(line->dx) > abs(line->dy) ?
+          FixedApproxDiv(thing->x - line->v1.x, (fixed_t)line->dx<<FRACBITS) :
+          FixedApproxDiv(thing->y - line->v1.y, (fixed_t)line->dy<<FRACBITS) ;
 
         // Get the angle between the two linedefs, for rotating
         // orientation and momentum. Rotate 180 degrees, and flip
         // the position across the exit linedef, if reversed.
         angle_t angle = (reverse ? pos = FRACUNIT-pos, 0 : ANG180) +
-          R_PointToAngle2(0, 0, l->dx, l->dy) -
-          R_PointToAngle2(0, 0, line->dx, line->dy);
+          R_PointToAngle2(0, 0, (fixed_t)l->dx<<FRACBITS, (fixed_t)l->dy<<FRACBITS) -
+          R_PointToAngle2(0, 0, (fixed_t)line->dx<<FRACBITS, (fixed_t)line->dy<<FRACBITS);
 
         // Interpolate position across the exit linedef
-        fixed_t x = l->v2.x - FixedMul(pos, l->dx);
-        fixed_t y = l->v2.y - FixedMul(pos, l->dy);
+        fixed_t x = l->v2.x - FixedMul(pos, (fixed_t)l->dx<<FRACBITS);
+        fixed_t y = l->v2.y - FixedMul(pos, (fixed_t)l->dy<<FRACBITS);
 
         // Sine, cosine of angle adjustment
         fixed_t s = finesine(  angle>>ANGLETOFINESHIFT);
@@ -661,7 +661,7 @@ static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mob
 
         // Make sure we are on correct side of exit linedef.
         while (P_PointOnLineSide(x, y, l) != side && --fudge>=0)
-          if (D_abs(l->dx) > D_abs(l->dy))
+          if (abs(l->dx) > abs(l->dy))
             y -= (l->dx < 0) != side ? -1 : 1;
           else
             x += (l->dy < 0) != side ? -1 : 1;
@@ -2116,10 +2116,6 @@ void P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slo
 
 static boolean PTR_UseTraverse (intercept_t* in)
   {
-  int16_t side;
-
-
-
   if (!LN_SPECIAL(in->d.line))
     {
     P_LineOpening (in->d.line);
@@ -2136,19 +2132,10 @@ static boolean PTR_UseTraverse (intercept_t* in)
     return true;
     }
 
-  side = 0;
-  if (P_PointOnLineSide (usething->x, usething->y, in->d.line) == 1)
-    side = 1;
+  if (P_PointOnLineSide (usething->x, usething->y, in->d.line) != 1)
+    P_UseSpecialLine (usething, in->d.line);
 
-  //  return false;   // don't use back side
-
-  P_UseSpecialLine (usething, in->d.line, side);
-
-  //WAS can't use for than one special line in a row
-  //jff 3/21/98 NOW multiple use allowed with enabling line flag
-
-  return ((in->d.line->flags&ML_PASSUSE))?
-          true : false;
+  return false;
 }
 
 // Returns false if a "oof" sound should be made because of a blocking

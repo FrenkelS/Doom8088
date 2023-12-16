@@ -59,7 +59,7 @@ static fixed_t basexscale, baseyscale;
 //
 
 #if !defined FLAT_SPAN
-inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte* colormap, uint32_t position)
+inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t position)
 {
     uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
     color = color | (color << 8);
@@ -73,8 +73,8 @@ inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* sourc
 typedef struct {
   uint32_t            position;
   uint32_t            step;
-  const byte          __far* source; // start of a 64*64 tile image
-  const lighttable_t  *colormap;
+  const byte         __far* source; // start of a 64*64 tile image
+  const lighttable_t __far* colormap;
 } draw_span_vars_t;
 
 
@@ -82,8 +82,8 @@ static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_var
 {
     uint16_t count = (x2 - x1);
 
-    const byte __far* source = dsvars->source;
-    const byte *colormap = dsvars->colormap;
+    const byte __far* source   = dsvars->source;
+    const byte __far* colormap = dsvars->colormap;
 
     uint32_t __far* dest = (uint32_t __far*)(_g_screen + (y * SCREENWIDTH) + (x1 << 2));
 
@@ -227,7 +227,8 @@ static void R_DoDrawPlane(visplane_t __far* pl)
 #if defined FLAT_SPAN
             draw_column_vars_t dcvars;
 
-            byte color = R_GetColorMapColor(pl->lightlevel, flattranslation[pl->picnum]);
+            const lighttable_t __far* colormap = R_LoadColorMap(pl->lightlevel);
+            byte color = colormap[flattranslation[pl->picnum]];
 
             for (int16_t x = pl->minx; x <= pl->maxx; x++)
             {
@@ -298,8 +299,8 @@ void R_ClearPlanes(void)
 
 
     for (int8_t i = 0; i < MAXVISPLANES; i++)
-        for (*freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *freehead; )
-            freehead = &(*freehead)->next;
+        for (*_g_freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *_g_freehead; )
+            _g_freehead = &(*_g_freehead)->next;
 
     R_ClearOpenings();
 

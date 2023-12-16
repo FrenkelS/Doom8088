@@ -65,39 +65,39 @@ typedef struct
 static channel_t *channels;
 
 // music currently being played
-static int32_t mus_playing;
+static musicenum_t mus_playing;
 
 
 // when to clip out sounds
 // Does not fit the large outdoor areas.
-#define S_CLIPPING_DIST (((int32_t)1200)<<FRACBITS)
+#define S_CLIPPING_DIST (1200L<<FRACBITS)
 
 // Distance tp origin when sounds should be maxed out.
 // This should relate to movement clipping resolution
 // (see BLOCKMAP handling).
 // Originally: (200*0x10000).
 
-#define S_CLOSE_DIST (((int32_t)160)<<FRACBITS)
+#define S_CLOSE_DIST (160L<<FRACBITS)
 #define S_ATTENUATOR ((S_CLIPPING_DIST-S_CLOSE_DIST)>>FRACBITS)
 
 // Adjustable by menu.
 #define NORM_PRIORITY 64
 #define NORM_SEP      128
 
-#define S_STEREO_SWING		(96*0x10000)
+#define S_STEREO_SWING		(96L<<FRACBITS)
 
 
 // These are not used, but should be (menu).
 // Maximum volume of a sound effect.
 // Internal default is max out of 0-15.
-int32_t snd_SfxVolume = 15;
+int16_t snd_SfxVolume = 15;
 
 // Maximum volume of music. Useless so far.
-int32_t snd_MusicVolume = 15;
+int16_t snd_MusicVolume = 15;
 
 
 // number of channels available
-static const int16_t numChannels = 8;
+static const int16_t numChannels = 1;
 
 //
 // Internals.
@@ -107,7 +107,7 @@ static void S_StopChannel(int16_t cnum);
 
 static void S_StopMusic(void);
 
-static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int32_t *vol, int16_t *sep);
+static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int16_t *vol, int16_t *sep);
 
 static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup);
 
@@ -116,12 +116,12 @@ static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolea
 //  allocates channel buffer, sets S_sfx lookup.
 //
 
-void S_Init(int32_t sfxVolume, int32_t musicVolume)
+void S_Init(int16_t sfxVolume, int16_t musicVolume)
 {
     //jff 1/22/98 skip sound init if sound not enabled
     if (!nosfxparm)
     {
-        printf("S_Init: default sfx volume %ld\n", sfxVolume);
+        printf("S_Init: default sfx volume %d\n", sfxVolume);
 
         S_SetSfxVolume(sfxVolume);
 
@@ -157,7 +157,7 @@ void S_Stop(void)
 //
 void S_Start(void)
 {
-    int32_t mnum;
+    musicenum_t mnum;
 
     // kill all playing sounds at start of level
     //  (trust me - a good idea)
@@ -173,7 +173,7 @@ void S_Start(void)
     S_ChangeMusic(mnum, true);
 }
 
-static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int32_t volume)
+static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int16_t volume)
 {
     int16_t cnum;
     boolean is_pickup;
@@ -189,8 +189,8 @@ static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int32_t
     sfx_id &= ~PICKUP_SOUND;
 
     // check for bogus sound #
-    if (sfx_id < 1 || sfx_id > NUMSFX)
-        I_Error("S_StartSoundAtVolume: Bad sfx #: %ld", sfx_id);
+    if (!(sfx_None < sfx_id && sfx_id < NUMSFX))
+        I_Error("S_StartSoundAtVolume: Bad sfx #: %d", sfx_id);
 
     sfx = &S_sfx[sfx_id];
 
@@ -326,22 +326,12 @@ void S_UpdateSounds(void)
 		{
             if (S_SoundIsPlaying(c->handle))
 			{
-				// initialize parameters
-                int32_t volume = snd_SfxVolume;
-
 				if (strcmp("chgun", sfx->name) == 0)
 				{
-					volume += 150;
-					
-					if (volume < 1)
+					if (snd_SfxVolume + 150 < 1)
 					{
 						S_StopChannel(cnum);
 						continue;
-					}
-					else
-					{
-                        if (volume > snd_SfxVolume)
-                            volume = snd_SfxVolume;
 					}
 				}
 			}
@@ -351,14 +341,14 @@ void S_UpdateSounds(void)
 	}
 }
 
-void S_SetMusicVolume(int32_t volume)
+void S_SetMusicVolume(int16_t volume)
 {
     //jff 1/22/98 return if music is not enabled
     if (nomusicparm)
         return;
 
     if (!(0 <= volume && volume <= 15))
-        I_Error("S_SetMusicVolume: Attempt to set music volume at %ld", volume);
+        I_Error("S_SetMusicVolume: Attempt to set music volume at %d", volume);
 
     I_SetMusicVolume(volume);
     snd_MusicVolume = volume;
@@ -366,14 +356,14 @@ void S_SetMusicVolume(int32_t volume)
 
 
 
-void S_SetSfxVolume(int32_t volume)
+void S_SetSfxVolume(int16_t volume)
 {
     //jff 1/22/98 return if sound is not enabled
     if (nosfxparm)
         return;
 
     if (!(0 <= volume && volume <= 127))
-        I_Error("S_SetSfxVolume: Attempt to set sfx volume at %ld", volume);
+        I_Error("S_SetSfxVolume: Attempt to set sfx volume at %d", volume);
 
     snd_SfxVolume = volume;
 }
@@ -382,7 +372,7 @@ void S_SetSfxVolume(int32_t volume)
 
 // Starts some music with the music id found in sounds.h.
 //
-void S_StartMusic(int32_t m_id)
+void S_StartMusic(musicenum_t m_id)
 {
     //jff 1/22/98 return if music is not enabled
     if (nomusicparm)
@@ -391,14 +381,14 @@ void S_StartMusic(int32_t m_id)
 }
 
 
-void S_ChangeMusic(int32_t musicnum, int32_t looping)
+void S_ChangeMusic(musicenum_t musicnum, boolean looping)
 {
     //jff 1/22/98 return if music is not enabled
     if (nomusicparm)
         return;
 
-    if (musicnum <= mus_None || musicnum >= NUMMUSIC)
-        I_Error("S_ChangeMusic: Bad music number %ld", musicnum);
+    if (!(mus_None < musicnum && musicnum < NUMMUSIC))
+        I_Error("S_ChangeMusic: Bad music number %d", musicnum);
 
     if (mus_playing == musicnum)
         return;
@@ -460,7 +450,7 @@ static void S_StopChannel(int16_t cnum)
 // Otherwise, modifies parameters and returns 1.
 //
 
-static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int32_t *vol, int16_t *sep)
+static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int16_t *vol, int16_t *sep)
 {
 	fixed_t adx, ady,approx_dist;
 

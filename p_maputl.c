@@ -86,7 +86,7 @@ int16_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* lin
     !line->dx ? x <= line->v1.x ? line->dy > 0 : line->dy < 0 :
     !line->dy ? y <= line->v1.y ? line->dx < 0 : line->dx > 0 :
     //FixedMul(y-line->v1.y, line->dx>>FRACBITS) >= FixedMul(line->dy>>FRACBITS, x-line->v1.x);
-    ((y - line->v1.y) >> 8) * (line->dx >> FRACBITS) >= (line->dy >> FRACBITS) * ((x - line->v1.x) >> 8);
+    ((y - line->v1.y) >> 8) * line->dx >= line->dy * ((x - line->v1.x) >> 8);
 }
 
 //
@@ -146,8 +146,8 @@ static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 {
   dl->x = li->v1.x;
   dl->y = li->v1.y;
-  dl->dx = li->dx;
-  dl->dy = li->dy;
+  dl->dx = (fixed_t)li->dx<<FRACBITS;
+  dl->dy = (fixed_t)li->dy<<FRACBITS;
 }
 
 

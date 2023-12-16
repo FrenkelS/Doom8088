@@ -527,7 +527,7 @@ static void __far* Z_TryMalloc(uint16_t size, int8_t tag, void __far*__far* user
 static void __far* Z_Malloc(uint16_t size, int8_t tag, void __far*__far* user) {
 	void __far* ptr = Z_TryMalloc(size, tag, user);
 	if (!ptr)
-		I_Error ("Z_Malloc: failed to allocate %li B, max free block %li B, total free %li", size, Z_GetLargestFreeBlockSize(), Z_GetTotalFreeMemory());
+		I_Error ("Z_Malloc: failed to allocate %u B, max free block %li B, total free %li", size, Z_GetLargestFreeBlockSize(), Z_GetTotalFreeMemory());
 	return ptr;
 }
 

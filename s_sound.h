@@ -46,7 +46,7 @@
 // Sets channels, SFX and music volume,
 //  allocates channel buffer, sets S_sfx lookup.
 //
-void S_Init(int32_t sfxVolume, int32_t musicVolume);
+void S_Init(int16_t sfxVolume, int16_t musicVolume);
 
 // Kills all sounds
 void S_Stop(void);
@@ -73,17 +73,17 @@ void S_StartSound2(degenmobj_t __far* origin, sfxenum_t sfx_id);
 void S_StopSound(void __far* origin);
 
 // Start music using <music_id> from sounds.h
-void S_StartMusic(int32_t music_id);
+void S_StartMusic(musicenum_t music_id);
 
 // Start music using <music_id> from sounds.h, and set whether looping
-void S_ChangeMusic(int32_t music_id, int32_t looping);
+void S_ChangeMusic(musicenum_t music_id, boolean looping);
 
 //
 // Updates music & sounds
 //
 void S_UpdateSounds(void);
-void S_SetMusicVolume(int32_t volume);
-void S_SetSfxVolume(int32_t volume);
+void S_SetMusicVolume(int16_t volume);
+void S_SetSfxVolume(int16_t volume);
 
 
 #endif

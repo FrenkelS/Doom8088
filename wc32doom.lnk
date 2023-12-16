@@ -13,6 +13,7 @@ lib noemu387.lib
 format os2 le
 name DOOM32WC
 
+file a_pcfx.obj
 file a_taskmn.obj
 file am_map.obj
 file d_items.obj
