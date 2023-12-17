@@ -24,33 +24,27 @@ static void cheat_fps(void);
 
 typedef struct c_cheat
 {
-    char* name;
-    byte sequence[8];
     uint32_t packed_sequence;
     void (*cheat_function)(void);
 } c_cheat;
 
 #define CHEAT_PACK(a,b,c,d,e,f,g,h) ((((int32_t)a) << 28)|(((int32_t)b) << 24)|(((int32_t)c) << 20)|(((int32_t)d) << 16)|(((int32_t)e) << 12)|(((int32_t)f) << 8)|(((int32_t)g) << 4)|(h))
 
-#define CHEAT_SEQ(a,b,c,d,e,f,g,h) {a,b,c,d,e,f,g,h}, CHEAT_PACK(a,b,c,d,e,f,g,h)
-
 static const c_cheat cheat_def[] =
 {
-    {"Chainsaw",        CHEAT_SEQ(KEYD_L,   KEYD_UP,    KEYD_UP,    KEYD_LEFT,  KEYD_L,     KEYD_SELECT,    KEYD_SELECT,    KEYD_UP),       cheat_choppers},
-    {"God mode",        CHEAT_SEQ(KEYD_UP,  KEYD_UP,    KEYD_DOWN,  KEYD_DOWN,  KEYD_LEFT,  KEYD_LEFT,      KEYD_RIGHT,     KEYD_RIGHT),    cheat_god},
-    {"Ammo & Keys",     CHEAT_SEQ(KEYD_L,   KEYD_LEFT,  KEYD_R,     KEYD_RIGHT, KEYD_SELECT,KEYD_UP,        KEYD_SELECT,    KEYD_UP),       cheat_idkfa},
-    {"Ammo",            CHEAT_SEQ(KEYD_R,   KEYD_R,     KEYD_SELECT,KEYD_R,     KEYD_SELECT,KEYD_UP,        KEYD_UP,        KEYD_LEFT),     cheat_ammo},
-    {"No Clipping",     CHEAT_SEQ(KEYD_UP,  KEYD_DOWN,  KEYD_LEFT,  KEYD_RIGHT, KEYD_UP,    KEYD_DOWN,      KEYD_LEFT,      KEYD_RIGHT),    cheat_noclip},
-    {"Invincibility",   CHEAT_SEQ(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_R,     KEYD_L,     KEYD_R,         KEYD_SELECT,    KEYD_SELECT),   cheat_invincibility},
-    {"Berserk",         CHEAT_SEQ(KEYD_B,   KEYD_B,     KEYD_R,     KEYD_UP,    KEYD_A,     KEYD_A,         KEYD_R,         KEYD_B),        cheat_beserk},
-    {"Invisibility",    CHEAT_SEQ(KEYD_A,   KEYD_A,     KEYD_SELECT,KEYD_B,     KEYD_A,     KEYD_SELECT,    KEYD_L,         KEYD_B),        cheat_invisibility},
-    {"Auto-map",        CHEAT_SEQ(KEYD_L,   KEYD_SELECT,KEYD_R,     KEYD_B,     KEYD_A,     KEYD_R,         KEYD_L,         KEYD_UP),       cheat_map},
-    {"Lite-Amp Goggles",CHEAT_SEQ(KEYD_DOWN,KEYD_LEFT,  KEYD_R,     KEYD_LEFT,  KEYD_R,     KEYD_L,         KEYD_L,         KEYD_SELECT),   cheat_goggles},
-    {"Exit Level",      CHEAT_SEQ(KEYD_LEFT,KEYD_R,     KEYD_LEFT,  KEYD_L,     KEYD_B,     KEYD_LEFT,      KEYD_RIGHT,     KEYD_A),        cheat_exit},
-
-    //Because Goldeneye!
-    {"Enemy Rockets",   CHEAT_SEQ(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_R,     KEYD_R,     KEYD_L,         KEYD_B,         KEYD_A),        cheat_rockets},
-	{"FPS Counter Ammo",CHEAT_SEQ(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_UP,    KEYD_DOWN,  KEYD_B,         KEYD_LEFT,     KEYD_LEFT),      cheat_fps},
+    {CHEAT_PACK(KEYD_L,   KEYD_UP,    KEYD_UP,    KEYD_LEFT,  KEYD_L,     KEYD_SELECT,    KEYD_SELECT,    KEYD_UP),       cheat_choppers},      // Chainsaw
+    {CHEAT_PACK(KEYD_UP,  KEYD_UP,    KEYD_DOWN,  KEYD_DOWN,  KEYD_LEFT,  KEYD_LEFT,      KEYD_RIGHT,     KEYD_RIGHT),    cheat_god},           // God mode
+    {CHEAT_PACK(KEYD_L,   KEYD_LEFT,  KEYD_R,     KEYD_RIGHT, KEYD_SELECT,KEYD_UP,        KEYD_SELECT,    KEYD_UP),       cheat_idkfa},         // Ammo & Keys
+    {CHEAT_PACK(KEYD_R,   KEYD_R,     KEYD_SELECT,KEYD_R,     KEYD_SELECT,KEYD_UP,        KEYD_UP,        KEYD_LEFT),     cheat_ammo},          // Ammo
+    {CHEAT_PACK(KEYD_UP,  KEYD_DOWN,  KEYD_LEFT,  KEYD_RIGHT, KEYD_UP,    KEYD_DOWN,      KEYD_LEFT,      KEYD_RIGHT),    cheat_noclip},        // No Clipping
+    {CHEAT_PACK(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_R,     KEYD_L,     KEYD_R,         KEYD_SELECT,    KEYD_SELECT),   cheat_invincibility}, // Invincibility
+    {CHEAT_PACK(KEYD_B,   KEYD_B,     KEYD_R,     KEYD_UP,    KEYD_A,     KEYD_A,         KEYD_R,         KEYD_B),        cheat_beserk},        // Berserk
+    {CHEAT_PACK(KEYD_A,   KEYD_A,     KEYD_SELECT,KEYD_B,     KEYD_A,     KEYD_SELECT,    KEYD_L,         KEYD_B),        cheat_invisibility},  // Invisibility
+    {CHEAT_PACK(KEYD_L,   KEYD_SELECT,KEYD_R,     KEYD_B,     KEYD_A,     KEYD_R,         KEYD_L,         KEYD_UP),       cheat_map},           // Auto-map
+    {CHEAT_PACK(KEYD_DOWN,KEYD_LEFT,  KEYD_R,     KEYD_LEFT,  KEYD_R,     KEYD_L,         KEYD_L,         KEYD_SELECT),   cheat_goggles},       // Lite-Amp Goggles
+    {CHEAT_PACK(KEYD_LEFT,KEYD_R,     KEYD_LEFT,  KEYD_L,     KEYD_B,     KEYD_LEFT,      KEYD_RIGHT,     KEYD_A),        cheat_exit},          // Exit Level
+    {CHEAT_PACK(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_R,     KEYD_R,     KEYD_L,         KEYD_B,         KEYD_A),        cheat_rockets},       // Enemy Rockets, Because Goldeneye!
+    {CHEAT_PACK(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_UP,    KEYD_DOWN,  KEYD_B,         KEYD_LEFT,      KEYD_LEFT),     cheat_fps},           // FPS Counter Ammo
 };
 
 static const int16_t num_cheats = sizeof(cheat_def) / sizeof (c_cheat);
@@ -61,9 +55,7 @@ static boolean CheckCheats(uint32_t keybuff)
     {
         if(cheat_def[i].packed_sequence == keybuff)
         {
-            if(cheat_def[i].cheat_function)
-                cheat_def[i].cheat_function();
-
+            cheat_def[i].cheat_function();
             return true;
         }
     }
