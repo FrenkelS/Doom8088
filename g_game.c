@@ -412,9 +412,6 @@ boolean G_Responder (event_t* ev)
         return false;
     }
 
-    if (_g_gamestate == GS_FINALE && F_Responder(ev))
-        return true;  // finale ate the event
-
     switch (ev->type)
     {
         case ev_keydown:

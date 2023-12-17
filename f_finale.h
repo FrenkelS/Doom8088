@@ -43,9 +43,6 @@
  */
 
 /* Called by main loop. */
-boolean F_Responder (event_t* ev);
-
-/* Called by main loop. */
 void F_Ticker (void);
 
 /* Called by main loop. */
