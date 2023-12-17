@@ -31,17 +31,19 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
  - When there's not enough memory for a texture, one color is drawn
 
 ## Controls:
-|Action      |GBA   |DOS                     |
-|------------|------|------------------------|
-|Fire        |B     |Ctrl                    |
-|Use / Sprint|A     |Enter, Space & Shift    |
-|Walk        |D-Pad |Arrow keys              |
-|Strafe      |L & R |< & >                   |
-|Automap     |SELECT|Tab                     |
-|Weapon up   |A + R |Enter, Space & Shift + >|
-|Weapon down |A + L |Enter, Space & Shift + <|
-|Menu        |Start |Esc                     |
-|Quit to DOS |      |F10                     |
+|Action          |GBA   |DOS                     |
+|----------------|------|------------------------|
+|Fire            |B     |Ctrl                    |
+|Use / Sprint    |A     |Enter, Space & Shift    |
+|Walk            |D-Pad |Arrow keys              |
+|Strafe          |L & R |< & >                   |
+|Automap         |SELECT|Tab                     |
+|Automap zoom in |      |+                       |
+|Automap zoom out|      |-                       |
+|Weapon up       |A + R |Enter, Space & Shift + >|
+|Weapon down     |A + L |Enter, Space & Shift + <|
+|Menu            |Start |Esc                     |
+|Quit to DOS     |      |F10                     |
 
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) on Ubuntu.

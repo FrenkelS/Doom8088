@@ -182,7 +182,9 @@ typedef enum {
 #define KEYD_LEFT       7
 #define KEYD_RIGHT      8
 #define KEYD_START      9
-#define KEYD_SELECT     10
+#define KEYD_SELECT    10
+#define KEYD_MINUS     11
+#define KEYD_PLUS      12
 
 
 //

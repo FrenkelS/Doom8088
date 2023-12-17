@@ -78,6 +78,13 @@ void I_InitScreen(void)
 
 
 #define SC_ESCAPE		0x01
+#define SC_1			0x02
+#define SC_2			0x03
+#define SC_3			0x04
+#define SC_4			0x05
+#define SC_5			0x06
+#define SC_MINUS		0x0c
+#define SC_PLUS			0x0d
 #define SC_TAB			0x0f
 #define SC_ENTER		0x1c
 #define SC_CTRL			0x1d
@@ -141,7 +148,7 @@ void I_StartTic(void)
 			case SC_ENTER:
 			case SC_SPACE:
 			case SC_RSHIFT:
-				ev.data1= KEYD_A;
+				ev.data1 = KEYD_A;
 				break;
 			case SC_UPARROW:
 				ev.data1 = KEYD_UP;
@@ -166,6 +173,12 @@ void I_StartTic(void)
 				break;
 			case SC_PERIOD:
 				ev.data1 = KEYD_R;
+				break;
+			case SC_MINUS:
+				ev.data1 = KEYD_MINUS;
+				break;
+			case SC_PLUS:
+				ev.data1 = KEYD_PLUS;
 				break;
 			case SC_F10:
 				I_Quit();
