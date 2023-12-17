@@ -411,7 +411,7 @@ boolean AM_Responder
 
     if (!(automapmode & am_active))
     {
-        if (ev->type == ev_keydown && ev->data1 == key_map)         // phares
+        if (ev->type == ev_keydown && ev->data1 == key_map)
         {
             AM_Start ();
             rc = true;
@@ -420,10 +420,10 @@ boolean AM_Responder
     else if (ev->type == ev_keydown)
     {
         rc = true;
-        ch = ev->data1;                                             // phares
+        ch = ev->data1;
 
-        if (ch == key_map_right)                                    //    |
-            if (!(automapmode & am_follow))                           //    V
+        if (ch == key_map_right)
+            if (!(automapmode & am_follow))
                 m_paninc.x = FTOM(F_PANINC);
             else
                 rc = false;
@@ -453,9 +453,8 @@ boolean AM_Responder
         {
             automapmode ^= am_follow;     // CPhipps - put all automap mode stuff into one enum
             f_oldloc.x = INT32_MAX;
-            // Ty 03/27/98 - externalized
             _g_player.message = (automapmode & am_follow) ? AMSTR_FOLLOWON : AMSTR_FOLLOWOFF;
-        }                                                         //    |
+        }
         else if (ch == key_map_zoomout)
         {
             mtof_zoommul = M_ZOOMOUT;
@@ -466,7 +465,7 @@ boolean AM_Responder
             mtof_zoommul = M_ZOOMIN;
             ftom_zoommul = M_ZOOMOUT;
         }
-        else                                                        // phares
+        else
         {
             rc = false;
         }
