@@ -1102,11 +1102,19 @@ static void R_DrawSprite (const vissprite_t* spr)
 }
 
 
+/*
+ * Frame flags:
+ * handles maximum brightness (torches, muzzle flare, light sources)
+ */
+
+#define FF_FULLBRIGHT   0x8000  /* flag in thing->frame */
+#define FF_FRAMEMASK    0x7fff
+
+
 //
 // R_DrawPSprite
 //
 
-#define SPR_FLIPPED(s, r) (s->flipmask & (1 << r))
 #define BASEYCENTER 100
 
 static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
@@ -1114,7 +1122,6 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     int16_t           x1, x2;
     spritedef_t   __far* sprdef;
     spriteframe_t __far* sprframe;
-    boolean       flip;
     vissprite_t   *vis;
     vissprite_t   avis;
     fixed_t       topoffset;
@@ -1123,8 +1130,6 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     sprdef = &sprites[psp->state->sprite];
 
     sprframe = &sprdef->spriteframes[psp->state->frame & FF_FRAMEMASK];
-
-    flip = (boolean) SPR_FLIPPED(sprframe, 0);
 
     const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
@@ -1158,19 +1163,11 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     vis->scale = PSPRITEYSCALE;
     vis->iscale = FixedReciprocal(PSPRITEYSCALE);
 
-    if (flip)
-    {
-        vis->xiscale = - FixedReciprocal(PSPRITESCALE);
-        vis->startfrac = (((int32_t)patch->width) << FRACBITS) - 1;
-    }
-    else
-    {
-        vis->xiscale = FixedReciprocal(PSPRITESCALE);
-        vis->startfrac = 0;
-    }
+    vis->xiscale = FixedReciprocal(PSPRITESCALE);
+    vis->startfrac = 0;
 
     if (vis->x1 > x1)
-        vis->startfrac += vis->xiscale*(vis->x1-x1);
+        vis->startfrac = vis->xiscale*(vis->x1-x1);
 
     vis->lump_num        = sprframe->lump[0];
     vis->patch_topoffset = patch->topoffset;
@@ -1332,6 +1329,8 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 
 #define MINZ        (FRACUNIT*4)
 #define MAXZ        (FRACUNIT*1280)
+
+#define SPR_FLIPPED(s, r) (s->flipmask & (1 << r))
 
 static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
 {
