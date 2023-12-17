@@ -773,18 +773,6 @@ void R_InitColormaps(void)
 }
 
 
-static void R_SetDefaultDrawColumnVars(draw_column_vars_t *dcvars)
-{
-	dcvars->x           = 0;
-	dcvars->yl          = 0;
-	dcvars->yh          = 0;
-	dcvars->iscale      = 0;
-	dcvars->texturemid  = 0;
-	dcvars->source      = NULL;
-	dcvars->colormap    = colormaps;
-}
-
-
 //
 // A vissprite_t is a thing that will be drawn during a refresh.
 // i.e. a sprite object that is partly visible.
@@ -821,9 +809,6 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     R_DrawColumn_f colfunc = R_DrawColumn;
     draw_column_vars_t dcvars;
-
-    R_SetDefaultDrawColumnVars(&dcvars);
-
     dcvars.colormap = vis->colormap;
 
     // killough 4/11/98: rearrange and handle translucent sprites
@@ -910,8 +895,6 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 {
     int16_t      texnum;
     draw_column_vars_t dcvars;
-
-    R_SetDefaultDrawColumnVars(&dcvars);
 
     // Calculate light table.
     // Use different light tables
@@ -1797,8 +1780,6 @@ static void R_RenderSegLoop (int16_t rw_x)
 {
     draw_column_vars_t dcvars;
     int16_t  texturecolumn = 0;   // shut up compiler warning
-
-    R_SetDefaultDrawColumnVars(&dcvars);
 
     dcvars.colormap = R_LoadColorMap(rw_lightlevel);
 
