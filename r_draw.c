@@ -2254,7 +2254,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         if (ceilingplane)   // killough 4/11/98: add NULL ptr checks
             ceilingplane = R_CheckPlane (ceilingplane, rw_x, rw_stopx-1);
         else
-            markceiling = 0;
+            markceiling = false;
     }
 
     if (markfloor)
@@ -2271,7 +2271,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
             else
                 floorplane = R_CheckPlane (floorplane, rw_x, rw_stopx-1);
         else
-            markfloor = 0;
+            markfloor = false;
     }
 
     didsolidcol = false;
