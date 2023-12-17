@@ -51,16 +51,6 @@
 #include "p_mobj.h"
 
 
-// Silhouette, needed for clipping Segs (mainly)
-// and sprites representing things.
-#define SIL_NONE    0
-#define SIL_BOTTOM  1
-#define SIL_TOP     2
-#define SIL_BOTH    3
-
-#define MAXDRAWSEGS   192
-
-
 //
 // INTERNAL MAP TYPES
 //  used by play and refresh
@@ -288,30 +278,11 @@ typedef struct subsector_s
 
 typedef byte  lighttable_t;
 
-//
-// Masked 2s linedefs
-//
-
-typedef struct drawseg_s
-{
-  const seg_t __far* curline;
-  int16_t x1, x2;
-  fixed_t scale1, scale2, scalestep;
-  int16_t silhouette;                       // 0=none, 1=bottom, 2=top, 3=both
-  fixed_t bsilheight;                   // do not clip sprites above this
-  fixed_t tsilheight;                   // do not clip sprites below this
-
-  // Pointers to lists for sprite clipping,
-  // all three adjusted so [x1] is first value.
-
-  int16_t *sprtopclip, *sprbottomclip;
-  int16_t *maskedtexturecol; // dropoff overflow
-} drawseg_t;
 
 // Patches.
 // A patch holds one or more columns.
 // Patches are used for sprites and all masked pictures,
-// and we compose textures from the TEXTURE1/2 lists
+// and we compose textures from the TEXTURE1 list
 // of patches.
 typedef struct
 {

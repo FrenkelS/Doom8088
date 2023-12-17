@@ -60,6 +60,31 @@ visplane_t __far* _g_freetail;
 visplane_t __far*__far* _g_freehead;
 
 
+// Silhouette, needed for clipping Segs (mainly)
+// and sprites representing things.
+#define SIL_NONE    0
+#define SIL_BOTTOM  1
+#define SIL_TOP     2
+#define SIL_BOTH    3
+
+typedef struct drawseg_s
+{
+  const seg_t __far* curline;
+  int16_t x1, x2;
+  fixed_t scale1, scale2, scalestep;
+  int16_t silhouette;                       // 0=none, 1=bottom, 2=top, 3=both
+  fixed_t bsilheight;                   // do not clip sprites above this
+  fixed_t tsilheight;                   // do not clip sprites below this
+
+  // Pointers to lists for sprite clipping,
+  // all three adjusted so [x1] is first value.
+
+  int16_t *sprtopclip, *sprbottomclip;
+  int16_t *maskedtexturecol; // dropoff overflow
+} drawseg_t;
+
+#define MAXDRAWSEGS   192
+
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
 
 
@@ -2082,7 +2107,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     else      // two sided line
     {
         ds_p->sprtopclip = ds_p->sprbottomclip = NULL;
-        ds_p->silhouette = 0;
+        ds_p->silhouette = SIL_NONE;
 
         if(linedata->r_flags & RF_CLOSED)
         { /* cph - closed 2S line e.g. door */
