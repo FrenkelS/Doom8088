@@ -81,7 +81,6 @@ typedef struct
   fixed_t sy;
 } pspdef_t;
 
-weapontype_t P_WeaponPreferred(weapontype_t w1, weapontype_t w2);
 
 struct player_s;
 weapontype_t P_SwitchWeapon(struct player_s *player);

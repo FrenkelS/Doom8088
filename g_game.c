@@ -262,62 +262,20 @@ void G_BuildTiccmd(void)
         netcmd.buttons |= BT_USE;
     }
 
-    // Toggle between the top 2 favorite weapons.                   // phares
-    // If not currently aiming one of these, switch to              // phares
-    // the favorite. Only switch if you possess the weapon.         // phares
-
-    // killough 3/22/98:
-    //
-    // Perform automatic weapons switch here rather than in p_pspr.c,
-    // except in demo_compatibility mode.
-    //
-    // killough 3/26/98, 4/2/98: fix autoswitch when no weapons are left
-
     if(_g_gamekeydown[key_use] && _g_gamekeydown[key_straferight])
     {
         newweapon = P_WeaponCycleUp(&_g_player);
         side -= sidemove[speed]; //Hack cancel strafe.
     }
-
     else if(_g_gamekeydown[key_use] && _g_gamekeydown[key_strafeleft])
     {
         newweapon = P_WeaponCycleDown(&_g_player);
         side += sidemove[speed]; //Hack cancel strafe.
     }
     else if ((_g_player.attackdown && !P_CheckAmmo(&_g_player)))
-        newweapon = P_SwitchWeapon(&_g_player);           // phares
+        newweapon = P_SwitchWeapon(&_g_player);
     else
-    {
         newweapon = wp_nochange;
-
-        // killough 3/22/98: For network and demo consistency with the
-        // new weapons preferences, we must do the weapons switches here
-        // instead of in p_user.c. But for old demos we must do it in
-        // p_user.c according to the old rules. Therefore demo_compatibility
-        // determines where the weapons switch is made.
-
-        // killough 2/8/98:
-        // Allow user to switch to fist even if they have chainsaw.
-        // Switch to fist or chainsaw based on preferences.
-        // Switch to shotgun or SSG based on preferences.
-
-        {
-            const player_t *player = &_g_player;
-
-            // only select chainsaw from '1' if it's owned, it's
-            // not already in use, and the player prefers it or
-            // the fist is already in use, or the player does not
-            // have the berserker strength.
-
-            if (newweapon==wp_fist && player->weaponowned[wp_chainsaw] &&
-                    player->readyweapon!=wp_chainsaw &&
-                    (player->readyweapon==wp_fist ||
-                     !player->powers[pw_strength] ||
-                     P_WeaponPreferred(wp_chainsaw, wp_fist)))
-                newweapon = wp_chainsaw;
-        }
-        // killough 2/8/98, 3/22/98 -- end of weapon selection changes
-    }
 
     if (newweapon != wp_nochange)
     {

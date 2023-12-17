@@ -50,8 +50,6 @@ typedef struct
   int8_t forwardmove;  /* *2048 for move       */
   int8_t sidemove; /* *2048 for move       */
   int16_t  angleturn;  /* <<16 for angle delta */
-  int16_t consistancy;          /* checks for net game  */
-  byte  chatchar;
   byte  buttons;
 } ticcmd_t;
 
