@@ -39,6 +39,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
 |Strafe                 |L & R |< & >                   |
 |Automap                |SELECT|Tab                     |
 |Automap zoom in and out|      |+ & -                   |
+|Automap follow mode    |      |F                       |
 |Weapon up and down     |      |[ & ]                   |
 |Menu                   |Start |Esc                     |
 |Quit to DOS            |      |F10                     |

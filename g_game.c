@@ -97,7 +97,7 @@ wbstartstruct_t _g_wminfo;               // parms for world map / intermission
 static int32_t             totalleveltimes;      // CPhipps - total time for all completed levels
 
 
-boolean _g_gamekeydown[NUMKEYS];
+static boolean gamekeydown[NUMKEYS];
 
 static skill_t d_skill;
 
@@ -140,7 +140,7 @@ static const int16_t key_straferight = KEYD_R;
        const int16_t key_map_up      = KEYD_UP;
        const int16_t key_map_down    = KEYD_DOWN;
        const int16_t key_map         = KEYD_SELECT;
-       const int16_t key_map_follow  = KEYD_A;
+       const int16_t key_map_follow  = KEYD_F;
        const int16_t key_map_zoomin  = KEYD_PLUS;
        const int16_t key_map_zoomout = KEYD_MINUS;
 static const int16_t key_weapon_up   = KEYD_BRACKET_RIGHT;
@@ -222,13 +222,13 @@ void G_BuildTiccmd(void)
     memset(&netcmd,0,sizeof(ticcmd_t));
 
     //Use button negates the always run setting.
-    speed = (_g_gamekeydown[key_use] ^ _g_alwaysRun);
+    speed = (gamekeydown[key_use] ^ _g_alwaysRun);
 
     forward = side = 0;
 
     // use two stage accelerative turning
-    // on the keyboard and joystick
-    if (_g_gamekeydown[key_right] || _g_gamekeydown[key_left])
+    // on the keyboard
+    if (gamekeydown[key_right] || gamekeydown[key_left])
         turnheld++;
     else
         turnheld = 0;
@@ -240,33 +240,33 @@ void G_BuildTiccmd(void)
 
     // let movement keys cancel each other out
 
-    if (_g_gamekeydown[key_right])
+    if (gamekeydown[key_right])
         netcmd.angleturn -= angleturn[tspeed];
-    if (_g_gamekeydown[key_left])
+    if (gamekeydown[key_left])
         netcmd.angleturn += angleturn[tspeed];
 
-    if (_g_gamekeydown[key_up])
+    if (gamekeydown[key_up])
         forward += forwardmove[speed];
-    if (_g_gamekeydown[key_down])
+    if (gamekeydown[key_down])
         forward -= forwardmove[speed];
 
-    if (_g_gamekeydown[key_straferight])
+    if (gamekeydown[key_straferight])
         side += sidemove[speed];
 
-    if (_g_gamekeydown[key_strafeleft])
+    if (gamekeydown[key_strafeleft])
         side -= sidemove[speed];
 
-    if (_g_gamekeydown[key_fire])
+    if (gamekeydown[key_fire])
         netcmd.buttons |= BT_ATTACK;
 
-    if (_g_gamekeydown[key_use])
+    if (gamekeydown[key_use])
     {
         netcmd.buttons |= BT_USE;
     }
 
-    if(_g_gamekeydown[key_weapon_up])
+    if(gamekeydown[key_weapon_up])
         newweapon = P_WeaponCycleUp(&_g_player);
-    else if(_g_gamekeydown[key_weapon_down])
+    else if(gamekeydown[key_weapon_down])
         newweapon = P_WeaponCycleDown(&_g_player);
     else if ((_g_player.attackdown && !P_CheckAmmo(&_g_player)))
         newweapon = P_SwitchWeapon(&_g_player);
@@ -323,7 +323,7 @@ static void G_DoLoadLevel (void)
     Z_CheckHeap ();
 
     // clear cmd building stuff
-    memset (_g_gamekeydown, 0, sizeof(_g_gamekeydown));
+    memset(gamekeydown, 0, sizeof(gamekeydown));
 
     // killough 5/13/98: in case netdemo has consoleplayer other than green
     ST_Start();
@@ -369,14 +369,13 @@ boolean G_Responder (event_t* ev)
     switch (ev->type)
     {
         case ev_keydown:
-
-            if (ev->data1 <NUMKEYS)
-                _g_gamekeydown[ev->data1] = true;
+            if (ev->data1 < NUMKEYS)
+                gamekeydown[ev->data1] = true;
             return true;    // eat key down events
 
         case ev_keyup:
-            if (ev->data1 <NUMKEYS)
-                _g_gamekeydown[ev->data1] = false;
+            if (ev->data1 < NUMKEYS)
+                gamekeydown[ev->data1] = false;
             return false;   // always let key up events filter down
 
         default:

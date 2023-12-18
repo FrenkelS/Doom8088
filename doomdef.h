@@ -187,6 +187,7 @@ typedef enum {
 #define KEYD_PLUS          12
 #define KEYD_BRACKET_LEFT  13
 #define KEYD_BRACKET_RIGHT 14
+#define KEYD_F             15
 
 #define NUMKEYS   16
 

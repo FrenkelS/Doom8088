@@ -90,6 +90,7 @@ void I_InitScreen(void)
 #define SC_BRACKET_RIGHT	0x1b
 #define SC_ENTER			0x1c
 #define SC_CTRL				0x1d
+#define SC_F				0x21
 #define SC_LSHIFT			0x2a
 #define SC_RSHIFT			0x36
 #define SC_COMMA			0x33
@@ -187,6 +188,9 @@ void I_StartTic(void)
 				break;
 			case SC_BRACKET_RIGHT:
 				ev.data1 = KEYD_BRACKET_RIGHT;
+				break;
+			case SC_F:
+				ev.data1 = KEYD_F;
 				break;
 			case SC_F10:
 				I_Quit();

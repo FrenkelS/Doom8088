@@ -51,9 +51,6 @@ enum automapmode_e {
 };
 
 
-// scale on entry
-#define INITSCALEMTOF (.2*FRACUNIT)
-
 // Called by main loop.
 boolean AM_Responder (event_t* ev);
 

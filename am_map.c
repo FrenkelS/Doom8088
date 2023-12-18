@@ -124,6 +124,9 @@ static fixed_t  max_scale_mtof; // used to tell when to stop zooming in
 // old location used by the Follower routine
 static mpoint_t f_oldloc;
 
+// scale on entry
+#define INITSCALEMTOF (.2*FRACUNIT)
+
 // used by MTOF to scale from map-to-frame-buffer coords
 static fixed_t scale_mtof = (fixed_t)INITSCALEMTOF;
 // used by FTOM to scale from frame-buffer-to-map coords (=1/scale_mtof)
@@ -291,7 +294,7 @@ static void AM_changeWindowLoc(void)
 //
 static void AM_initVariables(void)
 {
-    automapmode |= am_active;
+    automapmode |= (am_active | am_follow);
 
     f_oldloc.x = INT32_MAX;
 
@@ -448,7 +451,7 @@ boolean AM_Responder(event_t*  ev)
             else
                 automapmode |= (am_overlay | am_rotate | am_follow);
         }
-        else if (ch == key_map_follow && _g_gamekeydown[key_use])
+        else if (ch == key_map_follow)
         {
             automapmode ^= am_follow;     // CPhipps - put all automap mode stuff into one enum
             f_oldloc.x = INT32_MAX;
