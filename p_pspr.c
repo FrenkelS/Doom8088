@@ -176,20 +176,6 @@ weapontype_t P_SwitchWeapon(player_t *player)
   return newweapon;
 }
 
-// killough 5/2/98: whether consoleplayer prefers weapon w1 over weapon w2.
-weapontype_t P_WeaponPreferred(weapontype_t w1, weapontype_t w2)
-{
-  return
-    (weapon_preferences[0] != ++w2 && (weapon_preferences[0] == ++w1 ||
-    (weapon_preferences[1] !=   w2 && (weapon_preferences[1] ==   w1 ||
-    (weapon_preferences[2] !=   w2 && (weapon_preferences[2] ==   w1 ||
-    (weapon_preferences[3] !=   w2 && (weapon_preferences[3] ==   w1 ||
-    (weapon_preferences[4] !=   w2 && (weapon_preferences[4] ==   w1 ||
-    (weapon_preferences[5] !=   w2 && (weapon_preferences[5] ==   w1 ||
-    (weapon_preferences[6] !=   w2 && (weapon_preferences[6] ==   w1 ||
-    (weapon_preferences[7] !=   w2 && (weapon_preferences[7] ==   w1
-   ))))))))))))))));
-}
 
 static weapontype_t P_CheckCanSwitchWeapon(weapontype_t weapon, player_t* player)
 {

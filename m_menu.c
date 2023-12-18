@@ -283,7 +283,7 @@ static void M_NewGame(int16_t choice)
 	itemOn = 2; //Set hurt me plenty as default difficulty
 }
 
-// CPhipps - static
+
 static void M_VerifyNightmare(int16_t ch)
 {
     if (ch != key_enter)
@@ -784,20 +784,13 @@ boolean M_Responder (event_t* ev)
 {
     int16_t    ch;
 
-    ch = -1; // will be changed to a legit char if we're going to use it here
-
-
     // Mouse input processing removed
 
     // Process keyboard input
 
     if (ev->type == ev_keydown)
-    {
-        ch = ev->data1;               // phares 4/11/98:
-    }                             // down so you can get at the !,#,
-
-
-    if (ch == -1)
+        ch = ev->data1;
+    else
         return false; // we can't use the event here
 
     // Take care of any messages that need input
@@ -805,10 +798,10 @@ boolean M_Responder (event_t* ev)
     if (messageToPrint)
     {
         if (messageNeedsInput == true &&
-                !(ch == ' ' || ch == 'n' || ch == 'y' || ch == key_escape || ch == key_fire || ch == key_enter)) // phares
+                !(ch == ' ' || ch == 'n' || ch == 'y' || ch == key_escape || ch == key_fire || ch == key_enter))
             return false;
 
-        _g_menuactive     = messageLastMenuActive;
+        _g_menuactive  = messageLastMenuActive;
         messageToPrint = false;
         if (messageRoutine)
             messageRoutine(ch);
@@ -822,7 +815,7 @@ boolean M_Responder (event_t* ev)
 
     if (!_g_menuactive)
     {
-        if (ch == key_escape)                                     // phares
+        if (ch == key_escape)
         {
             M_StartControlPanel ();
             S_StartSound(NULL,sfx_swtchn);
@@ -834,7 +827,7 @@ boolean M_Responder (event_t* ev)
     // From here on, these navigation keys are used on the BIG FONT menus
     // like the Main Menu.
 
-    if (ch == key_menu_down)                             // phares 3/7/98
+    if (ch == key_menu_down)
     {
         do
         {
@@ -848,7 +841,7 @@ boolean M_Responder (event_t* ev)
         return true;
     }
 
-    if (ch == key_menu_up)                               // phares 3/7/98
+    if (ch == key_menu_up)
     {
         do
         {
@@ -862,7 +855,7 @@ boolean M_Responder (event_t* ev)
         return true;
     }
 
-    if (ch == key_menu_left)                             // phares 3/7/98
+    if (ch == key_menu_left)
     {
         if (currentMenu->menuitems[itemOn].routine &&
                 currentMenu->menuitems[itemOn].status == 2)
@@ -873,7 +866,7 @@ boolean M_Responder (event_t* ev)
         return true;
     }
 
-    if (ch == key_menu_right)                            // phares 3/7/98
+    if (ch == key_menu_right)
     {
         if (currentMenu->menuitems[itemOn].routine &&
                 currentMenu->menuitems[itemOn].status == 2)
@@ -884,7 +877,7 @@ boolean M_Responder (event_t* ev)
         return true;
     }
 
-    if (ch == key_menu_enter)                            // phares 3/7/98
+    if (ch == key_menu_enter)
     {
         if (currentMenu->menuitems[itemOn].routine &&
                 currentMenu->menuitems[itemOn].status)
@@ -900,20 +893,19 @@ boolean M_Responder (event_t* ev)
                 S_StartSound(NULL,sfx_pistol);
             }
         }
-        //jff 3/24/98 remember last skill selected
-        // killough 10/98 moved to skill-specific functions
+
         return true;
     }
 
-    if (ch == key_menu_escape)                           // phares 3/7/98
+    if (ch == key_menu_escape)
     {
         M_ClearMenus ();
         S_StartSound(NULL,sfx_swtchx);
         return true;
     }
 
-	//Allow being able to go back in menus ~Kippykip
-	if (ch == key_fire)                           // phares 3/7/98
+	//Allow being able to go back in menus
+	if (ch == key_fire)
     {
 		//If the prevMenu == NULL (Such as main menu screen), then just get out of the menu altogether
 		if(currentMenu->prevMenu == NULL)

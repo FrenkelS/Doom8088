@@ -62,27 +62,23 @@ void G_LoadSettings();
 void G_SaveSettings();
 
 
-extern const int32_t  key_menu_right;
-extern const int32_t  key_menu_left;
-extern const int32_t  key_menu_up;
-extern const int32_t  key_menu_down;
-extern const int32_t  key_menu_escape;
-extern const int32_t  key_menu_enter;
+extern const int16_t  key_menu_right;
+extern const int16_t  key_menu_left;
+extern const int16_t  key_menu_up;
+extern const int16_t  key_menu_down;
+extern const int16_t  key_menu_escape;
+extern const int16_t  key_menu_enter;
 extern const int16_t  key_fire;
-extern const int16_t  key_use;
-extern const int32_t  key_escape;
-extern const int32_t  key_enter;
-extern const int32_t  key_map_right;
-extern const int32_t  key_map_left;
-extern const int32_t  key_map_up;
-extern const int32_t  key_map_down;
-extern const int32_t  key_map_zoomin;
-extern const int32_t  key_map_zoomout;
-extern const int32_t  key_map;
-extern const int32_t  key_map_follow;
-
-
-#define NUMKEYS   16
+extern const int16_t  key_escape;
+extern const int16_t  key_enter;
+extern const int16_t  key_map_right;
+extern const int16_t  key_map_left;
+extern const int16_t  key_map_up;
+extern const int16_t  key_map_down;
+extern const int16_t  key_map_zoomin;
+extern const int16_t  key_map_zoomout;
+extern const int16_t  key_map;
+extern const int16_t  key_map_follow;
 
 
 #endif

@@ -139,7 +139,12 @@ void S_Init(int16_t sfxVolume, int16_t musicVolume)
     }
 }
 
-void S_Stop(void)
+
+//
+// Kills all sounds
+//
+
+static void S_Stop(void)
 {
     int16_t cnum;
 
