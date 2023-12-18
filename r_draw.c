@@ -185,6 +185,7 @@ static drawseg_t *ds_p;
 
 #if defined FLAT_SPAN
 static int16_t floorplane_color;
+static int16_t ceilingplane_color;
 #else
 static visplane_t __far* floorplane;
 #endif
@@ -1837,9 +1838,24 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 
             if (top <= bottom)
             {
+#if defined FLAT_SPAN
+                if (!ceilingplane)
+                {
+                    dcvars.yl = top;
+                    dcvars.yh = bottom;
+                    R_DrawColumnFlat(ceilingplane_color, &dcvars);
+                }
+                else
+                {
+                    ceilingplane->top[rw_x] = top;
+                    ceilingplane->bottom[rw_x] = bottom;
+                    ceilingplane->modified = true;
+                }
+#else
                 ceilingplane->top[rw_x] = top;
                 ceilingplane->bottom[rw_x] = bottom;
                 ceilingplane->modified = true;
+#endif
             }
             // SoM: this should be set here
             cc_rwx = bottom;
@@ -2261,10 +2277,17 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     // render it
     if (markceiling)
     {
+#if defined FLAT_SPAN
+        if (ceilingplane)
+            ceilingplane = R_CheckPlane(ceilingplane, rw_x, rw_stopx - 1);
+        else if (ceilingplane_color == -1)
+            markceiling = false;
+#else
         if (ceilingplane)   // killough 4/11/98: add NULL ptr checks
             ceilingplane = R_CheckPlane (ceilingplane, rw_x, rw_stopx-1);
         else
             markceiling = false;
+#endif
     }
 
     if (markfloor)
@@ -2558,6 +2581,18 @@ static void R_Subsector(int16_t num)
 #endif
 
 
+#if defined FLAT_SPAN
+    if (frontsector->ceilingpic == skyflatnum) {
+        ceilingplane_color = -1;
+        ceilingplane       = R_FindPlane(0, skyflatnum, 0);
+    } else if (frontsector->ceilingheight > viewz) {
+        ceilingplane_color = R_GetPlaneColor(frontsector->ceilingpic, frontsector->lightlevel);
+        ceilingplane       = NULL;
+    } else {
+        ceilingplane_color = -1;
+        ceilingplane       = NULL;
+    }
+#else
     if(frontsector->ceilingheight > viewz || (frontsector->ceilingpic == skyflatnum))
     {
         ceilingplane = R_FindPlane(frontsector->ceilingheight,     // killough 3/8/98
@@ -2569,6 +2604,7 @@ static void R_Subsector(int16_t num)
     {
         ceilingplane = NULL;
     }
+#endif
 
     R_AddSprites(sub, frontsector->lightlevel);
     while (count--)

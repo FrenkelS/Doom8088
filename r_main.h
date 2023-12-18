@@ -41,7 +41,7 @@
 
 
 #if defined FLAT_SPAN
-#define MAXVISPLANES 16    /* must be a power of 2 */
+#define MAXVISPLANES  4    /* must be a power of 2 */
 #else
 #define MAXVISPLANES 32    /* must be a power of 2 */
 #endif
