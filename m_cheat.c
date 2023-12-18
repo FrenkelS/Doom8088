@@ -12,7 +12,7 @@ static void cheat_idkfa(void);
 static void cheat_ammo(void);
 static void cheat_noclip(void);
 static void cheat_invincibility(void);
-static void cheat_beserk(void);
+static void cheat_berserk(void);
 static void cheat_invisibility(void);
 static void cheat_map(void);
 static void cheat_goggles(void);
@@ -21,77 +21,70 @@ static void cheat_rockets(void);
 static void cheat_fps(void);
 
 
-
-typedef struct c_cheat
+typedef struct
 {
-    uint32_t packed_sequence;
-    void (*cheat_function)(void);
-} c_cheat;
+	uint8_t *sequence;
+	uint8_t *p;
+} cheatseq_t;
 
-#define CHEAT_PACK(a,b,c,d,e,f,g,h) ((((int32_t)a) << 28)|(((int32_t)b) << 24)|(((int32_t)c) << 20)|(((int32_t)d) << 16)|(((int32_t)e) << 12)|(((int32_t)f) << 8)|(((int32_t)g) << 4)|(h))
+static cheatseq_t cheatseq_choppers      = {"idchoppers", NULL};
+static cheatseq_t cheatseq_god           = {"iddqd",      NULL};
+static cheatseq_t cheatseq_kfa           = {"idkfa",      NULL};
+static cheatseq_t cheatseq_ammo          = {"idfa",       NULL};
+static cheatseq_t cheatseq_noclip        = {"idspispopd", NULL};
+static cheatseq_t cheatseq_invincibility = {"idbeholdv",  NULL};
+static cheatseq_t cheatseq_berserk       = {"idbeholds",  NULL};
+static cheatseq_t cheatseq_invisibility  = {"idbeholdi",  NULL};
+static cheatseq_t cheatseq_map           = {"idbeholda",  NULL};
+static cheatseq_t cheatseq_goggles       = {"idbeholdl",  NULL};
+static cheatseq_t cheatseq_exit          = {"idclev",     NULL};
+static cheatseq_t cheatseq_rockets       = {"idrocket",   NULL}; //Because Goldeneye!
+static cheatseq_t cheatseq_fps           = {"idrate",     NULL};
 
-static const c_cheat cheat_def[] =
+
+static boolean cht_CheckCheat(cheatseq_t *cht, int8_t data1)
 {
-    {CHEAT_PACK(KEYD_L,   KEYD_UP,    KEYD_UP,    KEYD_LEFT,  KEYD_L,     KEYD_SELECT,    KEYD_SELECT,    KEYD_UP),       cheat_choppers},      // Chainsaw
-    {CHEAT_PACK(KEYD_UP,  KEYD_UP,    KEYD_DOWN,  KEYD_DOWN,  KEYD_LEFT,  KEYD_LEFT,      KEYD_RIGHT,     KEYD_RIGHT),    cheat_god},           // God mode
-    {CHEAT_PACK(KEYD_L,   KEYD_LEFT,  KEYD_R,     KEYD_RIGHT, KEYD_SELECT,KEYD_UP,        KEYD_SELECT,    KEYD_UP),       cheat_idkfa},         // Ammo & Keys
-    {CHEAT_PACK(KEYD_R,   KEYD_R,     KEYD_SELECT,KEYD_R,     KEYD_SELECT,KEYD_UP,        KEYD_UP,        KEYD_LEFT),     cheat_ammo},          // Ammo
-    {CHEAT_PACK(KEYD_UP,  KEYD_DOWN,  KEYD_LEFT,  KEYD_RIGHT, KEYD_UP,    KEYD_DOWN,      KEYD_LEFT,      KEYD_RIGHT),    cheat_noclip},        // No Clipping
-    {CHEAT_PACK(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_R,     KEYD_L,     KEYD_R,         KEYD_SELECT,    KEYD_SELECT),   cheat_invincibility}, // Invincibility
-    {CHEAT_PACK(KEYD_B,   KEYD_B,     KEYD_R,     KEYD_UP,    KEYD_A,     KEYD_A,         KEYD_R,         KEYD_B),        cheat_beserk},        // Berserk
-    {CHEAT_PACK(KEYD_A,   KEYD_A,     KEYD_SELECT,KEYD_B,     KEYD_A,     KEYD_SELECT,    KEYD_L,         KEYD_B),        cheat_invisibility},  // Invisibility
-    {CHEAT_PACK(KEYD_L,   KEYD_SELECT,KEYD_R,     KEYD_B,     KEYD_A,     KEYD_R,         KEYD_L,         KEYD_UP),       cheat_map},           // Auto-map
-    {CHEAT_PACK(KEYD_DOWN,KEYD_LEFT,  KEYD_R,     KEYD_LEFT,  KEYD_R,     KEYD_L,         KEYD_L,         KEYD_SELECT),   cheat_goggles},       // Lite-Amp Goggles
-    {CHEAT_PACK(KEYD_LEFT,KEYD_R,     KEYD_LEFT,  KEYD_L,     KEYD_B,     KEYD_LEFT,      KEYD_RIGHT,     KEYD_A),        cheat_exit},          // Exit Level
-    {CHEAT_PACK(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_R,     KEYD_R,     KEYD_L,         KEYD_B,         KEYD_A),        cheat_rockets},       // Enemy Rockets, Because Goldeneye!
-    {CHEAT_PACK(KEYD_A,   KEYD_B,     KEYD_L,     KEYD_UP,    KEYD_DOWN,  KEYD_B,         KEYD_LEFT,      KEYD_LEFT),     cheat_fps},           // FPS Counter Ammo
-};
+	if (!cht->p)
+		cht->p = cht->sequence; // initialize if first time
 
-static const int16_t num_cheats = sizeof(cheat_def) / sizeof (c_cheat);
+	if (*cht->p == data1)
+		cht->p++;
+	else
+		cht->p = cht->sequence;
 
-static boolean CheckCheats(uint32_t keybuff)
-{
-    for(int16_t i = 0; i < num_cheats; i++)
-    {
-        if(cheat_def[i].packed_sequence == keybuff)
-        {
-            cheat_def[i].cheat_function();
-            return true;
-        }
-    }
+	if (*cht->p == '\0') // end of sequence character
+	{
+		cht->p = cht->sequence;
+		return true;
+	}
 
     return false;
 }
+
 
 boolean C_Responder (event_t *ev)
 {
-    if(ev->type == ev_keydown)
-    {
-        //To enable fast cheat searching without having to
-        //maintain buffer of keypresses, we ensure that
-        //cheats are 8 keys long and the key-code is less
-        //than 16 so they fit in 4 bits.
+	if (ev->type == ev_keydown)
+	{
+		uint8_t data1 = ev->data1;
+		if (cht_CheckCheat(&cheatseq_choppers,      data1)) { cheat_choppers();      return true; }
+		if (cht_CheckCheat(&cheatseq_god,           data1)) { cheat_god();           return true; }
+		if (cht_CheckCheat(&cheatseq_kfa,           data1)) { cheat_idkfa();         return true; }
+		if (cht_CheckCheat(&cheatseq_ammo,          data1)) { cheat_ammo();          return true; }
+		if (cht_CheckCheat(&cheatseq_noclip,        data1)) { cheat_noclip();        return true; }
+		if (cht_CheckCheat(&cheatseq_invincibility, data1)) { cheat_invincibility(); return true; }
+		if (cht_CheckCheat(&cheatseq_berserk,       data1)) { cheat_berserk();       return true; }
+		if (cht_CheckCheat(&cheatseq_invisibility,  data1)) { cheat_invisibility();  return true; }
+		if (cht_CheckCheat(&cheatseq_map,           data1)) { cheat_map();           return true; }
+		if (cht_CheckCheat(&cheatseq_goggles,       data1)) { cheat_goggles();       return true; }
+		if (cht_CheckCheat(&cheatseq_exit,          data1)) { cheat_exit();          return true; }
+		if (cht_CheckCheat(&cheatseq_rockets,       data1)) { cheat_rockets();       return true; }
+		if (cht_CheckCheat(&cheatseq_fps,           data1)) { cheat_fps();           return true; }
+	}
 
-        //We can store a full 8 presses in a 32bit int.
-
-        //Adding a press to the list just means shifting the
-        //whole thing by 4 and ORing the next press into the
-        //low bits.
-
-        //We can test a cheat sequence with a simple int comparison.
-
-        static uint32_t cheat_buffer = 0;
-        uint32_t cb = cheat_buffer << 4;
-        cb |= ev->data1 & 0xf;
-
-        cheat_buffer = cb;
-
-        if(CheckCheats(cb))
-            return true; //eat last cheat key.
-    }
-
-    return false;
+	return false;
 }
+
 
 static void cheat_god()
 {
@@ -200,7 +193,7 @@ static void cheat_invincibility()
     P_GivePower(&_g_player, pw_invulnerability);
 }
 
-static void cheat_beserk()
+static void cheat_berserk()
 {
     P_GivePower(&_g_player, pw_strength);
 }
