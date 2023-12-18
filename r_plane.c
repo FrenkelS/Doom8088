@@ -209,6 +209,14 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
     while (b2 > b1 && b2 >= t2)
         spanstart[b2--] = x;
 }
+#else
+
+byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
+{
+	const lighttable_t __far* colormap = R_LoadColorMap(lightlevel);
+	return colormap[flattranslation[picnum]];
+}
+
 #endif
 
 
@@ -227,8 +235,7 @@ static void R_DoDrawPlane(visplane_t __far* pl)
 #if defined FLAT_SPAN
             draw_column_vars_t dcvars;
 
-            const lighttable_t __far* colormap = R_LoadColorMap(pl->lightlevel);
-            byte color = colormap[flattranslation[pl->picnum]];
+            byte color = R_GetPlaneColor(pl->picnum, pl->lightlevel);
 
             for (int16_t x = pl->minx; x <= pl->maxx; x++)
             {

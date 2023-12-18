@@ -77,20 +77,43 @@ void I_InitScreen(void)
 }
 
 
-#define SC_ESCAPE		0x01
-#define SC_TAB			0x0f
-#define SC_ENTER		0x1c
-#define SC_CTRL			0x1d
-#define SC_LSHIFT		0x2a
-#define SC_RSHIFT		0x36
-#define SC_COMMA		0x33
-#define SC_PERIOD		0x34
-#define SC_SPACE		0x39
-#define SC_F10			0x44
-#define SC_UPARROW		0x48
-#define SC_DOWNARROW	0x50
-#define SC_LEFTARROW	0x4b
-#define SC_RIGHTARROW	0x4d
+#define SC_ESCAPE			0x01
+#define SC_MINUS			0x0c
+#define SC_PLUS				0x0d
+#define SC_TAB				0x0f
+#define SC_BRACKET_LEFT		0x1a
+#define SC_BRACKET_RIGHT	0x1b
+#define SC_ENTER			0x1c
+#define SC_CTRL				0x1d
+#define SC_LSHIFT			0x2a
+#define SC_RSHIFT			0x36
+#define SC_COMMA			0x33
+#define SC_PERIOD			0x34
+#define SC_SPACE			0x39
+#define SC_F10				0x44
+#define SC_UPARROW			0x48
+#define SC_DOWNARROW		0x50
+#define SC_LEFTARROW		0x4b
+#define SC_RIGHTARROW		0x4d
+
+#define SC_Q	0x10
+#define SC_E	0x12
+#define SC_R	0x13
+#define SC_T	0x14
+#define SC_I	0x17
+#define SC_O	0x18
+#define SC_P	0x19
+#define SC_A	0x1e
+#define SC_S	0x1f
+#define SC_D	0x20
+#define SC_F	0x21
+#define SC_H	0x23
+#define SC_K	0x25
+#define SC_L	0x26
+#define SC_C	0x2e
+#define SC_V	0x2f
+#define SC_B	0x30
+
 
 void I_StartTic(void)
 {
@@ -141,7 +164,7 @@ void I_StartTic(void)
 			case SC_ENTER:
 			case SC_SPACE:
 			case SC_RSHIFT:
-				ev.data1= KEYD_A;
+				ev.data1 = KEYD_A;
 				break;
 			case SC_UPARROW:
 				ev.data1 = KEYD_UP;
@@ -167,6 +190,37 @@ void I_StartTic(void)
 			case SC_PERIOD:
 				ev.data1 = KEYD_R;
 				break;
+			case SC_MINUS:
+				ev.data1 = KEYD_MINUS;
+				break;
+			case SC_PLUS:
+				ev.data1 = KEYD_PLUS;
+				break;
+			case SC_BRACKET_LEFT:
+				ev.data1 = KEYD_BRACKET_LEFT;
+				break;
+			case SC_BRACKET_RIGHT:
+				ev.data1 = KEYD_BRACKET_RIGHT;
+				break;
+
+			case SC_Q: ev.data1 = 'q'; break;
+			case SC_E: ev.data1 = 'e'; break;
+			case SC_R: ev.data1 = 'r'; break;
+			case SC_T: ev.data1 = 't'; break;
+			case SC_I: ev.data1 = 'i'; break;
+			case SC_O: ev.data1 = 'o'; break;
+			case SC_P: ev.data1 = 'p'; break;
+			case SC_A: ev.data1 = 'a'; break;
+			case SC_S: ev.data1 = 's'; break;
+			case SC_D: ev.data1 = 'd'; break;
+			case SC_F: ev.data1 = 'f'; break;
+			case SC_H: ev.data1 = 'h'; break;
+			case SC_K: ev.data1 = 'k'; break;
+			case SC_L: ev.data1 = 'l'; break;
+			case SC_C: ev.data1 = 'c'; break;
+			case SC_V: ev.data1 = 'v'; break;
+			case SC_B: ev.data1 = 'b'; break;
+
 			case SC_F10:
 				I_Quit();
 			default:

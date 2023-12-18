@@ -93,13 +93,6 @@ void F_StartFinale (void)
 }
 
 
-
-boolean F_Responder (event_t *event)
-{
-	UNUSED(event);
-	return false;
-}
-
 // Get_TextSpeed() returns the value of the text display speed  // phares
 // Rewritten to allow user-directed acceleration -- killough 3/28/98
 

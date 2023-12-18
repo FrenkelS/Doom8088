@@ -60,6 +60,31 @@ visplane_t __far* _g_freetail;
 visplane_t __far*__far* _g_freehead;
 
 
+// Silhouette, needed for clipping Segs (mainly)
+// and sprites representing things.
+#define SIL_NONE    0
+#define SIL_BOTTOM  1
+#define SIL_TOP     2
+#define SIL_BOTH    3
+
+typedef struct drawseg_s
+{
+  const seg_t __far* curline;
+  int16_t x1, x2;
+  fixed_t scale1, scale2, scalestep;
+  int16_t silhouette;                       // 0=none, 1=bottom, 2=top, 3=both
+  fixed_t bsilheight;                   // do not clip sprites above this
+  fixed_t tsilheight;                   // do not clip sprites below this
+
+  // Pointers to lists for sprite clipping,
+  // all three adjusted so [x1] is first value.
+
+  int16_t *sprtopclip, *sprbottomclip;
+  int16_t *maskedtexturecol; // dropoff overflow
+} drawseg_t;
+
+#define MAXDRAWSEGS   192
+
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
 
 
@@ -158,7 +183,13 @@ static sector_t  __far* frontsector;
 static sector_t  __far* backsector;
 static drawseg_t *ds_p;
 
+#if defined FLAT_SPAN
+static int16_t floorplane_color;
+static int16_t ceilingplane_color;
+#else
 static visplane_t __far* floorplane;
+#endif
+
 static visplane_t __far* ceilingplane;
 static int32_t             rw_angle1;
 
@@ -175,10 +206,6 @@ static int32_t      worldbottom;
 
 static boolean didsolidcol; /* True if at least one column was marked solid */
 
-// True if any of the segs textures might be visible.
-static boolean  segtextured;
-static boolean  markfloor;      // False if the back side is the same plane.
-static boolean  markceiling;
 static boolean  maskedtexture;
 static int16_t      toptexture;
 static int16_t      bottomtexture;
@@ -730,18 +757,6 @@ void R_InitColormaps(void)
 }
 
 
-static void R_SetDefaultDrawColumnVars(draw_column_vars_t *dcvars)
-{
-	dcvars->x           = 0;
-	dcvars->yl          = 0;
-	dcvars->yh          = 0;
-	dcvars->iscale      = 0;
-	dcvars->texturemid  = 0;
-	dcvars->source      = NULL;
-	dcvars->colormap    = colormaps;
-}
-
-
 //
 // A vissprite_t is a thing that will be drawn during a refresh.
 // i.e. a sprite object that is partly visible.
@@ -778,9 +793,6 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     R_DrawColumn_f colfunc = R_DrawColumn;
     draw_column_vars_t dcvars;
-
-    R_SetDefaultDrawColumnVars(&dcvars);
-
     dcvars.colormap = vis->colormap;
 
     // killough 4/11/98: rearrange and handle translucent sprites
@@ -867,8 +879,6 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 {
     int16_t      texnum;
     draw_column_vars_t dcvars;
-
-    R_SetDefaultDrawColumnVars(&dcvars);
 
     // Calculate light table.
     // Use different light tables
@@ -1051,11 +1061,19 @@ static void R_DrawSprite (const vissprite_t* spr)
 }
 
 
+/*
+ * Frame flags:
+ * handles maximum brightness (torches, muzzle flare, light sources)
+ */
+
+#define FF_FULLBRIGHT   0x8000  /* flag in thing->frame */
+#define FF_FRAMEMASK    0x7fff
+
+
 //
 // R_DrawPSprite
 //
 
-#define SPR_FLIPPED(s, r) (s->flipmask & (1 << r))
 #define BASEYCENTER 100
 
 static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
@@ -1063,7 +1081,6 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     int16_t           x1, x2;
     spritedef_t   __far* sprdef;
     spriteframe_t __far* sprframe;
-    boolean       flip;
     vissprite_t   *vis;
     vissprite_t   avis;
     fixed_t       topoffset;
@@ -1072,8 +1089,6 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     sprdef = &sprites[psp->state->sprite];
 
     sprframe = &sprdef->spriteframes[psp->state->frame & FF_FRAMEMASK];
-
-    flip = (boolean) SPR_FLIPPED(sprframe, 0);
 
     const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
@@ -1107,19 +1122,11 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     vis->scale = PSPRITEYSCALE;
     vis->iscale = FixedReciprocal(PSPRITEYSCALE);
 
-    if (flip)
-    {
-        vis->xiscale = - FixedReciprocal(PSPRITESCALE);
-        vis->startfrac = (((int32_t)patch->width) << FRACBITS) - 1;
-    }
-    else
-    {
-        vis->xiscale = FixedReciprocal(PSPRITESCALE);
-        vis->startfrac = 0;
-    }
+    vis->xiscale = FixedReciprocal(PSPRITESCALE);
+    vis->startfrac = 0;
 
     if (vis->x1 > x1)
-        vis->startfrac += vis->xiscale*(vis->x1-x1);
+        vis->startfrac = vis->xiscale*(vis->x1-x1);
 
     vis->lump_num        = sprframe->lump[0];
     vis->patch_topoffset = patch->topoffset;
@@ -1281,6 +1288,8 @@ static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 
 #define MINZ        (FRACUNIT*4)
 #define MAXZ        (FRACUNIT*1280)
+
+#define SPR_FLIPPED(s, r) (s->flipmask & (1 << r))
 
 static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
 {
@@ -1744,18 +1753,18 @@ static void R_DrawSegTextureColumn(int16_t texture, int16_t texcolumn, draw_colu
 // R_RenderSegLoop
 // Draws zero, one, or two textures (and possibly a masked texture) for walls.
 // Can draw or mark the starting pixel of floor and ceiling textures.
+// boolean segtextured is true if any of the segs textures might be visible.
+// boolean markfloor is false if the back side is the same plane.
 // CALLED: CORE LOOPING ROUTINE.
 //
 
 #define HEIGHTBITS 12
 #define HEIGHTUNIT (1<<HEIGHTBITS)
 
-static void R_RenderSegLoop (int16_t rw_x)
+static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor, boolean markceiling)
 {
     draw_column_vars_t dcvars;
     int16_t  texturecolumn = 0;   // shut up compiler warning
-
-    R_SetDefaultDrawColumnVars(&dcvars);
 
     dcvars.colormap = R_LoadColorMap(rw_lightlevel);
 
@@ -1772,6 +1781,8 @@ static void R_RenderSegLoop (int16_t rw_x)
         // no space above wall?
         int16_t bottom,top = cc_rwx+1;
 
+        dcvars.x  = rw_x;
+
         if (yl < top)
             yl = top;
 
@@ -1784,9 +1795,24 @@ static void R_RenderSegLoop (int16_t rw_x)
 
             if (top <= bottom)
             {
+#if defined FLAT_SPAN
+                if (!ceilingplane)
+                {
+                    dcvars.yl = top;
+                    dcvars.yh = bottom;
+                    R_DrawColumnFlat(ceilingplane_color, &dcvars);
+                }
+                else
+                {
+                    ceilingplane->top[rw_x] = top;
+                    ceilingplane->bottom[rw_x] = bottom;
+                    ceilingplane->modified = true;
+                }
+#else
                 ceilingplane->top[rw_x] = top;
                 ceilingplane->bottom[rw_x] = bottom;
                 ceilingplane->modified = true;
+#endif
             }
             // SoM: this should be set here
             cc_rwx = bottom;
@@ -1803,9 +1829,15 @@ static void R_RenderSegLoop (int16_t rw_x)
 
             if (++top <= bottom)
             {
+#if defined FLAT_SPAN
+                dcvars.yl = top;
+                dcvars.yh = bottom;
+                R_DrawColumnFlat(floorplane_color, &dcvars);
+#else
                 floorplane->top[rw_x] = top;
                 floorplane->bottom[rw_x] = bottom;
                 floorplane->modified = true;
+#endif
             }
             // SoM: This should be set here to prevent overdraw
             fc_rwx = top;
@@ -1818,8 +1850,6 @@ static void R_RenderSegLoop (int16_t rw_x)
 #if !defined FLAT_WALL
             texturecolumn = (rw_offset - FixedMul(rw_distance, finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT))) >> FRACBITS;
 #endif
-
-            dcvars.x = rw_x;
 
             dcvars.iscale = FixedReciprocal((uint32_t)rw_scale);
         }
@@ -2031,6 +2061,8 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     midtexture = toptexture = bottomtexture = maskedtexture = 0;
     ds_p->maskedtexturecol = NULL;
 
+    boolean markfloor, markceiling;
+
     if (!backsector)
     {
         // single sided line
@@ -2058,7 +2090,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     else      // two sided line
     {
         ds_p->sprtopclip = ds_p->sprbottomclip = NULL;
-        ds_p->silhouette = 0;
+        ds_p->silhouette = SIL_NONE;
 
         if(linedata->r_flags & RF_CLOSED)
         { /* cph - closed 2S line e.g. door */
@@ -2151,7 +2183,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     }
 
     // calculate rw_offset (only needed for textured lines)
-    segtextured = ((midtexture | toptexture | bottomtexture | maskedtexture) > 0);
+    boolean segtextured = ((midtexture | toptexture | bottomtexture | maskedtexture) > 0);
 
     if (segtextured)
     {
@@ -2202,14 +2234,25 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     // render it
     if (markceiling)
     {
+#if defined FLAT_SPAN
+        if (ceilingplane)
+            ceilingplane = R_CheckPlane(ceilingplane, rw_x, rw_stopx - 1);
+        else if (ceilingplane_color == -1)
+            markceiling = false;
+#else
         if (ceilingplane)   // killough 4/11/98: add NULL ptr checks
             ceilingplane = R_CheckPlane (ceilingplane, rw_x, rw_stopx-1);
         else
-            markceiling = 0;
+            markceiling = false;
+#endif
     }
 
     if (markfloor)
     {
+#if defined FLAT_SPAN
+        if (floorplane_color == -1)
+            markfloor = false;
+#else
         if (floorplane)     // killough 4/11/98: add NULL ptr checks
             /* cph 2003/04/18  - ceilingplane and floorplane might be the same
        * visplane (e.g. if both skies); R_CheckPlane doesn't know about
@@ -2222,11 +2265,12 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
             else
                 floorplane = R_CheckPlane (floorplane, rw_x, rw_stopx-1);
         else
-            markfloor = 0;
+            markfloor = false;
+#endif
     }
 
     didsolidcol = false;
-    R_RenderSegLoop(rw_x);
+    R_RenderSegLoop(rw_x, segtextured, markfloor, markceiling);
 
     /* cph - if a column was made solid by this wall, we _must_ save full clipping info */
     if (backsector && didsolidcol)
@@ -2474,6 +2518,12 @@ static void R_Subsector(int16_t num)
     count = sub->numlines;
     line = &_g_segs[sub->firstline];
 
+#if defined FLAT_SPAN
+    if (frontsector->floorheight < viewz)
+        floorplane_color = R_GetPlaneColor(frontsector->floorpic, frontsector->lightlevel);
+    else
+        floorplane_color = -1;
+#else
     if(frontsector->floorheight < viewz)
     {
         floorplane = R_FindPlane(frontsector->floorheight,
@@ -2485,8 +2535,21 @@ static void R_Subsector(int16_t num)
     {
         floorplane = NULL;
     }
+#endif
 
 
+#if defined FLAT_SPAN
+    if (frontsector->ceilingpic == skyflatnum) {
+        ceilingplane_color = -1;
+        ceilingplane       = R_FindPlane(0, skyflatnum, 0);
+    } else if (frontsector->ceilingheight > viewz) {
+        ceilingplane_color = R_GetPlaneColor(frontsector->ceilingpic, frontsector->lightlevel);
+        ceilingplane       = NULL;
+    } else {
+        ceilingplane_color = -1;
+        ceilingplane       = NULL;
+    }
+#else
     if(frontsector->ceilingheight > viewz || (frontsector->ceilingpic == skyflatnum))
     {
         ceilingplane = R_FindPlane(frontsector->ceilingheight,     // killough 3/8/98
@@ -2498,6 +2561,7 @@ static void R_Subsector(int16_t num)
     {
         ceilingplane = NULL;
     }
+#endif
 
     R_AddSprites(sub, frontsector->lightlevel);
     while (count--)
