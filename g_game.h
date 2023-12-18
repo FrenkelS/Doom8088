@@ -82,7 +82,4 @@ extern const int16_t  key_map;
 extern const int16_t  key_map_follow;
 
 
-#define NUMKEYS   16
-
-
 #endif

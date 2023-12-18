@@ -77,27 +77,29 @@ void I_InitScreen(void)
 }
 
 
-#define SC_ESCAPE		0x01
-#define SC_1			0x02
-#define SC_2			0x03
-#define SC_3			0x04
-#define SC_4			0x05
-#define SC_5			0x06
-#define SC_MINUS		0x0c
-#define SC_PLUS			0x0d
-#define SC_TAB			0x0f
-#define SC_ENTER		0x1c
-#define SC_CTRL			0x1d
-#define SC_LSHIFT		0x2a
-#define SC_RSHIFT		0x36
-#define SC_COMMA		0x33
-#define SC_PERIOD		0x34
-#define SC_SPACE		0x39
-#define SC_F10			0x44
-#define SC_UPARROW		0x48
-#define SC_DOWNARROW	0x50
-#define SC_LEFTARROW	0x4b
-#define SC_RIGHTARROW	0x4d
+#define SC_ESCAPE			0x01
+#define SC_1				0x02
+#define SC_2				0x03
+#define SC_3				0x04
+#define SC_4				0x05
+#define SC_5				0x06
+#define SC_MINUS			0x0c
+#define SC_PLUS				0x0d
+#define SC_TAB				0x0f
+#define SC_BRACKET_LEFT		0x1a
+#define SC_BRACKET_RIGHT	0x1b
+#define SC_ENTER			0x1c
+#define SC_CTRL				0x1d
+#define SC_LSHIFT			0x2a
+#define SC_RSHIFT			0x36
+#define SC_COMMA			0x33
+#define SC_PERIOD			0x34
+#define SC_SPACE			0x39
+#define SC_F10				0x44
+#define SC_UPARROW			0x48
+#define SC_DOWNARROW		0x50
+#define SC_LEFTARROW		0x4b
+#define SC_RIGHTARROW		0x4d
 
 void I_StartTic(void)
 {
@@ -179,6 +181,12 @@ void I_StartTic(void)
 				break;
 			case SC_PLUS:
 				ev.data1 = KEYD_PLUS;
+				break;
+			case SC_BRACKET_LEFT:
+				ev.data1 = KEYD_BRACKET_LEFT;
+				break;
+			case SC_BRACKET_RIGHT:
+				ev.data1 = KEYD_BRACKET_RIGHT;
 				break;
 			case SC_F10:
 				I_Quit();

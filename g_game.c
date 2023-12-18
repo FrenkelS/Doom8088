@@ -143,6 +143,8 @@ static const int16_t key_straferight = KEYD_R;
        const int16_t key_map_follow  = KEYD_A;
        const int16_t key_map_zoomin  = KEYD_PLUS;
        const int16_t key_map_zoomout = KEYD_MINUS;
+static const int16_t key_weapon_up   = KEYD_BRACKET_RIGHT;
+static const int16_t key_weapon_down = KEYD_BRACKET_LEFT;
 
 
 #define MAXPLMOVE   (forwardmove[1])
@@ -262,16 +264,10 @@ void G_BuildTiccmd(void)
         netcmd.buttons |= BT_USE;
     }
 
-    if(_g_gamekeydown[key_use] && _g_gamekeydown[key_straferight])
-    {
+    if(_g_gamekeydown[key_weapon_up])
         newweapon = P_WeaponCycleUp(&_g_player);
-        side -= sidemove[speed]; //Hack cancel strafe.
-    }
-    else if(_g_gamekeydown[key_use] && _g_gamekeydown[key_strafeleft])
-    {
+    else if(_g_gamekeydown[key_weapon_down])
         newweapon = P_WeaponCycleDown(&_g_player);
-        side += sidemove[speed]; //Hack cancel strafe.
-    }
     else if ((_g_player.attackdown && !P_CheckAmmo(&_g_player)))
         newweapon = P_SwitchWeapon(&_g_player);
     else
