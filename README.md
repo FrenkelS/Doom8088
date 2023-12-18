@@ -45,19 +45,21 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
 |Quit to DOS            |      |F10                     |
 
 ## Cheats:
-**Chainsaw:** IDCHOPPERS
-**God mode:** IDDQD
-**Ammo & Keys:** IDKFA
-**Ammo:** IDKA
-**No Clipping:** IDSPISPOPD
-**Invincibility:** IDBEHOLDV
-**Berserk:** IDBEHOLDS
-**Invisibility:** IDBEHOLDI
-**Auto-map:** IDBEHOLDA
-**Lite-Amp Goggles:** IDBEHOLDL
-**Exit Level:** IDCLEV
-**Enemy Rockets (Goldeneye):** IDROCKET
-**Toggle FPS counter:** IDRATE
+|Code      |Effects                  |
+|----------|-------------------------|
+|IDCHOPPERS|Chainsaw                 |
+|IDDQD     |God mode                 |
+|IDKFA     |Ammo & Keys              |
+|IDKA      |Ammo                     |
+|IDSPISPOPD|No Clipping              |
+|IDBEHOLDV |Invincibility            |
+|IDBEHOLDS |Berserk                  |
+|IDBEHOLDI |Invisibility             |
+|IDBEHOLDA |Auto-map                 |
+|IDBEHOLDL |Lite-Amp Goggles         |
+|IDCLEV    |Exit Level               |
+|IDROCKET  |Enemy Rockets (GoldenEye)|
+|IDRATE    |Toggle FPS counter       |
 
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) on Ubuntu.
