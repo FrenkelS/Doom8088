@@ -183,7 +183,12 @@ static sector_t  __far* frontsector;
 static sector_t  __far* backsector;
 static drawseg_t *ds_p;
 
+#if defined FLAT_SPAN
+static int16_t floorplane_color;
+#else
 static visplane_t __far* floorplane;
+#endif
+
 static visplane_t __far* ceilingplane;
 static int32_t             rw_angle1;
 
@@ -1818,6 +1823,8 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
         // no space above wall?
         int16_t bottom,top = cc_rwx+1;
 
+        dcvars.x  = rw_x;
+
         if (yl < top)
             yl = top;
 
@@ -1849,9 +1856,15 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 
             if (++top <= bottom)
             {
+#if defined FLAT_SPAN
+                dcvars.yl = top;
+                dcvars.yh = bottom;
+                R_DrawColumnFlat(floorplane_color, &dcvars);
+#else
                 floorplane->top[rw_x] = top;
                 floorplane->bottom[rw_x] = bottom;
                 floorplane->modified = true;
+#endif
             }
             // SoM: This should be set here to prevent overdraw
             fc_rwx = top;
@@ -1864,8 +1877,6 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 #if !defined FLAT_WALL
             texturecolumn = (rw_offset - FixedMul(rw_distance, finetangent((rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT))) >> FRACBITS;
 #endif
-
-            dcvars.x = rw_x;
 
             dcvars.iscale = FixedReciprocal((uint32_t)rw_scale);
         }
@@ -2258,6 +2269,10 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 
     if (markfloor)
     {
+#if defined FLAT_SPAN
+        if (floorplane_color == -1)
+            markfloor = false;
+#else
         if (floorplane)     // killough 4/11/98: add NULL ptr checks
             /* cph 2003/04/18  - ceilingplane and floorplane might be the same
        * visplane (e.g. if both skies); R_CheckPlane doesn't know about
@@ -2271,6 +2286,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
                 floorplane = R_CheckPlane (floorplane, rw_x, rw_stopx-1);
         else
             markfloor = false;
+#endif
     }
 
     didsolidcol = false;
@@ -2522,6 +2538,12 @@ static void R_Subsector(int16_t num)
     count = sub->numlines;
     line = &_g_segs[sub->firstline];
 
+#if defined FLAT_SPAN
+    if (frontsector->floorheight < viewz)
+        floorplane_color = R_GetPlaneColor(frontsector->floorpic, frontsector->lightlevel);
+    else
+        floorplane_color = -1;
+#else
     if(frontsector->floorheight < viewz)
     {
         floorplane = R_FindPlane(frontsector->floorheight,
@@ -2533,6 +2555,7 @@ static void R_Subsector(int16_t num)
     {
         floorplane = NULL;
     }
+#endif
 
 
     if(frontsector->ceilingheight > viewz || (frontsector->ceilingpic == skyflatnum))

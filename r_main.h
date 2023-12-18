@@ -40,7 +40,11 @@
 #include "r_data.h"
 
 
+#if defined FLAT_SPAN
+#define MAXVISPLANES 16    /* must be a power of 2 */
+#else
 #define MAXVISPLANES 32    /* must be a power of 2 */
+#endif
 
 
 typedef struct {
@@ -99,6 +103,7 @@ void R_DrawColumn (const draw_column_vars_t *dcvars);
 void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
 
 void R_DrawPlanes (void);
+byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel);
 void R_ClearPlanes(void);
 void R_ClearOpenings(void);
 
