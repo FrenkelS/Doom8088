@@ -200,7 +200,6 @@ static int32_t      worldbottom;
 
 static boolean didsolidcol; /* True if at least one column was marked solid */
 
-static boolean  markceiling;
 static boolean  maskedtexture;
 static int16_t      toptexture;
 static int16_t      bottomtexture;
@@ -1799,7 +1798,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int16_t texcolumn, draw_colu
 #define HEIGHTBITS 12
 #define HEIGHTUNIT (1<<HEIGHTBITS)
 
-static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor)
+static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor, boolean markceiling)
 {
     draw_column_vars_t dcvars;
     int16_t  texturecolumn = 0;   // shut up compiler warning
@@ -2078,7 +2077,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     midtexture = toptexture = bottomtexture = maskedtexture = 0;
     ds_p->maskedtexturecol = NULL;
 
-    boolean markfloor;
+    boolean markfloor, markceiling;
 
     if (!backsector)
     {
@@ -2275,7 +2274,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     }
 
     didsolidcol = false;
-    R_RenderSegLoop(rw_x, segtextured, markfloor);
+    R_RenderSegLoop(rw_x, segtextured, markfloor, markceiling);
 
     /* cph - if a column was made solid by this wall, we _must_ save full clipping info */
     if (backsector && didsolidcol)
