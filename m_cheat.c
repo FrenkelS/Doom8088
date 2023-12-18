@@ -23,8 +23,8 @@ static void cheat_fps(void);
 
 typedef struct
 {
-	uint8_t *sequence;
-	uint8_t *p;
+	char *sequence;
+	char *p;
 } cheatseq_t;
 
 static cheatseq_t cheatseq_choppers      = {"idchoppers", NULL};
@@ -42,7 +42,7 @@ static cheatseq_t cheatseq_rockets       = {"idrocket",   NULL}; //Because Golde
 static cheatseq_t cheatseq_fps           = {"idrate",     NULL};
 
 
-static boolean cht_CheckCheat(cheatseq_t *cht, int8_t data1)
+static boolean cht_CheckCheat(cheatseq_t *cht, char data1)
 {
 	if (!cht->p)
 		cht->p = cht->sequence; // initialize if first time
@@ -66,7 +66,7 @@ boolean C_Responder (event_t *ev)
 {
 	if (ev->type == ev_keydown)
 	{
-		uint8_t data1 = ev->data1;
+		char data1 = ev->data1;
 		if (cht_CheckCheat(&cheatseq_choppers,      data1)) { cheat_choppers();      return true; }
 		if (cht_CheckCheat(&cheatseq_god,           data1)) { cheat_god();           return true; }
 		if (cht_CheckCheat(&cheatseq_kfa,           data1)) { cheat_idkfa();         return true; }

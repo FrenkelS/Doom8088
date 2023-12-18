@@ -48,8 +48,6 @@
 //
 void S_Init(int16_t sfxVolume, int16_t musicVolume);
 
-// Kills all sounds
-void S_Stop(void);
 
 //
 // Per level startup code.

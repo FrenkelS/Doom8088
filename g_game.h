@@ -69,7 +69,6 @@ extern const int16_t  key_menu_down;
 extern const int16_t  key_menu_escape;
 extern const int16_t  key_menu_enter;
 extern const int16_t  key_fire;
-extern const int16_t  key_use;
 extern const int16_t  key_escape;
 extern const int16_t  key_enter;
 extern const int16_t  key_map_right;
