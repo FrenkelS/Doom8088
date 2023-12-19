@@ -102,7 +102,6 @@ visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop
 byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel);
 void R_ResetPlanes(void);
 void R_ClearPlanes(void);
-void R_ClearOpenings(void);
 
 void R_DrawSky(visplane_t __far* pl);
 

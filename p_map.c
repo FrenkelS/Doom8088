@@ -1696,15 +1696,14 @@ static boolean PTR_AimTraverse (intercept_t* in)
 
         if (LN_FRONTSECTOR(li)->floorheight != LN_BACKSECTOR(li)->floorheight)
         {
-            slope = FixedApproxDiv (_g_openbottom - shootz , dist);
-
+            slope = dist != 0 ? FixedApproxDiv(_g_openbottom - shootz, dist) : INT32_MAX;
             if (slope > bottomslope)
                 bottomslope = slope;
         }
 
         if (LN_FRONTSECTOR(li)->ceilingheight != LN_BACKSECTOR(li)->ceilingheight)
         {
-            slope = FixedApproxDiv (_g_opentop - shootz , dist);
+            slope = dist != 0 ? FixedApproxDiv(_g_opentop - shootz, dist) : INT32_MAX;
             if (slope < topslope)
                 topslope = slope;
         }
@@ -1733,12 +1732,12 @@ static boolean PTR_AimTraverse (intercept_t* in)
     // check angles to see if the thing can be aimed at
 
     dist = FixedMul (attackrange, in->frac);
-    thingtopslope = FixedApproxDiv (th->z+th->height - shootz , dist);
+    thingtopslope = dist != 0 ? FixedApproxDiv(th->z + th->height - shootz, dist) : INT32_MAX;
 
     if (thingtopslope < bottomslope)
         return true;    // shot over the thing
 
-    thingbottomslope = FixedApproxDiv (th->z - shootz, dist);
+    thingbottomslope = dist != 0 ? FixedApproxDiv(th->z - shootz, dist) : INT32_MAX;
 
     if (thingbottomslope > topslope)
         return true;    // shot under the thing

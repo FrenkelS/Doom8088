@@ -85,7 +85,7 @@ enum { unused_block = 0, used_block = 1};
 
 void __far* Z_BMalloc(struct block_memory_alloc_s *pzone)
 {
-	register bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
+	bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
 	while (*pool != NULL) {
 		byte __far* p = _fmemchr((*pool)->used, unused_block, (*pool)->blocks); // Scan for unused marker
 		if (p) {
@@ -113,7 +113,7 @@ void __far* Z_BMalloc(struct block_memory_alloc_s *pzone)
 
 void Z_BFree(struct block_memory_alloc_s *pzone, void __far* p)
 {
-	register bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
+	bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
 
 	while (*pool != NULL) {
 		int16_t n = iselem(*pool, pzone->size, p);
