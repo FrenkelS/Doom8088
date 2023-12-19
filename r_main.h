@@ -100,6 +100,12 @@ byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel);
 void R_ResetPlanes(void);
 void R_ClearPlanes(void);
 
+#if defined FLAT_SPAN
+void R_LoadSkyPatch(void);
+void R_FreeSkyPatch(void);
+void R_DrawSky(draw_column_vars_t *dcvars);
+#else
 void R_DrawSky(visplane_t __far* pl);
+#endif
 
 #endif
