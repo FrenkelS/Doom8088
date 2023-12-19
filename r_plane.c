@@ -32,6 +32,17 @@
 #include "globdata.h"
 
 
+#if defined FLAT_SPAN
+#define MAXVISPLANES  4    /* must be a power of 2 */
+#else
+#define MAXVISPLANES 32    /* must be a power of 2 */
+#endif
+
+static visplane_t __far* visplanes[MAXVISPLANES];
+static visplane_t __far* freetail;
+static visplane_t __far*__far* freehead;
+
+
 static int16_t firstflat;
 static int16_t  animated_flat_basepic;
 static int16_t __far* flattranslation;             // for global animation
@@ -275,7 +286,7 @@ void R_DrawPlanes (void)
 {
     for (int8_t i = 0; i < MAXVISPLANES; i++)
     {
-        visplane_t __far* pl = _g_visplanes[i];
+        visplane_t __far* pl = visplanes[i];
 
         while(pl)
         {
@@ -285,6 +296,16 @@ void R_DrawPlanes (void)
             pl = pl->next;
         }
     }
+}
+
+
+//Planes are alloc'd with PU_LEVEL tag so are dumped at level
+//end. This function resets the visplane arrays.
+void R_ResetPlanes(void)
+{
+    memset(visplanes, 0, sizeof(visplanes));
+    freetail = NULL;
+    freehead = &freetail;
 }
 
 
@@ -301,8 +322,8 @@ void R_ClearPlanes(void)
 
 
     for (int8_t i = 0; i < MAXVISPLANES; i++)
-        for (*_g_freehead = _g_visplanes[i], _g_visplanes[i] = NULL; *_g_freehead; )
-            _g_freehead = &(*_g_freehead)->next;
+        for (*freehead = visplanes[i], visplanes[i] = NULL; *freehead; )
+            freehead = &(*freehead)->next;
 
     R_ClearOpenings();
 
@@ -312,6 +333,121 @@ void R_ClearPlanes(void)
     basexscale = FixedMul(viewsin,iprojection);
     baseyscale = FixedMul(viewcos,iprojection);
 #endif
+}
+
+
+static visplane_t __far* new_visplane(uint16_t hash)
+{
+    visplane_t __far* check = freetail;
+
+    if (!check)
+        check = Z_CallocLevel(sizeof(visplane_t));
+    else
+    {
+        if (!(freetail = freetail->next))
+            freehead = &freetail;
+    }
+
+    check->next = visplanes[hash];
+    visplanes[hash] = check;
+
+    return check;
+}
+
+
+// killough -- hash function for visplanes
+// Empirically verified to be fairly uniform:
+
+#define visplane_hash(picnum,lightlevel,height) \
+  ((uint16_t)((picnum)*3+(lightlevel)+(height)*7) & (MAXVISPLANES-1))
+
+
+//
+// R_FindPlane
+//
+
+visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int16_t lightlevel)
+{
+    visplane_t __far* check;
+    uint16_t hash;
+
+    if (picnum == skyflatnum)
+        height = lightlevel = 0;         // killough 7/19/98: most skies map together
+
+    // New visplane algorithm uses hash table -- killough
+    hash = visplane_hash(picnum,lightlevel,height);
+
+    for (check=visplanes[hash]; check; check=check->next)  // killough
+        if (height == check->height &&
+                picnum == check->picnum &&
+                lightlevel == check->lightlevel)
+            return check;
+
+    check = new_visplane(hash);         // killough
+
+    check->height = height;
+    check->picnum = picnum;
+    check->lightlevel = lightlevel;
+    check->minx = VIEWWINDOWWIDTH;
+    check->maxx = -1;
+
+    _fmemset(check->top, -1, sizeof(check->top));
+
+    check->modified = false;
+
+    return check;
+}
+
+
+/*
+ * R_DupPlane
+ *
+ * create duplicate of existing visplane and set initial range
+ */
+visplane_t __far* R_DupPlane(const visplane_t __far* pl, int16_t start, int16_t stop)
+{
+    uint16_t hash = visplane_hash(pl->picnum, pl->lightlevel, pl->height);
+    visplane_t __far* new_pl = new_visplane(hash);
+
+    new_pl->height = pl->height;
+    new_pl->picnum = pl->picnum;
+    new_pl->lightlevel = pl->lightlevel;
+    new_pl->minx = start;
+    new_pl->maxx = stop;
+
+    _fmemset(new_pl->top, -1, sizeof(new_pl->top));
+
+    new_pl->modified = false;
+
+    return new_pl;
+}
+
+
+//
+// R_CheckPlane
+//
+visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop)
+{
+    int16_t intrl, intrh, unionl, unionh, x;
+
+    if (start < pl->minx)
+        intrl   = pl->minx, unionl = start;
+    else
+        unionl  = pl->minx,  intrl = start;
+
+    if (stop  > pl->maxx)
+        intrh   = pl->maxx, unionh = stop;
+    else
+        unionh  = pl->maxx, intrh  = stop;
+
+    for (x=intrl ; x <= intrh && pl->top[x] == 0xff; x++) // dropoff overflow
+        ;
+
+    if (x > intrh) { /* Can use existing plane; extend range */
+        pl->minx = unionl; pl->maxx = unionh;
+        return pl;
+    } else /* Cannot use existing plane; create a new one */
+        return R_DupPlane(pl,start,stop);
 }
 
 
