@@ -270,7 +270,7 @@ static void R_DoDrawPlane(visplane_t __far* pl)
 
             planeheight = D_abs(pl->height - viewz);
 
-            for (register int16_t x = pl->minx; x <= stop; x++)
+            for (int16_t x = pl->minx; x <= stop; x++)
             {
                 R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], &dsvars);
             }

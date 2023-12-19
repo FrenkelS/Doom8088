@@ -623,9 +623,9 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
         TOP     =8
     };
 
-    register int32_t outcode1 = 0;
-    register int32_t outcode2 = 0;
-    register int32_t outside;
+    int32_t outcode1 = 0;
+    int32_t outcode2 = 0;
+    int32_t outside;
 
     fpoint_t  tmp;
     int32_t   dx;

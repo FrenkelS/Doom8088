@@ -389,8 +389,8 @@ static void P_LoadSideDefs2(int16_t lump)
 
     for (int16_t i = 0; i < numsides; i++)
     {
-        register const mapsidedef_t __far* msd = (const mapsidedef_t __far*) data + i;
-        register side_t __far* sd = _g_sides + i;
+        const mapsidedef_t __far* msd = (const mapsidedef_t __far*) data + i;
+        side_t __far* sd = _g_sides + i;
 
         sd->textureoffset = msd->textureoffset;
         sd->rowoffset     = msd->rowoffset;
