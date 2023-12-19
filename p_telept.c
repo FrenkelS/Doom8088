@@ -50,10 +50,10 @@ static mobj_t __far* P_TeleportDestination(const line_t __far* line)
 {
   int16_t i;
   for (i = -1; (i = P_FindSectorFromLineTag(line, i)) >= 0;) {
-    register thinker_t __far* th = NULL;
+    thinker_t __far* th = NULL;
     while ((th = P_NextThinker(th)) != NULL)
       if (th->function == P_MobjThinker) {
-        register mobj_t __far* m = (mobj_t __far*)th;
+        mobj_t __far* m = (mobj_t __far*)th;
         if (m->type == MT_TELEPORTMAN  &&
             m->subsector->sector-_g_sectors == i)
             return m;

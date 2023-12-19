@@ -95,7 +95,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 static void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
     static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
-    static const int32_t   DXI = (((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH;
+    static const int16_t   DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH) >> 8;
     static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
     static const int16_t   DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
 
@@ -106,7 +106,7 @@ static void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
     const int16_t right  = ((x + patch->width)  * DX) >> FRACBITS;
     const int16_t bottom = ((y + patch->height) * DY) >> FRACBITS;
 
-    int32_t   col = 0;
+    uint16_t   col = 0;
 
     for (int16_t dc_x = left; dc_x < right; dc_x++, col += DXI)
     {
@@ -115,7 +115,7 @@ static void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
         else if (dc_x >= SCREENWIDTH)
             break;
 
-        const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> FRACBITS]);
+        const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> 8]);
 
         // step through the posts in a column
         while (column->topdelta != 0xff)

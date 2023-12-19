@@ -385,12 +385,12 @@ static void P_LoadSideDefs (int16_t lump)
 
 static void P_LoadSideDefs2(int16_t lump)
 {
-    const byte __far* data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
+    const mapsidedef_t __far* data = W_GetLumpByNumAutoFree(lump); // cph - const*, wad lump handling updated
 
     for (int16_t i = 0; i < numsides; i++)
     {
-        register const mapsidedef_t __far* msd = (const mapsidedef_t __far*) data + i;
-        register side_t __far* sd = _g_sides + i;
+        const mapsidedef_t __far* msd = data + i;
+        side_t __far* sd = _g_sides + i;
 
         sd->textureoffset = msd->textureoffset;
         sd->rowoffset     = msd->rowoffset;
@@ -408,9 +408,9 @@ static void P_LoadSideDefs2(int16_t lump)
         sd->toptexture    = msd->toptexture;
         sd->bottomtexture = msd->bottomtexture;
 
-        R_GetTexture(sd->midtexture);
-        R_GetTexture(sd->toptexture);
-        R_GetTexture(sd->bottomtexture);
+        P_LoadTexture(sd->midtexture);
+        P_LoadTexture(sd->toptexture);
+        P_LoadTexture(sd->bottomtexture);
     }
 }
 

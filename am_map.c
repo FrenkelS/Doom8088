@@ -73,8 +73,8 @@ static const uint8_t mapcolor_unsn = 104;    // computer map unseen line color
 static const uint8_t mapcolor_flat = 88;    // line with no floor/ceiling changes
 static const uint8_t mapcolor_sngl = 208;    // single player arrow color
 
-static const int32_t f_w = SCREENWIDTH;
-static const int32_t f_h = SCREENHEIGHT - ST_HEIGHT;// to allow runtime setting of width/height
+static const int16_t f_w = SCREENWIDTH;
+static const int16_t f_h = SCREENHEIGHT - ST_HEIGHT;// to allow runtime setting of width/height
 
 
 typedef struct
@@ -89,7 +89,7 @@ typedef struct
 
 typedef struct
 {
-  int32_t x, y;
+  int16_t x, y;
 } fpoint_t;
 
 typedef struct
@@ -243,11 +243,11 @@ static void AM_findMinMaxBoundaries(void)
     max_w = (max_x >>= FRACTOMAPBITS) - (min_x >>= FRACTOMAPBITS);//e6y
     max_h = (max_y >>= FRACTOMAPBITS) - (min_y >>= FRACTOMAPBITS);//e6y
 
-    a = FixedApproxDiv(f_w<<FRACBITS, max_w);
-    b = FixedApproxDiv(f_h<<FRACBITS, max_h);
+    a = FixedApproxDiv((int32_t)f_w<<FRACBITS, max_w);
+    b = FixedApproxDiv((int32_t)f_h<<FRACBITS, max_h);
 
     min_scale_mtof = a < b ? a : b;
-    max_scale_mtof = FixedApproxDiv(f_h<<FRACBITS, 2*PLAYERRADIUS);
+    max_scale_mtof = FixedApproxDiv((int32_t)f_h<<FRACBITS, 2*PLAYERRADIUS);
 }
 
 //
@@ -623,13 +623,13 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
         TOP     =8
     };
 
-    register int32_t outcode1 = 0;
-    register int32_t outcode2 = 0;
-    register int32_t outside;
+    int16_t outcode1 = 0;
+    int16_t outcode2 = 0;
+    int16_t outside;
 
     fpoint_t  tmp;
-    int32_t   dx;
-    int32_t   dy;
+    int16_t   dx;
+    int16_t   dy;
 
 
 #define DOOUTCODE(oc, mx, my) \
@@ -749,19 +749,19 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
 //
 static void V_DrawLine(fline_t* fl, uint8_t color)
 {
-    int32_t x0 = fl->a.x;
-    int32_t x1 = fl->b.x;
+    int16_t x0 = fl->a.x;
+    int16_t x1 = fl->b.x;
 
-    int32_t y0 = fl->a.y;
-    int32_t y1 = fl->b.y;
+    int16_t y0 = fl->a.y;
+    int16_t y1 = fl->b.y;
 
-    int32_t dx =  D_abs(x1-x0);
+    int16_t dx = abs(x1 - x0);
     int16_t sx = x0<x1 ? 1 : -1;
 
-    int32_t dy = -D_abs(y1-y0);
+    int16_t dy = -abs(y1 - y0);
     int16_t sy = y0<y1 ? 1 : -1;
 
-    int32_t err = dx + dy;
+    int16_t err = dx + dy;
 
     while(true)
     {
@@ -770,7 +770,7 @@ static void V_DrawLine(fline_t* fl, uint8_t color)
         if (x0==x1 && y0==y1)
             break;
 
-        int32_t e2 = 2*err;
+        int16_t e2 = 2 * err;
 
         if (e2 >= dy)
         {

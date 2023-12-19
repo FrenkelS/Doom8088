@@ -270,7 +270,7 @@ static void R_DoDrawPlane(visplane_t __far* pl)
 
             planeheight = D_abs(pl->height - viewz);
 
-            for (register int16_t x = pl->minx; x <= stop; x++)
+            for (int16_t x = pl->minx; x <= stop; x++)
             {
                 R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x], &dsvars);
             }
@@ -325,12 +325,9 @@ void R_ClearPlanes(void)
     for (int8_t i = 0; i < VIEWWINDOWWIDTH; i++)
         floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
 
-
     for (int8_t i = 0; i < MAXVISPLANES; i++)
         for (*freehead = visplanes[i], visplanes[i] = NULL; *freehead; )
             freehead = &(*freehead)->next;
-
-    R_ClearOpenings();
 
 #if !defined FLAT_SPAN
     static const fixed_t iprojection = (1L << FRACBITS) / (VIEWWINDOWWIDTH / 2);
