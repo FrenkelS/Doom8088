@@ -105,6 +105,23 @@ void P_InitSwitchList(void)
     numswitches = index/2;
     switchlist[index] = -1;
 }
+
+
+void P_LoadTexture(int16_t texture)
+{
+	R_GetTexture(texture);
+
+	for (int16_t i = 0; i < numswitches * 2; i++)
+	{
+		if (switchlist[i] == texture)
+		{
+			R_GetTexture(switchlist[i ^ 1]);
+			return;
+		}
+	}
+}
+
+
 //
 // P_StartButton()
 //
@@ -165,8 +182,6 @@ void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
     tmid = _g_sides[line->sidenum[0]].midtexture;
     tbot = _g_sides[line->sidenum[0]].bottomtexture;
 
-    sfxenum_t sound = sfx_swtchn;
-
     /* don't zero line->special until after exit switch test */
     if (!useAgain)
         LN_SPECIAL(line) = 0;
@@ -217,7 +232,7 @@ void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
             break;
     }
 
-    S_StartSound2(&LN_FRONTSECTOR(line)->soundorg, sound);
+    S_StartSound2(&LN_FRONTSECTOR(line)->soundorg, sfx_swtchn);
 
     if (useAgain)
         P_StartButton(line, position, switchlist[i], BUTTONTIME);
