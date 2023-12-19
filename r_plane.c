@@ -289,6 +289,13 @@ static void R_DoDrawPlane(visplane_t __far* pl)
 
 void R_DrawPlanes (void)
 {
+#if !defined FLAT_SPAN
+    static const fixed_t iprojection = (1L << FRACBITS) / (VIEWWINDOWWIDTH / 2);
+
+    basexscale = FixedMul(viewsin,iprojection);
+    baseyscale = FixedMul(viewcos,iprojection);
+#endif
+
     for (int8_t i = 0; i < MAXVISPLANES; i++)
     {
         visplane_t __far* pl = visplanes[i];
@@ -321,20 +328,9 @@ void R_ResetPlanes(void)
 
 void R_ClearPlanes(void)
 {
-    // opening / clipping determination
-    for (int8_t i = 0; i < VIEWWINDOWWIDTH; i++)
-        floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
-
     for (int8_t i = 0; i < MAXVISPLANES; i++)
         for (*freehead = visplanes[i], visplanes[i] = NULL; *freehead; )
             freehead = &(*freehead)->next;
-
-#if !defined FLAT_SPAN
-    static const fixed_t iprojection = (1L << FRACBITS) / (VIEWWINDOWWIDTH / 2);
-
-    basexscale = FixedMul(viewsin,iprojection);
-    baseyscale = FixedMul(viewcos,iprojection);
-#endif
 }
 
 

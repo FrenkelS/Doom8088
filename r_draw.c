@@ -123,8 +123,8 @@ static fixed_t finetangent(int16_t x)
 }
 
 
-int16_t floorclip[VIEWWINDOWWIDTH];
-int16_t ceilingclip[VIEWWINDOWWIDTH];
+static int16_t floorclip[VIEWWINDOWWIDTH];
+static int16_t ceilingclip[VIEWWINDOWWIDTH];
 
 
 static int16_t screenheightarray[VIEWWINDOWWIDTH] =
@@ -1886,6 +1886,14 @@ static boolean R_CheckOpenings(const int32_t start)
 }
 
 
+static void R_ClearOpeningClippingDetermination(void)
+{
+	// opening / clipping determination
+	for (int8_t i = 0; i < VIEWWINDOWWIDTH; i++)
+		floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
+}
+
+
 static void R_ClearOpenings(void)
 {
 	lastopening = openings;
@@ -2737,6 +2745,7 @@ void R_RenderPlayerView (player_t* player)
     // Clear buffers.
     R_ClearClipSegs ();
     R_ClearDrawSegs ();
+    R_ClearOpeningClippingDetermination ();
     R_ClearPlanes ();
     R_ClearOpenings ();
     R_ClearSprites ();
