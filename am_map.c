@@ -73,8 +73,8 @@ static const uint8_t mapcolor_unsn = 104;    // computer map unseen line color
 static const uint8_t mapcolor_flat = 88;    // line with no floor/ceiling changes
 static const uint8_t mapcolor_sngl = 208;    // single player arrow color
 
-static const int32_t f_w = SCREENWIDTH;
-static const int32_t f_h = SCREENHEIGHT - ST_HEIGHT;// to allow runtime setting of width/height
+static const int16_t f_w = SCREENWIDTH;
+static const int16_t f_h = SCREENHEIGHT - ST_HEIGHT;// to allow runtime setting of width/height
 
 
 typedef struct
@@ -243,11 +243,11 @@ static void AM_findMinMaxBoundaries(void)
     max_w = (max_x >>= FRACTOMAPBITS) - (min_x >>= FRACTOMAPBITS);//e6y
     max_h = (max_y >>= FRACTOMAPBITS) - (min_y >>= FRACTOMAPBITS);//e6y
 
-    a = FixedApproxDiv(f_w<<FRACBITS, max_w);
-    b = FixedApproxDiv(f_h<<FRACBITS, max_h);
+    a = FixedApproxDiv((int32_t)f_w<<FRACBITS, max_w);
+    b = FixedApproxDiv((int32_t)f_h<<FRACBITS, max_h);
 
     min_scale_mtof = a < b ? a : b;
-    max_scale_mtof = FixedApproxDiv(f_h<<FRACBITS, 2*PLAYERRADIUS);
+    max_scale_mtof = FixedApproxDiv((int32_t)f_h<<FRACBITS, 2*PLAYERRADIUS);
 }
 
 //
