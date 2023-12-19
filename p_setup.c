@@ -556,16 +556,6 @@ static void P_GroupLines (void)
 }
 
 
-//Planes are alloc'd with PU_LEVEL tag so are dumped at level
-//end. This function resets the visplane arrays.
-static void R_ResetPlanes()
-{
-    memset(_g_visplanes, 0, sizeof(_g_visplanes));
-    _g_freetail = NULL;
-    _g_freehead = &_g_freetail;
-}
-
-
 static void P_FreeLevelData()
 {
     R_ResetPlanes();

@@ -55,11 +55,6 @@
 #include "globdata.h"
 
 
-visplane_t __far* _g_visplanes[MAXVISPLANES];
-visplane_t __far* _g_freetail;
-visplane_t __far*__far* _g_freehead;
-
-
 // Silhouette, needed for clipping Segs (mainly)
 // and sprites representing things.
 #define SIL_NONE    0
@@ -1448,123 +1443,6 @@ static void R_AddSprites(subsector_t __far* subsec, int16_t lightlevel)
 
   for (thing = sec->thinglist; thing; thing = thing->snext)
     R_ProjectSprite(thing, lightlevel);
-}
-
-//
-// R_FindPlane
-//
-// killough 2/28/98: Add offsets
-
-
-// New function, by Lee Killough
-
-static visplane_t __far* new_visplane(uint16_t hash)
-{
-    visplane_t __far* check = _g_freetail;
-
-    if (!check)
-        check = Z_CallocLevel(sizeof(visplane_t));
-    else
-    {
-        if (!(_g_freetail = _g_freetail->next))
-            _g_freehead = &_g_freetail;
-    }
-
-    check->next = _g_visplanes[hash];
-    _g_visplanes[hash] = check;
-
-    return check;
-}
-
-
-// killough -- hash function for visplanes
-// Empirically verified to be fairly uniform:
-
-#define visplane_hash(picnum,lightlevel,height) \
-  ((uint16_t)((picnum)*3+(lightlevel)+(height)*7) & (MAXVISPLANES-1))
-
-
-static visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int16_t lightlevel)
-{
-    visplane_t __far* check;
-    uint16_t hash;
-
-    if (picnum == skyflatnum)
-        height = lightlevel = 0;         // killough 7/19/98: most skies map together
-
-    // New visplane algorithm uses hash table -- killough
-    hash = visplane_hash(picnum,lightlevel,height);
-
-    for (check=_g_visplanes[hash]; check; check=check->next)  // killough
-        if (height == check->height &&
-                picnum == check->picnum &&
-                lightlevel == check->lightlevel)
-            return check;
-
-    check = new_visplane(hash);         // killough
-
-    check->height = height;
-    check->picnum = picnum;
-    check->lightlevel = lightlevel;
-    check->minx = VIEWWINDOWWIDTH;
-    check->maxx = -1;
-
-    _fmemset(check->top, -1, sizeof(check->top));
-
-    check->modified = false;
-
-    return check;
-}
-
-/*
- * R_DupPlane
- *
- * cph 2003/04/18 - create duplicate of existing visplane and set initial range
- */
-static visplane_t __far* R_DupPlane(const visplane_t __far* pl, int16_t start, int16_t stop)
-{
-    uint16_t hash = visplane_hash(pl->picnum, pl->lightlevel, pl->height);
-    visplane_t __far* new_pl = new_visplane(hash);
-
-    new_pl->height = pl->height;
-    new_pl->picnum = pl->picnum;
-    new_pl->lightlevel = pl->lightlevel;
-    new_pl->minx = start;
-    new_pl->maxx = stop;
-
-    _fmemset(new_pl->top, -1, sizeof(new_pl->top));
-
-    new_pl->modified = false;
-
-    return new_pl;
-}
-
-
-//
-// R_CheckPlane
-//
-static visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop)
-{
-    int16_t intrl, intrh, unionl, unionh, x;
-
-    if (start < pl->minx)
-        intrl   = pl->minx, unionl = start;
-    else
-        unionl  = pl->minx,  intrl = start;
-
-    if (stop  > pl->maxx)
-        intrh   = pl->maxx, unionh = stop;
-    else
-        unionh  = pl->maxx, intrh  = stop;
-
-    for (x=intrl ; x <= intrh && pl->top[x] == 0xff; x++) // dropoff overflow
-        ;
-
-    if (x > intrh) { /* Can use existing plane; extend range */
-        pl->minx = unionl; pl->maxx = unionh;
-        return pl;
-    } else /* Cannot use existing plane; create a new one */
-        return R_DupPlane(pl,start,stop);
 }
 
 
