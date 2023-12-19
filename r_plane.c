@@ -32,27 +32,21 @@
 #include "globdata.h"
 
 
-#if defined FLAT_SPAN
-#define MAXVISPLANES  4    /* must be a power of 2 */
-#else
-#define MAXVISPLANES 32    /* must be a power of 2 */
-#endif
-
-static visplane_t __far* visplanes[MAXVISPLANES];
-static visplane_t __far* freetail;
-static visplane_t __far*__far* freehead;
-
-
 static int16_t firstflat;
 static int16_t  animated_flat_basepic;
 static int16_t __far* flattranslation;             // for global animation
-
 
 #if defined FLAT_SPAN
 static int16_t animated_flat_basepic_color[3];
 #else
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
+
+#define MAXVISPLANES 32    /* must be a power of 2 */
+
+static visplane_t __far* visplanes[MAXVISPLANES];
+static visplane_t __far* freetail;
+static visplane_t __far*__far* freehead;
 #endif
 
 
@@ -69,7 +63,15 @@ static fixed_t basexscale, baseyscale;
 //  and the inner loop has to step in texture space u and v.
 //
 
-#if !defined FLAT_SPAN
+#if defined FLAT_SPAN
+byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
+{
+	const lighttable_t __far* colormap = R_LoadColorMap(lightlevel);
+	return colormap[flattranslation[picnum]];
+}
+
+#else
+
 inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t position)
 {
     uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
@@ -220,15 +222,6 @@ static void R_MakeSpans(int16_t x, uint16_t t1, uint16_t b1, uint16_t t2, uint16
     while (b2 > b1 && b2 >= t2)
         spanstart[b2--] = x;
 }
-#else
-
-byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
-{
-	const lighttable_t __far* colormap = R_LoadColorMap(lightlevel);
-	return colormap[flattranslation[picnum]];
-}
-
-#endif
 
 
 static void R_DoDrawPlane(visplane_t __far* pl)
@@ -243,22 +236,6 @@ static void R_DoDrawPlane(visplane_t __far* pl)
         else
         {
             // regular flat
-#if defined FLAT_SPAN
-            draw_column_vars_t dcvars;
-
-            byte color = R_GetPlaneColor(pl->picnum, pl->lightlevel);
-
-            for (int16_t x = pl->minx; x <= pl->maxx; x++)
-            {
-                if (pl->top[x] <= pl->bottom[x])
-                {
-                    dcvars.x = x;
-                    dcvars.yl = pl->top[x];
-                    dcvars.yh = pl->bottom[x];
-                    R_DrawColumnFlat(color, &dcvars);
-                }
-            }
-#else
             const int16_t stop = pl->maxx + 1;
 
             pl->top[pl->minx - 1] = pl->top[stop] = 0xff; // dropoff overflow
@@ -276,7 +253,6 @@ static void R_DoDrawPlane(visplane_t __far* pl)
             }
 
             Z_ChangeTagToCache(dsvars.source);
-#endif
         }
     }
 }
@@ -289,6 +265,11 @@ static void R_DoDrawPlane(visplane_t __far* pl)
 
 void R_DrawPlanes (void)
 {
+    static const fixed_t iprojection = (1L << FRACBITS) / (VIEWWINDOWWIDTH / 2);
+
+    basexscale = FixedMul(viewsin,iprojection);
+    baseyscale = FixedMul(viewcos,iprojection);
+
     for (int8_t i = 0; i < MAXVISPLANES; i++)
     {
         visplane_t __far* pl = visplanes[i];
@@ -321,20 +302,9 @@ void R_ResetPlanes(void)
 
 void R_ClearPlanes(void)
 {
-    // opening / clipping determination
-    for (int8_t i = 0; i < VIEWWINDOWWIDTH; i++)
-        floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
-
     for (int8_t i = 0; i < MAXVISPLANES; i++)
         for (*freehead = visplanes[i], visplanes[i] = NULL; *freehead; )
             freehead = &(*freehead)->next;
-
-#if !defined FLAT_SPAN
-    static const fixed_t iprojection = (1L << FRACBITS) / (VIEWWINDOWWIDTH / 2);
-
-    basexscale = FixedMul(viewsin,iprojection);
-    baseyscale = FixedMul(viewcos,iprojection);
-#endif
 }
 
 
@@ -451,6 +421,7 @@ visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop
     } else /* Cannot use existing plane; create a new one */
         return R_DupPlane(pl,start,stop);
 }
+#endif
 
 
 //
