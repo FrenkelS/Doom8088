@@ -325,12 +325,9 @@ void R_ClearPlanes(void)
     for (int8_t i = 0; i < VIEWWINDOWWIDTH; i++)
         floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
 
-
     for (int8_t i = 0; i < MAXVISPLANES; i++)
         for (*freehead = visplanes[i], visplanes[i] = NULL; *freehead; )
             freehead = &(*freehead)->next;
-
-    R_ClearOpenings();
 
 #if !defined FLAT_SPAN
     static const fixed_t iprojection = (1L << FRACBITS) / (VIEWWINDOWWIDTH / 2);

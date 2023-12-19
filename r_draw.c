@@ -1886,7 +1886,7 @@ static boolean R_CheckOpenings(const int32_t start)
 }
 
 
-void R_ClearOpenings(void)
+static void R_ClearOpenings(void)
 {
 	lastopening = openings;
 }
@@ -2738,6 +2738,7 @@ void R_RenderPlayerView (player_t* player)
     R_ClearClipSegs ();
     R_ClearDrawSegs ();
     R_ClearPlanes ();
+    R_ClearOpenings ();
     R_ClearSprites ();
 
     // The head node is the last node output.
