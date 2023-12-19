@@ -123,8 +123,8 @@ static fixed_t finetangent(int16_t x)
 }
 
 
-int16_t floorclip[VIEWWINDOWWIDTH];
-int16_t ceilingclip[VIEWWINDOWWIDTH];
+static int16_t floorclip[VIEWWINDOWWIDTH];
+static int16_t ceilingclip[VIEWWINDOWWIDTH];
 
 
 static int16_t screenheightarray[VIEWWINDOWWIDTH] =
@@ -183,9 +183,9 @@ static int16_t floorplane_color;
 static int16_t ceilingplane_color;
 #else
 static visplane_t __far* floorplane;
+static visplane_t __far* ceilingplane;
 #endif
 
-static visplane_t __far* ceilingplane;
 static int32_t             rw_angle1;
 
 static angle_t         rw_normalangle; // angle to line origin
@@ -1674,18 +1674,12 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
             if (top <= bottom)
             {
 #if defined FLAT_SPAN
-                if (!ceilingplane)
-                {
-                    dcvars.yl = top;
-                    dcvars.yh = bottom;
-                    R_DrawColumnFlat(ceilingplane_color, &dcvars);
-                }
+                dcvars.yl = top;
+                dcvars.yh = bottom;
+                if (ceilingplane_color == -2)
+                    R_DrawSky(&dcvars);
                 else
-                {
-                    ceilingplane->top[rw_x] = top;
-                    ceilingplane->bottom[rw_x] = bottom;
-                    ceilingplane->modified = true;
-                }
+                    R_DrawColumnFlat(ceilingplane_color, &dcvars);
 #else
                 ceilingplane->top[rw_x] = top;
                 ceilingplane->bottom[rw_x] = bottom;
@@ -1840,6 +1834,14 @@ static boolean R_CheckOpenings(const int32_t start)
 #endif
 
     return need <= MAXOPENINGS;
+}
+
+
+static void R_ClearOpeningClippingDetermination(void)
+{
+	// opening / clipping determination
+	for (int8_t i = 0; i < VIEWWINDOWWIDTH; i++)
+		floorclip[i] = VIEWWINDOWHEIGHT, ceilingclip[i] = -1;
 }
 
 
@@ -2113,9 +2115,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     if (markceiling)
     {
 #if defined FLAT_SPAN
-        if (ceilingplane)
-            ceilingplane = R_CheckPlane(ceilingplane, rw_x, rw_stopx - 1);
-        else if (ceilingplane_color == -1)
+        if (ceilingplane_color == -1)
             markceiling = false;
 #else
         if (ceilingplane)   // killough 4/11/98: add NULL ptr checks
@@ -2418,15 +2418,12 @@ static void R_Subsector(int16_t num)
 
 #if defined FLAT_SPAN
     if (frontsector->ceilingpic == skyflatnum) {
-        ceilingplane_color = -1;
-        ceilingplane       = R_FindPlane(0, skyflatnum, 0);
-    } else if (frontsector->ceilingheight > viewz) {
+        ceilingplane_color = -2;
+        R_LoadSkyPatch();
+    } else if (frontsector->ceilingheight > viewz)
         ceilingplane_color = R_GetPlaneColor(frontsector->ceilingpic, frontsector->lightlevel);
-        ceilingplane       = NULL;
-    } else {
+    else
         ceilingplane_color = -1;
-        ceilingplane       = NULL;
-    }
 #else
     if(frontsector->ceilingheight > viewz || (frontsector->ceilingpic == skyflatnum))
     {
@@ -2694,14 +2691,23 @@ void R_RenderPlayerView (player_t* player)
     // Clear buffers.
     R_ClearClipSegs ();
     R_ClearDrawSegs ();
+    R_ClearOpeningClippingDetermination ();
+
+#if !defined FLAT_SPAN
     R_ClearPlanes ();
+#endif
+
     R_ClearOpenings ();
     R_ClearSprites ();
 
     // The head node is the last node output.
     R_RenderBSPNode (numnodes-1);
 
+#if defined FLAT_SPAN
+    R_FreeSkyPatch ();
+#else
     R_DrawPlanes ();
+#endif
 
     R_DrawMasked ();
 }

@@ -7,7 +7,6 @@ export RENDER_OPTIONS="-DFLAT_SPAN -DDISABLE_STATUS_BAR"
 
 ia16-elf-gcc -c i_system.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c r_plane.c  $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 
 export CFLAGS="-march=i286 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops"
@@ -53,8 +52,7 @@ export GLOBOBJS+=" p_user.c"
 export GLOBOBJS+=" r_data.c"
 #export GLOBOBJS+=" r_draw.c"
 export GLOBOBJS+=" r_draw.o"
-#export GLOBOBJS+=" r_plane.c"
-export GLOBOBJS+=" r_plane.o"
+export GLOBOBJS+=" r_plane.c"
 export GLOBOBJS+=" r_sky.c"
 export GLOBOBJS+=" r_things.c"
 export GLOBOBJS+=" s_sound.c"
@@ -72,5 +70,4 @@ ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
 rm i_system.o
 rm r_draw.o
-rm r_plane.o
 rm tables.o

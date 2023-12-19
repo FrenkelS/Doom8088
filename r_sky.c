@@ -30,10 +30,58 @@
 
 #define FLAT_SKY_COLOR 100
 
+#define ANGLETOSKYSHIFT         22
+
+
 int16_t skyflatnum;
 static int16_t skypatchnum;
 static uint16_t skywidthmask;
 
+
+#if defined FLAT_SPAN
+static const patch_t __far* skypatch;
+
+
+void R_LoadSkyPatch(void)
+{
+	skypatch = W_TryGetLumpByNum(skypatchnum);
+}
+
+
+void R_FreeSkyPatch(void)
+{
+	if (skypatch)
+	{
+		Z_ChangeTagToCache(skypatch);
+		skypatch = NULL;
+	}
+}
+
+
+void R_DrawSky(draw_column_vars_t *dcvars)
+{
+	if (skypatch == NULL)
+		R_DrawColumnFlat(FLAT_SKY_COLOR, dcvars);
+	else
+	{
+		dcvars->texturemid = 100 * FRACUNIT;
+
+		if (!(dcvars->colormap = fixedcolormap))
+			dcvars->colormap = fullcolormap;
+
+		dcvars->iscale = (FRACUNIT * 200) / (VIEWWINDOWHEIGHT + 16);
+
+		int16_t xc = (viewangle + xtoviewangle(dcvars->x)) >> ANGLETOSKYSHIFT;
+		int16_t x_c = xc & skywidthmask;
+
+		const column_t __far* column = (const column_t __far*) ((const byte __far*)skypatch + skypatch->columnofs[x_c]);
+
+		dcvars->source = (const byte __far*)column + 3;
+		R_DrawColumn(dcvars);
+	}
+}
+
+#else
 
 static void R_DrawSkyFlat(visplane_t __far* pl)
 {
@@ -52,14 +100,8 @@ static void R_DrawSkyFlat(visplane_t __far* pl)
 }
 
 
-#define ANGLETOSKYSHIFT         22
-
 void R_DrawSky(visplane_t __far* pl)
 {
-#if defined FLAT_SKY
-	R_DrawSkyFlat(pl);
-#else
-
 	const patch_t __far* patch = W_TryGetLumpByNum(skypatchnum);
 	if (patch == NULL)
 	{
@@ -95,8 +137,8 @@ void R_DrawSky(visplane_t __far* pl)
 	}
 
 	Z_ChangeTagToCache(patch);
-#endif
 }
+#endif
 
 
 // Set the sky map.
