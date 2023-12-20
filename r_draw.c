@@ -256,7 +256,7 @@ uint16_t validcount = 1;         // increment every time a check is made
 //*****************************************
 
 static const int16_t CENTERX = VIEWWINDOWWIDTH  / 2;
-static const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
+       const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
 
 static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 
@@ -528,213 +528,6 @@ const lighttable_t __far* R_LoadColorMap(int16_t lightlevel)
 
 
 //
-// A column is a vertical slice/span from a wall texture that,
-//  given the DOOM style restrictions on the view orientation,
-//  will always have constant z depth.
-// Thus a special case loop for very fast rendering can
-//  be used. It has also been used with Wolfenstein 3D.
-//
-
-#define COLEXTRABITS 9
-#define COLBITS (FRACBITS + COLEXTRABITS)
-
-inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t frac)
-{
-	uint16_t color = colormap[source[frac>>COLBITS]];
-	color = (color | (color << 8));
-
-	uint16_t __far* d = (uint16_t __far*) dest;
-	*d++ = color;
-	*d   = color;
-}
-
-
-void R_DrawColumn (const draw_column_vars_t *dcvars)
-{
-    int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
-
-    const byte __far* source   = dcvars->source;
-    const byte __far* colormap = dcvars->colormap;
-
-    uint8_t __far* dest = _g_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
-
-    const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
-    uint32_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) << COLEXTRABITS;
-
-    // Inner loop that does the actual texture mapping,
-    //  e.g. a DDA-lile scaling.
-    // This is as fast as it gets.
-
-    uint16_t l = count >> 4;
-
-    while (l--)
-    {
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-    }
-
-    switch (count & 15)
-    {
-        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
-    }
-}
-
-
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
-{
-	int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-	// Zero length, column does not exceed a pixel.
-	if (count <= 0)
-		return;
-
-	const uint16_t color = (texture << 8) | texture;
-
-	uint8_t __far* dest = _g_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
-	uint16_t __far* d = (uint16_t __far*) dest;
-
-	uint16_t l = count >> 4;
-
-	while (l--)
-	{
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-	}
-
-	switch (count & 15)
-	{
-		case 15: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 14: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 13: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 12: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 11: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 10: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  9: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  8: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  7: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  6: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  5: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  4: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  3: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  2: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  1: *d++ = color; *d = color;
-	}
-}
-
-
-#define FUZZOFF (VIEWWINDOWWIDTH)
-#define FUZZTABLE 50
-
-static const int8_t fuzzoffset[FUZZTABLE] =
-{
-    FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
-    FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
-    FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
-    FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
-};
-
-//
-// Framebuffer postprocessing.
-// Creates a fuzzy image by copying pixels
-//  from adjacent ones to left and right.
-// Used with an all black colormap, this
-//  could create the SHADOW effect,
-//  i.e. spectres and invisible players.
-//
-static void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
-{
-    int16_t dc_yl = dcvars->yl;
-    int16_t dc_yh = dcvars->yh;
-
-    // Adjust borders. Low...
-    if (dc_yl <= 0)
-        dc_yl = 1;
-
-    // .. and high.
-    if (dc_yh >= VIEWWINDOWHEIGHT - 1)
-        dc_yh = VIEWWINDOWHEIGHT - 2;
-
-    int16_t count = (dc_yh - dc_yl) + 1;
-
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
-
-    const byte __far* colormap = &fullcolormap[6 * 256];
-
-    uint8_t __far* dest = _g_screen + (dc_yl * SCREENWIDTH) + (dcvars->x << 2);
-
-    static int16_t fuzzpos = 0;
-
-    do
-    {        
-        R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], colormap, 0);
-        dest += SCREENWIDTH;
-
-        fuzzpos++;
-        if (fuzzpos >= FUZZTABLE)
-            fuzzpos = 0;
-
-    } while(--count);
-}
-
-
-//
 // R_DrawMaskedColumn
 // Used for sprites and masked mid textures.
 // Masked means: partly transparent, i.e. stored
@@ -818,6 +611,9 @@ typedef struct vissprite_s
   const lighttable_t __far* colormap;
 
 } vissprite_t;
+
+
+void R_DrawFuzzColumn (const draw_column_vars_t *dcvars);
 
 
 //
