@@ -133,7 +133,45 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
-	//TODO implement me
+	y -= patch->topoffset;
+	x -= patch->leftoffset;
+
+	int16_t plane = x & 3;
+	outp(SC_INDEX + 1, 1 << plane);
+	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + x / 4;
+
+	int16_t width = patch->width;
+
+	for (int16_t col = 0; col < width; col++)
+	{
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			const byte __far* source = (const byte __far*)column + 3;
+			byte __far* dest = desttop + (column->topdelta * PLANEWIDTH);
+
+			uint16_t count = column->length;
+
+			while (count--)
+			{
+				*dest = *source++;
+				dest += PLANEWIDTH;
+			}
+
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+
+		if (++plane == 4)
+		{
+			plane = 0;
+			desttop++;
+		}
+		outp(SC_INDEX + 1, 1 << plane);
+	}
+
+	outp(SC_INDEX + 1, 15);
 }
 
 
@@ -359,59 +397,52 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 static const int8_t fuzzoffset[FUZZTABLE] =
 {
-    FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
-    FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
-    FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
-    FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
+	FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
+	FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
+	FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
+	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
 };
 
-//
-// Framebuffer postprocessing.
-// Creates a fuzzy image by copying pixels
-//  from adjacent ones to left and right.
-// Used with an all black colormap, this
-//  could create the SHADOW effect,
-//  i.e. spectres and invisible players.
-//
+
 void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 {
-    int16_t dc_yl = dcvars->yl;
-    int16_t dc_yh = dcvars->yh;
+	int16_t dc_yl = dcvars->yl;
+	int16_t dc_yh = dcvars->yh;
 
-    // Adjust borders. Low...
-    if (dc_yl <= 0)
-        dc_yl = 1;
+	// Adjust borders. Low...
+	if (dc_yl <= 0)
+		dc_yl = 1;
 
-    // .. and high.
-    if (dc_yh >= VIEWWINDOWHEIGHT - 1)
-        dc_yh = VIEWWINDOWHEIGHT - 2;
+	// .. and high.
+	if (dc_yh >= VIEWWINDOWHEIGHT - 1)
+		dc_yh = VIEWWINDOWHEIGHT - 2;
 
-    int16_t count = (dc_yh - dc_yl) + 1;
+	int16_t count = (dc_yh - dc_yl) + 1;
 
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
 
-    const byte __far* colormap = &fullcolormap[6 * 256];
+	const byte __far* colormap = &fullcolormap[6 * 256];
 
-    uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
+	uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
 
-    static int16_t fuzzpos = 0;
+	static int16_t fuzzpos = 0;
 
-    do
-    {        
+	do
+	{        
 		//TODO implement me
-        *dest = 0;
-        dest += PLANEWIDTH;
+		*dest = 0;
+		dest += PLANEWIDTH;
 
-        fuzzpos++;
-        if (fuzzpos >= FUZZTABLE)
-            fuzzpos = 0;
+		fuzzpos++;
+		if (fuzzpos >= FUZZTABLE)
+			fuzzpos = 0;
 
-    } while(--count);
+	} while(--count);
 }
 
 
