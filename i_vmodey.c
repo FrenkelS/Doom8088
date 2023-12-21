@@ -69,9 +69,59 @@ void V_DrawBackground(void)
 }
 
 
+static int16_t cachedLumpNum;
+static int16_t cachedLumpHeight;
+
 void V_DrawRaw(int16_t num, uint16_t offset)
 {
-	//TODO implement me
+	if (cachedLumpNum != num)
+	{
+		const uint8_t __far* lump = W_TryGetLumpByNum(num);
+
+		if (lump != NULL)
+		{
+			uint16_t lumpLength = W_LumpLength(num);
+			cachedLumpHeight = lumpLength / SCREENWIDTH;
+			for (int16_t plane = 0; plane < 4; plane++)
+			{
+				outp(SC_INDEX + 1, 1 << plane);
+				for (int16_t y = 0; y < cachedLumpHeight; y++)
+				{
+					uint8_t __far* dest = D_MK_FP(0xa800, y * PLANEWIDTH + __djgpp_conventional_base);
+					for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+					{
+						*dest++ = lump[y * SCREENWIDTH + (x * 4) + plane];
+					}
+				}
+			}
+			outp(SC_INDEX + 1, 15);
+			Z_ChangeTagToCache(lump);
+
+			cachedLumpNum = num;
+		}
+	}
+
+	if (cachedLumpNum == num)
+	{
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+		uint8_t __far *src  = D_MK_FP(0xa800, 0 + __djgpp_conventional_base);
+		uint8_t __far *dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
+		for (int16_t y = 0; y < cachedLumpHeight; y++)
+		{
+			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+			{
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
+			}
+		}
+
+		// set write mode 0
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+	}
 }
 
 
@@ -200,8 +250,6 @@ void I_InitGraphics(void)
 
 	outp(CRTC_INDEX, CRTC_MODE);
 	outp(CRTC_INDEX + 1, inp(CRTC_INDEX + 1) | 0x40);
-
-	outp(GC_INDEX, GC_READMAP);
 }
 
 
