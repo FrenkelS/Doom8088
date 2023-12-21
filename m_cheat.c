@@ -23,23 +23,31 @@ static void cheat_fps(void);
 
 typedef struct
 {
+	void (*cheat_function)(void);
 	char *sequence;
 	char *p;
 } cheatseq_t;
 
-static cheatseq_t cheatseq_choppers      = {"idchoppers", NULL};
-static cheatseq_t cheatseq_god           = {"iddqd",      NULL};
-static cheatseq_t cheatseq_kfa           = {"idkfa",      NULL};
-static cheatseq_t cheatseq_ammo          = {"idfa",       NULL};
-static cheatseq_t cheatseq_noclip        = {"idspispopd", NULL};
-static cheatseq_t cheatseq_invincibility = {"idbeholdv",  NULL};
-static cheatseq_t cheatseq_berserk       = {"idbeholds",  NULL};
-static cheatseq_t cheatseq_invisibility  = {"idbeholdi",  NULL};
-static cheatseq_t cheatseq_map           = {"idbeholda",  NULL};
-static cheatseq_t cheatseq_goggles       = {"idbeholdl",  NULL};
-static cheatseq_t cheatseq_exit          = {"idclev",     NULL};
-static cheatseq_t cheatseq_rockets       = {"idrocket",   NULL}; //Because Goldeneye!
-static cheatseq_t cheatseq_fps           = {"idrate",     NULL};
+
+static cheatseq_t cheat_def[] =
+{
+	{cheat_choppers,      "idchoppers", NULL},
+	{cheat_god,           "iddqd",      NULL},
+	{cheat_idkfa,         "idkfa",      NULL},
+	{cheat_ammo,          "idfa",       NULL},
+	{cheat_noclip,        "idspispopd", NULL},
+	{cheat_invincibility, "idbeholdv",  NULL},
+	{cheat_berserk,       "idbeholds",  NULL},
+	{cheat_invisibility,  "idbeholdi",  NULL},
+	{cheat_map,           "idbeholda",  NULL},
+	{cheat_goggles,       "idbeholdl",  NULL},
+	{cheat_exit,          "idclev",     NULL},
+	{cheat_rockets,       "idrocket",   NULL}, // Because Goldeneye!
+	{cheat_fps,           "idrate",     NULL}
+};
+
+
+static const int16_t num_cheats = sizeof(cheat_def) / sizeof (cheatseq_t);
 
 
 static boolean cht_CheckCheat(cheatseq_t *cht, char data1)
@@ -66,20 +74,14 @@ boolean C_Responder (event_t *ev)
 {
 	if (ev->type == ev_keydown)
 	{
-		char data1 = ev->data1;
-		if (cht_CheckCheat(&cheatseq_choppers,      data1)) { cheat_choppers();      return true; }
-		if (cht_CheckCheat(&cheatseq_god,           data1)) { cheat_god();           return true; }
-		if (cht_CheckCheat(&cheatseq_kfa,           data1)) { cheat_idkfa();         return true; }
-		if (cht_CheckCheat(&cheatseq_ammo,          data1)) { cheat_ammo();          return true; }
-		if (cht_CheckCheat(&cheatseq_noclip,        data1)) { cheat_noclip();        return true; }
-		if (cht_CheckCheat(&cheatseq_invincibility, data1)) { cheat_invincibility(); return true; }
-		if (cht_CheckCheat(&cheatseq_berserk,       data1)) { cheat_berserk();       return true; }
-		if (cht_CheckCheat(&cheatseq_invisibility,  data1)) { cheat_invisibility();  return true; }
-		if (cht_CheckCheat(&cheatseq_map,           data1)) { cheat_map();           return true; }
-		if (cht_CheckCheat(&cheatseq_goggles,       data1)) { cheat_goggles();       return true; }
-		if (cht_CheckCheat(&cheatseq_exit,          data1)) { cheat_exit();          return true; }
-		if (cht_CheckCheat(&cheatseq_rockets,       data1)) { cheat_rockets();       return true; }
-		if (cht_CheckCheat(&cheatseq_fps,           data1)) { cheat_fps();           return true; }
+		for (int16_t i = 0; i < num_cheats; i++)
+		{
+			if (cht_CheckCheat(&cheat_def[i], ev->data1))
+			{
+				cheat_def[i].cheat_function();
+				return true;
+			}
+		}
 	}
 
 	return false;

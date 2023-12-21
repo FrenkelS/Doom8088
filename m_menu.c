@@ -118,7 +118,7 @@ char _g_savegamestrings[8][8];
 int16_t showMessages;
 
 
-static void (*messageRoutine)(int16_t response);
+static void (*messageRoutine)(boolean affirmative);
 
 // we are going to be entering a savegame string
 
@@ -168,7 +168,7 @@ static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t therm
 static void M_WriteText(int16_t x, int16_t y, const char __far* string);
 static int16_t M_StringWidth(const char __far* string);
 static int16_t M_StringHeight(const char *string);
-static void M_StartMessage(const char *string,void (*routine)(int16_t),boolean input);
+static void M_StartMessage(const char *string,void (*routine)(boolean));
 static void M_ClearMenus (void);
 
 
@@ -284,19 +284,17 @@ static void M_NewGame(int16_t choice)
 }
 
 
-static void M_VerifyNightmare(int16_t ch)
+static void M_VerifyNightmare(boolean affirmative)
 {
-    if (ch != key_enter)
-        return;
-
-    G_DeferedInitNew(nightmare);
+    if (affirmative)
+        G_DeferedInitNew(nightmare);
 }
 
 static void M_ChooseSkill(int16_t choice)
 {
     if (choice == nightmare)
-    {   // Ty 03/27/98 - externalized
-        M_StartMessage(NIGHTMARE,M_VerifyNightmare,true);
+    {
+        M_StartMessage(NIGHTMARE, M_VerifyNightmare);
 		itemOn = 0;
     }
     else
@@ -495,7 +493,7 @@ static void M_SaveGame (int16_t choice)
 	// killough 10/6/98: allow savegames during single-player demo playback
 	if (!_g_usergame && (!_g_demoplayback))
 	{
-		M_StartMessage(SAVEDEAD,NULL,false); // Ty 03/27/98 - externalized
+		M_StartMessage(SAVEDEAD, NULL);
 		return;
 	}
 
@@ -670,9 +668,9 @@ static void M_MusicVol(int16_t choice)
 // M_EndGame
 //
 
-static void M_EndGameResponse(int16_t ch)
+static void M_EndGameResponse(boolean affirmative)
 {
-  if (ch != key_enter)
+  if (!affirmative)
     return;
 
   // killough 5/26/98: make endgame quit if recording or playing back demo
@@ -687,7 +685,7 @@ static void M_EndGame(int16_t choice)
 {
 	UNUSED(choice);
 
-	M_StartMessage(ENDGAME,M_EndGameResponse,true); // Ty 03/27/98 - externalized
+	M_StartMessage(ENDGAME, M_EndGameResponse);
 }
 
 /////////////////////////////
@@ -798,13 +796,13 @@ boolean M_Responder (event_t* ev)
     if (messageToPrint)
     {
         if (messageNeedsInput == true &&
-                !(ch == ' ' || ch == 'n' || ch == 'y' || ch == key_escape || ch == key_fire || ch == key_enter))
+                !(ch == 'n' || ch == 'y' || ch == key_escape || ch == key_fire || ch == key_enter))
             return false;
 
         _g_menuactive  = messageLastMenuActive;
         messageToPrint = false;
         if (messageRoutine)
-            messageRoutine(ch);
+            messageRoutine(ch == 'y' || ch == key_fire || ch == key_enter);
 
         _g_menuactive = false;
         S_StartSound(NULL,sfx_swtchx);
@@ -1071,13 +1069,13 @@ void M_Ticker (void)
 // Message Routines
 //
 
-static void M_StartMessage (const char* string, void (*routine)(int16_t), boolean input)
+static void M_StartMessage (const char* string, void (*routine)(boolean))
 {
 	messageLastMenuActive = _g_menuactive;
 	messageToPrint        = true;
 	messageString         = string;
 	messageRoutine        = routine;
-	messageNeedsInput     = input;
+	messageNeedsInput     = routine != NULL;
 	_g_menuactive         = true;
 }
 

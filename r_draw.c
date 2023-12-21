@@ -535,10 +535,10 @@ const lighttable_t __far* R_LoadColorMap(int16_t lightlevel)
 //  be used. It has also been used with Wolfenstein 3D.
 //
 
-#define COLEXTRABITS 9
-#define COLBITS (FRACBITS + COLEXTRABITS)
+#define COLEXTRABITS (8 - 1)
+#define COLBITS (8 + 1)
 
-inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t frac)
+inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, const byte __far* colormap, uint16_t frac)
 {
 	*dest = colormap[source[frac>>COLBITS]];
 }
@@ -557,8 +557,8 @@ void R_DrawColumn (const draw_column_vars_t *dcvars)
 
     uint8_t __far* dest = _g_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 
-    const uint32_t		fracstep = (dcvars->iscale << COLEXTRABITS);
-    uint32_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) << COLEXTRABITS;
+    const uint16_t		fracstep = (dcvars->iscale >> COLEXTRABITS);
+    uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
