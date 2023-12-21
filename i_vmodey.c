@@ -41,6 +41,20 @@
 
 #define PLANEWIDTH 80
 
+#define SC_INDEX                0x3c4
+#define SC_MAPMASK              2
+#define SC_MEMMODE              4
+
+#define CRTC_INDEX              0x3d4
+#define CRTC_STARTHIGH          12
+#define CRTC_UNDERLINE          20
+#define CRTC_MODE               23
+
+#define GC_INDEX                0x3ce
+#define GC_READMAP              4
+#define GC_MODE                 5
+#define GC_MISCELLANEOUS        6
+ 
  
 void I_SetScreenMode(uint16_t mode);
 
@@ -75,14 +89,19 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 void V_FillRect(byte colour)
 {
-	//TODO implement me
+	for (int16_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
+		_fmemset(_s_screen + y * PLANEWIDTH, colour, SCREENWIDTH / 4);
 }
 
 
 
 void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
-	//TODO implement me
+	outp(SC_INDEX + 1, 1 << (x & 3));
+
+	_s_screen[y * PLANEWIDTH + x / 4] = color;
+
+	outp(SC_INDEX + 1, 15);
 }
 
 
@@ -123,21 +142,6 @@ static void I_UploadNewPalette(int8_t pal)
 		Z_ChangeTagToCache(palette_lump);
 	}
 }
-
-
-#define SC_INDEX                0x3c4
-#define SC_MAPMASK              2
-#define SC_MEMMODE              4
-
-#define CRTC_INDEX              0x3d4
-#define CRTC_STARTHIGH          12
-#define CRTC_UNDERLINE          20
-#define CRTC_MODE               23
-
-#define GC_INDEX                0x3ce
-#define GC_READMAP              4
-#define GC_MODE                 5
-#define GC_MISCELLANEOUS        6
 
 
 #define NO_PALETTE_CHANGE 100
