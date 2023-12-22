@@ -115,7 +115,7 @@ static boolean messageNeedsInput; // timed message = no input from user
 char _g_savegamestrings[8][8];
 
 
-int16_t showMessages;
+int16_t showMessages = 1;
 
 
 static void (*messageRoutine)(boolean affirmative);
