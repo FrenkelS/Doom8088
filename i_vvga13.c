@@ -638,7 +638,7 @@ void wipe_StartScreen(void)
 }
 
 
-static boolean wipe_ScreenWipe(int32_t ticks)
+static boolean wipe_ScreenWipe(int16_t ticks)
 {
 	boolean done = true;
 
@@ -738,11 +738,12 @@ void D_Wipe(void)
 	wipe_initMelt();
 
 	boolean done;
-	int32_t wipestart = I_GetTime () - 1;
+	int32_t wipestart = I_GetTime() - 1;
 
 	do
 	{
-		int32_t nowtime, tics;
+		int32_t nowtime;
+		int16_t tics;
 		do
 		{
 			nowtime = I_GetTime();
