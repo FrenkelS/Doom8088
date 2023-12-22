@@ -31,18 +31,18 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
  - When there's not enough memory for a texture, one color is drawn
 
 ## Controls:
-|Action                 |GBA   |DOS                     |
-|-----------------------|------|------------------------|
-|Fire                   |B     |Ctrl                    |
-|Use / Sprint           |A     |Enter, Space & Shift    |
-|Walk                   |D-Pad |Arrow keys              |
-|Strafe                 |L & R |< & >                   |
-|Automap                |SELECT|Tab                     |
-|Automap zoom in and out|      |+ & -                   |
-|Automap follow mode    |      |F                       |
-|Weapon up and down     |      |[ & ]                   |
-|Menu                   |Start |Esc                     |
-|Quit to DOS            |      |F10                     |
+|Action                 |                        |
+|-----------------------|------------------------|
+|Fire                   |Ctrl                    |
+|Use / Sprint           |Enter, Space & Shift    |
+|Walk                   |Arrow keys              |
+|Strafe                 |< & >                   |
+|Automap                |Tab                     |
+|Automap zoom in and out|+ & -                   |
+|Automap follow mode    |F                       |
+|Weapon up and down     |[ & ]                   |
+|Menu                   |Esc                     |
+|Quit to DOS            |F10                     |
 
 ## Cheats:
 |Code      |Effects                  |
