@@ -67,7 +67,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch);
 void V_FillRect(byte colour);
 
 
-void V_PlotPixel(int16_t x, int16_t y, uint8_t color);
+void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color);
 
 
 #endif

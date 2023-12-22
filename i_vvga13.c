@@ -55,26 +55,26 @@ static uint8_t  __far* _s_screen;
  */
 void V_DrawBackground(void)
 {
-    /* erase the entire screen to a tiled background */
-    const byte __far* src = W_GetLumpByName("FLOOR4_8");
+	/* erase the entire screen to a tiled background */
+	const byte __far* src = W_GetLumpByName("FLOOR4_8");
 
-    for(uint8_t y = 0; y < SCREENHEIGHT; y++)
-    {
-        for(uint16_t x = 0; x < SCREENWIDTH; x+=64)
-        {
-            uint8_t __far* d = &_s_screen[y * SCREENWIDTH + x];
-            const byte __far* s = &src[((y&63) * 64) + (x&63)];
+	for(uint8_t y = 0; y < SCREENHEIGHT; y++)
+	{
+		for(uint16_t x = 0; x < SCREENWIDTH; x+=64)
+		{
+			uint8_t __far* d = &_s_screen[y * SCREENWIDTH + x];
+			const byte __far* s = &src[((y&63) * 64) + (x&63)];
 
-            uint8_t len = 64;
+			uint8_t len = 64;
 
-            if (SCREENWIDTH - x < 64)
-                len = SCREENWIDTH - x;
+			if (SCREENWIDTH - x < 64)
+				len = SCREENWIDTH - x;
 
-            _fmemcpy(d, s, len);
-        }
-    }
+			_fmemcpy(d, s, len);
+		}
+	}
 
-    Z_ChangeTagToCache(src);
+	Z_ChangeTagToCache(src);
 }
 
 
@@ -95,89 +95,89 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
-    static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
-    static const int16_t   DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH) >> 8;
-    static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
-    static const int16_t   DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
+	static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
+	static const int16_t   DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH) >> 8;
+	static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
+	static const int16_t   DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
 
-    y -= patch->topoffset;
-    x -= patch->leftoffset;
+	y -= patch->topoffset;
+	x -= patch->leftoffset;
 
-    const int16_t left   = ( x * DX ) >> FRACBITS;
-    const int16_t right  = ((x + patch->width)  * DX) >> FRACBITS;
-    const int16_t bottom = ((y + patch->height) * DY) >> FRACBITS;
+	const int16_t left   = ( x * DX ) >> FRACBITS;
+	const int16_t right  = ((x + patch->width)  * DX) >> FRACBITS;
+	const int16_t bottom = ((y + patch->height) * DY) >> FRACBITS;
 
-    uint16_t   col = 0;
+	uint16_t   col = 0;
 
-    for (int16_t dc_x = left; dc_x < right; dc_x++, col += DXI)
-    {
-        if (dc_x < 0)
-            continue;
-        else if (dc_x >= SCREENWIDTH)
-            break;
+	for (int16_t dc_x = left; dc_x < right; dc_x++, col += DXI)
+	{
+		if (dc_x < 0)
+			continue;
+		else if (dc_x >= SCREENWIDTH)
+			break;
 
-        const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> 8]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> 8]);
 
-        // step through the posts in a column
-        while (column->topdelta != 0xff)
-        {
-            int16_t dc_yl = (((y + column->topdelta) * DY) >> FRACBITS);
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			int16_t dc_yl = (((y + column->topdelta) * DY) >> FRACBITS);
 
-            if ((dc_yl >= SCREENHEIGHT) || (dc_yl > bottom))
-                break;
+			if ((dc_yl >= SCREENHEIGHT) || (dc_yl > bottom))
+				break;
 
-            int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
+			int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
 
-            byte __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + dc_x;
+			byte __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + dc_x;
 
-            int16_t frac = 0;
+			int16_t frac = 0;
 
-            const byte __far* source = (const byte __far*)column + 3;
+			const byte __far* source = (const byte __far*)column + 3;
 
-            int16_t count = dc_yh - dc_yl;
-            while (count--)
-            {
-                *dest = source[frac >> 8];
-                dest += SCREENWIDTH;
-                frac += DYI;
-            }
+			int16_t count = dc_yh - dc_yl;
+			while (count--)
+			{
+				*dest = source[frac >> 8];
+				dest += SCREENWIDTH;
+				frac += DYI;
+			}
 
-            column = (const column_t __far*)((const byte __far*)column + column->length + 4);
-        }
-    }
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+	}
 }
 
 
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
-    y -= patch->topoffset;
-    x -= patch->leftoffset;
+	y -= patch->topoffset;
+	x -= patch->leftoffset;
 
-    byte __far* desttop = _s_screen + (y * SCREENWIDTH) + x;
+	byte __far* desttop = _s_screen + (y * SCREENWIDTH) + x;
 
-    int16_t width = patch->width;
+	int16_t width = patch->width;
 
-    for (int16_t col = 0; col < width; col++, desttop++)
-    {
-        const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
+	for (int16_t col = 0; col < width; col++, desttop++)
+	{
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
 
-        // step through the posts in a column
-        while (column->topdelta != 0xff)
-        {
-            const byte __far* source = (const byte __far*)column + 3;
-            byte __far* dest = desttop + (column->topdelta * SCREENWIDTH);
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			const byte __far* source = (const byte __far*)column + 3;
+			byte __far* dest = desttop + (column->topdelta * SCREENWIDTH);
 
-            uint16_t count = column->length;
+			uint16_t count = column->length;
 
-            while (count--)
-            {
-                *dest = *source++;
-                dest += SCREENWIDTH;
-            }
+			while (count--)
+			{
+				*dest = *source++;
+				dest += SCREENWIDTH;
+			}
 
-            column = (const column_t __far*)((const byte __far*)column + column->length + 4);
-        }
-    }
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+	}
 }
 
 
@@ -191,9 +191,52 @@ void V_FillRect(byte colour)
 
 
 
-void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
+static void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
-    _s_screen[y * SCREENWIDTH + x] = color;
+	_s_screen[y * SCREENWIDTH + x] = color;
+}
+
+
+//
+// V_DrawLine()
+//
+// Draw a line in the frame buffer.
+// Classic Bresenham w/ whatever optimizations needed for speed
+//
+// Passed the frame coordinates of line, and the color to be drawn
+// Returns nothing
+//
+void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
+{
+	int16_t dx = abs(x1 - x0);
+	int16_t sx = x0<x1 ? 1 : -1;
+
+	int16_t dy = -abs(y1 - y0);
+	int16_t sy = y0<y1 ? 1 : -1;
+
+	int16_t err = dx + dy;
+
+	while(true)
+	{
+		V_PlotPixel(x0, y0, color);
+
+		if (x0==x1 && y0==y1)
+			break;
+
+		int16_t e2 = 2 * err;
+
+		if (e2 >= dy)
+		{
+			err += dy;
+			x0 += sx;
+		}
+
+		if (e2 <= dx)
+		{
+			err += dx;
+			y0 += sy;
+		}
+	}
 }
 
 
@@ -326,67 +369,67 @@ inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* sour
 
 void R_DrawColumn (const draw_column_vars_t *dcvars)
 {
-    int16_t count = (dcvars->yh - dcvars->yl) + 1;
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
 
-    const byte __far* source   = dcvars->source;
-    const byte __far* colormap = dcvars->colormap;
+	const byte __far* source   = dcvars->source;
+	const byte __far* colormap = dcvars->colormap;
 
-    uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
+	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 
-    const uint16_t		fracstep = (dcvars->iscale >> COLEXTRABITS);
-    uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
+	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
+	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
 
-    // Inner loop that does the actual texture mapping,
-    //  e.g. a DDA-lile scaling.
-    // This is as fast as it gets.
+	// Inner loop that does the actual texture mapping,
+	//  e.g. a DDA-lile scaling.
+	// This is as fast as it gets.
 
-    uint16_t l = count >> 4;
+	uint16_t l = count >> 4;
 
-    while (l--)
-    {
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+	while (l--)
+	{
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-    }
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+	}
 
-    switch (count & 15)
-    {
-        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
-        case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
-    }
+	switch (count & 15)
+	{
+		case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=SCREENWIDTH; frac+=fracstep;
+		case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
+	}
 }
 
 
@@ -454,13 +497,13 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 static const int8_t fuzzoffset[FUZZTABLE] =
 {
-    FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
-    FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-    FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
-    FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
-    FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
+	FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
+	FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
+	FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
+	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
 };
 
 //
@@ -473,109 +516,109 @@ static const int8_t fuzzoffset[FUZZTABLE] =
 //
 void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 {
-    int16_t dc_yl = dcvars->yl;
-    int16_t dc_yh = dcvars->yh;
+	int16_t dc_yl = dcvars->yl;
+	int16_t dc_yh = dcvars->yh;
 
-    // Adjust borders. Low...
-    if (dc_yl <= 0)
-        dc_yl = 1;
+	// Adjust borders. Low...
+	if (dc_yl <= 0)
+		dc_yl = 1;
 
-    // .. and high.
-    if (dc_yh >= VIEWWINDOWHEIGHT - 1)
-        dc_yh = VIEWWINDOWHEIGHT - 2;
+	// .. and high.
+	if (dc_yh >= VIEWWINDOWHEIGHT - 1)
+		dc_yh = VIEWWINDOWHEIGHT - 2;
 
-    int16_t count = (dc_yh - dc_yl) + 1;
+	int16_t count = (dc_yh - dc_yl) + 1;
 
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
 
-    const byte __far* colormap = &fullcolormap[6 * 256];
+	const byte __far* colormap = &fullcolormap[6 * 256];
 
-    uint8_t __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + (dcvars->x << 2);
+	uint8_t __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + (dcvars->x << 2);
 
-    static int16_t fuzzpos = 0;
+	static int16_t fuzzpos = 0;
 
-    do
-    {        
-        R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], colormap, 0);
-        dest += SCREENWIDTH;
+	do
+	{        
+		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], colormap, 0);
+		dest += SCREENWIDTH;
 
-        fuzzpos++;
-        if (fuzzpos >= FUZZTABLE)
-            fuzzpos = 0;
+		fuzzpos++;
+		if (fuzzpos >= FUZZTABLE)
+			fuzzpos = 0;
 
-    } while(--count);
+	} while(--count);
 }
 
 
 #if !defined FLAT_SPAN
 inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t position)
 {
-    uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
-    color = color | (color << 8);
+	uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
+	color = color | (color << 8);
 
-    uint16_t __far* d = (uint16_t __far*) dest;
-    *d++ = color;
-    *d   = color;
+	uint16_t __far* d = (uint16_t __far*) dest;
+	*d++ = color;
+	*d   = color;
 }
 
 
 void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *dsvars)
 {
-    uint16_t count = (x2 - x1);
+	uint16_t count = (x2 - x1);
 
-    const byte __far* source   = dsvars->source;
-    const byte __far* colormap = dsvars->colormap;
+	const byte __far* source   = dsvars->source;
+	const byte __far* colormap = dsvars->colormap;
 
-    uint32_t __far* dest = (uint32_t __far*)(_s_screen + (y * SCREENWIDTH) + (x1 << 2));
+	uint32_t __far* dest = (uint32_t __far*)(_s_screen + (y * SCREENWIDTH) + (x1 << 2));
 
-    const uint32_t step = dsvars->step;
-    uint32_t position = dsvars->position;
+	const uint32_t step = dsvars->step;
+	uint32_t position = dsvars->position;
 
-    uint16_t l = (count >> 4);
+	uint16_t l = (count >> 4);
 
-    while (l--)
-    {
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+	while (l--)
+	{
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
 
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
 
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
 
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
     }
 
-    switch (count & 15)
-    {
-        case 15:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 14:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 13:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 12:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 11:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 10:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  9:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  8:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  7:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  6:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  5:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  4:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  3:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  2:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  1:    R_DrawSpanPixel(dest, source, colormap, position);
-    }
+	switch (count & 15)
+	{
+		case 15:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case 14:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case 13:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case 12:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case 11:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case 10:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  9:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  8:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  7:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  6:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  5:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  4:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  3:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  2:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
+		case  1:    R_DrawSpanPixel(dest, source, colormap, position);
+	}
 }
 #endif
 
@@ -597,87 +640,86 @@ void wipe_StartScreen(void)
 
 static boolean wipe_ScreenWipe(int32_t ticks)
 {
-    boolean done = true;
+	boolean done = true;
 
-    uint16_t __far* backbuffer = (uint16_t __far*)backBuffer;
+	uint16_t __far* backbuffer = (uint16_t __far*)backBuffer;
 
-    while (ticks--)
-    {
-        I_DrawBuffer((uint8_t __far*)frontbuffer);
-        for (int16_t i = 0; i < SCREENWIDTH / 2; i++)
-        {
-            if (wipe_y_lookup[i] < 0)
-            {
-                wipe_y_lookup[i]++;
-                done = false;
-                continue;
-            }
+	while (ticks--)
+	{
+		I_DrawBuffer((uint8_t __far*)frontbuffer);
+		for (int16_t i = 0; i < SCREENWIDTH / 2; i++)
+		{
+			if (wipe_y_lookup[i] < 0)
+			{
+				wipe_y_lookup[i]++;
+				done = false;
+				continue;
+			}
 
-            // scroll down columns, which are still visible
-            if (wipe_y_lookup[i] < SCREENHEIGHT)
-            {
-                /* cph 2001/07/29 -
-                 *  The original melt rate was 8 pixels/sec, i.e. 25 frames to melt
-                 *  the whole screen, so make the melt rate depend on SCREENHEIGHT
-                 *  so it takes no longer in high res
-                 */
-                int16_t dy = (wipe_y_lookup[i] < 16) ? wipe_y_lookup[i] + 1 : SCREENHEIGHT / 25;
-                // At most dy shall be so that the column is shifted by SCREENHEIGHT (i.e. just
-                // invisible)
-                if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
-                    dy = SCREENHEIGHT - wipe_y_lookup[i];
+			// scroll down columns, which are still visible
+			if (wipe_y_lookup[i] < SCREENHEIGHT)
+			{
+				/* cph 2001/07/29 -
+				 *  The original melt rate was 8 pixels/sec, i.e. 25 frames to melt
+				 *  the whole screen, so make the melt rate depend on SCREENHEIGHT
+				 *  so it takes no longer in high res
+				 */
+				int16_t dy = (wipe_y_lookup[i] < 16) ? wipe_y_lookup[i] + 1 : SCREENHEIGHT / 25;
+				// At most dy shall be so that the column is shifted by SCREENHEIGHT (i.e. just invisible)
+				if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
+					dy = SCREENHEIGHT - wipe_y_lookup[i];
 
-                uint16_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - dy - 1) * (SCREENWIDTH / 2));
+				uint16_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - dy - 1) * (SCREENWIDTH / 2));
 
-                uint16_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1) * (SCREENWIDTH / 2));
+				uint16_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1) * (SCREENWIDTH / 2));
 
-                // scroll down the column. Of course we need to copy from the bottom... up to
-                // SCREENHEIGHT - yLookup - dy
+				// scroll down the column. Of course we need to copy from the bottom... up to
+				// SCREENHEIGHT - yLookup - dy
 
-                for (int16_t j = SCREENHEIGHT - wipe_y_lookup[i] - dy; j; j--)
-                {
-                    *d = *s;
-                    d += -(SCREENWIDTH / 2);
-                    s += -(SCREENWIDTH / 2);
-                }
+				for (int16_t j = SCREENHEIGHT - wipe_y_lookup[i] - dy; j; j--)
+				{
+					*d = *s;
+					d += -(SCREENWIDTH / 2);
+					s += -(SCREENWIDTH / 2);
+				}
 
-                // copy new screen. We need to copy only between y_lookup and + dy y_lookup
-                s = &backbuffer[i]  + wipe_y_lookup[i] * SCREENWIDTH / 2;
-                d = &frontbuffer[i] + wipe_y_lookup[i] * SCREENWIDTH / 2;
+				// copy new screen. We need to copy only between y_lookup and + dy y_lookup
+				s = &backbuffer[i]  + wipe_y_lookup[i] * SCREENWIDTH / 2;
+				d = &frontbuffer[i] + wipe_y_lookup[i] * SCREENWIDTH / 2;
 
-                for (int16_t j = 0 ; j < dy; j++)
-                {
-                    *d = *s;
-                    d += (SCREENWIDTH / 2);
-                    s += (SCREENWIDTH / 2);
-                }
+				for (int16_t j = 0 ; j < dy; j++)
+				{
+					*d = *s;
+					d += (SCREENWIDTH / 2);
+					s += (SCREENWIDTH / 2);
+				}
 
-                wipe_y_lookup[i] += dy;
-                done = false;
-            }
-        }
-    }
+				wipe_y_lookup[i] += dy;
+				done = false;
+			}
+		}
+	}
 
-    return done;
+	return done;
 }
 
 static void wipe_initMelt()
 {
-    wipe_y_lookup = Z_MallocStatic(SCREENWIDTH);
+	wipe_y_lookup = Z_MallocStatic(SCREENWIDTH);
 
-    // setup initial column positions (y<0 => not ready to scroll yet)
-    wipe_y_lookup[0] = -(M_Random() % 16);
-    for (int8_t i = 1; i < SCREENWIDTH / 2; i++)
-    {
-        int8_t r = (M_Random() % 3) - 1;
+	// setup initial column positions (y<0 => not ready to scroll yet)
+	wipe_y_lookup[0] = -(M_Random() % 16);
+	for (int8_t i = 1; i < SCREENWIDTH / 2; i++)
+	{
+		int8_t r = (M_Random() % 3) - 1;
 
-        wipe_y_lookup[i] = wipe_y_lookup[i - 1] + r;
+		wipe_y_lookup[i] = wipe_y_lookup[i - 1] + r;
 
-        if (wipe_y_lookup[i] > 0)
-            wipe_y_lookup[i] = 0;
-        else if (wipe_y_lookup[i] == -16)
-            wipe_y_lookup[i] = -15;
-    }
+		if (wipe_y_lookup[i] > 0)
+			wipe_y_lookup[i] = 0;
+		else if (wipe_y_lookup[i] == -16)
+			wipe_y_lookup[i] = -15;
+	}
 }
 
 
@@ -690,30 +732,30 @@ static void wipe_initMelt()
 
 void D_Wipe(void)
 {
-    if (!frontbuffer)
-        return;
+	if (!frontbuffer)
+		return;
 
-    wipe_initMelt();
+	wipe_initMelt();
 
-    boolean done;
-    int32_t wipestart = I_GetTime () - 1;
+	boolean done;
+	int32_t wipestart = I_GetTime () - 1;
 
-    do
-    {
-        int32_t nowtime, tics;
-        do
-        {
-            nowtime = I_GetTime();
-            tics = nowtime - wipestart;
-        } while (!tics);
+	do
+	{
+		int32_t nowtime, tics;
+		do
+		{
+			nowtime = I_GetTime();
+			tics = nowtime - wipestart;
+		} while (!tics);
 
-        wipestart = nowtime;
-        done = wipe_ScreenWipe(tics);
+		wipestart = nowtime;
+		done = wipe_ScreenWipe(tics);
 
-        M_Drawer();                   // menu is drawn even on top of wipes
+		M_Drawer();                   // menu is drawn even on top of wipes
 
-    } while (!done);
+	} while (!done);
 
-    Z_Free(frontbuffer);
-    Z_Free(wipe_y_lookup);
+	Z_Free(frontbuffer);
+	Z_Free(wipe_y_lookup);
 }

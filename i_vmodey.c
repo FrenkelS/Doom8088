@@ -137,13 +137,14 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	x -= patch->leftoffset;
 
 	int16_t plane = x & 3;
-	outp(SC_INDEX + 1, 1 << plane);
 	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + x / 4;
 
 	int16_t width = patch->width;
 
 	for (int16_t col = 0; col < width; col++)
 	{
+		outp(SC_INDEX + 1, 1 << plane);
+
 		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
 
 		// step through the posts in a column
@@ -168,7 +169,6 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			plane = 0;
 			desttop++;
 		}
-		outp(SC_INDEX + 1, 1 << plane);
 	}
 
 	outp(SC_INDEX + 1, 15);
@@ -183,11 +183,44 @@ void V_FillRect(byte colour)
 
 
 
-void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
+static void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
 {
 	outp(SC_INDEX + 1, 1 << (x & 3));
-
 	_s_screen[y * PLANEWIDTH + x / 4] = color;
+}
+
+
+void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
+{
+	int16_t dx = abs(x1 - x0);
+	int16_t sx = x0<x1 ? 1 : -1;
+
+	int16_t dy = -abs(y1 - y0);
+	int16_t sy = y0<y1 ? 1 : -1;
+
+	int16_t err = dx + dy;
+
+	while(true)
+	{
+		V_PlotPixel(x0, y0, color);
+
+		if (x0==x1 && y0==y1)
+			break;
+
+		int16_t e2 = 2 * err;
+
+		if (e2 >= dy)
+		{
+			err += dy;
+			x0 += sx;
+		}
+
+		if (e2 <= dx)
+		{
+			err += dx;
+			y0 += sy;
+		}
+	}
 
 	outp(SC_INDEX + 1, 15);
 }
