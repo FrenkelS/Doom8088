@@ -367,7 +367,7 @@ inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* sour
 }
 
 
-void R_DrawColumn (const draw_column_vars_t *dcvars)
+void R_DrawColumn(const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -514,7 +514,7 @@ static const int8_t fuzzoffset[FUZZTABLE] =
 //  could create the SHADOW effect,
 //  i.e. spectres and invisible players.
 //
-void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
+void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 {
 	int16_t dc_yl = dcvars->yl;
 	int16_t dc_yh = dcvars->yh;
@@ -540,7 +540,7 @@ void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 	static int16_t fuzzpos = 0;
 
 	do
-	{        
+	{
 		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], colormap, 0);
 		dest += SCREENWIDTH;
 

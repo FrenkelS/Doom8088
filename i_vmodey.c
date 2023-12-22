@@ -310,9 +310,6 @@ boolean I_IsGraphicsModeSet(void)
 
 static void I_UploadNewPalette(int8_t pal)
 {
-	// This is used to replace the current 256 colour cmap with a new one
-	// Used by 256 colour PseudoColor modes
-
 	char lumpName[9] = "PLAYPAL0";
 
 	if(_g_gamma == 0)
@@ -407,7 +404,7 @@ inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* sour
 }
 
 
-void R_DrawColumn (const draw_column_vars_t *dcvars)
+void R_DrawColumn(const draw_column_vars_t *dcvars)
 {
     int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -493,7 +490,7 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 }
 
 
-#define FUZZOFF (VIEWWINDOWWIDTH)
+#define FUZZOFF (PLANEWIDTH)
 #define FUZZTABLE 50
 
 static const int8_t fuzzoffset[FUZZTABLE] =
@@ -508,7 +505,7 @@ static const int8_t fuzzoffset[FUZZTABLE] =
 };
 
 
-void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
+void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 {
 	int16_t dc_yl = dcvars->yl;
 	int16_t dc_yh = dcvars->yh;
@@ -534,16 +531,15 @@ void R_DrawFuzzColumn (const draw_column_vars_t *dcvars)
 	static int16_t fuzzpos = 0;
 
 	do
-	{        
-		//TODO implement me
-		*dest = 0;
+	{
+		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos]], colormap, 0);
 		dest += PLANEWIDTH;
 
 		fuzzpos++;
 		if (fuzzpos >= FUZZTABLE)
 			fuzzpos = 0;
 
-	} while(--count);
+	} while (--count);
 }
 
 
