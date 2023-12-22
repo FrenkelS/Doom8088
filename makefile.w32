@@ -24,7 +24,7 @@
 #
 # --------------------------------------------------------------------------
 
-CCOPTS = -omaxtnrih -ol+ -oe=32 -zp1 -bt=dos -D__far= -3r -j -zq -zc -wx -za99
+CCOPTS = -omaxtnrih -ol+ -oe=32 -zp1 -bt=dos -D__far= -3r -j -zq -zc -wx -za99 -DFLAT_SPAN
 
 GLOBOBJS = &
  a_pcfx.obj &
@@ -33,12 +33,12 @@ GLOBOBJS = &
  d_items.obj &
  d_main.obj &
  f_finale.obj &
- f_wipe.obj &
  g_game.obj &
  hu_stuff.obj &
  i_audio.obj &
  i_main.obj &
  i_system.obj &
+ i_vmodey.obj &
  info.obj &
  m_cheat.obj &
  m_menu.obj &

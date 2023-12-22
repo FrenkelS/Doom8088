@@ -64,7 +64,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) on Ubuntu.
 
-2) Run `compia16.sh`
+2) Run `compiamy.sh` to compile the Mode Y version and `compia13.sh` for the Mode 13h version.
 
 3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
 

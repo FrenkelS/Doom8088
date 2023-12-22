@@ -7,7 +7,7 @@ set CFLAGS=-march=i386
 set CFLAGS=%CFLAGS% -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -mpreferred-stack-boundary=2 -Wno-attributes -Wpedantic
 @rem set CFLAGS=%CFLAGS% -Wall -Wextra
 @rem set CFLAGS=%CFLAGS% -ffunction-sections -Wl,--gc-sections -Wl,--print-gc-sections
-set CFLAGS=%CFLAGS% -D__far=
+set CFLAGS=%CFLAGS% -D__far= -DFLAT_SPAN
 
 @set GLOBOBJS=
 @set GLOBOBJS=%GLOBOBJS% a_pcfx.c
@@ -16,12 +16,12 @@ set CFLAGS=%CFLAGS% -D__far=
 @set GLOBOBJS=%GLOBOBJS% d_items.c
 @set GLOBOBJS=%GLOBOBJS% d_main.c
 @set GLOBOBJS=%GLOBOBJS% f_finale.c
-@set GLOBOBJS=%GLOBOBJS% f_wipe.c
 @set GLOBOBJS=%GLOBOBJS% g_game.c
 @set GLOBOBJS=%GLOBOBJS% hu_stuff.c
 @set GLOBOBJS=%GLOBOBJS% i_audio.c
 @set GLOBOBJS=%GLOBOBJS% i_main.c
 @set GLOBOBJS=%GLOBOBJS% i_system.c
+@set GLOBOBJS=%GLOBOBJS% i_vmodey.c
 @set GLOBOBJS=%GLOBOBJS% info.c
 @set GLOBOBJS=%GLOBOBJS% m_cheat.c
 @set GLOBOBJS=%GLOBOBJS% m_menu.c
