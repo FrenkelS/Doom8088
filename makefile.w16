@@ -44,12 +44,12 @@ GLOBOBJS = &
  d_items.obj &
  d_main.obj &
  f_finale.obj &
- f_wipe.obj &
  g_game.obj &
  hu_stuff.obj &
  i_audio.obj &
  i_main.obj &
  i_system.obj &
+ i_vmodey.obj &
  info.obj &
  m_cheat.obj &
  m_menu.obj &
@@ -99,7 +99,7 @@ WC16\DOOM16WC.EXE : $(GLOBOBJS)
  wcc $(CCOPTSS) $[* /fo=WC16\$^&
 
 
-i_system.obj : i_system.c
+i_vmodey.obj : i_vmodey.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
 r_draw.obj : r_draw.c
