@@ -65,7 +65,23 @@ static uint8_t  __far* _s_screen;
 
 void V_DrawBackground(void)
 {
-	//TODO implement me
+	const byte __far* src = W_GetLumpByName("FLOOR4_8");
+
+	for (int16_t plane = 0; plane < 4; plane++)
+	{
+		outp(SC_INDEX + 1, 1 << plane);
+		for (int16_t y = 0; y < SCREENHEIGHT; y++)
+		{
+			uint8_t __far* dest = _s_screen + y * PLANEWIDTH;
+			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+			{
+				*dest++ = src[(y & 63) * 64 + (((x * 4) + plane) & 63)];
+			}
+		}
+	}
+	outp(SC_INDEX + 1, 15);
+
+	Z_ChangeTagToCache(src);
 }
 
 
