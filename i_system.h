@@ -50,7 +50,6 @@ void I_InitScreen();
 void I_InitGraphics();
 
 void I_FinishUpdate(void);
-void I_DrawBuffer(uint8_t __far* buffer);
 
 void I_SetPalette(int8_t pal);
 
@@ -61,9 +60,5 @@ void I_SetPalette(int8_t pal);
  * Can call D_PostEvent.
  */
 void I_StartTic();
-
-uint8_t __far* I_GetBackBuffer();
-
-void I_CopyBackBufferToBuffer(uint8_t __far* buffer);
 
 #endif

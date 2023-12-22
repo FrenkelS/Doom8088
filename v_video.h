@@ -53,6 +53,7 @@ void V_DrawBackground(void);
 void V_DrawRaw(int16_t num, uint16_t offset);
 
 // V_DrawNumPatchScaled - Draws the patch from lump num
+void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch);
 void V_DrawNumPatchScaled(int16_t x, int16_t y, int16_t lump);
 void V_DrawNumPatchNotScaled(int16_t x, int16_t y, int16_t lump);
 
@@ -66,7 +67,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch);
 void V_FillRect(byte colour);
 
 
-void V_PlotPixel(int16_t x, int16_t y, uint8_t color);
+void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color);
 
 
 #endif

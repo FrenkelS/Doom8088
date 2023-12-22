@@ -19,12 +19,12 @@ file am_map.obj
 file d_items.obj
 file d_main.obj
 file f_finale.obj
-file f_wipe.obj
 file g_game.obj
 file hu_stuff.obj
 file i_audio.obj
 file i_main.obj
 file i_system.obj
+file i_vmodey.obj
 file info.obj
 file m_cheat.obj
 file m_menu.obj

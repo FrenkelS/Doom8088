@@ -72,81 +72,12 @@ byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
 
 #else
 
-inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t position)
-{
-    uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
-    color = color | (color << 8);
-
-    uint16_t __far* d = (uint16_t __far*) dest;
-    *d++ = color;
-    *d   = color;
-}
-
-
 typedef struct {
   uint32_t            position;
   uint32_t            step;
   const byte         __far* source; // start of a 64*64 tile image
   const lighttable_t __far* colormap;
 } draw_span_vars_t;
-
-
-static void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *dsvars)
-{
-    uint16_t count = (x2 - x1);
-
-    const byte __far* source   = dsvars->source;
-    const byte __far* colormap = dsvars->colormap;
-
-    uint32_t __far* dest = (uint32_t __far*)(_g_screen + (y * SCREENWIDTH) + (x1 << 2));
-
-    const uint32_t step = dsvars->step;
-    uint32_t position = dsvars->position;
-
-    uint16_t l = (count >> 4);
-
-    while (l--)
-    {
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-    }
-
-    switch (count & 15)
-    {
-        case 15:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 14:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 13:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 12:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 11:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case 10:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  9:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  8:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  7:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  6:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  5:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  4:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  3:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  2:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-        case  1:    R_DrawSpanPixel(dest, source, colormap, position);
-    }
-}
 
 
 static const fixed_t yslopeTable[VIEWWINDOWHEIGHT / 2] =

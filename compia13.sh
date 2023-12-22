@@ -5,7 +5,7 @@ unset CFLAGS
 #export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR"
 export RENDER_OPTIONS="-DFLAT_SPAN"
 
-ia16-elf-gcc -c i_system.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c i_vvga13.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 
@@ -19,13 +19,13 @@ export GLOBOBJS+=" am_map.c"
 export GLOBOBJS+=" d_items.c"
 export GLOBOBJS+=" d_main.c"
 export GLOBOBJS+=" f_finale.c"
-export GLOBOBJS+=" f_wipe.c"
 export GLOBOBJS+=" g_game.c"
 export GLOBOBJS+=" hu_stuff.c"
 export GLOBOBJS+=" i_audio.c"
 export GLOBOBJS+=" i_main.c"
-#export GLOBOBJS+=" i_system.c"
-export GLOBOBJS+=" i_system.o"
+export GLOBOBJS+=" i_system.c"
+#export GLOBOBJS+=" i_vvga13.c"
+export GLOBOBJS+=" i_vvga13.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_menu.c"
@@ -68,6 +68,6 @@ export GLOBOBJS+=" z_zone.c"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
-rm i_system.o
+rm i_vvga13.o
 rm r_draw.o
 rm tables.o

@@ -739,55 +739,6 @@ static boolean AM_clipMline(mline_t*  ml, fline_t*  fl)
 
 
 //
-// V_DrawLine()
-//
-// Draw a line in the frame buffer.
-// Classic Bresenham w/ whatever optimizations needed for speed
-//
-// Passed the frame coordinates of line, and the color to be drawn
-// Returns nothing
-//
-static void V_DrawLine(fline_t* fl, uint8_t color)
-{
-    int16_t x0 = fl->a.x;
-    int16_t x1 = fl->b.x;
-
-    int16_t y0 = fl->a.y;
-    int16_t y1 = fl->b.y;
-
-    int16_t dx = abs(x1 - x0);
-    int16_t sx = x0<x1 ? 1 : -1;
-
-    int16_t dy = -abs(y1 - y0);
-    int16_t sy = y0<y1 ? 1 : -1;
-
-    int16_t err = dx + dy;
-
-    while(true)
-    {
-        V_PlotPixel(x0, y0, color);
-
-        if (x0==x1 && y0==y1)
-            break;
-
-        int16_t e2 = 2 * err;
-
-        if (e2 >= dy)
-        {
-            err += dy;
-            x0 += sx;
-        }
-
-        if (e2 <= dx)
-        {
-            err += dx;
-            y0 += sy;
-        }
-    }
-}
-
-
-//
 // AM_drawMline()
 //
 // Clip lines, draw visible parts of lines.
@@ -806,7 +757,7 @@ static void AM_drawMline(mline_t* ml, uint8_t color)
         color=0;
 
     if (AM_clipMline(ml, &fl))
-        V_DrawLine(&fl, color); // draws it on frame buffer using fb coords
+        V_DrawLine(fl.a.x, fl.a.y, fl.b.x, fl.b.y, color); // draws it on frame buffer using fb coords
 }
 
 //
