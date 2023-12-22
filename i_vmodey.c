@@ -365,7 +365,7 @@ void I_InitGraphics(void)
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
-	_s_screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
+	_s_screen = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
 
 	outp(SC_INDEX, SC_MEMMODE);
 	outp(SC_INDEX + 1, (inp(SC_INDEX + 1) & ~8) | 4);
@@ -545,11 +545,130 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void wipe_StartScreen(void)
 {
-	//TODO implement me
+	// Do nothing
+}
+
+
+static uint8_t __far* frontbuffer;
+static int16_t __far* wipe_y_lookup;
+
+
+static boolean wipe_ScreenWipe(int16_t ticks)
+{
+	boolean done = true;
+
+	uint8_t __far* backbuffer = _s_screen;
+
+	while (ticks--)
+	{
+		for (int16_t i = 0; i < SCREENWIDTH / 4; i++)
+		{
+			if (wipe_y_lookup[i] < 0)
+			{
+				wipe_y_lookup[i]++;
+				done = false;
+				continue;
+			}
+
+			// scroll down columns, which are still visible
+			if (wipe_y_lookup[i] < SCREENHEIGHT)
+			{
+				int16_t dy = (wipe_y_lookup[i] < 16) ? wipe_y_lookup[i] + 1 : SCREENHEIGHT / 25;
+				// At most dy shall be so that the column is shifted by SCREENHEIGHT (i.e. just invisible)
+				if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
+					dy = SCREENHEIGHT - wipe_y_lookup[i];
+
+				uint8_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - 1 - dy) * PLANEWIDTH);
+				uint8_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1)      * PLANEWIDTH);
+
+				// scroll down the column. Of course we need to copy from the bottom... up to
+				// SCREENHEIGHT - yLookup - dy
+
+				for (int16_t j = SCREENHEIGHT - wipe_y_lookup[i] - dy; j; j--)
+				{
+					*d = *s;
+					d += -PLANEWIDTH;
+					s += -PLANEWIDTH;
+				}
+
+				// copy new screen. We need to copy only between y_lookup and + dy y_lookup
+				s = &backbuffer[i]  + wipe_y_lookup[i] * PLANEWIDTH;
+				d = &frontbuffer[i] + wipe_y_lookup[i] * PLANEWIDTH;
+
+				for (int16_t j = 0 ; j < dy; j++)
+				{
+					*d = *s;
+					d += PLANEWIDTH;
+					s += PLANEWIDTH;
+				}
+
+				wipe_y_lookup[i] += dy;
+				done = false;
+			}
+		}
+	}
+
+	return done;
+}
+
+
+static void wipe_initMelt()
+{
+	wipe_y_lookup = Z_MallocStatic((SCREENWIDTH / 4) * sizeof(int16_t));
+
+	// setup initial column positions (y<0 => not ready to scroll yet)
+	wipe_y_lookup[0] = -(M_Random() % 16);
+	for (int16_t i = 1; i < SCREENWIDTH / 4; i++)
+	{
+		int16_t r = (M_Random() % 3) - 1;
+
+		wipe_y_lookup[i] = wipe_y_lookup[i - 1] + r;
+
+		if (wipe_y_lookup[i] > 0)
+			wipe_y_lookup[i] = 0;
+		else if (wipe_y_lookup[i] == -16)
+			wipe_y_lookup[i] = -15;
+	}
 }
 
 
 void D_Wipe(void)
 {
-	//TODO implement me
+#if defined _M_I86
+	frontbuffer = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff);
+#else
+	frontbuffer = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
+#endif
+
+	// set write mode 1
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+	wipe_initMelt();
+
+	boolean done;
+	int32_t wipestart = I_GetTime() - 1;
+
+	do
+	{
+		int32_t nowtime;
+		int16_t tics;
+		do
+		{
+			nowtime = I_GetTime();
+			tics = nowtime - wipestart;
+		} while (!tics);
+
+		wipestart = nowtime;
+		done = wipe_ScreenWipe(tics);
+
+		M_Drawer();                   // menu is drawn even on top of wipes
+
+	} while (!done);
+
+	Z_Free(wipe_y_lookup);
+
+	// set write mode 0
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
 }
