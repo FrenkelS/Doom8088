@@ -64,12 +64,14 @@ void I_SetScreenMode(uint16_t mode)
 static byte keyboardqueue[KBDQUESIZE];
 static int16_t kbdtail, kbdhead;
 static boolean isKeyboardIsrSet = false;
+static boolean mousepresent;
 
 #if defined __DJGPP__ 
 static _go32_dpmi_seginfo oldkeyboardisr, newkeyboardisr;
 #else
 static void (__interrupt *oldkeyboardisr)(void);
 #endif
+
 
 static void __interrupt I_KeyboardISR(void)	
 {
@@ -81,12 +83,45 @@ static void __interrupt I_KeyboardISR(void)
 	outp(0x20, 0x20);
 }
 
+
+static void I_ResetMouse(void)
+{
+	union REGS regs;
+	regs.w.ax = 0;
+	int86(0x33, &regs, &regs);
+	mousepresent = regs.w.ax != 0;
+}
+
+
+static void I_ReadMouse(void)
+{
+	if (!mousepresent)
+		return;
+
+	event_t ev;
+	ev.type = ev_mouse;
+
+	union REGS regs;
+	regs.w.ax = 3;                               // read buttons / position
+	int86(0x33, &regs, &regs);
+	ev.data1 = regs.w.bx;
+
+	regs.w.ax = 11;                              // read counters
+	int86(0x33, &regs, &regs);
+	ev.data2 = regs.w.cx;
+
+	D_PostEvent(&ev);
+}
+
+
 void I_InitScreen(void)
 {
 	I_SetScreenMode(3);
 
 	replaceInterrupt(oldkeyboardisr, newkeyboardisr, KEYBOARDINT, I_KeyboardISR);
 	isKeyboardIsrSet = true;
+
+	I_ResetMouse();
 }
 
 
@@ -119,15 +154,15 @@ void I_InitScreen(void)
 
 void I_StartTic(void)
 {
+	I_ReadMouse();
+
 	//
 	// process keyboard events
 	//
-	byte k;
-	event_t ev;
 
 	while (kbdtail < kbdhead)
 	{
-		k = keyboardqueue[kbdtail & (KBDQUESIZE - 1)];
+		byte k = keyboardqueue[kbdtail & (KBDQUESIZE - 1)];
 		kbdtail++;
 
 		// extended keyboard shift key bullshit
@@ -151,6 +186,8 @@ void I_StartTic(void)
 			//D_PostEvent(&ev);
 			continue;
 		}
+
+		event_t ev;
 
 		if (k & 0x80)
 			ev.type = ev_keyup;
@@ -290,6 +327,9 @@ static void I_Shutdown(void)
 	{
 		restoreInterrupt(KEYBOARDINT, oldkeyboardisr, newkeyboardisr);
 	}
+
+	if (mousepresent)
+		I_ResetMouse();
 
 	Z_Shutdown();
 }

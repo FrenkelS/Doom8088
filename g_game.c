@@ -99,6 +99,10 @@ static int32_t             totalleveltimes;      // CPhipps - total time for all
 
 static boolean gamekeydown[NUMKEYS];
 
+static const int16_t mouseSensitivity = 50;
+static boolean mousebutton;
+static int16_t mousex;
+
 static skill_t d_skill;
 
 static byte  savegameslot;         // Slot to load if gameaction == ga_loadgame
@@ -200,7 +204,7 @@ static const uint16_t settings_sram_offset = sizeof(gba_save_data_t) * 8;
 //
 static inline int8_t fudgef(int8_t b)
 {
-    static int32_t c;
+    static int16_t c;
     if (!b) return b;
     if (++c & 0x1f) return b;
     b |= 1; if (b>2) b-=2;
@@ -245,6 +249,9 @@ void G_BuildTiccmd(void)
     if (gamekeydown[key_left])
         netcmd.angleturn += angleturn[tspeed];
 
+    netcmd.angleturn -= mousex;
+    mousex = 0;
+
     if (gamekeydown[key_up])
         forward += forwardmove[speed];
     if (gamekeydown[key_down])
@@ -256,7 +263,7 @@ void G_BuildTiccmd(void)
     if (gamekeydown[key_strafeleft])
         side -= sidemove[speed];
 
-    if (gamekeydown[key_fire])
+    if (gamekeydown[key_fire] || mousebutton)
         netcmd.buttons |= BT_ATTACK;
 
     if (gamekeydown[key_use])
@@ -336,7 +343,7 @@ static void G_DoLoadLevel (void)
 // Get info needed to make ticcmd_ts for the players.
 //
 
-boolean G_Responder (event_t* ev)
+void G_Responder (event_t* ev)
 {
     // any other key pops up menu if in demos
     //
@@ -358,12 +365,12 @@ boolean G_Responder (event_t* ev)
                 if(ev->type == ev_keydown)
                 {
                     M_StartControlPanel();
-                    return true;
+                    return;
                 }
             }
         }
 
-        return false;
+        return;
     }
 
     switch (ev->type)
@@ -371,17 +378,43 @@ boolean G_Responder (event_t* ev)
         case ev_keydown:
             if (ev->data1 < NUMKEYS)
                 gamekeydown[ev->data1] = true;
-            return true;    // eat key down events
+            else if(ev->data1 == 'w')
+                gamekeydown[key_up] = true;
+            else if(ev->data1 == 's')
+                gamekeydown[key_down] = true;
+            else if(ev->data1 == 'a')
+                gamekeydown[key_strafeleft] = true;
+            else if(ev->data1 == 'd')
+                gamekeydown[key_straferight] = true;
+            else if(ev->data1 == 'e')
+                gamekeydown[key_use] = true;
+
+            return;    // eat key down events
 
         case ev_keyup:
             if (ev->data1 < NUMKEYS)
                 gamekeydown[ev->data1] = false;
-            return false;   // always let key up events filter down
+            else if(ev->data1 == 'w')
+                gamekeydown[key_up] = false;
+            else if(ev->data1 == 's')
+                gamekeydown[key_down] = false;
+            else if(ev->data1 == 'a')
+                gamekeydown[key_strafeleft] = false;
+            else if(ev->data1 == 'd')
+                gamekeydown[key_straferight] = false;
+            else if(ev->data1 == 'e')
+                gamekeydown[key_use] = false;
+
+            return;   // always let key up events filter down
+
+        case ev_mouse:
+            mousebutton = ev->data1;
+            mousex      = (ev->data2 * (mouseSensitivity + 5) / 10) * 8;
+            return;
 
         default:
             break;
     }
-    return false;
 }
 
 //
