@@ -336,7 +336,7 @@ static void G_DoLoadLevel (void)
 // Get info needed to make ticcmd_ts for the players.
 //
 
-boolean G_Responder (event_t* ev)
+void G_Responder (event_t* ev)
 {
     // any other key pops up menu if in demos
     //
@@ -358,12 +358,12 @@ boolean G_Responder (event_t* ev)
                 if(ev->type == ev_keydown)
                 {
                     M_StartControlPanel();
-                    return true;
+                    return;
                 }
             }
         }
 
-        return false;
+        return;
     }
 
     switch (ev->type)
@@ -371,17 +371,16 @@ boolean G_Responder (event_t* ev)
         case ev_keydown:
             if (ev->data1 < NUMKEYS)
                 gamekeydown[ev->data1] = true;
-            return true;    // eat key down events
+            return;    // eat key down events
 
         case ev_keyup:
             if (ev->data1 < NUMKEYS)
                 gamekeydown[ev->data1] = false;
-            return false;   // always let key up events filter down
+            return;   // always let key up events filter down
 
         default:
             break;
     }
-    return false;
 }
 
 //
