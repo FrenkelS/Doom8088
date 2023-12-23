@@ -264,7 +264,10 @@ void G_BuildTiccmd(void)
         side -= sidemove[speed];
 
     if (gamekeydown[key_fire] || mousebutton)
+    {
         netcmd.buttons |= BT_ATTACK;
+        mousebutton = false;
+    }
 
     if (gamekeydown[key_use])
     {

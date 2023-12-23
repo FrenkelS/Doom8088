@@ -110,7 +110,8 @@ static void I_ReadMouse(void)
 	int86(0x33, &regs, &regs);
 	ev.data2 = regs.w.cx;
 
-	D_PostEvent(&ev);
+	if (ev.data2 != 0 || ev.data1 != 0)
+		D_PostEvent(&ev);
 }
 
 
