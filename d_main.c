@@ -152,8 +152,6 @@ static void D_Display (void)
     if (nodrawers)                    // for comparative timing / profiling
         return;
 
-    I_StartDisplay();
-
     // save the current screen if about to wipe
     boolean wipe = (_g_gamestate != wipegamestate);
 

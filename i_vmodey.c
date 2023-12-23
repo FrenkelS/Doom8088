@@ -389,12 +389,6 @@ void I_InitGraphics(void)
 }
 
 
-void I_StartDisplay(void)
-{
-	// Do nothing
-}
-
-
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 

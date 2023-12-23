@@ -241,8 +241,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 
 static boolean isGraphicsModeSet = false;
-static uint8_t __far* screen;
-static uint8_t __far* backBuffer;
+static uint8_t __far* vgascreen;
 
 static int8_t newpal;
 
@@ -284,7 +283,7 @@ static void I_UploadNewPalette(int8_t pal)
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
-	uint8_t __far* dst = screen;
+	uint8_t __far* dst = vgascreen;
 
 #if defined DISABLE_STATUS_BAR
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
@@ -312,7 +311,7 @@ void I_FinishUpdate(void)
 		newpal = NO_PALETTE_CHANGE;
 	}
 
-	I_DrawBuffer(backBuffer);
+	I_DrawBuffer(_s_screen);
 }
 
 
@@ -332,16 +331,10 @@ void I_InitGraphics(void)
 	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
-	screen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	vgascreen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 
-	backBuffer = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
-	_fmemset(backBuffer, 0, SCREENWIDTH * SCREENHEIGHT);
-}
-
-
-void I_StartDisplay(void)
-{
-	_s_screen = backBuffer;
+	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
+	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
 }
 
 
@@ -633,7 +626,7 @@ void wipe_StartScreen(void)
 	if (frontbuffer)
 	{
 		// copy back buffer to front buffer
-		_fmemcpy(frontbuffer, backBuffer, SCREENWIDTH * SCREENHEIGHT);
+		_fmemcpy(frontbuffer, _s_screen, SCREENWIDTH * SCREENHEIGHT);
 	}
 }
 
@@ -642,7 +635,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 {
 	boolean done = true;
 
-	uint16_t __far* backbuffer = (uint16_t __far*)backBuffer;
+	uint16_t __far* backbuffer = (uint16_t __far*)_s_screen;
 
 	while (ticks--)
 	{
