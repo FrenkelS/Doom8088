@@ -20,13 +20,14 @@ cpu 8086
 bits 16
 
 
+; Divide FFFFFFFFh by a 32-bit number.
+; Based on https://github.com/FDOS/kernel/blob/master/kernel/ludivmul.inc
+;
 ; input:
-;   ffff ffff = dividend (was dx:ax)
-;   dx:ax = divisor (was cx:bx)
+;   dx:ax = divisor
 ;
 ; output:
-;   dx:ax = quotient of division of dividend by divisor
-;   cx:bx = remainder of division of dividend by divisor
+;   dx:ax = quotient of division of FFFFFFFFh by divisor
 
 global FixedReciprocal
 FixedReciprocal:
@@ -40,8 +41,8 @@ FixedReciprocal:
 	xchg    ax, cx             ; cx = quotient-hi, ax = FFFFh
 
 	div     bx                 ; ax = quotient-lo
-	mov     dx, cx             ; dx = quotient-hi (quotient in dx:ax)
-	ret
+	mov     dx, cx             ; dx = quotient-hi
+	ret                        ; return quotient in dx:ax
 
 big_divisor:
 	mov     cx, dx
@@ -51,36 +52,29 @@ big_divisor:
 
 	push    si                 ; save temp
 	push    di                 ;  variables
-	push    dx                 ; save
-	push    ax                 ;  dividend
 	mov     si, bx             ; divisor now in
 	mov     di, cx             ;  di:si and cx:bx
 shift_loop:
-	shr     dx, 1              ; shift both
-	rcr     ax, 1              ;  dividend
-	shr     cx, 1              ;   and divisor
-	rcr     bx, 1              ;    right by 1 bit
-	jnz     shift_loop         ;     loop if di non-zero (rcr does not touch ZF)
-	div     bx                 ; compute quotient dx:ax>>x / cx:bx>>x (stored in ax; remainder in dx not used)
-	pop     bx                 ; get dividend lo-word
+	shr     dx, 1              ; shift both dividend = FFFFFFFFh
+	shr     cx, 1              ;  and divisor
+	rcr     bx, 1              ;   right by 1 bit
+	jnz     shift_loop         ;    loop if di non-zero (rcr does not touch ZF)
+	div     bx                 ; compute quotient FFFFh:FFFFh>>x / cx:bx>>x (stored in ax; remainder in dx not used)
 	mov     cx, ax             ; save quotient
 	mul     di                 ; quotient * divisor hi-word (low only)
-	pop     dx                 ; dividend high
+	mov     dx, 0ffffh         ; dividend high = FFFFh
 	sub     dx, ax             ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
 	push    dx                 ; save dividend high
 	mov     ax, cx             ; ax=quotient
 	mul     si                 ; quotient * divisor lo-word
+	mov     bx, 0ffffh         ; get dividend lo-word = FFFFh
 	sub     bx, ax             ; dividend-lo - (quot.*divisor-lo)-lo
 	mov     ax, cx             ; get quotient
 	pop     cx                 ; restore dividend hi-word
 	sbb     cx, dx             ; subtract (divisor-lo * quot.)-hi from dividend-hi
 	sbb     dx, dx             ; 0 if remainder > 0, else FFFFFFFFh
-	and     si, dx             ; nothing to add
-	and     di, dx             ;  back if remainder positive di:si := di:si(cx:bx) & dx:dx
-	add     bx, si             ; correct remainder           cx:bx += di:si
-	adc     cx, di             ;  and
-	add     ax, dx             ;   quotient if necessary           ax += dx
+	add     ax, dx             ; correct quotient if necessary           ax += dx
 	xor     dx, dx             ; clear hi-word of quot (ax<=FFFFh) dx := 0
 	pop     di                 ; restore temp  
 	pop     si                 ;  variables
-	ret
+	ret                        ; return quotient in dx:ax
