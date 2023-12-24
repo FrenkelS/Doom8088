@@ -64,14 +64,11 @@ shift_loop:
 	mul     di                 ; quotient * divisor hi-word (low only)
 	mov     dx, 0ffffh         ; dividend high = FFFFh
 	sub     dx, ax             ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
-	push    dx                 ; save dividend high
+	mov     bx, dx             ; save dividend high
 	mov     ax, cx             ; ax=quotient
 	mul     si                 ; quotient * divisor lo-word
-	mov     bx, 0ffffh         ; get dividend lo-word = FFFFh
-	sub     bx, ax             ; dividend-lo - (quot.*divisor-lo)-lo
 	mov     ax, cx             ; get quotient
-	pop     cx                 ; restore dividend hi-word
-	sbb     cx, dx             ; subtract (divisor-lo * quot.)-hi from dividend-hi
+	sub     bx, dx             ; subtract (divisor-lo * quot.)-hi from dividend-hi
 	sbb     dx, dx             ; 0 if remainder > 0, else FFFFFFFFh
 	add     ax, dx             ; correct quotient if necessary           ax += dx
 	xor     dx, dx             ; clear hi-word of quot (ax<=FFFFh) dx := 0
