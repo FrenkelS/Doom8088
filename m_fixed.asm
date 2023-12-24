@@ -31,11 +31,12 @@ bits 16
 
 global FixedReciprocal
 FixedReciprocal:
+	mov     bx, ax             ; bx = divisor-lo
+	mov     ax, 0ffffh         ; ax = FFFFh
+
 	test    dx, dx             ; divisor > 2^16-1 ?
 	jnz     big_divisor        ; yes, divisor > 2^16-1
 
-	mov     bx, ax             ;
-	mov     ax, 0ffffh         ; 
 	mov     cx, ax             ; ax = FFFFh, bx = divisor-lo, cx = FFFFh, dx = 0
 	div     bx                 ; quotient-hi in ax
 	xchg    ax, cx             ; cx = quotient-hi, ax = FFFFh
@@ -45,10 +46,8 @@ FixedReciprocal:
 	ret                        ; return quotient in dx:ax
 
 big_divisor:
-	mov     cx, dx
-	mov     bx, ax
-	mov     dx, 0ffffh
-	mov     ax, dx
+	mov     cx, dx             ; cx = divisor-hi
+	mov     dx, ax             ; ax = FFFFh, bx = divisor-lo, cx = divisor-hi, dx = FFFFh
 
 	push    si                 ; save temp
 	push    di                 ;  variables
