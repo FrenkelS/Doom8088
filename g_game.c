@@ -200,7 +200,7 @@ static const uint16_t settings_sram_offset = sizeof(gba_save_data_t) * 8;
 //
 static inline int8_t fudgef(int8_t b)
 {
-    static int32_t c;
+    static int16_t c;
     if (!b) return b;
     if (++c & 0x1f) return b;
     b |= 1; if (b>2) b-=2;
