@@ -39,7 +39,6 @@ boolean I_IsGraphicsModeSet(void);
 void I_FinishUpdate(void);
 void I_SetPalette(int8_t pal);
 void I_InitGraphics(void);
-void I_StartDisplay(void);
 void R_DrawColumn (const draw_column_vars_t *dcvars);
 void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
 void R_DrawFuzzColumn (const draw_column_vars_t *dcvars);

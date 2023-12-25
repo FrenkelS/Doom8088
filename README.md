@@ -63,7 +63,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
 |IDRATE    |Toggle FPS counter       |
 
 ## Building:
-1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) on Ubuntu.
+1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) and [NASM](https://www.nasm.us) on Ubuntu.
 
 2) Run `compiamy.sh` to compile the Mode Y version and `compia13.sh` for the Mode 13h version.
 
