@@ -261,10 +261,10 @@ static const int16_t CENTERX = VIEWWINDOWWIDTH  / 2;
 static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 
 static const int16_t  PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
-static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_VGA;
+static const fixed_t IPSPRITESCALE  = FRACUNIT * SCREENWIDTH_VGA / VIEWWINDOWWIDTH; // = FixedReciprocal(PSPRITESCALE)
 
-static const fixed_t IPSPRITESCALE  = 0x55555; // FixedReciprocal(PSPRITESCALE)
-static const fixed_t IPSPRITEYSCALE = 0x14000; // FixedReciprocal(PSPRITEYSCALE)
+static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT     / SCREENHEIGHT_VGA;
+static const fixed_t IPSPRITEYSCALE = FRACUNIT * SCREENHEIGHT_VGA / SCREENHEIGHT; // = FixedReciprocal(PSPRITEYSCALE)
 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
 
@@ -327,6 +327,36 @@ inline static fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 	uint32_t hl = (uint32_t) ahw * blw;
 	return (ll >> FRACBITS) + hl;
 }
+
+
+//
+// FixedReciprocalSmall
+// Divide FFFFFFFFh by a 16-bit number.
+//
+
+#if defined C_ONLY
+#define FixedReciprocalSmall(v) (0xffffffffu/(uint16_t)(v))
+#else
+inline static fixed_t CONSTFUNC FixedReciprocalSmall(uint16_t divisor)
+{
+	fixed_t quotient;
+	asm
+	(
+		"mov %0, %%bx \n"      // bx = divisor
+		"mov $0xffff, %%ax \n" // ax = FFFFh
+		"mov %%ax, %%cx \n"    // cx = FFFFh
+		"xor %%dx, %%dx \n"    // dx = 0
+		"div %%bx \n"          // dx:ax / bx -> quotient-hi in ax, remainder in dx
+		"xchg %%cx, %%ax \n"   // cx = quotient-hi, ax = FFFFh
+		"div %%bx \n"          // dx:ax / bx -> ax = quotient-lo
+		"mov %%cx, %%dx"       // dx = quotient-hi
+		: "=A" (quotient)      // return quotient in dx:ax
+		: "q" (divisor)
+		: "bx", "cx"
+	);
+	return quotient;
+}
+#endif
 
 
 //Approx fixed point divide of a/b using reciprocal. -> a * (1/b).

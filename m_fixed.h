@@ -69,10 +69,8 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b);
 //Approx Reciprocal of v
 #if defined C_ONLY
 #define FixedReciprocal(v) (0xffffffffu/(v))
-#define FixedReciprocalSmall FixedReciprocal
 #else
 fixed_t CONSTFUNC FixedReciprocal(fixed_t v);
-fixed_t CONSTFUNC FixedReciprocalSmall(uint16_t v);
 #endif
 
 

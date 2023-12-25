@@ -74,25 +74,3 @@ shift_loop:
 	pop     di                 ; restore temp  
 	pop     si                 ;  variables
 	retf                       ; return quotient in dx:ax
-
-
-; Divide FFFFFFFFh by a 16-bit number.
-;
-; input:
-;   ax = divisor
-;
-; output:
-;   dx:ax = quotient of division of FFFFFFFFh by divisor
-
-global FixedReciprocalSmall
-FixedReciprocalSmall:
-	mov     bx, ax             ; bx = divisor
-	mov     ax, 0ffffh         ;
-	mov     cx, ax             ;
-	xor     dx, dx             ; ax = FFFFh, bx = divisor, cx = FFFFh, dx = 0
-	div     bx                 ; quotient-hi in ax
-	xchg    ax, cx             ; cx = quotient-hi, ax = FFFFh
-
-	div     bx                 ; ax = quotient-lo
-	mov     dx, cx             ; dx = quotient-hi
-	retf                       ; return quotient in dx:ax
