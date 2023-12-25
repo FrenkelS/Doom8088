@@ -837,7 +837,7 @@ static PUREFUNC boolean R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t __far
     if ((ldy ^ ldx ^ x ^ y) < 0)
         return (ldy ^ x) < 0;          // (left is negative)
 
-    return FixedMul(y, ldx>>FRACBITS) >= FixedMul(x, ldy>>FRACBITS);
+    return FixedMul3216(y, ldx>>FRACBITS) >= FixedMul3216(x, ldy>>FRACBITS);
 }
 
 
