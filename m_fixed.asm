@@ -76,23 +76,42 @@ shift_loop:
 	retf                       ; return quotient in dx:ax
 
 
-; Divide FFFFFFFFh by a 16-bit number.
+; Divide FFFFFFFFh by a 32-bit number.
 ;
 ; input:
-;   ax = divisor
+;   dx:ax = divisor, dx != 0
 ;
 ; output:
-;   dx:ax = quotient of division of FFFFFFFFh by divisor
+;   ax = quotient of division of FFFFFFFFh by divisor
 
-global FixedReciprocalSmall
-FixedReciprocalSmall:
-	mov     bx, ax             ; bx = divisor
-	mov     ax, 0ffffh         ;
-	mov     cx, ax             ;
-	xor     dx, dx             ; ax = FFFFh, bx = divisor, cx = FFFFh, dx = 0
-	div     bx                 ; quotient-hi in ax
-	xchg    ax, cx             ; cx = quotient-hi, ax = FFFFh
+global FixedReciprocalBig
+FixedReciprocalBig:
+	mov     bx, ax             ; bx = divisor-lo
+	mov     cx, dx             ; cx = divisor-hi
+	mov     ax, 0ffffh         ; ax = FFFFh
+	mov     dx, ax             ; ax = FFFFh, bx = divisor-lo, cx = divisor-hi, dx = FFFFh
 
-	div     bx                 ; ax = quotient-lo
-	mov     dx, cx             ; dx = quotient-hi
+	push    si                 ; save temp
+	push    di                 ;  variables
+	mov     si, bx             ; divisor now in
+	mov     di, cx             ;  di:si and cx:bx
+shift_loop_big:
+	shr     dx, 1              ; shift both dividend = FFFFFFFFh
+	shr     cx, 1              ;  and divisor
+	rcr     bx, 1              ;   right by 1 bit
+	jnz     shift_loop_big     ;    loop if di non-zero (rcr does not touch ZF)
+	div     bx                 ; compute quotient FFFFh:FFFFh>>x / cx:bx>>x (stored in ax; remainder in dx not used)
+	mov     cx, ax             ; save quotient
+	mul     di                 ; quotient * divisor hi-word (low only)
+	mov     dx, 0ffffh         ; dividend high = FFFFh
+	sub     dx, ax             ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
+	mov     bx, dx             ; save dividend high
+	mov     ax, cx             ; ax=quotient
+	mul     si                 ; quotient * divisor lo-word
+	mov     ax, cx             ; get quotient
+	sub     bx, dx             ; subtract (divisor-lo * quot.)-hi from dividend-hi
+	sbb     dx, dx             ; 0 if remainder > 0, else FFFFFFFFh
+	add     ax, dx             ; correct quotient if necessary           ax += dx
+	pop     di                 ; restore temp  
+	pop     si                 ;  variables
 	retf                       ; return quotient in dx:ax
