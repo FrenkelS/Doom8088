@@ -1002,10 +1002,10 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     fixed_t tx = psp->sx - (SCREENWIDTH_VGA / 2) * FRACUNIT;
 
     tx -= ((int32_t)patch->leftoffset) << FRACBITS;
-    x1 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS);
+    x1 = CENTERX + (FixedMul3216(tx, PSPRITESCALE) >> FRACBITS);
 
     tx += ((int32_t)patch->width) << FRACBITS;
-    x2 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS) - 1;
+    x2 = CENTERX + (FixedMul3216(tx, PSPRITESCALE) >> FRACBITS) - 1;
 
     topoffset = ((int32_t)patch->topoffset) << FRACBITS;
 
