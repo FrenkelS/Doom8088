@@ -24,7 +24,7 @@
 #
 # --------------------------------------------------------------------------
 
-CCOPTS = -omaxtnrih -ol+ -oe=32 -zp1 -bt=dos -D__far= -3r -j -zq -zc -wx -za99 -DFLAT_SPAN
+CCOPTS = -omaxtnrih -ol+ -oe=32 -zp1 -bt=dos -D__far= -3r -j -zq -zc -wx -za99 -DFLAT_SPAN -DC_ONLY
 
 GLOBOBJS = &
  a_pcfx.obj &

@@ -283,6 +283,10 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 		uint32_t ll = (uint32_t) alw * blw;
 		uint32_t hl = (uint32_t) ahw * blw;
 		return (ll >> FRACBITS) + hl;
+	} else if (alw == 0) {
+		uint32_t hl = (uint32_t) ahw * blw;
+		uint32_t hh = (uint32_t) ahw * bhw;
+		return hl + (hh << FRACBITS);
 	} else if (ahw == 0) {
 		uint32_t ll = (uint32_t) alw * blw;
 		uint32_t lh = (uint32_t) alw * bhw;
@@ -332,7 +336,7 @@ inline
 fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 {
 	if (b <= 0xffffu)
-		return FixedMul3232(a, FixedReciprocal(b));
+		return FixedMul3232(a, FixedReciprocalSmall(b));
 	else
 		return FixedMul3216(a, 0xffffu / (int16_t)(b >> FRACBITS));
 }
@@ -833,7 +837,7 @@ static PUREFUNC boolean R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t __far
     if ((ldy ^ ldx ^ x ^ y) < 0)
         return (ldy ^ x) < 0;          // (left is negative)
 
-    return FixedMul(y, ldx>>FRACBITS) >= FixedMul(x, ldy>>FRACBITS);
+    return FixedMul3216(y, ldx>>FRACBITS) >= FixedMul3216(x, ldy>>FRACBITS);
 }
 
 
