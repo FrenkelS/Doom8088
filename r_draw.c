@@ -263,6 +263,8 @@ static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 static const int16_t  PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
 static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_VGA;
 
+static const fixed_t IPSPRITESCALE  = 0x55555; // FixedReciprocal(PSPRITESCALE)
+static const fixed_t IPSPRITEYSCALE = 0x14000; // FixedReciprocal(PSPRITEYSCALE)
 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
 
@@ -987,9 +989,9 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     vis->x2 = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
     // proff 11/06/98: Added for high-res
     vis->scale = PSPRITEYSCALE;
-    vis->iscale = FixedReciprocal(PSPRITEYSCALE);
+    vis->iscale = IPSPRITEYSCALE;
 
-    vis->xiscale = FixedReciprocal(PSPRITESCALE);
+    vis->xiscale = IPSPRITESCALE;
     vis->startfrac = 0;
 
     if (vis->x1 > x1)
