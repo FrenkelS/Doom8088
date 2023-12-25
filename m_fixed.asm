@@ -43,7 +43,7 @@ FixedReciprocal:
 
 	div     bx                 ; ax = quotient-lo
 	mov     dx, cx             ; dx = quotient-hi
-	ret                        ; return quotient in dx:ax
+	retf                       ; return quotient in dx:ax
 
 big_divisor:
 	mov     cx, dx             ; cx = divisor-hi
@@ -73,4 +73,4 @@ shift_loop:
 	xor     dx, dx             ; clear hi-word of quot (ax<=FFFFh) dx := 0
 	pop     di                 ; restore temp  
 	pop     si                 ;  variables
-	ret                        ; return quotient in dx:ax
+	retf                       ; return quotient in dx:ax
