@@ -297,6 +297,32 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 }
 
 
+inline static fixed_t CONSTFUNC FixedMul3232(fixed_t a, fixed_t b)
+{
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+	uint16_t blw = b;
+	 int16_t bhw = b >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * blw;
+	uint32_t lh = (uint32_t) alw * bhw;
+	uint32_t hl = (uint32_t) ahw * blw;
+	uint32_t hh = (uint32_t) ahw * bhw;
+	return (ll >> FRACBITS) + lh + hl + (hh << FRACBITS);
+}
+
+
+inline static fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
+{
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * blw;
+	uint32_t hl = (uint32_t) ahw * blw;
+	return (ll >> FRACBITS) + hl;
+}
+
+
 //Approx fixed point divide of a/b using reciprocal. -> a * (1/b).
 #if defined __WATCOMC__
 //
@@ -305,7 +331,10 @@ inline
 #endif
 fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 {
-	return FixedMul(a, FixedReciprocal(b));
+	if (b <= 0xffffu)
+		return FixedMul3232(a, FixedReciprocal(b));
+	else
+		return FixedMul3216(a, 0xffffu / (int16_t)(b >> FRACBITS));
 }
 
 
