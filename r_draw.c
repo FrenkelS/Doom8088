@@ -318,7 +318,12 @@ inline static fixed_t CONSTFUNC FixedMul3232(fixed_t a, fixed_t b)
 }
 
 
-inline static fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
+#if defined __WATCOMC__
+//
+#else
+inline
+#endif
+fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 {
 	uint16_t alw = a;
 	 int16_t ahw = a >> FRACBITS;
