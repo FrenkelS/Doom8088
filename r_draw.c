@@ -332,7 +332,7 @@ inline
 fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 {
 	if (b <= 0xffffu)
-		return FixedMul3232(a, FixedReciprocal(b));
+		return FixedMul3232(a, FixedReciprocalSmall(b));
 	else
 		return FixedMul3216(a, 0xffffu / (int16_t)(b >> FRACBITS));
 }
