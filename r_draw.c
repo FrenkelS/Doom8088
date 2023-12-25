@@ -336,6 +336,7 @@ inline static fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 
 #if defined C_ONLY
 #define FixedReciprocalSmall(v) (0xffffffffu/(uint16_t)(v))
+#define FixedReciprocalBig(v)   (0xffffffffu/(v))
 #else
 inline static fixed_t CONSTFUNC FixedReciprocalSmall(uint16_t divisor)
 {
@@ -356,6 +357,8 @@ inline static fixed_t CONSTFUNC FixedReciprocalSmall(uint16_t divisor)
 	);
 	return quotient;
 }
+
+uint16_t CONSTFUNC FixedReciprocalBig(fixed_t v);
 #endif
 
 
@@ -370,7 +373,7 @@ fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 	if (b <= 0xffffu)
 		return FixedMul3232(a, FixedReciprocalSmall(b));
 	else
-		return FixedMul3216(a, 0xffffu / (int16_t)(b >> FRACBITS));
+		return FixedMul3216(a, FixedReciprocalBig(b));
 }
 
 
