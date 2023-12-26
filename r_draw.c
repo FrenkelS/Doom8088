@@ -233,6 +233,7 @@ int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - kill
 int16_t       __far* texturetranslation;
 
 fixed_t  viewcos, viewsin;
+static boolean viewcosint16, viewsinint16;
 
 static fixed_t  topfrac;
 static fixed_t  topstep;
@@ -1207,7 +1208,9 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     const fixed_t tr_x = fx - viewx;
     const fixed_t tr_y = fy - viewy;
 
-    const fixed_t tz = FixedMul(tr_x, viewcos) - (-FixedMul(tr_y, viewsin));
+    fixed_t xc = viewcosint16 ? FixedMul3216(tr_x, viewcos) : FixedMul3232(tr_x, viewcos);
+    fixed_t ys = viewsinint16 ? FixedMul3216(tr_y, viewsin) : FixedMul3232(tr_y, viewsin);
+    const fixed_t tz = xc - (-ys);
 
     // thing is behind view plane?
     if (tz < MINZ)
@@ -1217,7 +1220,9 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     if(tz > MAXZ)
         return;
 
-    fixed_t tx = -(FixedMul(tr_y, viewcos) + (-FixedMul(tr_x, viewsin)));
+    fixed_t yc = viewcosint16 ? FixedMul3216(tr_y, viewcos) : FixedMul3232(tr_y, viewcos);
+    fixed_t xs = viewsinint16 ? FixedMul3216(tr_x, viewsin) : FixedMul3232(tr_x, viewsin);
+    fixed_t tx = -(yc + (-xs));
 
     // too far off the side?
     if (D_abs(tx)>(tz<<2))
@@ -2578,6 +2583,9 @@ static void R_SetupFrame (player_t *player)
 
     viewsin = finesine(  viewangle>>ANGLETOFINESHIFT);
     viewcos = finecosine(viewangle>>ANGLETOFINESHIFT);
+
+    viewsinint16 = viewsin >> FRACBITS == 0;
+    viewcosint16 = viewcos >> FRACBITS == 0;
 
     fullcolormap = &colormaps[0];
 
