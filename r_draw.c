@@ -344,26 +344,7 @@ fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 #define FixedReciprocalSmall(v) (0xffffffffu/(uint16_t)(v))
 #define FixedReciprocalBig(v)   (0xffffffffu/(v))
 #else
-inline static fixed_t CONSTFUNC FixedReciprocalSmall(uint16_t divisor)
-{
-	fixed_t quotient;
-	asm
-	(
-		"mov %0, %%bx \n"      // bx = divisor
-		"mov $0xffff, %%ax \n" // ax = FFFFh
-		"mov %%ax, %%cx \n"    // cx = FFFFh
-		"xor %%dx, %%dx \n"    // dx = 0
-		"div %%bx \n"          // dx:ax / bx -> quotient-hi in ax, remainder in dx
-		"xchg %%cx, %%ax \n"   // cx = quotient-hi, ax = FFFFh
-		"div %%bx \n"          // dx:ax / bx -> ax = quotient-lo
-		"mov %%cx, %%dx"       // dx = quotient-hi
-		: "=A" (quotient)      // return quotient in dx:ax
-		: "q" (divisor)
-		: "bx", "cx"
-	);
-	return quotient;
-}
-
+fixed_t  CONSTFUNC FixedReciprocalSmall(uint16_t v);
 uint16_t CONSTFUNC FixedReciprocalBig(fixed_t v);
 #endif
 
