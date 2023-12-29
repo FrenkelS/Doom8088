@@ -61,9 +61,8 @@ shift_loop:
 	div     bx                 ; compute quotient FFFFh:FFFFh>>x / cx:bx>>x (stored in ax; remainder in dx not used)
 	mov     cx, ax             ; save quotient
 	mul     di                 ; quotient * divisor hi-word (low only)
-	mov     dx, 0ffffh         ; dividend high = FFFFh
-	sub     dx, ax             ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
-	mov     bx, dx             ; save dividend high
+	not     ax                 ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
+	mov     bx, ax             ; save dividend high
 	mov     ax, cx             ; ax=quotient
 	mul     si                 ; quotient * divisor lo-word
 	mov     ax, cx             ; get quotient
@@ -125,9 +124,8 @@ shift_loop_big:
 	div     bx                 ; compute quotient FFFFh:FFFFh>>x / cx:bx>>x (stored in ax; remainder in dx not used)
 	mov     cx, ax             ; save quotient
 	mul     di                 ; quotient * divisor hi-word (low only)
-	mov     dx, 0ffffh         ; dividend high = FFFFh
-	sub     dx, ax             ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
-	mov     bx, dx             ; save dividend high
+	not     ax                 ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
+	mov     bx, ax             ; save dividend high
 	mov     ax, cx             ; ax=quotient
 	mul     si                 ; quotient * divisor lo-word
 	mov     ax, cx             ; get quotient
