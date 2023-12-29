@@ -50,7 +50,8 @@ typedef enum
 {
   ev_keydown,
   ev_keyup,
-  ev_mouse
+  ev_mouse_click,
+  ev_mouse_move
 } evtype_t;
 
 // Event structure.
@@ -58,7 +59,6 @@ typedef struct
 {
   evtype_t type;
   int16_t  data1;    // keys / mouse buttons
-  int16_t  data2;    // mouse x move
 } event_t;
 
 

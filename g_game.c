@@ -99,9 +99,10 @@ static int32_t             totalleveltimes;      // CPhipps - total time for all
 
 static boolean gamekeydown[NUMKEYS];
 
-static const int16_t mouseSensitivity = 50;
+static const int16_t mouseSensitivity = 35;
 static boolean mousebutton;
 static int16_t mousex;
+static int16_t mousexframe;
 
 static skill_t d_skill;
 
@@ -250,7 +251,8 @@ void G_BuildTiccmd(void)
         netcmd.angleturn += angleturn[tspeed];
 
     netcmd.angleturn -= mousex;
-    mousex = 0;
+    if (mousexframe-- == 0)
+        mousex = 0;
 
     if (gamekeydown[key_up])
         forward += forwardmove[speed];
@@ -410,9 +412,13 @@ void G_Responder (event_t* ev)
 
             return;   // always let key up events filter down
 
-        case ev_mouse:
-            mousebutton = ev->data1;
-            mousex      = (ev->data2 * (mouseSensitivity + 5) / 10) * 8;
+        case ev_mouse_click:
+            mousebutton = true;
+            return;
+
+        case ev_mouse_move:
+            mousex = (ev->data1 * (mouseSensitivity + 5) / 10) * 8;
+            mousexframe = 3;
             return;
 
         default:

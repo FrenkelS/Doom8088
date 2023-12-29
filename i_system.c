@@ -98,20 +98,26 @@ static void I_ReadMouse(void)
 	if (!mousepresent)
 		return;
 
-	event_t ev;
-	ev.type = ev_mouse;
-
 	union REGS regs;
+
 	regs.w.ax = 3;                               // read buttons / position
 	int86(0x33, &regs, &regs);
-	ev.data1 = regs.w.bx;
+	if (regs.w.bx)
+	{
+		event_t ev;
+		ev.type = ev_mouse_click;
+		D_PostEvent(&ev);
+	}
 
 	regs.w.ax = 11;                              // read counters
 	int86(0x33, &regs, &regs);
-	ev.data2 = regs.w.cx;
-
-	if (ev.data2 != 0 || ev.data1 != 0)
+	if (regs.w.cx)
+	{
+		event_t ev;
+		ev.type = ev_mouse_move;
+		ev.data1 = regs.w.cx;
 		D_PostEvent(&ev);
+	}
 }
 
 
