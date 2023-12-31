@@ -31,7 +31,7 @@ bits 16
 
 global FixedReciprocal
 FixedReciprocal:
-	mov     bx, ax             ; bx = divisor-lo
+	xchg    bx, ax             ; bx = divisor-lo
 	mov     ax, 0ffffh         ; ax = FFFFh
 
 	test    dx, dx             ; divisor > 2^16-1 ?
@@ -85,7 +85,7 @@ shift_loop:
 
 global FixedReciprocalSmall
 FixedReciprocalSmall:
-	mov     bx, ax             ; bx = divisor
+	xchg    bx, ax             ; bx = divisor
 	mov     ax, 0ffffh         ;
 	mov     cx, ax             ;
 	xor     dx, dx             ; ax = FFFFh, bx = divisor, cx = FFFFh, dx = 0
@@ -107,7 +107,7 @@ FixedReciprocalSmall:
 
 global FixedReciprocalBig
 FixedReciprocalBig:
-	mov     bx, ax             ; bx = divisor-lo
+	xchg    bx, ax             ; bx = divisor-lo
 	mov     cx, dx             ; cx = divisor-hi
 	mov     ax, 0ffffh         ; ax = FFFFh
 	mov     dx, ax             ; ax = FFFFh, bx = divisor-lo, cx = divisor-hi, dx = FFFFh
