@@ -403,7 +403,7 @@ void I_InitGraphics(void)
 #define COLBITS (8 + 1)
 
 static byte nearcolormap[256];
-static uint16_t nearcolormapoffset;
+static uint16_t nearcolormapoffset = 0xffff;
 
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)

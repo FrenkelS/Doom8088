@@ -360,7 +360,7 @@ void I_InitGraphics(void)
 #define COLBITS (8 + 1)
 
 static byte nearcolormap[256];
-static uint16_t nearcolormapoffset;
+static uint16_t nearcolormapoffset = 0xffff;
 
 
 inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, uint16_t frac)
