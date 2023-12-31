@@ -402,10 +402,8 @@ void I_InitGraphics(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, const byte __far* colormap, uint16_t frac)
-{
-	*dest = colormap[source[frac>>COLBITS]];
-}
+static byte nearcolormap[256];
+static uint16_t nearcolormapoffset;
 
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
@@ -417,7 +415,12 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
         return;
 
     const byte __far* source   = dcvars->source;
-    const byte __far* colormap = dcvars->colormap;
+
+	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
+	{
+		_fmemcpy(nearcolormap, dcvars->colormap, 256);
+		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
+	}
 
     uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
@@ -432,44 +435,44 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 
     while (l--)
     {
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
 
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
     }
 
     switch (count & 15)
     {
-        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
+        case 15:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case 14:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case 13:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case 12:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case 11:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case 10:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  9:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  8:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  7:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  6:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  5:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  4:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  3:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  2:    *dest = nearcolormap[source[frac>>COLBITS]]; dest+=PLANEWIDTH; frac+=fracstep;
+        case  1:    *dest = nearcolormap[source[frac>>COLBITS]];
     }
 }
 
@@ -528,7 +531,11 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	const byte __far* colormap = &fullcolormap[6 * 256];
+	if (nearcolormapoffset != D_FP_OFF(&fullcolormap[6 * 256]))
+	{
+		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
+		nearcolormapoffset = D_FP_OFF(&fullcolormap[6 * 256]);
+	}
 
 	uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
 
@@ -536,7 +543,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	do
 	{
-		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos]], colormap, 0);
+		*dest = nearcolormap[dest[fuzzoffset[fuzzpos]]];
 		dest += PLANEWIDTH;
 
 		fuzzpos++;
