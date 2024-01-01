@@ -5,6 +5,7 @@ unset CFLAGS
 #export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR"
 export RENDER_OPTIONS="-DFLAT_SPAN"
 
+nasm i_vvg13a.asm -f elf
 nasm m_fixed.asm -f elf
 
 ia16-elf-gcc -c i_vvga13.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
@@ -28,6 +29,7 @@ export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
 #export GLOBOBJS+=" i_vvga13.c"
 export GLOBOBJS+=" i_vvga13.o"
+export GLOBOBJS+=" i_vvg13a.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_fixed.o"
@@ -71,6 +73,7 @@ export GLOBOBJS+=" z_zone.c"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
+rm i_vvg13a.o
 rm m_fixed.o
 rm i_vvga13.o
 rm r_draw.o

@@ -426,13 +426,13 @@ void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
 {
-    int16_t count = (dcvars->yh - dcvars->yl) + 1;
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
 
-    source = dcvars->source;
+	source = dcvars->source;
 
 	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
 	{
@@ -440,16 +440,16 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
 	}
 
-    dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
-    const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
-    uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
+	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
+	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
 
-    // Inner loop that does the actual texture mapping,
-    //  e.g. a DDA-lile scaling.
-    // This is as fast as it gets.
+	// Inner loop that does the actual texture mapping,
+	//  e.g. a DDA-lile scaling.
+	// This is as fast as it gets.
 
-    R_DrawColumn2(fracstep, frac, count);
+	R_DrawColumn2(fracstep, frac, count);
 }
 
 
