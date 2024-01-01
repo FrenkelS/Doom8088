@@ -96,8 +96,8 @@ last_pixels:
 	je last_pixel3					;  then jump to last_pixel3
 	cmp ah, 2						; if count = 2
 	je last_pixel2					;  then jump to last_pixel2
-	cmp ah, 1						; if count = 1
-	je last_pixel1					;  then jump to last_pixel1
+	or ah, ah						; if count = 1
+	jnz last_pixel1					;  then jump to last_pixel1
 
 	pop bp							; else return
 	pop es
