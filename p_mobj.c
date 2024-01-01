@@ -991,7 +991,6 @@ void P_RemoveMobj(mobj_t __far* mobj)
  *
  * Finds a mobj type with a matching doomednum
  *
- * killough 8/24/98: rewrote to use hashing
  */
 
 static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
@@ -1097,26 +1096,13 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     fixed_t y;
     const int16_t options = mthing->options;
 
-    // killough 2/26/98: Ignore type-0 things as NOPs
-    // phares 5/14/98: Ignore Player 5-8 starts (for now)
-
-    switch(mthing->type)
-    {
-        case 0:
-        case DEN_PLAYER5:
-        case DEN_PLAYER6:
-        case DEN_PLAYER7:
-        case DEN_PLAYER8:
-            return;
-    }
-
     // check for players specially
 
     //Only care about start spot for player 1.
     if(mthing->type == 1)
     {
         playerstart = *mthing;
-        playerstart.options = 1;
+        playerstart.options = MTF_EASY;
         P_SpawnPlayer (&playerstart);
         return;
     }
@@ -1136,12 +1122,16 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
 
     // find which type to spawn
 
-    // killough 8/23/98: use table for faster lookup
     i = P_FindDoomedNum(mthing->type);
 
-    // phares 5/16/98:
-    // Do not abort because of an unknown thing. Ignore it, but post a
-    // warning message for the player.
+    // Do not abort because of an unknown thing. Ignore it.
+    //
+    // Unknown types:
+    //  1: Player start #1
+    //  2: Player start #2
+    //  3: Player start #3
+    //  4: Player start #4
+    // 11: Deathmatch start
 
     if (i == NUMMOBJTYPES)
         return;

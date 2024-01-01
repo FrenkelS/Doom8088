@@ -251,49 +251,6 @@ static void P_LoadNodes (int16_t lump)
 
 
 /*
- * P_IsDoomnumAllowed()
- * Based on code taken from P_LoadThings() in src/p_setup.c  Return TRUE
- * if the thing in question is expected to be available.
- */
-
-//#define NOMONSTERS
-
-static boolean P_IsDoomnumAllowed(int16_t doomnum)
-{
-  // Do not spawn cool, new monsters
-  switch(doomnum)
-    {
-#if defined NOMONSTERS
-    case    7: // Spiderdemon
-    case    9: // Shotgun guy
-    case   16: // Cyberdemon
-    case   58: // Spectre
-    case   72: // Commander Keen
-    case 3001: // Imp
-    case 3002: // Demon
-    case 3003: // Baron of Hell
-    case 3004: // Zombieman
-    case 3005: // Cacodemon
-    case 3006: // Lost soul
-#endif
-    case 64:  // Arch-vile
-    case 65:  // Heavy weapon dude
-    case 66:  // Revenant
-    case 67:  // Mancubus
-    case 68:  // Arachnotron
-    case 69:  // Hell knight
-    case 71:  // Pain elemental
-    case 84:  // Wolfenstein SS
-    case 88:  // Romero's head
-    case 89:  // Monster spawner
-      return false;
-    }
-
-  return true;
-}
-
-
-/*
  * P_LoadThings
  *
  * killough 5/3/98: reformatted, cleaned up
@@ -303,7 +260,7 @@ static boolean P_IsDoomnumAllowed(int16_t doomnum)
 
 static void P_LoadThings (int16_t lump)
 {
-    int16_t  i, numthings = W_LumpLength (lump) / sizeof(mapthing_t);
+    int16_t  numthings = W_LumpLength (lump) / sizeof(mapthing_t);
     const mapthing_t __far* data = W_GetLumpByNumAutoFree (lump);
 
     if ((!data) || (!numthings))
@@ -312,17 +269,14 @@ static void P_LoadThings (int16_t lump)
     _g_thingPool = Z_CallocLevel(numthings * sizeof(mobj_t));
     _g_thingPoolSize = numthings;
 
-    for(int16_t i = 0; i < numthings; i++)
+    for (int16_t i = 0; i < numthings; i++)
     {
         _g_thingPool[i].type = MT_NOTHING;
     }
 
-    for (i=0; i<numthings; i++)
+    for (int16_t i=0; i<numthings; i++)
     {
         const mapthing_t __far* mt = &data[i];
-
-        if (!P_IsDoomnumAllowed(mt->type))
-            continue;
 
         // Do spawn all other stuff.
         P_SpawnMapThing(mt);

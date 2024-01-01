@@ -77,13 +77,6 @@
 // The maximum number of players, multiplayer/networking.
 #define MAXPLAYERS       1
 
-// phares 5/14/98:
-// DOOM Editor Numbers (aka doomednum in mobj_t)
-
-#define DEN_PLAYER5 4001
-#define DEN_PLAYER6 4002
-#define DEN_PLAYER7 4003
-#define DEN_PLAYER8 4004
 
 // State updates, number of tics / second.
 #define TICRATE          35
