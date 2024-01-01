@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023 Frenkel Smeijers
+ *  Copyright (C) 2023-2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -359,8 +359,11 @@ void I_InitGraphics(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-static byte nearcolormap[256];
+uint8_t nearcolormap[256];
 static uint16_t nearcolormapoffset = 0xffff;
+
+const uint8_t __far* source;
+uint8_t __far* dest;
 
 
 inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, uint16_t frac)
@@ -374,6 +377,21 @@ inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* sour
 }
 
 
+#if defined C_ONLY
+static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
+{
+	while (count--)
+	{
+		R_DrawColumnPixel(dest, source, frac);
+		dest += SCREENWIDTH;
+		frac += fracstep;
+	}
+}
+#else
+void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
+#endif
+
+
 void R_DrawColumn(const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
@@ -382,7 +400,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	const byte __far* source   = dcvars->source;
+	source = dcvars->source;
 
 	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
 	{
@@ -390,7 +408,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
 	}
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
+	dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 
 	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
 	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
@@ -399,49 +417,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 	//  e.g. a DDA-lile scaling.
 	// This is as fast as it gets.
 
-	uint16_t l = count >> 4;
-
-	while (l--)
-	{
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-	}
-
-	switch (count & 15)
-	{
-		case 15:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case 14:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case 13:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case 12:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case 11:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case 10:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  9:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  8:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  7:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  6:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  5:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  4:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  3:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  2:    R_DrawColumnPixel(dest, source, frac); dest+=SCREENWIDTH; frac+=fracstep;
-		case  1:    R_DrawColumnPixel(dest, source, frac);
-	}
+	R_DrawColumn2(fracstep, frac, count);
 }
 
 
