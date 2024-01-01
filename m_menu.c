@@ -62,6 +62,9 @@
 #include "globdata.h"
 
 
+#define DISABLE_SOUND_OPTIONS
+
+
 //
 // MENU TYPEDEFS
 //
@@ -153,8 +156,6 @@ static void M_Sound(int16_t choice);
 static void M_LoadSelect(int16_t choice);
 static void M_SaveSelect(int16_t choice);
 static void M_ReadSaveStrings(void);
-void M_QuickSave(void);
-void M_QuickLoad(void);
 
 static void M_DrawMainMenu(void);
 static void M_DrawNewGame(void);
@@ -189,9 +190,9 @@ static void M_ClearMenus (void);
 enum
 {
   newgame = 0,
+  options,
   loadgame,
   savegame,
-  options,
   main_end
 };
 
@@ -199,8 +200,7 @@ enum
 // MainMenu is the definition of what the main menu Screen should look
 // like. Each entry shows that the cursor can land on each item (1), the
 // built-in graphic lump (i.e. "M_NGAME") that should be displayed,
-// the program which takes over when an item is selected, and the hotkey
-// associated with the item.
+// and the program which takes over when an item is selected.
 //
 
 static const menuitem_t MainMenu[]=
@@ -517,7 +517,9 @@ enum
   messages,
   alwaysrun,
   gamma,
+#if !defined DISABLE_SOUND_OPTIONS
   soundvol,
+#endif
   opt_end
 };
 
@@ -530,7 +532,9 @@ static const menuitem_t OptionsMenu[]=
   {1,"M_MESSG",  M_ChangeMessages},
   {1,"M_ARUN",   M_ChangeAlwaysRun},
   {2,"M_GAMMA",  M_ChangeGamma},
+#if !defined DISABLE_SOUND_OPTIONS
   {1,"M_SVOL",   M_Sound}
+#endif
 };
 
 static const menu_t OptionsDef =
