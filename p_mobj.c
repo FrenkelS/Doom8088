@@ -1088,8 +1088,6 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 // Deaf monsters/do not react to sound.
 #define MTF_AMBUSH              8
 #define MTF_NOTSINGLE          16
-#define MTF_FRIEND            128
-#define MTF_RESERVED          256
 
 void P_SpawnMapThing(const mapthing_t __far* mthing)
 {
@@ -1097,7 +1095,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     mobj_t __far* mobj;
     fixed_t x;
     fixed_t y;
-    int16_t options = mthing->options; /* cph 2001/07/07 - make writable copy */
+    const int16_t options = mthing->options;
 
     // killough 2/26/98: Ignore type-0 things as NOPs
     // phares 5/14/98: Ignore Player 5-8 starts (for now)
@@ -1110,20 +1108,6 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
         case DEN_PLAYER7:
         case DEN_PLAYER8:
             return;
-    }
-
-    // killough 11/98: clear flags unused by Doom
-    //
-    // We clear the flags unused in Doom if we see flag mask 256 set, since
-    // it is reserved to be 0 under the new scheme. A 1 in this reserved bit
-    // indicates it's a Doom wad made by a Doom editor which puts 1's in
-    // bits that weren't used in Doom (such as HellMaker wads). So we should
-    // then simply ignore all upper bits.
-
-    if (options & MTF_RESERVED)
-    {
-        printf("P_SpawnMapThing: correcting bad flags (%u) (thing type %d)\n", options, mthing->type);
-        options &= MTF_EASY|MTF_NORMAL|MTF_HARD|MTF_AMBUSH|MTF_NOTSINGLE;
     }
 
     // check for players specially
@@ -1169,11 +1153,6 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
 
     if (mobj->tics > 0)
         mobj->tics = 1 + (P_Random () % mobj->tics);
-
-    if (!(mobj->flags & MF_FRIEND) && options & MTF_FRIEND)
-    {
-        mobj->flags |= MF_FRIEND;
-    }
 
     /* killough 7/20/98: exclude friends */
     if (!((mobj->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
