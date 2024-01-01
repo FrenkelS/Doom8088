@@ -233,6 +233,7 @@ int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - kill
 int16_t       __far* texturetranslation;
 
 fixed_t  viewcos, viewsin;
+static boolean viewcosint16, viewsinint16;
 
 static fixed_t  topfrac;
 static fixed_t  topstep;
@@ -261,8 +262,10 @@ static const int16_t CENTERX = VIEWWINDOWWIDTH  / 2;
 static const fixed_t PROJECTION = (VIEWWINDOWWIDTH / 2L) << FRACBITS;
 
 static const int16_t  PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VGA;
-static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT    / SCREENHEIGHT_VGA;
+static const fixed_t IPSPRITESCALE  = FRACUNIT * SCREENWIDTH_VGA / VIEWWINDOWWIDTH; // = FixedReciprocal(PSPRITESCALE)
 
+static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT     / SCREENHEIGHT_VGA;
+static const fixed_t IPSPRITEYSCALE = FRACUNIT * SCREENHEIGHT_VGA / SCREENHEIGHT; // = FixedReciprocal(PSPRITEYSCALE)
 
 static const angle_t clipangle = 537395200; //xtoviewangle(0);
 
@@ -316,7 +319,12 @@ inline static fixed_t CONSTFUNC FixedMul3232(fixed_t a, fixed_t b)
 }
 
 
-inline static fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
+#if defined __WATCOMC__
+//
+#else
+inline
+#endif
+fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 {
 	uint16_t alw = a;
 	 int16_t ahw = a >> FRACBITS;
@@ -325,6 +333,20 @@ inline static fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 	uint32_t hl = (uint32_t) ahw * blw;
 	return (ll >> FRACBITS) + hl;
 }
+
+
+//
+// FixedReciprocalSmall
+// Divide FFFFFFFFh by a 16-bit number.
+//
+
+#if defined C_ONLY
+#define FixedReciprocalSmall(v) (0xffffffffu/(uint16_t)(v))
+#define FixedReciprocalBig(v)   (0xffffffffu/(v))
+#else
+fixed_t  CONSTFUNC FixedReciprocalSmall(uint16_t v);
+uint16_t CONSTFUNC FixedReciprocalBig(fixed_t v);
+#endif
 
 
 //Approx fixed point divide of a/b using reciprocal. -> a * (1/b).
@@ -338,7 +360,7 @@ fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 	if (b <= 0xffffu)
 		return FixedMul3232(a, FixedReciprocalSmall(b));
 	else
-		return FixedMul3216(a, 0xffffu / (int16_t)(b >> FRACBITS));
+		return FixedMul3216(a, FixedReciprocalBig(b));
 }
 
 
@@ -962,10 +984,10 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     fixed_t tx = psp->sx - (SCREENWIDTH_VGA / 2) * FRACUNIT;
 
     tx -= ((int32_t)patch->leftoffset) << FRACBITS;
-    x1 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS);
+    x1 = CENTERX + (FixedMul3216(tx, PSPRITESCALE) >> FRACBITS);
 
     tx += ((int32_t)patch->width) << FRACBITS;
-    x2 = CENTERX + (FixedMul(tx, PSPRITESCALE) >> FRACBITS) - 1;
+    x2 = CENTERX + (FixedMul3216(tx, PSPRITESCALE) >> FRACBITS) - 1;
 
     topoffset = ((int32_t)patch->topoffset) << FRACBITS;
 
@@ -987,9 +1009,9 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     vis->x2 = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
     // proff 11/06/98: Added for high-res
     vis->scale = PSPRITEYSCALE;
-    vis->iscale = FixedReciprocal(PSPRITEYSCALE);
+    vis->iscale = IPSPRITEYSCALE;
 
-    vis->xiscale = FixedReciprocal(PSPRITESCALE);
+    vis->xiscale = IPSPRITESCALE;
     vis->startfrac = 0;
 
     if (vis->x1 > x1)
@@ -1167,7 +1189,9 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     const fixed_t tr_x = fx - viewx;
     const fixed_t tr_y = fy - viewy;
 
-    const fixed_t tz = FixedMul(tr_x, viewcos) - (-FixedMul(tr_y, viewsin));
+    fixed_t xc = viewcosint16 ? FixedMul3216(tr_x, viewcos) : FixedMul3232(tr_x, viewcos);
+    fixed_t ys = viewsinint16 ? FixedMul3216(tr_y, viewsin) : FixedMul3232(tr_y, viewsin);
+    const fixed_t tz = xc - (-ys);
 
     // thing is behind view plane?
     if (tz < MINZ)
@@ -1177,7 +1201,9 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     if(tz > MAXZ)
         return;
 
-    fixed_t tx = -(FixedMul(tr_y, viewcos) + (-FixedMul(tr_x, viewsin)));
+    fixed_t yc = viewcosint16 ? FixedMul3216(tr_y, viewcos) : FixedMul3232(tr_y, viewcos);
+    fixed_t xs = viewsinint16 ? FixedMul3216(tr_x, viewsin) : FixedMul3232(tr_x, viewsin);
+    fixed_t tx = -(yc + (-xs));
 
     // too far off the side?
     if (D_abs(tx)>(tz<<2))
@@ -2538,6 +2564,9 @@ static void R_SetupFrame (player_t *player)
 
     viewsin = finesine(  viewangle>>ANGLETOFINESHIFT);
     viewcos = finecosine(viewangle>>ANGLETOFINESHIFT);
+
+    viewsinint16 = viewsin >> FRACBITS == 0;
+    viewcosint16 = viewcos >> FRACBITS == 0;
 
     fullcolormap = &colormaps[0];
 

@@ -64,15 +64,14 @@ typedef int32_t fixed_t;
  */
 
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b);
+fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw);
 
 
 //Approx Reciprocal of v
 #if defined C_ONLY
 #define FixedReciprocal(v) (0xffffffffu/(v))
-#define FixedReciprocalSmall FixedReciprocal
 #else
 fixed_t CONSTFUNC FixedReciprocal(fixed_t v);
-fixed_t CONSTFUNC FixedReciprocalSmall(uint16_t v);
 #endif
 
 
