@@ -228,34 +228,6 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 
 
 //
-// P_FindHighestCeilingSurrounding()
-//
-// Passed a sector, returns the fixed point value of the largest
-// ceiling height in the surrounding sectors, not including that passed
-//
-fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
-{
-  int16_t             i;
-  const line_t __far* check;
-  sector_t __far*       other;
-  fixed_t height = -32000*FRACUNIT;
-
-  for (i=0 ;i < sec->linecount ; i++)
-  {
-    check = sec->lines[i];
-    other = getNextSector(check,sec);
-
-    if (!other)
-      continue;
-
-    if (other->ceilingheight > height)
-      height = other->ceilingheight;
-  }
-  return height;
-}
-
-
-//
 // RETURN NEXT SECTOR # THAT LINE TAG REFERS TO
 //
 int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)

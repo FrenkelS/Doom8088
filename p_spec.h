@@ -521,8 +521,6 @@ fixed_t P_FindNextLowestFloor(sector_t __far* sec, fixed_t currentheight);
 
 fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec);
 
-fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec);
-
 int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start);
 
 sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec);
@@ -556,7 +554,6 @@ void T_MoveCeiling(ceiling_t __far* ceiling);
 
 result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int16_t floorOrCeiling, int16_t direction);
 
-void T_MoveFloor(floormove_t __far* floor);
 
 ////////////////////////////////////////////////////////////////
 //
@@ -568,22 +565,12 @@ void T_MoveFloor(floormove_t __far* floor);
 
 boolean EV_Teleport(const line_t __far* line, int16_t side, mobj_t __far* thing);
 
-// killough 2/14/98: Add silent teleporter
-boolean EV_SilentTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing);
 
 // p_floor
-
-boolean EV_DoElevator(const line_t __far* line, elevator_e type);
 
 boolean EV_BuildStairs(const line_t __far* line, stair_e type);
 
 boolean EV_DoFloor(const line_t __far* line, floor_e floortype);
-
-// p_ceilng
-
-boolean EV_DoCeiling(const line_t __far* line, ceiling_e type);
-
-boolean EV_CeilingCrushStop(const line_t __far* line);
 
 // p_doors
 
@@ -591,23 +578,15 @@ boolean EV_DoDoor(const line_t __far* line, vldoor_e type);
 
 // p_lights
 
-void EV_StartLightStrobing(const line_t __far* line);
-
-void EV_TurnTagLightsOff(const line_t __far* line);
-
 void EV_LightTurnOn(const line_t __far* line, int16_t bright);
 
 // p_floor
-
-boolean EV_DoChange(const line_t __far* line, change_e changetype);
 
 boolean EV_DoDonut(const line_t __far* line);
 
 // p_plats
 
 boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount);
-
-void EV_StopPlat(const line_t __far* line);
 
 
 ////////////////////////////////////////////////////////////////
@@ -645,12 +624,9 @@ void P_SpawnGlowingLight(sector_t __far* sector);
 
 // p_plats
 
-void P_AddActivePlat(plat_t __far* plat);
-
 void P_RemoveAllActivePlats
 ( void );    // killough
 
-void P_ActivateInStasis(int16_t tag);
 
 // p_doors
 
@@ -662,9 +638,5 @@ void P_SpawnDoorRaiseIn5Mins(sector_t __far* sec);
 
 void P_RemoveAllActiveCeilings
 ( void );                //jff 2/22/98
-
-void P_AddActiveCeiling(ceiling_t __far* c);
-
-boolean P_ActivateInStasisCeiling(const line_t __far* line);
 
 #endif

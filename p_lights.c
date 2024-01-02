@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -370,59 +370,6 @@ void P_SpawnGlowingLight(sector_t __far* sector)
 // Linedef lighting function handlers
 //
 //////////////////////////////////////////////////////////
-
-//
-// EV_StartLightStrobing()
-//
-// Start strobing lights (usually from a trigger)
-//
-// Passed the line that activated the strobing
-//
-void EV_StartLightStrobing(const line_t __far* line)
-{
-  int16_t   secnum;
-  sector_t __far* sec;
-
-  secnum = -1;
-  // start lights strobing in all sectors tagged same as line
-  while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
-  {
-    sec = &_g_sectors[secnum];
-    // if already doing a lighting function, don't start a second
-    if (P_SectorActive(lighting_special,sec)) //jff 2/22/98
-      continue;
-
-    P_SpawnStrobeFlash (sec,SLOWDARK, false);
-  }
-}
-
-//
-// EV_TurnTagLightsOff()
-//
-// Turn line's tagged sector's lights to min adjacent neighbor level
-//
-// Passed the line that activated the lights being turned off
-//
-void EV_TurnTagLightsOff(const line_t __far* line)
-{
-  int16_t j;
-
-  // search sectors for those with same tag as activating line
-
-  // killough 10/98: replaced inefficient search with fast search
-  for (j = -1; (j = P_FindSectorFromLineTag(line,j)) >= 0;)
-    {
-      sector_t __far* sector = _g_sectors + j;
-      sector_t __far* tsec;
-      int16_t i, min = sector->lightlevel;
-      // find min neighbor light level
-      for (i = 0;i < sector->linecount; i++)
-  if ((tsec = getNextSector(sector->lines[i], sector)) &&
-      tsec->lightlevel < min)
-    min = tsec->lightlevel;
-      sector->lightlevel = min;
-    }
-}
 
 //
 // EV_LightTurnOn()

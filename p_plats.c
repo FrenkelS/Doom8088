@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -193,6 +193,10 @@ void T_PlatRaise(plat_t __far* plat)
 // and for some plat types, an amount to raise
 // Returns true if a thinker is started, or restarted from stasis
 //
+
+static void P_ActivateInStasis(int16_t tag);
+static void P_AddActivePlat(plat_t __far* plat);
+
 boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
 {
   plat_t __far* plat;
@@ -351,7 +355,7 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
 // Passed the tag of the plat that should be reactivated
 // Returns nothing
 //
-void P_ActivateInStasis(int16_t tag)
+static void P_ActivateInStasis(int16_t tag)
 {
   platlist_t __far* pl;
   for (pl=activeplats; pl; pl=pl->next)   // search the active plats
@@ -368,27 +372,6 @@ void P_ActivateInStasis(int16_t tag)
   }
 }
 
-//
-// EV_StopPlat()
-//
-// Handler for "stop perpetual floor" linedef type
-//
-// Passed the linedef that stopped the plat
-//
-void EV_StopPlat(const line_t __far* line)
-{
-  platlist_t __far* pl;
-  for (pl=activeplats; pl; pl=pl->next)  // search the active plats
-  {
-    plat_t __far* plat = pl->plat;             // for one with the tag not in stasis
-    if (plat->status != in_stasis && plat->tag == line->tag)
-    {
-      plat->oldstatus = plat->status;    // put it in stasis
-      plat->status = in_stasis;
-      plat->thinker.function = NULL;
-    }
-  }
-}
 
 //
 // P_AddActivePlat()
@@ -398,7 +381,7 @@ void EV_StopPlat(const line_t __far* line)
 // Passed a pointer to the plat to add
 // Returns nothing
 //
-void P_AddActivePlat(plat_t __far* plat)
+static void P_AddActivePlat(plat_t __far* plat)
 {
     platlist_t __far* old_head = activeplats;
 

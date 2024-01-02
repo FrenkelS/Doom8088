@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -245,109 +245,6 @@ void T_MoveCeiling (ceiling_t __far* ceiling)
 }
 
 
-//
-// EV_DoCeiling
-//
-// Move a ceiling up/down or start a crusher
-//
-// Passed the linedef activating the function and the type of function desired
-// returns true if a thinker started
-//
-boolean EV_DoCeiling(const line_t __far* line, ceiling_e type)
-{
-  int16_t   secnum;
-  boolean   rtn;
-  sector_t __far* sec;
-  ceiling_t __far* ceiling;
-
-  secnum = -1;
-  rtn = false;
-
-  // Reactivate in-stasis ceilings...for certain types.
-  // This restarts a crusher after it has been stopped
-  switch(type)
-  {
-    case fastCrushAndRaise:
-    case silentCrushAndRaise:
-    case crushAndRaise:
-      //jff 4/5/98 return if activated
-      rtn = P_ActivateInStasisCeiling(line);
-    default:
-      break;
-  }
-
-  // affects all sectors with the same tag as the linedef
-  while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
-  {
-    sec = &_g_sectors[secnum];
-
-    // if ceiling already moving, don't start a second function on it
-    if (P_SectorActive(ceiling_special,sec))  //jff 2/22/98
-      continue;
-
-    // create a new ceiling thinker
-    rtn = true;
-    ceiling = Z_CallocLevSpec(sizeof(*ceiling));
-    P_AddThinker (&ceiling->thinker);
-    sec->ceilingdata = ceiling;               //jff 2/22/98
-    ceiling->thinker.function = T_MoveCeiling;
-    ceiling->sector = sec;
-    ceiling->crush = false;
-
-    // setup ceiling structure according to type of function
-    switch(type)
-    {
-      case fastCrushAndRaise:
-        ceiling->crush = true;
-        ceiling->topheight = sec->ceilingheight;
-        ceiling->bottomheight = sec->floorheight + (8*FRACUNIT);
-        ceiling->direction = -1;
-        ceiling->speed = CEILSPEED * 2;
-        break;
-
-      case silentCrushAndRaise:
-      case crushAndRaise:
-        ceiling->crush = true;
-        ceiling->topheight = sec->ceilingheight;
-      case lowerAndCrush:
-      case lowerToFloor:
-        ceiling->bottomheight = sec->floorheight;
-        if (type != lowerToFloor)
-          ceiling->bottomheight += 8*FRACUNIT;
-        ceiling->direction = -1;
-        ceiling->speed = CEILSPEED;
-        break;
-
-      case raiseToHighest:
-        ceiling->topheight = P_FindHighestCeilingSurrounding(sec);
-        ceiling->direction = 1;
-        ceiling->speed = CEILSPEED;
-        break;
-
-      case lowerToLowest:
-        ceiling->bottomheight = P_FindLowestCeilingSurrounding(sec);
-        ceiling->direction = -1;
-        ceiling->speed = CEILSPEED;
-        break;
-
-      case lowerToMaxFloor:
-        ceiling->bottomheight = P_FindHighestFloorSurrounding(sec);
-        ceiling->direction = -1;
-        ceiling->speed = CEILSPEED;
-        break;
-
-      default:
-        break;
-    }
-
-    // add the ceiling to the active list
-    ceiling->tag = sec->tag;
-    ceiling->type = type;
-    P_AddActiveCeiling(ceiling);
-  }
-  return rtn;
-}
-
 //////////////////////////////////////////////////////////////////////
 //
 // Active ceiling list primitives
@@ -363,83 +260,6 @@ boolean EV_DoCeiling(const line_t __far* line, ceiling_e type)
 // fixed-size array was used, with NULL indicating
 // empty entries, while now a doubly-linked list
 // is used.
-
-//
-// P_ActivateInStasisCeiling()
-//
-// Reactivates all stopped crushers with the right tag
-//
-// Passed the line reactivating the crusher
-// Returns true if a ceiling reactivated
-//
-//jff 4/5/98 return if activated
-boolean P_ActivateInStasisCeiling(const line_t __far* line)
-{
-  ceilinglist_t __far* cl;
-  boolean rtn=false;
-
-  for (cl=activeceilings; cl; cl=cl->next)
-  {
-    ceiling_t __far* ceiling = cl->ceiling;
-    if (ceiling->tag == line->tag && ceiling->direction == 0)
-    {
-      ceiling->direction = ceiling->olddirection;
-      ceiling->thinker.function = T_MoveCeiling;
-      //jff 4/5/98 return if activated
-      rtn=true;
-    }
-  }
-  return rtn;
-}
-
-//
-// EV_CeilingCrushStop()
-//
-// Stops all active ceilings with the right tag
-//
-// Passed the linedef stopping the ceilings
-// Returns true if a ceiling put in stasis
-//
-boolean EV_CeilingCrushStop(const line_t __far* line)
-{
-  boolean rtn=false;
-
-  ceilinglist_t __far* cl;
-  for (cl=activeceilings; cl; cl=cl->next)
-  {
-    ceiling_t __far* ceiling = cl->ceiling;
-    if (ceiling->direction != 0 && ceiling->tag == line->tag)
-    {
-      ceiling->olddirection = ceiling->direction;
-      ceiling->direction = 0;
-      ceiling->thinker.function = NULL;
-      rtn=true;
-    }
-  }
-  return rtn;
-}
-
-//
-// P_AddActiveCeiling()
-//
-// Adds a ceiling to the head of the list of active ceilings
-//
-// Passed the ceiling motion structure
-// Returns nothing
-//
-void P_AddActiveCeiling(ceiling_t __far* ceiling)
-{
-    ceilinglist_t __far* old_head = activeceilings;
-
-    ceilinglist_t __far* list = activeceilings = Z_MallocLevel(sizeof *list, (void __far*__far*)&activeceilings);
-    list->ceiling = ceiling;
-    ceiling->list = list;
-
-    if ((list->next = old_head))
-        list->next->prev = &list->next;
-
-    list->prev = old_head;
-}
 
 //
 // P_RemoveActiveCeiling()
