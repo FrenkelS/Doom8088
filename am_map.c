@@ -770,29 +770,17 @@ static void AM_drawMline(mline_t* ml, uint8_t color)
 //    0 if a red key required
 //    1 if a blue key required
 //    2 if a yellow key required
-//    3 if a multiple keys required
-//
-// jff 4/3/98 add routine to get color of generalized keyed door
-//
 static int16_t AM_DoorColor(int16_t type)
 {
-    if (GenLockedBase <= type && type< GenDoorBase)
-    {
-        type -= GenLockedBase;
-        type = (type & LockedKey) >> LockedKeyShift;
-        if (!type || type==7)
-            return 3;  //any or all keys
-        else return (type-1)%3;
-    }
     switch (type)  // closed keyed door
     {
-    case 26: case 32: case 99: case 133:
+    case 26: case 32:
         /*bluekey*/
         return 1;
-    case 27: case 34: case 136: case 137:
+    case 27: case 34:
         /*yellowkey*/
         return 2;
-    case 28: case 33: case 134: case 135:
+    case 28: case 33:
         /*redkey*/
         return 0;
     default:
@@ -882,10 +870,6 @@ static void AM_drawWalls(void)
                             /*redkey*/
                             AM_drawMline(&l,mapcolor_rdor);
                             continue;
-                        case 3:
-                            /*any or all*/
-                            AM_drawMline(&l, mapcolor_clsd);
-                            continue;
                         }
                     }
                 }
@@ -905,8 +889,7 @@ static void AM_drawWalls(void)
                 if
                         (
                          mapcolor_tele && !(_g_lines[i].flags & ML_SECRET) &&
-                         (line_special == 39 || line_special == 97 ||
-                          line_special == 125 || line_special == 126)
+                         (line_special == 97)
                          )
                 { // teleporters
                     AM_drawMline(&l, mapcolor_tele);
