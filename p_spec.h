@@ -85,15 +85,6 @@
 //
 //////////////////////////////////////////////////////////////////
 
-//jff 2/23/98 identify the special classes that can share sectors
-
-typedef enum
-{
-  floor_special,
-  ceiling_special,
-} special_e;
-
-
 // p_plats
 
 typedef enum
@@ -390,9 +381,6 @@ int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start);
 sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec);
 
 boolean P_CheckTag(const line_t __far* line);
-
-boolean P_SectorActive(special_e t, const sector_t __far* s);
-
 
 void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain);
 

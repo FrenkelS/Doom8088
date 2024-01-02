@@ -245,31 +245,6 @@ int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
 
 
 //
-// P_SectorActive()
-//
-// Passed a linedef special class (floor, ceiling) and a sector
-// returns whether the sector is already busy with a linedef special of the
-// same class. If old demo compatibility true, all linedef special classes
-// are the same.
-//
-// jff 2/23/98 added to prevent old demos from
-//  succeeding in starting multiple specials on one sector
-//
-boolean PUREFUNC P_SectorActive(special_e t, const sector_t __far* sec)
-{
-    switch (t)             // return whether thinker of same type is active
-    {
-      case floor_special:
-        return sec->floordata != NULL;
-      case ceiling_special:
-        return sec->ceilingdata != NULL;
-    }
-
-    I_Error("P_SectorActive: don't know which special, must be active, shouldn't be here");
-}
-
-
-//
 // P_CheckTag()
 //
 // Passed a line, returns true if the tag is non-zero or the line special

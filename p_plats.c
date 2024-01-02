@@ -230,7 +230,7 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
     sec = &_g_sectors[secnum];
 
     // don't start a second floor function if already moving
-    if (P_SectorActive(floor_special,sec)) //jff 2/23/98 multiple thinkers
+    if (sec->floordata != NULL) // multiple thinkers
       continue;
 
     // Create a thinker

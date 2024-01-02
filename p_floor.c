@@ -618,7 +618,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
     sec = &_g_sectors[secnum];
 
     // Don't start a second thinker on the same floor
-    if (P_SectorActive(floor_special,sec)) //jff 2/23/98
+    if (sec->floordata != NULL)
       continue;
 
     // new floor thinker
@@ -831,7 +831,7 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
    sector_t __far*     sec = &_g_sectors[secnum];
 
     // don't start a stair if the first step's floor is already moving
-   if (!P_SectorActive(floor_special,sec)) { //jff 2/22/98
+   if (sec->floordata == NULL) {
     floormove_t __far*  floor;
     int16_t       texture;
     fixed_t       height;
@@ -900,7 +900,7 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
           continue;
 
         // if sector's floor already moving, look for another
-        if (P_SectorActive(floor_special,tsec)) //jff 2/22/98
+        if (tsec->floordata != NULL)
           continue;
 
         height += stairsize;
@@ -958,7 +958,7 @@ boolean EV_DoDonut(const line_t __far* line)
     s1 = &_g_sectors[secnum];                // s1 is pillar's sector
 
     // do not start the donut if the pillar is already moving
-    if (P_SectorActive(floor_special,s1)) //jff 2/22/98
+    if (s1->floordata != NULL)
       continue;
 
     s2 = getNextSector(s1->lines[0],s1);  // s2 is pool's sector
@@ -967,7 +967,7 @@ boolean EV_DoDonut(const line_t __far* line)
 
     /* do not start the donut if the pool is already moving
      * cph - DEMOSYNC - was !compatibility */
-    if (P_SectorActive(floor_special,s2))
+    if (s2->floordata != NULL)
       continue;                           //jff 5/7/98
 
     // find a two sided line around the pool whose other side isn't the pillar

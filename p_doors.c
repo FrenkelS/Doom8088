@@ -336,7 +336,7 @@ boolean EV_DoDoor(const line_t __far* line, vldoor_e type)
   {
     sec = &_g_sectors[secnum];
     // if the ceiling already moving, don't start the door action
-    if (P_SectorActive(ceiling_special,sec)) //jff 2/22/98
+    if (sec->ceilingdata != NULL)
         continue;
 
     // new door thinker
