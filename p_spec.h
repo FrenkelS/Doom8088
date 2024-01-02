@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -511,10 +511,6 @@ typedef struct
 //
 ////////////////////////////////////////////////////////////////
 
-boolean twoSided(int16_t sector, int16_t line);
-
-side_t __far* getSide(int16_t currentSector, int16_t line, int16_t side);
-
 fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec);
 
 fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec);
@@ -526,8 +522,6 @@ fixed_t P_FindNextLowestFloor(sector_t __far* sec, fixed_t currentheight);
 fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec);
 
 fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec);
-
-sector_t __far* P_FindModelFloorSector(fixed_t floordestheight, int16_t secnum);
 
 int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start);
 
@@ -617,21 +611,6 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount);
 
 void EV_StopPlat(const line_t __far* line);
 
-// p_genlin
-
-boolean EV_DoGenFloor(const line_t __far* line);
-
-boolean EV_DoGenCeiling(const line_t __far* line);
-
-boolean EV_DoGenLift(const line_t __far* line);
-
-boolean EV_DoGenStairs(const line_t __far* line);
-
-boolean EV_DoGenCrusher(const line_t __far* line);
-
-boolean EV_DoGenDoor(const line_t __far* line);
-
-boolean EV_DoGenLockedDoor(const line_t __far* line);
 
 ////////////////////////////////////////////////////////////////
 //

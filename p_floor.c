@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -592,6 +592,95 @@ fixed_t P_FindNextHighestFloor(sector_t __far* sec)
 // Floor motion linedef handlers
 //
 ///////////////////////////////////////////////////////////////////////
+
+//
+// getSide()
+//
+// Will return a side_t*
+//  given the number of the current sector,
+//  the line number, and the side (0/1) that you want.
+//
+// Note: if side=1 is specified, it must exist or results undefined
+//
+static side_t __far* getSide(int16_t currentSector, int16_t line, int16_t side)
+{
+  return &_g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ];
+}
+
+
+//
+// getSector()
+//
+// Will return a sector_t*
+//  given the number of the current sector,
+//  the line number and the side (0/1) that you want.
+//
+// Note: if side=1 is specified, it must exist or results undefined
+//
+static sector_t __far* getSector(int16_t currentSector, int16_t line, int16_t side)
+{
+  return _g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ].sector;
+}
+
+
+//
+// twoSided()
+//
+// Given the sector number and the line number,
+//  it will tell you whether the line is two-sided or not.
+//
+// modified to return actual two-sidedness rather than presence
+// of 2S flag unless compatibility optioned
+//
+static boolean twoSided(int16_t sector, int16_t line)
+{
+  //jff 1/26/98 return what is actually needed, whether the line
+  //has two sidedefs, rather than whether the 2S flag is set
+
+  return (_g_sectors[sector].lines[line])->sidenum[1] != NO_INDEX;
+}
+
+
+//
+// P_FindModelFloorSector()
+//
+// Passed a floor height and a sector number, return a pointer to a
+// a sector with that floor height across the lowest numbered two sided
+// line surrounding the sector.
+//
+// Note: If no sector at that height bounds the sector passed, return NULL
+//
+// jff 02/03/98 Add routine to find numeric model floor
+//  around a sector specified by sector number
+// jff 3/14/98 change first parameter to plain height to allow call
+//  from routine not using floormove_t
+//
+static sector_t __far* P_FindModelFloorSector(fixed_t floordestheight,int16_t secnum)
+{
+  int16_t i;
+  sector_t __far* sec;
+  int16_t linecount;
+
+  sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
+  //jff 5/23/98 don't disturb sec->linecount while searching
+  // but allow early exit in old demos
+  linecount = sec->linecount;
+  for (i = 0; i < (linecount); i++)
+  {
+    if ( twoSided(secnum, i) )
+    {
+      if (getSide(secnum,i,0)->sector-_g_sectors == secnum)
+          sec = getSector(secnum,i,1);
+      else
+          sec = getSector(secnum,i,0);
+
+      if (sec->floorheight == floordestheight)
+        return sec;
+    }
+  }
+  return NULL;
+}
+
 
 //
 // EV_DoFloor()
