@@ -82,8 +82,7 @@ void T_PlatRaise(plat_t __far* plat)
       res = T_MovePlane(plat->sector,plat->speed,plat->high,plat->crush,0,1);
 
       // if a pure raise type, make the plat moving sound
-      if (plat->type == raiseAndChange
-          || plat->type == raiseToNearestAndChange)
+      if (plat->type == raiseToNearestAndChange)
       {
         if (!(_g_leveltime&7))
           S_StartSound2(&plat->sector->soundorg, sfx_stnmov);
@@ -100,28 +99,17 @@ void T_PlatRaise(plat_t __far* plat)
       {
         if (res == pastdest) // end of stroke
         {
-          // if not an instant toggle type, wait, make plat stop sound
-          if (plat->type!=toggleUpDn)
-          {
-            plat->count = plat->wait;
-            plat->status = waiting;
-            S_StartSound2(&plat->sector->soundorg, sfx_pstop);
-          }
-          else // else go into stasis awaiting next toggle activation
-          {
-            plat->oldstatus = plat->status;//jff 3/14/98 after action wait
-            plat->status = in_stasis;      //for reactivation of toggle
-          }
+          // not an instant toggle type, wait, make plat stop sound
+          plat->count = plat->wait;
+          plat->status = waiting;
+          S_StartSound2(&plat->sector->soundorg, sfx_pstop);
 
           // lift types and pure raise types are done at end of up stroke
           // only the perpetual type waits then goes back up
           switch(plat->type)
           {
-            case blazeDWUS:
             case downWaitUpStay:
-            case raiseAndChange:
             case raiseToNearestAndChange:
-            case genLift:
               P_RemoveActivePlat(plat);     // killough
             default:
               break;
@@ -136,18 +124,10 @@ void T_PlatRaise(plat_t __far* plat)
       // handle reaching end of down stroke
       if (res == pastdest)
       {
-        // if not an instant toggle, start waiting, make plat stop sound
-        if (plat->type!=toggleUpDn) //jff 3/14/98 toggle up down
-        {                           // is silent, instant, no waiting
-          plat->count = plat->wait;
-          plat->status = waiting;
-          S_StartSound2(&plat->sector->soundorg,sfx_pstop);
-        }
-        else // instant toggles go into stasis awaiting next activation
-        {
-          plat->oldstatus = plat->status;//jff 3/14/98 after action wait
-          plat->status = in_stasis;      //for reactivation of toggle
-        }
+        // not an instant toggle, start waiting, make plat stop sound
+        plat->count = plat->wait;
+        plat->status = waiting;
+        S_StartSound2(&plat->sector->soundorg,sfx_pstop);
 
         //jff 1/26/98 remove the plat if it bounced so it can be tried again
         //only affects plats that raise and bounce
@@ -155,7 +135,6 @@ void T_PlatRaise(plat_t __far* plat)
 
           switch(plat->type)
           {
-            case raiseAndChange:
             case raiseToNearestAndChange:
               P_RemoveActivePlat(plat);
             default:
@@ -189,15 +168,13 @@ void T_PlatRaise(plat_t __far* plat)
 //
 // Handle Plat linedef types
 //
-// Passed the linedef that activated the plat, the type of plat action,
-// and for some plat types, an amount to raise
+// Passed the linedef that activated the plat and the type of plat action.
 // Returns true if a thinker is started, or restarted from stasis
 //
 
-static void P_ActivateInStasis(int16_t tag);
 static void P_AddActivePlat(plat_t __far* plat);
 
-boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
+boolean EV_DoPlat(const line_t __far* line, plattype_e type)
 {
   plat_t __far* plat;
   int16_t             secnum;
@@ -206,23 +183,6 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
 
   secnum = -1;
   rtn = false;
-
-
-  // Activate all <type> plats that are in_stasis
-  switch(type)
-  {
-    case perpetualRaise:
-      P_ActivateInStasis(line->tag);
-      break;
-
-    case toggleUpDn:
-      P_ActivateInStasis(line->tag);
-      rtn=true;
-      break;
-
-    default:
-      break;
-  }
 
   // act on all sectors tagged the same as the activating linedef
   while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
@@ -265,16 +225,6 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
         S_StartSound2(&sec->soundorg,sfx_stnmov);
         break;
 
-      case raiseAndChange:
-        plat->speed = PLATSPEED/2;
-        sec->floorpic = _g_sides[line->sidenum[0]].sector->floorpic;
-        plat->high = sec->floorheight + amount*FRACUNIT;
-        plat->wait = 0;
-        plat->status = up;
-
-        S_StartSound2(&sec->soundorg,sfx_stnmov);
-        break;
-
       case downWaitUpStay:
         plat->speed = PLATSPEED * 4;
         plat->low = P_FindLowestFloorSurrounding(sec);
@@ -286,48 +236,6 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
         plat->wait = 35*PLATWAIT;
         plat->status = down;
         S_StartSound2(&sec->soundorg,sfx_pstart);
-        break;
-
-      case blazeDWUS:
-        plat->speed = PLATSPEED * 8;
-        plat->low = P_FindLowestFloorSurrounding(sec);
-
-        if (plat->low > sec->floorheight)
-          plat->low = sec->floorheight;
-
-        plat->high = sec->floorheight;
-        plat->wait = 35*PLATWAIT;
-        plat->status = down;
-        S_StartSound2(&sec->soundorg,sfx_pstart);
-        break;
-
-      case perpetualRaise:
-        plat->speed = PLATSPEED;
-        plat->low = P_FindLowestFloorSurrounding(sec);
-
-        if (plat->low > sec->floorheight)
-          plat->low = sec->floorheight;
-
-        plat->high = P_FindHighestFloorSurrounding(sec);
-
-        if (plat->high < sec->floorheight)
-          plat->high = sec->floorheight;
-
-        plat->wait = 35*PLATWAIT;
-        plat->status = P_Random()&1;
-
-        S_StartSound2(&sec->soundorg,sfx_pstart);
-        break;
-
-      case toggleUpDn: //jff 3/14/98 add new type to support instant toggle
-        plat->speed = PLATSPEED;  //not used
-        plat->wait = 35*PLATWAIT; //not used
-        plat->crush = true; //jff 3/14/98 crush anything in the way
-
-        // set up toggling between ceiling, floor inclusive
-        plat->low = sec->ceilingheight;
-        plat->high = sec->floorheight;
-        plat->status =  down;
         break;
 
       default:
@@ -345,33 +253,6 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount)
 // fixed-size array was used, with NULL indicating
 // empty entries, while now a doubly-linked list
 // is used.
-
-//
-// P_ActivateInStasis()
-//
-// Activate a plat that has been put in stasis
-// (stopped perpetual floor, instant floor/ceil toggle)
-//
-// Passed the tag of the plat that should be reactivated
-// Returns nothing
-//
-static void P_ActivateInStasis(int16_t tag)
-{
-  platlist_t __far* pl;
-  for (pl=activeplats; pl; pl=pl->next)   // search the active plats
-  {
-    plat_t __far* plat = pl->plat;              // for one in stasis with right tag
-    if (plat->tag == tag && plat->status == in_stasis)
-    {
-      if (plat->type==toggleUpDn) //jff 3/14/98 reactivate toggle type
-        plat->status = plat->oldstatus==up? down : up;
-      else
-        plat->status = plat->oldstatus;
-      plat->thinker.function = T_PlatRaise;
-    }
-  }
-}
-
 
 //
 // P_AddActivePlat()

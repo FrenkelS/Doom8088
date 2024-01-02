@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -89,7 +89,7 @@ static void P_BobAndThrust(player_t *player, int16_t angle, int8_t move)
 // Calculate the walking / running height adjustment
 //
 
-void P_CalcHeight (player_t* player)
+static void P_CalcHeight (player_t* player)
   {
   int16_t     angle;
   fixed_t bob;

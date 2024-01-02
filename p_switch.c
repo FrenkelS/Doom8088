@@ -412,30 +412,6 @@ static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
 
 
 //
-// EV_DoLockedDoor
-//
-// Handle opening a tagged locked door
-//
-// Passed the line activating the door, the type of door,
-// and the thing that activated the line
-// Returns true if a thinker created
-//
-static boolean EV_DoLockedDoor(const line_t __far* line, vldoor_e type, mobj_t __far* thing)
-{
-  player_t* p;
-
-  // only players can open locked doors
-  p = P_MobjIsPlayer(thing);
-
-  if (!p)
-    return false;
-
-  // got the key, so open the door
-  return EV_DoDoor(line,type);
-}
-
-
-//
 // P_UseSpecialLine
 //
 //
@@ -522,7 +498,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line)
 
     case 20:
       // Raise Plat next highest floor and change texture
-      if (EV_DoPlat(line,raiseToNearestAndChange,0))
+      if (EV_DoPlat(line,raiseToNearestAndChange))
         P_ChangeSwitchTexture(line,false);
       break;
 
@@ -556,7 +532,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line)
     // Buttons (retriggerable switches)
     case 62:
       // PlatDownWaitUpStay
-      if (EV_DoPlat(line,downWaitUpStay,1))
+      if (EV_DoPlat(line,downWaitUpStay))
         P_ChangeSwitchTexture(line,true);
       break;
 

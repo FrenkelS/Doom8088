@@ -97,15 +97,8 @@ typedef enum
 
 typedef enum
 {
-  perpetualRaise,
   downWaitUpStay,
-  raiseAndChange,
   raiseToNearestAndChange,
-  blazeDWUS,
-  genLift,      //jff added to support generalized Plat types
-  genPerpetual,
-  toggleUpDn,   //jff 3/14/98 added to support instant toggle type
-
 } plattype_e;
 
 // p_doors
@@ -438,7 +431,7 @@ boolean EV_DoDonut(const line_t __far* line);
 
 // p_plats
 
-boolean EV_DoPlat(const line_t __far* line, plattype_e type, int16_t amount);
+boolean EV_DoPlat(const line_t __far* line, plattype_e type);
 
 
 ////////////////////////////////////////////////////////////////
