@@ -1002,7 +1002,7 @@ static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
             return i;
     }
 
-    return NUMMOBJTYPES;
+    I_Error("P_FindDoomedNum: unknown thing %i", type);
 }
 
 
@@ -1014,7 +1014,7 @@ static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
 //
 
 static void P_SpawnPlayer (const mapthing_t* mthing)
-  {
+{
   player_t* p;
   fixed_t   x;
   fixed_t   y;
@@ -1063,13 +1063,9 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 
   P_SetupPsprites (p);
 
-
-  if (mthing->type-1 == 0)
-    {
-    ST_Start(); // wake up the status bar
-    HU_Start(); // wake up the heads up text
-    }
-  }
+  ST_Start(); // wake up the status bar
+  HU_Start(); // wake up the heads up text
+}
 
 
 //
@@ -1099,11 +1095,16 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     // check for players specially
 
     //Only care about start spot for player 1.
-    if(mthing->type == 1)
+    if (mthing->type == 1)
     {
         playerstart = *mthing;
         playerstart.options = MTF_EASY;
         P_SpawnPlayer (&playerstart);
+        return;
+    }
+    else if (mthing->type == 2 || mthing->type == 3 || mthing->type == 4 || mthing->type == 11)
+    {
+        // ignore start spot for player 2, 3, 4 and Deathmatch
         return;
     }
 
@@ -1123,18 +1124,6 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     // find which type to spawn
 
     i = P_FindDoomedNum(mthing->type);
-
-    // Do not abort because of an unknown thing. Ignore it.
-    //
-    // Unknown types:
-    //  1: Player start #1
-    //  2: Player start #2
-    //  3: Player start #3
-    //  4: Player start #4
-    // 11: Deathmatch start
-
-    if (i == NUMMOBJTYPES)
-        return;
 
     x = ((int32_t)mthing->x) << FRACBITS;
     y = ((int32_t)mthing->y) << FRACBITS;
