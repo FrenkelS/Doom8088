@@ -38,18 +38,15 @@
 #include "r_defs.h"
 #include "d_player.h"
 
-//      Define values for map objects
-#define MO_TELEPORTMAN  14
 
 // p_floor
 
-#define ELEVATORSPEED (FRACUNIT*4)
 #define FLOORSPEED     FRACUNIT
 
 // p_ceilng
 
 #define CEILSPEED   FRACUNIT
-#define CEILWAIT    150
+
 
 // p_doors
 
@@ -80,132 +77,6 @@
 #define DAMAGE_MASK     0x60
 #define DAMAGE_SHIFT    5
 #define SECRET_MASK     0x80
-#define SECRET_SHIFT    7
-#define FRICTION_MASK   0x100
-#define FRICTION_SHIFT  8
-#define PUSH_MASK       0x200
-#define PUSH_SHIFT      9
-
-//jff 02/04/98 Define masks, shifts, for fields in
-// generalized linedef types
-
-#define GenEnd                0x8000
-#define GenFloorBase          0x6000
-#define GenCeilingBase        0x4000
-#define GenDoorBase           0x3c00
-#define GenLockedBase         0x3800
-#define GenLiftBase           0x3400
-#define GenStairsBase         0x3000
-#define GenCrusherBase        0x2F80
-
-#define TriggerType           0x0007
-#define TriggerTypeShift      0
-
-// define masks and shifts for the floor type fields
-
-#define FloorCrush            0x1000
-#define FloorChange           0x0c00
-#define FloorTarget           0x0380
-#define FloorDirection        0x0040
-#define FloorModel            0x0020
-#define FloorSpeed            0x0018
-
-#define FloorCrushShift           12
-#define FloorChangeShift          10
-#define FloorTargetShift           7
-#define FloorDirectionShift        6
-#define FloorModelShift            5
-#define FloorSpeedShift            3
-
-// define masks and shifts for the ceiling type fields
-
-#define CeilingCrush          0x1000
-#define CeilingChange         0x0c00
-#define CeilingTarget         0x0380
-#define CeilingDirection      0x0040
-#define CeilingModel          0x0020
-#define CeilingSpeed          0x0018
-
-#define CeilingCrushShift         12
-#define CeilingChangeShift        10
-#define CeilingTargetShift         7
-#define CeilingDirectionShift      6
-#define CeilingModelShift          5
-#define CeilingSpeedShift          3
-
-// define masks and shifts for the lift type fields
-
-#define LiftTarget            0x0300
-#define LiftDelay             0x00c0
-#define LiftMonster           0x0020
-#define LiftSpeed             0x0018
-
-#define LiftTargetShift            8
-#define LiftDelayShift             6
-#define LiftMonsterShift           5
-#define LiftSpeedShift             3
-
-// define masks and shifts for the stairs type fields
-
-#define StairIgnore           0x0200
-#define StairDirection        0x0100
-#define StairStep             0x00c0
-#define StairMonster          0x0020
-#define StairSpeed            0x0018
-
-#define StairIgnoreShift           9
-#define StairDirectionShift        8
-#define StairStepShift             6
-#define StairMonsterShift          5
-#define StairSpeedShift            3
-
-// define masks and shifts for the crusher type fields
-
-#define CrusherSilent         0x0040
-#define CrusherMonster        0x0020
-#define CrusherSpeed          0x0018
-
-#define CrusherSilentShift         6
-#define CrusherMonsterShift        5
-#define CrusherSpeedShift          3
-
-// define masks and shifts for the door type fields
-
-#define DoorDelay             0x0300
-#define DoorMonster           0x0080
-#define DoorKind              0x0060
-#define DoorSpeed             0x0018
-
-#define DoorDelayShift             8
-#define DoorMonsterShift           7
-#define DoorKindShift              5
-#define DoorSpeedShift             3
-
-// define masks and shifts for the locked door type fields
-
-#define LockedNKeys           0x0200
-#define LockedKey             0x01c0
-#define LockedKind            0x0020
-#define LockedSpeed           0x0018
-
-#define LockedNKeysShift           9
-#define LockedKeyShift             6
-#define LockedKindShift            5
-#define LockedSpeedShift           3
-
-// define names for the TriggerType field of the general linedefs
-
-typedef enum
-{
-  WalkOnce,
-  WalkMany,
-  SwitchOnce,
-  SwitchMany,
-  GunOnce,
-  GunMany,
-  PushOnce,
-  PushMany,
-} triggertype_e;
 
 
 //////////////////////////////////////////////////////////////////
@@ -220,15 +91,8 @@ typedef enum
 {
   floor_special,
   ceiling_special,
-  lighting_special,
 } special_e;
 
-//jff 3/15/98 pure texture/type change for better generalized support
-typedef enum
-{
-  trigChangeOnly,
-  numChangeOnly,
-} change_e;
 
 // p_plats
 
@@ -614,8 +478,6 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line);
 
 // p_lights
 
-void P_SpawnFireFlicker(sector_t __far* sector);
-
 void P_SpawnLightFlash(sector_t __far* sector);
 
 void P_SpawnStrobeFlash(sector_t __far* sector, int16_t fastOrSlow, boolean inSync);
@@ -627,12 +489,6 @@ void P_SpawnGlowingLight(sector_t __far* sector);
 void P_RemoveAllActivePlats
 ( void );    // killough
 
-
-// p_doors
-
-void P_SpawnDoorCloseIn30(sector_t __far* sec);
-
-void P_SpawnDoorRaiseIn5Mins(sector_t __far* sec);
 
 // p_ceilng
 

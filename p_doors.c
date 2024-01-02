@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -401,72 +401,4 @@ boolean EV_DoDoor(const line_t __far* line, vldoor_e type)
     }
   }
   return rtn;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// Sector type door spawners
-//
-///////////////////////////////////////////////////////////////
-
-//
-// P_SpawnDoorCloseIn30()
-//
-// Spawn a door that closes after 30 seconds (called at level init)
-//
-// Passed the sector of the door, whose type specified the door action
-// Returns nothing
-//
-void P_SpawnDoorCloseIn30(sector_t __far* sec)
-{
-  vldoor_t __far* door;
-
-  door = Z_CallocLevSpec(sizeof(*door));
-
-  P_AddThinker (&door->thinker);
-
-  sec->ceilingdata = door; //jff 2/22/98
-  sec->special = 0;
-
-  door->thinker.function = T_VerticalDoor;
-  door->sector = sec;
-  door->direction = 0;
-  door->type = normal;
-  door->speed = VDOORSPEED;
-  door->topcountdown = 30 * 35;
-  door->line = NULL; // jff 1/31/98 remember line that triggered us
-  door->lighttag = 0; /* killough 10/98: no lighting changes */
-}
-
-//
-// P_SpawnDoorRaiseIn5Mins()
-//
-// Spawn a door that opens after 5 minutes (called at level init)
-//
-// Passed the sector of the door, whose type specified the door action
-// Returns nothing
-//
-void P_SpawnDoorRaiseIn5Mins(sector_t __far* sec)
-{
-  vldoor_t __far* door;
-
-  door = Z_CallocLevSpec(sizeof(*door));
-
-  P_AddThinker (&door->thinker);
-
-  sec->ceilingdata = door; //jff 2/22/98
-  sec->special = 0;
-
-  door->thinker.function = T_VerticalDoor;
-  door->sector = sec;
-  door->direction = 2;
-  door->type = raiseIn5Mins;
-  door->speed = VDOORSPEED;
-  door->topheight = P_FindLowestCeilingSurrounding(sec);
-  door->topheight -= 4*FRACUNIT;
-  door->topwait = VDOORWAIT;
-  door->topcountdown = 5 * 60 * 35;
-  door->line = NULL; // jff 1/31/98 remember line that triggered us
-  door->lighttag = 0; /* killough 10/98: no lighting changes */
 }

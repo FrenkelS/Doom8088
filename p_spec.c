@@ -247,7 +247,7 @@ int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
 //
 // P_SectorActive()
 //
-// Passed a linedef special class (floor, ceiling, lighting) and a sector
+// Passed a linedef special class (floor, ceiling) and a sector
 // returns whether the sector is already busy with a linedef special of the
 // same class. If old demo compatibility true, all linedef special classes
 // are the same.
@@ -263,10 +263,9 @@ boolean PUREFUNC P_SectorActive(special_e t, const sector_t __far* sec)
         return sec->floordata != NULL;
       case ceiling_special:
         return sec->ceilingdata != NULL;
-      case lighting_special:
-        return false;
     }
-  return true; // don't know which special, must be active, shouldn't be here
+
+    I_Error("P_SectorActive: don't know which special, must be active, shouldn't be here");
 }
 
 
@@ -434,12 +433,6 @@ void P_SpawnSpecials (void)
         P_SpawnStrobeFlash(sector,SLOWDARK,false);
         break;
 
-      case 4:
-        // strobe fast/death slime
-        P_SpawnStrobeFlash(sector,FASTDARK,false);
-        sector->special |= 3<<DAMAGE_SHIFT; //jff 3/14/98 put damage bits in
-        break;
-
       case 8:
         // glowing light
         P_SpawnGlowingLight(sector);
@@ -450,11 +443,6 @@ void P_SpawnSpecials (void)
           _g_totalsecret++;        // a generalized sector type
         break;
 
-      case 10:
-        // door close in 30 seconds
-        P_SpawnDoorCloseIn30 (sector);
-        break;
-
       case 12:
         // sync strobe slow
         P_SpawnStrobeFlash (sector, SLOWDARK, true);
@@ -463,16 +451,6 @@ void P_SpawnSpecials (void)
       case 13:
         // sync strobe fast
         P_SpawnStrobeFlash (sector, FASTDARK, true);
-        break;
-
-      case 14:
-        // door raise in 5 minutes
-        P_SpawnDoorRaiseIn5Mins (sector);
-        break;
-
-      case 17:
-        // fire flickering
-        P_SpawnFireFlicker(sector);
         break;
     }
   }

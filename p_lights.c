@@ -51,42 +51,6 @@
 //////////////////////////////////////////////////////////
 
 //
-// T_FireFlicker()
-//
-// Firelight flicker action routine, called once per tick
-//
-// Passed a fireflicker_t structure containing light levels and timing
-// Returns nothing
-//
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t __far* sector;
-  int16_t count;
-  int16_t maxlight;
-  int16_t minlight;
-
-} fireflicker_t;
-
-static void T_FireFlicker (fireflicker_t __far* flick)
-{
-  int16_t amount;
-
-  if (--flick->count)
-    return;
-
-  amount = (P_Random()&3)*16;
-
-  if (flick->sector->lightlevel - amount < flick->minlight)
-    flick->sector->lightlevel = flick->minlight;
-  else
-    flick->sector->lightlevel = flick->maxlight - amount;
-
-  flick->count = 4;
-}
-
-//
 // T_LightFlash()
 //
 // Broken light flashing action routine, called once per tick
@@ -246,33 +210,6 @@ static int16_t P_FindMinSurroundingLight(sector_t __far* sector, int16_t max)
 // for specials that spawn thinkers
 //
 //////////////////////////////////////////////////////////
-
-//
-// P_SpawnFireFlicker()
-//
-// Spawns a fire flicker lighting thinker
-//
-// Passed the sector that spawned the thinker
-// Returns nothing
-//
-void P_SpawnFireFlicker(sector_t __far* sector)
-{
-  fireflicker_t __far*  flick;
-
-  // Note that we are resetting sector attributes.
-  // Nothing special about it during gameplay.
-  sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
-
-  flick = Z_CallocLevSpec( sizeof(*flick));
-
-  P_AddThinker (&flick->thinker);
-
-  flick->thinker.function = T_FireFlicker;
-  flick->sector = sector;
-  flick->maxlight = sector->lightlevel;
-  flick->minlight = P_FindMinSurroundingLight(sector,sector->lightlevel)+16;
-  flick->count = 4;
-}
 
 //
 // P_SpawnLightFlash()

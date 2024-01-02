@@ -309,8 +309,6 @@ static void P_PlayerInSpecialSector (player_t* player)
 
       case 16:
         // 10/20 unit damage per 31 ticks
-      case 4:
-        // 10/20 unit damage plus blinking light (light already spawned)
         if (!player->powers[pw_ironfeet]
             || (P_Random()<5) ) // even with suit, take damage
         {
@@ -372,13 +370,6 @@ static void P_PlayerInSpecialSector (player_t* player)
       if (sector->special<32) // if all extended bits clear,
         sector->special=0;    // sector is not special anymore
     }
-
-    // phares 3/19/98:
-    //
-    // If FRICTION_MASK or PUSH_MASK is set, we don't care at this
-    // point, since the code to deal with those situations is
-    // handled by Thinkers.
-
   }
 }
 
