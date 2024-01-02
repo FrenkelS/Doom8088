@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -273,170 +273,6 @@ int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
 
 
 //
-// P_CanUnlockGenDoor()
-//
-// Passed a generalized locked door linedef and a player, returns whether
-// the player has the keys necessary to unlock that door.
-//
-// Note: The linedef passed MUST be a generalized locked door type
-//       or results are undefined.
-//
-// jff 02/05/98 routine added to test for unlockability of
-//  generalized locked doors
-//
-
-// define names for the locked door Kind field of the general ceiling
-
-typedef enum
-{
-  AnyKey,
-  RCard,
-  BCard,
-  YCard,
-  RSkull,
-  BSkull,
-  YSkull,
-  AllKeys,
-} keykind_e;
-
-boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player)
-{
-  // does this line special distinguish between skulls and keys?
-  boolean skulliscard = (LN_SPECIAL(line) & LockedNKeys)>>LockedNKeysShift;
-
-  // determine for each case of lock type if player's keys are adequate
-  switch((LN_SPECIAL(line) & LockedKey)>>LockedKeyShift)
-  {
-    case AnyKey:
-      if
-      (
-        !player->cards[it_redcard] &&
-        !player->cards[it_redskull] &&
-        !player->cards[it_bluecard] &&
-        !player->cards[it_blueskull] &&
-        !player->cards[it_yellowcard] &&
-        !player->cards[it_yellowskull]
-      )
-      {
-        player->message = PD_ANY; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case RCard:
-      if
-      (
-        !player->cards[it_redcard] &&
-        (!skulliscard || !player->cards[it_redskull])
-      )
-      {
-        player->message = skulliscard? PD_REDK : PD_REDC; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case BCard:
-      if
-      (
-        !player->cards[it_bluecard] &&
-        (!skulliscard || !player->cards[it_blueskull])
-      )
-      {
-        player->message = skulliscard? PD_BLUEK : PD_BLUEC; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case YCard:
-      if
-      (
-        !player->cards[it_yellowcard] &&
-        (!skulliscard || !player->cards[it_yellowskull])
-      )
-      {
-        player->message = skulliscard? PD_YELLOWK : PD_YELLOWC; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case RSkull:
-      if
-      (
-        !player->cards[it_redskull] &&
-        (!skulliscard || !player->cards[it_redcard])
-      )
-      {
-        player->message = skulliscard? PD_REDK : PD_REDS; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case BSkull:
-      if
-      (
-        !player->cards[it_blueskull] &&
-        (!skulliscard || !player->cards[it_bluecard])
-      )
-      {
-        player->message = skulliscard? PD_BLUEK : PD_BLUES; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case YSkull:
-      if
-      (
-        !player->cards[it_yellowskull] &&
-        (!skulliscard || !player->cards[it_yellowcard])
-      )
-      {
-        player->message = skulliscard? PD_YELLOWK : PD_YELLOWS; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case AllKeys:
-      if
-      (
-        !skulliscard &&
-        (
-          !player->cards[it_redcard] ||
-          !player->cards[it_redskull] ||
-          !player->cards[it_bluecard] ||
-          !player->cards[it_blueskull] ||
-          !player->cards[it_yellowcard] ||
-          !player->cards[it_yellowskull]
-        )
-      )
-      {
-        player->message = PD_ALL6; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      if
-      (
-        skulliscard &&
-        (
-          (!player->cards[it_redcard] &&
-            !player->cards[it_redskull]) ||
-          (!player->cards[it_bluecard] &&
-            !player->cards[it_blueskull]) ||
-          (!player->cards[it_yellowcard] &&
-            !player->cards[it_yellowskull])
-        )
-      )
-      {
-        player->message = PD_ALL3; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-  }
-  return true;
-}
-
-
-//
 // P_SectorActive()
 //
 // Passed a linedef special class (floor, ceiling, lighting) and a sector
@@ -491,50 +327,15 @@ boolean P_CheckTag(const line_t __far* line)
     case 32:
     case 33:
     case 34:
-    case 117:
-    case 118:
 
-    case 139:               // Lighting specials
-    case 170:
-    case 79:
-    case 35:
-    case 138:
-    case 171:
-    case 81:
-    case 13:
-    case 192:
-    case 169:
-    case 80:
-    case 12:
-    case 194:
-    case 173:
-    case 157:
-    case 104:
-    case 193:
-    case 172:
-    case 156:
-    case 17:
+    case 35:                // Lighting specials
 
-    case 195:               // Thing teleporters
-    case 174:
-    case 97:
-    case 39:
-    case 126:
-    case 125:
-    case 210:
-    case 209:
-    case 208:
-    case 207:
+    case 97:                // Thing teleporters
 
     case 11:                // Exits
-    case 52:
-    case 197:
     case 51:
-    case 124:
-    case 198:
 
     case 48:                // Scrolling walls
-    case 85:
       return true;   // zero tag allowed
 
     default:

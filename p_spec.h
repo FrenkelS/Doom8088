@@ -529,8 +529,6 @@ sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec);
 
 boolean P_CheckTag(const line_t __far* line);
 
-boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player);
-
 boolean P_SectorActive(special_e t, const sector_t __far* s);
 
 
