@@ -307,14 +307,6 @@ static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
   // get the sector on the second side of activating linedef
   sec = _g_sides[line->sidenum[1]].sector;
 
-  /* if door already has a thinker, use it
-   * cph 2001/04/05 -
-   * Ok, this is a disaster area. We're assuming that sec->ceilingdata
-   *  is a vldoor_t! What if this door is controlled by both DR lines
-   *  and by switches? I don't know how to fix that.
-   * Secondly, original Doom didn't distinguish floor/lighting/ceiling
-   *  actions, so we need to do the same in demo compatibility mode.
-   */
   door = sec->ceilingdata;
 
   /* If this is a repeatable line, and the door is already moving, then we can just reverse the current action. Note that in prboom 2.3.0 I erroneously removed the if-this-is-repeatable check, hence the prboom_4_compatibility clause below (foolishly assumed that already moving implies repeatable - but it could be moving due to another switch, e.g. lv19-509) */

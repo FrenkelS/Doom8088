@@ -182,7 +182,6 @@ typedef struct
   int16_t wait;
   int16_t count;
   plat_e status;
-  plat_e oldstatus;
   int16_t tag;
   plattype_e type;
 
@@ -216,37 +215,6 @@ typedef struct
   int16_t lighttag;
 } vldoor_t;
 
-// p_doors
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t __far* sector;
-  fixed_t bottomheight;
-  fixed_t topheight;
-  fixed_t speed;
-  fixed_t oldspeed;
-  boolean crush;
-
-  //jff 02/04/98 add these to support ceiling changers
-  int16_t newspecial;
-  int16_t oldspecial; //jff 3/14/98 add to fix bug in change transfers
-  int16_t texture;
-
-  // 1 = up, 0 = waiting, -1 = down
-  int16_t direction;
-
-  // ID
-  int16_t tag;
-  int16_t olddirection;
-  struct ceilinglist __far* list;
-} ceiling_t;
-
-typedef struct ceilinglist {
-  ceiling_t __far* ceiling;
-  struct ceilinglist __far* next;
-  struct ceilinglist __far*__far* prev;
-} ceilinglist_t;
 
 // p_floor
 
@@ -257,7 +225,6 @@ typedef struct
   sector_t __far* sector;
   int16_t direction;
   int16_t newspecial;
-  int16_t oldspecial;   //jff 3/14/98 add to fix bug in change transfers
   int16_t texture;
   fixed_t floordestheight;
   fixed_t speed;
