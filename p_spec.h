@@ -106,22 +106,7 @@ typedef enum
 {
   normal,
   close30ThenOpen,
-  dclose,
   dopen,
-  raiseIn5Mins,
-  blazeRaise,
-  blazeOpen,
-  blazeClose,
-
-  //jff 02/05/98 add generalize door types
-  genRaise,
-  genBlazeRaise,
-  genOpen,
-  genBlazeOpen,
-  genClose,
-  genBlazeClose,
-  genCdO,
-  genBlazeCdO,
 } vldoor_e;
 
 // p_ceilng

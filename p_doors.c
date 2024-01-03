@@ -100,8 +100,6 @@ static void EV_LightTurnOnPartway(const line_t __far* line, fixed_t level)
 // See P_SPEC.H for fields.
 // Returns nothing.
 //
-// jff 02/08/98 all cases with labels beginning with gen added to support
-// generalized line type behaviors.
 
 void T_VerticalDoor(vldoor_t __far* door)
 {
@@ -116,44 +114,13 @@ void T_VerticalDoor(vldoor_t __far* door)
       {
         switch(door->type)
         {
-          case blazeRaise:
-          case genBlazeRaise:
-            door->direction = -1; // time to go back down
-            S_StartSound2(&door->sector->soundorg,sfx_bdcls);
-            break;
-
           case normal:
-          case genRaise:
             door->direction = -1; // time to go back down
             S_StartSound2(&door->sector->soundorg,sfx_dorcls);
             break;
 
           case close30ThenOpen:
-          case genCdO:
             door->direction = 1;  // time to go back up
-            S_StartSound2(&door->sector->soundorg,sfx_doropn);
-            break;
-
-          case genBlazeCdO:
-            door->direction = 1;  // time to go back up
-            S_StartSound2(&door->sector->soundorg,sfx_bdopn);
-            break;
-
-          default:
-            break;
-        }
-      }
-      break;
-
-    case 2:
-      // Special case for sector type door that opens in 5 mins
-      if (!--door->topcountdown)  // 5 minutes up?
-      {
-        switch(door->type)
-        {
-          case raiseIn5Mins:
-            door->direction = 1;  // time to raise then
-            door->type = normal;  // door acts just like normal 1 DR door now
             S_StartSound2(&door->sector->soundorg,sfx_doropn);
             break;
 
@@ -192,19 +159,7 @@ void T_VerticalDoor(vldoor_t __far* door)
         switch(door->type)
         {
           // regular open and close doors are all done, remove them
-          case blazeRaise:
-          case blazeClose:
-          case genBlazeRaise:
-          case genBlazeClose:
-            door->sector->ceilingdata = NULL;  //jff 2/22/98
-            P_RemoveThinker (&door->thinker);  // unlink and free
-            // killough 4/15/98: remove double-closing sound of blazing doors
-            break;
-
           case normal:
-          case dclose:
-          case genRaise:
-          case genClose:
             door->sector->ceilingdata = NULL; //jff 2/22/98
             P_RemoveThinker (&door->thinker);  // unlink and free
             break;
@@ -213,12 +168,6 @@ void T_VerticalDoor(vldoor_t __far* door)
           case close30ThenOpen:
             door->direction = 0;
             door->topcountdown = TICRATE*30;
-            break;
-
-          case genCdO:
-          case genBlazeCdO:
-            door->direction = 0;
-            door->topcountdown = door->topwait; // jff 5/8/98 insert delay
             break;
 
           default:
@@ -230,25 +179,9 @@ void T_VerticalDoor(vldoor_t __far* door)
        */
       else if (res == crushed) // handle door meeting obstruction on way down
       {
-        switch(door->type)
-        {
-          case genClose:
-          case genBlazeClose:
-          case blazeClose:
-          case dclose:          // Close types do not bounce, merely wait
-            break;
-
-          case blazeRaise:
-          case genBlazeRaise:
-            door->direction = 1;
-          S_StartSound2(&door->sector->soundorg,sfx_bdopn);
-	      break;
-
-          default:             // other types bounce off the obstruction
-            door->direction = 1;
-            S_StartSound2(&door->sector->soundorg,sfx_doropn);
-            break;
-        }
+        // other types bounce off the obstruction
+        door->direction = 1;
+        S_StartSound2(&door->sector->soundorg,sfx_doropn);
       }
       break;
 
@@ -280,21 +213,13 @@ void T_VerticalDoor(vldoor_t __far* door)
       {
         switch(door->type)
         {
-          case blazeRaise:       // regular open/close doors start waiting
-          case normal:
-          case genRaise:
-          case genBlazeRaise:
+          case normal:           // regular open/close doors start waiting
             door->direction = 0; // wait at top with delay
             door->topcountdown = door->topwait;
             break;
 
           case close30ThenOpen:  // close and close/open doors are done
-          case blazeOpen:
           case dopen:
-          case genBlazeOpen:
-          case genOpen:
-          case genCdO:
-          case genBlazeCdO:
             door->sector->ceilingdata = NULL; //jff 2/22/98
             P_RemoveThinker (&door->thinker); // unlink and free
             break;
@@ -356,35 +281,10 @@ boolean EV_DoDoor(const line_t __far* line, vldoor_e type)
     // setup door parameters according to type of door
     switch(type)
     {
-      case blazeClose:
-        door->topheight = P_FindLowestCeilingSurrounding(sec);
-        door->topheight -= 4*FRACUNIT;
-        door->direction = -1;
-        door->speed = VDOORSPEED * 4;
-        S_StartSound2(&door->sector->soundorg,sfx_bdcls);
-        break;
-
-      case dclose:
-        door->topheight = P_FindLowestCeilingSurrounding(sec);
-        door->topheight -= 4*FRACUNIT;
-        door->direction = -1;
-        S_StartSound2(&door->sector->soundorg,sfx_dorcls);
-        break;
-
       case close30ThenOpen:
         door->topheight = sec->ceilingheight;
         door->direction = -1;
         S_StartSound2(&door->sector->soundorg,sfx_dorcls);
-        break;
-
-      case blazeRaise:
-      case blazeOpen:
-        door->direction = 1;
-        door->topheight = P_FindLowestCeilingSurrounding(sec);
-        door->topheight -= 4*FRACUNIT;
-        door->speed = VDOORSPEED * 4;
-        if (door->topheight != sec->ceilingheight)
-          S_StartSound2(&door->sector->soundorg,sfx_bdopn);
         break;
 
       case normal:
