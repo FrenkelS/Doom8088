@@ -153,35 +153,9 @@ typedef enum
   // raise floor to next highest surrounding floor
   raiseFloorToNearest,
 
-  //jff 02/03/98 lower floor to next lowest neighbor
-  lowerFloorToNearest,
-
-  // raise floor to shortest height texture around it
-  raiseToTexture,
-
-  // lower floor to lowest surrounding floor
-  //  and change floorpic
-  lowerAndChange,
-
-  raiseFloor24,
-
-  raiseFloor24AndChange,
-  raiseFloorCrush,
-
-  // raise to next highest floor, turbo-speed
-  raiseFloorTurbo,
   donutRaise,
-  raiseFloor512,
 
-  //jff 02/04/98  add types for generalized floor mover
-  genFloor,
-  genFloorChg,
-  genFloorChg0,
-  genFloorChgT,
-
-  //new types for stair builders
   buildStair,
-  genBuildStair,
 } floor_e;
 
 typedef enum
@@ -348,8 +322,6 @@ fixed_t P_FindLowestFloorSurrounding(sector_t __far* sec);
 fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec);
 
 fixed_t P_FindNextHighestFloor(sector_t __far* sec);
-
-fixed_t P_FindNextLowestFloor(sector_t __far* sec, fixed_t currentheight);
 
 fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec);
 

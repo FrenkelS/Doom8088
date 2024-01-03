@@ -417,38 +417,6 @@ static void T_MoveFloor(floormove_t __far* floor)
           floor->sector->special = floor->newspecial;
           floor->sector->floorpic = floor->texture;
           break;
-        case genFloorChgT:
-        case genFloorChg0:
-          floor->sector->special = floor->newspecial;
-          //jff add to fix bug in special transfers from changes
-          floor->sector->oldspecial = floor->oldspecial;
-          //fall thru
-        case genFloorChg:
-          floor->sector->floorpic = floor->texture;
-          break;
-        default:
-          break;
-      }
-    }
-    else if (floor->direction == -1) // going down
-    {
-      switch(floor->type) // handle texture/type changes
-      {
-        case lowerAndChange:
-          floor->sector->special = floor->newspecial;
-          //jff add to fix bug in special transfers from changes
-          floor->sector->oldspecial = floor->oldspecial;
-          floor->sector->floorpic = floor->texture;
-          break;
-        case genFloorChgT:
-        case genFloorChg0:
-          floor->sector->special = floor->newspecial;
-          //jff add to fix bug in special transfers from changes
-          floor->sector->oldspecial = floor->oldspecial;
-          //fall thru
-        case genFloorChg:
-          floor->sector->floorpic = floor->texture;
-          break;
         default:
           break;
       }
@@ -506,95 +474,6 @@ fixed_t P_FindNextHighestFloor(sector_t __far* sec)
 ///////////////////////////////////////////////////////////////////////
 
 //
-// getSide()
-//
-// Will return a side_t*
-//  given the number of the current sector,
-//  the line number, and the side (0/1) that you want.
-//
-// Note: if side=1 is specified, it must exist or results undefined
-//
-static side_t __far* getSide(int16_t currentSector, int16_t line, int16_t side)
-{
-  return &_g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ];
-}
-
-
-//
-// getSector()
-//
-// Will return a sector_t*
-//  given the number of the current sector,
-//  the line number and the side (0/1) that you want.
-//
-// Note: if side=1 is specified, it must exist or results undefined
-//
-static sector_t __far* getSector(int16_t currentSector, int16_t line, int16_t side)
-{
-  return _g_sides[ (_g_sectors[currentSector].lines[line])->sidenum[side] ].sector;
-}
-
-
-//
-// twoSided()
-//
-// Given the sector number and the line number,
-//  it will tell you whether the line is two-sided or not.
-//
-// modified to return actual two-sidedness rather than presence
-// of 2S flag unless compatibility optioned
-//
-static boolean twoSided(int16_t sector, int16_t line)
-{
-  //jff 1/26/98 return what is actually needed, whether the line
-  //has two sidedefs, rather than whether the 2S flag is set
-
-  return (_g_sectors[sector].lines[line])->sidenum[1] != NO_INDEX;
-}
-
-
-//
-// P_FindModelFloorSector()
-//
-// Passed a floor height and a sector number, return a pointer to a
-// a sector with that floor height across the lowest numbered two sided
-// line surrounding the sector.
-//
-// Note: If no sector at that height bounds the sector passed, return NULL
-//
-// jff 02/03/98 Add routine to find numeric model floor
-//  around a sector specified by sector number
-// jff 3/14/98 change first parameter to plain height to allow call
-//  from routine not using floormove_t
-//
-static sector_t __far* P_FindModelFloorSector(fixed_t floordestheight,int16_t secnum)
-{
-  int16_t i;
-  sector_t __far* sec;
-  int16_t linecount;
-
-  sec = &_g_sectors[secnum]; //jff 3/2/98 woops! better do this
-  //jff 5/23/98 don't disturb sec->linecount while searching
-  // but allow early exit in old demos
-  linecount = sec->linecount;
-  for (i = 0; i < (linecount); i++)
-  {
-    if ( twoSided(secnum, i) )
-    {
-      if (getSide(secnum,i,0)->sector-_g_sectors == secnum)
-          sec = getSector(secnum,i,1);
-      else
-          sec = getSector(secnum,i,0);
-
-      if (sec->floorheight == floordestheight)
-        return sec;
-    }
-  }
-  return NULL;
-}
-
-
-//
 // EV_DoFloor()
 //
 // Handle regular and extended floor types
@@ -606,7 +485,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 {
   int16_t           secnum;
   boolean           rtn;
-  int16_t           i;
   sector_t __far*     sec;
   floormove_t __far*  floor;
 
@@ -647,15 +525,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->floordestheight = P_FindLowestFloorSurrounding(sec);
         break;
 
-        //jff 02/03/30 support lowering floor to next lowest floor
-      case lowerFloorToNearest:
-        floor->direction = -1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight =
-          P_FindNextLowestFloor(sec,floor->sector->floorheight);
-        break;
-
       case turboLower:
         floor->direction = -1;
         floor->sector = sec;
@@ -665,8 +534,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
           floor->floordestheight += 8*FRACUNIT;
         break;
 
-      case raiseFloorCrush:
-        floor->crush = true;
       case raiseFloor:
         floor->direction = 1;
         floor->sector = sec;
@@ -674,14 +541,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->floordestheight = P_FindLowestCeilingSurrounding(sec);
         if (floor->floordestheight > sec->ceilingheight)
           floor->floordestheight = sec->ceilingheight;
-        floor->floordestheight -= (8*FRACUNIT)*(floortype == raiseFloorCrush);
-        break;
-
-      case raiseFloorTurbo:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED*4;
-        floor->floordestheight = P_FindNextHighestFloor(sec);
         break;
 
       case raiseFloorToNearest:
@@ -691,89 +550,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->floordestheight = P_FindNextHighestFloor(sec);
         break;
 
-      case raiseFloor24:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = floor->sector->floorheight + 24 * FRACUNIT;
-        break;
-
-      case raiseFloor512:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = floor->sector->floorheight + 512 * FRACUNIT;
-        break;
-
-      case raiseFloor24AndChange:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = floor->sector->floorheight + 24 * FRACUNIT;
-        sec->floorpic = LN_FRONTSECTOR(line)->floorpic;
-        sec->special = LN_FRONTSECTOR(line)->special;
-        //jff 3/14/98 transfer both old and new special
-        sec->oldspecial = LN_FRONTSECTOR(line)->oldspecial;
-        break;
-
-      case raiseToTexture:
-        {
-          int16_t minsize = 32000; /* jff 3/13/98 no ovf */
-          side_t __far*     side;
-
-          floor->direction = 1;
-          floor->sector = sec;
-          floor->speed = FLOORSPEED;
-          for (i = 0; i < sec->linecount; i++)
-          {
-            if (twoSided (secnum, i) )
-            {
-              side = getSide(secnum,i,0);
-              // jff 8/14/98 don't scan texture 0, its not real
-              if (side->bottomtexture > 0)
-                if (textureheight[side->bottomtexture] < minsize)
-                  minsize = textureheight[side->bottomtexture];
-              side = getSide(secnum,i,1);
-              // jff 8/14/98 don't scan texture 0, its not real
-              if (side->bottomtexture > 0)
-                if (textureheight[side->bottomtexture] < minsize)
-                  minsize = textureheight[side->bottomtexture];
-            }
-          }
-          {
-            floor->floordestheight =
-              (floor->sector->floorheight>>FRACBITS) + minsize;
-            if (floor->floordestheight>32000)
-              floor->floordestheight = 32000;        //jff 3/13/98 do not
-            floor->floordestheight<<=FRACBITS;       // allow height overflow
-          }
-        }
-      break;
-
-      case lowerAndChange:
-        floor->direction = -1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = P_FindLowestFloorSurrounding(sec);
-        floor->texture = sec->floorpic;
-
-        // jff 1/24/98 make sure floor->newspecial gets initialized
-        // in case no surrounding sector is at floordestheight
-        // --> should not affect compatibility <--
-        floor->newspecial = sec->special;
-        //jff 3/14/98 transfer both old and new special
-        floor->oldspecial = sec->oldspecial;
-
-        //jff 5/23/98 use model subroutine to unify fixes and handling
-        sec = P_FindModelFloorSector(floor->floordestheight,sec-_g_sectors);
-        if (sec)
-        {
-          floor->texture = sec->floorpic;
-          floor->newspecial = sec->special;
-          //jff 3/14/98 transfer both old and new special
-          floor->oldspecial = sec->oldspecial;
-        }
-        break;
       default:
         break;
     }

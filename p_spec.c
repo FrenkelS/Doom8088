@@ -169,37 +169,6 @@ fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 
 
 //
-// P_FindNextLowestFloor()
-//
-// Passed a sector and a floor height, returns the fixed point value
-// of the largest floor height in a surrounding sector smaller than
-// the floor height passed. If no such height exists the floorheight
-// passed is returned.
-//
-// jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
-//
-fixed_t P_FindNextLowestFloor(sector_t __far* sec, fixed_t currentheight)
-{
-  sector_t __far* other;
-  int16_t i;
-
-  for (i=0 ;i < sec->linecount ; i++)
-    if ((other = getNextSector(sec->lines[i],sec)) &&
-         other->floorheight < currentheight)
-    {
-      fixed_t height = other->floorheight;
-      while (++i < sec->linecount)
-        if ((other = getNextSector(sec->lines[i],sec)) &&
-            other->floorheight > height &&
-            other->floorheight < currentheight)
-          height = other->floorheight;
-      return height;
-    }
-  return currentheight;
-}
-
-
-//
 // P_FindLowestCeilingSurrounding()
 //
 // Passed a sector, returns the fixed point value of the smallest
