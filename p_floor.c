@@ -47,7 +47,6 @@
 #include "globdata.h"
 
 
-static boolean crushchange;
 static boolean nofit;
 
 
@@ -119,8 +118,6 @@ static boolean P_ThingHeightClip(mobj_t __far* thing)
 
 static void PIT_ChangeSector(mobj_t __far* thing)
   {
-  mobj_t __far* mo;
-
   if (P_ThingHeightClip (thing))
     return;
 
@@ -152,22 +149,6 @@ static void PIT_ChangeSector(mobj_t __far* thing)
     }
 
   nofit = true;
-
-  if (crushchange && !(_g_leveltime&3)) {
-    int16_t t;
-    P_DamageMobj(thing,NULL,NULL,10);
-
-    // spray blood in a random direction
-    mo = P_SpawnMobj (thing->x,
-                      thing->y,
-                      thing->z + thing->height/2, MT_BLOOD);
-
-    /* killough 8/10/98: remove dependence on order of evaluation */
-    t = P_Random();
-    mo->momx = (t - P_Random ())<<12;
-    t = P_Random();
-    mo->momy = (t - P_Random ())<<12;
-  }
   }
 
 
@@ -178,12 +159,11 @@ static void PIT_ChangeSector(mobj_t __far* thing)
 // sector. Both more accurate and faster.
 //
 
-static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
+static boolean P_CheckSector(sector_t __far* sector)
   {
   msecnode_t __far* n;
 
   nofit = false;
-  crushchange = crunch;
 
   // killough 4/4/98: scan list front-to-back until empty or exhausted,
   // restarting from beginning after each thing is processed. Avoids
@@ -235,17 +215,13 @@ static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
 //  pastdest - plane moved normally and is now at destination height
 //  crushed - plane encountered an obstacle, is holding until removed
 //
-result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int16_t floorOrCeiling, int16_t direction)
+result_e T_MovePlaneFloor(sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction)
 {
   boolean       flag;
   fixed_t       lastpos;
   fixed_t       destheight; //jff 02/04/98 used to keep floors/ceilings
                             // from moving thru each other
 
-  switch(floorOrCeiling)
-  {
-    case 0:
-      // Moving a floor
       switch(direction)
       {
         case -1:
@@ -254,11 +230,11 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->floorheight;
             sector->floorheight = dest;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
             if (flag == true)
             {
               sector->floorheight =lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
             }
             return pastdest;
           }
@@ -266,7 +242,7 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->floorheight;
             sector->floorheight -= speed;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
       /* cph - make more compatible with original Doom, by
        *  reintroducing this code. This means floors can't lower
        *  if objects are stuck in the ceiling */
@@ -283,11 +259,11 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->floorheight;
             sector->floorheight = destheight;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
             if (flag == true)
             {
               sector->floorheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
             }
             return pastdest;
           }
@@ -296,21 +272,29 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
             // crushing is possible
             lastpos = sector->floorheight;
             sector->floorheight += speed;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
             if (flag == true)
             {
 
               sector->floorheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
               return crushed;
             }
           }
           break;
       }
-      break;
 
-    case 1:
-      // moving a ceiling
+  return ok;
+}
+
+
+result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction)
+{
+  boolean       flag;
+  fixed_t       lastpos;
+  fixed_t       destheight; //jff 02/04/98 used to keep floors/ceilings
+                            // from moving thru each other
+
       switch(direction)
       {
         case -1:
@@ -323,12 +307,12 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->ceilingheight;
             sector->ceilingheight = destheight;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
 
             if (flag == true)
             {
               sector->ceilingheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
             }
             return pastdest;
           }
@@ -337,14 +321,12 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
             // crushing is possible
             lastpos = sector->ceilingheight;
             sector->ceilingheight -= speed;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
 
             if (flag == true)
             {
-              if (crush == true)
-                return crushed;
               sector->ceilingheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
               return crushed;
             }
           }
@@ -356,11 +338,11 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->ceilingheight;
             sector->ceilingheight = dest;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
             if (flag == true)
             {
               sector->ceilingheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
             }
             return pastdest;
           }
@@ -368,14 +350,14 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->ceilingheight;
             sector->ceilingheight += speed;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
           }
           break;
       }
-      break;
-  }
+
   return ok;
 }
+
 
 //
 // T_MoveFloor()
@@ -394,15 +376,8 @@ static void T_MoveFloor(floormove_t __far* floor)
 {
   result_e      res;
 
-  res = T_MovePlane       // move the floor
-  (
-    floor->sector,
-    floor->speed,
-    floor->floordestheight,
-    floor->crush,
-    0,
-    floor->direction
-  );
+  // move the floor
+  res = T_MovePlaneFloor(floor->sector, floor->speed, floor->floordestheight, floor->direction);
 
   if (!(_g_leveltime&7))     // make the floormove sound
     S_StartSound2(&floor->sector->soundorg, sfx_stnmov);
@@ -506,7 +481,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
     sec->floordata = floor; //jff 2/22/98
     floor->thinker.function = T_MoveFloor;
     floor->type = floortype;
-    floor->crush = false;
 
     // setup the thinker according to the linedef type
     switch(floortype)
@@ -628,7 +602,6 @@ boolean EV_BuildStairs(const line_t __far* line)
     // set up the speed and stepsize
     speed = FLOORSPEED/4;
     stairsize = 8*FRACUNIT;
-    floor->crush = false; //jff 2/27/98 fix uninitialized crush field
     floor->speed = speed;
     height = sec->floorheight + stairsize;
     floor->floordestheight = height;
@@ -684,8 +657,6 @@ boolean EV_BuildStairs(const line_t __far* line)
         floor->speed = speed;
         floor->floordestheight = height;
         floor->type = buildStair; //jff 3/31/98 do not leave uninited
-        //jff 2/27/98 fix uninitialized crush field
-          floor->crush = false;
         ok = true;
         break;
       }
@@ -753,7 +724,6 @@ boolean EV_DoDonut(const line_t __far* line)
       s2->floordata = floor; //jff 2/22/98
       floor->thinker.function = T_MoveFloor;
       floor->type = donutRaise;
-      floor->crush = false;
       floor->direction = 1;
       floor->sector = s2;
       floor->speed = FLOORSPEED / 2;
@@ -767,7 +737,6 @@ boolean EV_DoDonut(const line_t __far* line)
       s1->floordata = floor; //jff 2/22/98
       floor->thinker.function = T_MoveFloor;
       floor->type = lowerFloor;
-      floor->crush = false;
       floor->direction = -1;
       floor->sector = s1;
       floor->speed = FLOORSPEED / 2;

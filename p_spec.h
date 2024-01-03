@@ -189,7 +189,6 @@ typedef struct
   int16_t count;
   plat_e status;
   plat_e oldstatus;
-  boolean crush;
   int16_t tag;
   plattype_e type;
 
@@ -261,7 +260,6 @@ typedef struct
 {
   thinker_t thinker;
   floor_e type;
-  boolean crush;
   sector_t __far* sector;
   int16_t direction;
   int16_t newspecial;
@@ -311,7 +309,8 @@ void T_VerticalDoor(vldoor_t __far* door);
 
 // p_floor
 
-result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int16_t floorOrCeiling, int16_t direction);
+result_e T_MovePlaneFloor  (sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction);
+result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction);
 
 
 ////////////////////////////////////////////////////////////////

@@ -79,7 +79,7 @@ void T_PlatRaise(plat_t __far* plat)
   switch(plat->status)
   {
     case up: // plat moving up
-      res = T_MovePlane(plat->sector,plat->speed,plat->high,plat->crush,0,1);
+      res = T_MovePlaneFloor(plat->sector,plat->speed,plat->high,1);
 
       // if a pure raise type, make the plat moving sound
       if (plat->type == raiseToNearestAndChange)
@@ -89,7 +89,7 @@ void T_PlatRaise(plat_t __far* plat)
       }
 
       // if encountered an obstacle, and not a crush type, reverse direction
-      if (res == crushed && (!plat->crush))
+      if (res == crushed)
       {
         plat->count = plat->wait;
         plat->status = down;
@@ -119,7 +119,7 @@ void T_PlatRaise(plat_t __far* plat)
       break;
 
     case down: // plat moving down
-      res = T_MovePlane(plat->sector,plat->speed,plat->low,false,0,-1);
+      res = T_MovePlaneFloor(plat->sector,plat->speed,plat->low,-1);
 
       // handle reaching end of down stroke
       if (res == pastdest)
@@ -199,7 +199,6 @@ boolean EV_DoPlat(const line_t __far* line, plattype_e type)
     plat->sector = sec;
     plat->sector->floordata = plat; //jff 2/23/98 multiple thinkers
     plat->thinker.function = T_PlatRaise;
-    plat->crush = false;
     plat->tag = line->tag;
 
     //jff 1/26/98 Avoid raise plat bouncing a head off a ceiling and then

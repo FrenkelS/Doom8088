@@ -132,15 +132,7 @@ void T_VerticalDoor(vldoor_t __far* door)
 
     case -1:
       // Door is moving down
-      res = T_MovePlane
-            (
-              door->sector,
-              door->speed,
-              door->sector->floorheight,
-              false,
-              1,
-              door->direction
-            );
+      res = T_MovePlaneCeiling(door->sector, door->speed, door->sector->floorheight, door->direction);
 
       /* killough 10/98: implement gradual lighting effects */
       // e6y: "Tagged doors don't trigger special lighting" handled wrong
@@ -187,15 +179,7 @@ void T_VerticalDoor(vldoor_t __far* door)
 
     case 1:
       // Door is moving up
-      res = T_MovePlane
-            (
-              door->sector,
-              door->speed,
-              door->topheight,
-              false,
-              1,
-              door->direction
-            );
+      res = T_MovePlaneCeiling(door->sector, door->speed, door->topheight, door->direction);
 
       /* killough 10/98: implement gradual lighting effects */
       // e6y: "Tagged doors don't trigger special lighting" handled wrong
