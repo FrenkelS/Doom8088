@@ -344,7 +344,6 @@ static void P_SpawnScrollers(void);
 //  scan for specials that spawn thinkers
 //
 
-// Parses command line parameters.
 void P_SpawnSpecials (void)
 {
   sector_t __far*   sector;
@@ -398,8 +397,6 @@ void P_SpawnSpecials (void)
         break;
     }
   }
-
-  P_RemoveAllActiveCeilings();
 
   P_RemoveAllActivePlats();
 

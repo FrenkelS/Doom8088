@@ -385,9 +385,4 @@ void P_RemoveAllActivePlats
 ( void );    // killough
 
 
-// p_ceilng
-
-void P_RemoveAllActiveCeilings
-( void );                //jff 2/22/98
-
 #endif
