@@ -73,7 +73,7 @@ void T_PlatRaise(plat_t __far* plat)
 {
   result_e      res;
 
-  // handle plat moving, up, down, waiting, or in stasis,
+  // handle plat moving, up, down, or waiting
   switch(plat->status)
   {
     case up: // plat moving up
@@ -164,7 +164,7 @@ void T_PlatRaise(plat_t __far* plat)
 // Handle Plat linedef types
 //
 // Passed the linedef that activated the plat and the type of plat action.
-// Returns true if a thinker is started, or restarted from stasis
+// Returns true if a thinker is started
 //
 
 static void P_AddActivePlat(plat_t __far* plat);
