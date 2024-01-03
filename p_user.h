@@ -41,6 +41,5 @@
 #include "d_player.h"
 
 void P_PlayerThink(player_t *player);
-void P_CalcHeight(player_t *player);
 
 #endif  /* __P_USER__ */

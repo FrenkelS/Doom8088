@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -169,37 +169,6 @@ fixed_t P_FindHighestFloorSurrounding(sector_t __far* sec)
 
 
 //
-// P_FindNextLowestFloor()
-//
-// Passed a sector and a floor height, returns the fixed point value
-// of the largest floor height in a surrounding sector smaller than
-// the floor height passed. If no such height exists the floorheight
-// passed is returned.
-//
-// jff 02/03/98 Twiddled Lee's P_FindNextHighestFloor to make this
-//
-fixed_t P_FindNextLowestFloor(sector_t __far* sec, fixed_t currentheight)
-{
-  sector_t __far* other;
-  int16_t i;
-
-  for (i=0 ;i < sec->linecount ; i++)
-    if ((other = getNextSector(sec->lines[i],sec)) &&
-         other->floorheight < currentheight)
-    {
-      fixed_t height = other->floorheight;
-      while (++i < sec->linecount)
-        if ((other = getNextSector(sec->lines[i],sec)) &&
-            other->floorheight > height &&
-            other->floorheight < currentheight)
-          height = other->floorheight;
-      return height;
-    }
-  return currentheight;
-}
-
-
-//
 // P_FindLowestCeilingSurrounding()
 //
 // Passed a sector, returns the fixed point value of the smallest
@@ -228,34 +197,6 @@ fixed_t P_FindLowestCeilingSurrounding(sector_t __far* sec)
 
 
 //
-// P_FindHighestCeilingSurrounding()
-//
-// Passed a sector, returns the fixed point value of the largest
-// ceiling height in the surrounding sectors, not including that passed
-//
-fixed_t P_FindHighestCeilingSurrounding(sector_t __far* sec)
-{
-  int16_t             i;
-  const line_t __far* check;
-  sector_t __far*       other;
-  fixed_t height = -32000*FRACUNIT;
-
-  for (i=0 ;i < sec->linecount ; i++)
-  {
-    check = sec->lines[i];
-    other = getNextSector(check,sec);
-
-    if (!other)
-      continue;
-
-    if (other->ceilingheight > height)
-      height = other->ceilingheight;
-  }
-  return height;
-}
-
-
-//
 // RETURN NEXT SECTOR # THAT LINE TAG REFERS TO
 //
 int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
@@ -269,196 +210,6 @@ int16_t P_FindSectorFromLineTag(const line_t __far* line, int16_t start)
     }
 
     return -1;
-}
-
-
-//
-// P_CanUnlockGenDoor()
-//
-// Passed a generalized locked door linedef and a player, returns whether
-// the player has the keys necessary to unlock that door.
-//
-// Note: The linedef passed MUST be a generalized locked door type
-//       or results are undefined.
-//
-// jff 02/05/98 routine added to test for unlockability of
-//  generalized locked doors
-//
-
-// define names for the locked door Kind field of the general ceiling
-
-typedef enum
-{
-  AnyKey,
-  RCard,
-  BCard,
-  YCard,
-  RSkull,
-  BSkull,
-  YSkull,
-  AllKeys,
-} keykind_e;
-
-boolean P_CanUnlockGenDoor(const line_t __far* line, player_t* player)
-{
-  // does this line special distinguish between skulls and keys?
-  boolean skulliscard = (LN_SPECIAL(line) & LockedNKeys)>>LockedNKeysShift;
-
-  // determine for each case of lock type if player's keys are adequate
-  switch((LN_SPECIAL(line) & LockedKey)>>LockedKeyShift)
-  {
-    case AnyKey:
-      if
-      (
-        !player->cards[it_redcard] &&
-        !player->cards[it_redskull] &&
-        !player->cards[it_bluecard] &&
-        !player->cards[it_blueskull] &&
-        !player->cards[it_yellowcard] &&
-        !player->cards[it_yellowskull]
-      )
-      {
-        player->message = PD_ANY; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case RCard:
-      if
-      (
-        !player->cards[it_redcard] &&
-        (!skulliscard || !player->cards[it_redskull])
-      )
-      {
-        player->message = skulliscard? PD_REDK : PD_REDC; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case BCard:
-      if
-      (
-        !player->cards[it_bluecard] &&
-        (!skulliscard || !player->cards[it_blueskull])
-      )
-      {
-        player->message = skulliscard? PD_BLUEK : PD_BLUEC; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case YCard:
-      if
-      (
-        !player->cards[it_yellowcard] &&
-        (!skulliscard || !player->cards[it_yellowskull])
-      )
-      {
-        player->message = skulliscard? PD_YELLOWK : PD_YELLOWC; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case RSkull:
-      if
-      (
-        !player->cards[it_redskull] &&
-        (!skulliscard || !player->cards[it_redcard])
-      )
-      {
-        player->message = skulliscard? PD_REDK : PD_REDS; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case BSkull:
-      if
-      (
-        !player->cards[it_blueskull] &&
-        (!skulliscard || !player->cards[it_bluecard])
-      )
-      {
-        player->message = skulliscard? PD_BLUEK : PD_BLUES; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case YSkull:
-      if
-      (
-        !player->cards[it_yellowskull] &&
-        (!skulliscard || !player->cards[it_yellowcard])
-      )
-      {
-        player->message = skulliscard? PD_YELLOWK : PD_YELLOWS; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-    case AllKeys:
-      if
-      (
-        !skulliscard &&
-        (
-          !player->cards[it_redcard] ||
-          !player->cards[it_redskull] ||
-          !player->cards[it_bluecard] ||
-          !player->cards[it_blueskull] ||
-          !player->cards[it_yellowcard] ||
-          !player->cards[it_yellowskull]
-        )
-      )
-      {
-        player->message = PD_ALL6; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      if
-      (
-        skulliscard &&
-        (
-          (!player->cards[it_redcard] &&
-            !player->cards[it_redskull]) ||
-          (!player->cards[it_bluecard] &&
-            !player->cards[it_blueskull]) ||
-          (!player->cards[it_yellowcard] &&
-            !player->cards[it_yellowskull])
-        )
-      )
-      {
-        player->message = PD_ALL3; // Ty 03/27/98 - externalized
-        S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
-        return false;
-      }
-      break;
-  }
-  return true;
-}
-
-
-//
-// P_SectorActive()
-//
-// Passed a linedef special class (floor, ceiling, lighting) and a sector
-// returns whether the sector is already busy with a linedef special of the
-// same class. If old demo compatibility true, all linedef special classes
-// are the same.
-//
-// jff 2/23/98 added to prevent old demos from
-//  succeeding in starting multiple specials on one sector
-//
-boolean PUREFUNC P_SectorActive(special_e t, const sector_t __far* sec)
-{
-    switch (t)             // return whether thinker of same type is active
-    {
-      case floor_special:
-        return sec->floordata != NULL;
-      case ceiling_special:
-        return sec->ceilingdata != NULL;
-      case lighting_special:
-        return false;
-    }
-  return true; // don't know which special, must be active, shouldn't be here
 }
 
 
@@ -491,50 +242,15 @@ boolean P_CheckTag(const line_t __far* line)
     case 32:
     case 33:
     case 34:
-    case 117:
-    case 118:
 
-    case 139:               // Lighting specials
-    case 170:
-    case 79:
-    case 35:
-    case 138:
-    case 171:
-    case 81:
-    case 13:
-    case 192:
-    case 169:
-    case 80:
-    case 12:
-    case 194:
-    case 173:
-    case 157:
-    case 104:
-    case 193:
-    case 172:
-    case 156:
-    case 17:
+    case 35:                // Lighting specials
 
-    case 195:               // Thing teleporters
-    case 174:
-    case 97:
-    case 39:
-    case 126:
-    case 125:
-    case 210:
-    case 209:
-    case 208:
-    case 207:
+    case 97:                // Thing teleporters
 
     case 11:                // Exits
-    case 52:
-    case 197:
     case 51:
-    case 124:
-    case 198:
 
     case 48:                // Scrolling walls
-    case 85:
       return true;   // zero tag allowed
 
     default:
@@ -628,7 +344,6 @@ static void P_SpawnScrollers(void);
 //  scan for specials that spawn thinkers
 //
 
-// Parses command line parameters.
 void P_SpawnSpecials (void)
 {
   sector_t __far*   sector;
@@ -641,10 +356,7 @@ void P_SpawnSpecials (void)
     if (!sector->special)
       continue;
 
-    if (sector->special&SECRET_MASK) //jff 3/15/98 count extended
-      _g_totalsecret++;                 // secret sectors too
-
-    switch (sector->special&31)
+    switch (sector->special)
     {
       case 1:
         // random off
@@ -661,25 +373,13 @@ void P_SpawnSpecials (void)
         P_SpawnStrobeFlash(sector,SLOWDARK,false);
         break;
 
-      case 4:
-        // strobe fast/death slime
-        P_SpawnStrobeFlash(sector,FASTDARK,false);
-        sector->special |= 3<<DAMAGE_SHIFT; //jff 3/14/98 put damage bits in
-        break;
-
       case 8:
         // glowing light
         P_SpawnGlowingLight(sector);
         break;
       case 9:
         // secret sector
-        if (sector->special<32) //jff 3/14/98 bits don't count unless not
-          _g_totalsecret++;        // a generalized sector type
-        break;
-
-      case 10:
-        // door close in 30 seconds
-        P_SpawnDoorCloseIn30 (sector);
+        _g_totalsecret++;
         break;
 
       case 12:
@@ -691,20 +391,8 @@ void P_SpawnSpecials (void)
         // sync strobe fast
         P_SpawnStrobeFlash (sector, FASTDARK, true);
         break;
-
-      case 14:
-        // door raise in 5 minutes
-        P_SpawnDoorRaiseIn5Mins (sector);
-        break;
-
-      case 17:
-        // fire flickering
-        P_SpawnFireFlicker(sector);
-        break;
     }
   }
-
-  P_RemoveAllActiveCeilings();
 
   P_RemoveAllActivePlats();
 

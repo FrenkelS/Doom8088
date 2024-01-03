@@ -144,8 +144,8 @@ typedef enum {
   sfx_punch,
   sfx_chgun,
   sfx_tink,
-  sfx_bdopn,
-  sfx_bdcls,
+  sfx_bdopn, //TODO remove me
+  sfx_bdcls, //TODO remove me
   sfx_itmbk,
   sfx_getpow,
   NUMSFX

@@ -190,27 +190,6 @@ static boolean P_IsOnLift(const mobj_t __far* actor)
   return false;
 }
 
-/*
- * P_IsUnderDamage
- *
- * killough 9/9/98:
- *
- * Returns nonzero if the object is under damage based on
- * their current position. Returns 1 if the damage is moderate,
- * -1 if it is serious. Used for AI.
- */
-
-static int16_t P_IsUnderDamage(mobj_t __far* actor)
-{
-  const struct msecnode_s __far* seclist;
-  const ceiling_t __far* cl;             // Crushing ceiling
-  int16_t dir = 0;
-  for (seclist=actor->touching_sectorlist; seclist; seclist=seclist->m_tnext)
-    if ((cl = seclist->m_sector->ceilingdata) &&
-  cl->thinker.function == T_MoveCeiling)
-      dir |= cl->direction;
-  return dir;
-}
 
 //
 // P_Move
@@ -496,7 +475,7 @@ static void P_NewChaseDir(mobj_t __far* actor)
 
         if (actor->flags & target->flags & MF_FRIEND &&
                 distfriend > dist &&
-                !P_IsOnLift(target) && !P_IsUnderDamage(actor))
+                !P_IsOnLift(target))
         {
             deltax = -deltax, deltay = -deltay;
         }

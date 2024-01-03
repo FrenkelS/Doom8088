@@ -26,11 +26,9 @@ set CFLAGS=%CFLAGS% -D__far= -DFLAT_SPAN -DC_ONLY
 @set GLOBOBJS=%GLOBOBJS% m_cheat.c
 @set GLOBOBJS=%GLOBOBJS% m_menu.c
 @set GLOBOBJS=%GLOBOBJS% m_random.c
-@set GLOBOBJS=%GLOBOBJS% p_ceilng.c
 @set GLOBOBJS=%GLOBOBJS% p_doors.c
 @set GLOBOBJS=%GLOBOBJS% p_enemy.c
 @set GLOBOBJS=%GLOBOBJS% p_floor.c
-@set GLOBOBJS=%GLOBOBJS% p_genlin.c
 @set GLOBOBJS=%GLOBOBJS% p_inter.c
 @set GLOBOBJS=%GLOBOBJS% p_lights.c
 @set GLOBOBJS=%GLOBOBJS% p_map.c
