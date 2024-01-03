@@ -109,30 +109,6 @@ typedef enum
   dopen,
 } vldoor_e;
 
-// p_ceilng
-
-typedef enum
-{
-  lowerToFloor,
-  raiseToHighest,
-  lowerToLowest,
-  lowerToMaxFloor,
-  lowerAndCrush,
-  crushAndRaise,
-  fastCrushAndRaise,
-  silentCrushAndRaise,
-
-  //jff 02/04/98 add types for generalized ceiling mover
-  genCeiling,
-  genCeilingChg,
-  genCeilingChg0,
-  genCeilingChgT,
-
-  //jff 02/05/98 add types for generalized ceiling mover
-  genCrusher,
-  genSilentCrusher,
-
-} ceiling_e;
 
 // p_floor
 
@@ -158,13 +134,6 @@ typedef enum
   buildStair,
 } floor_e;
 
-
-typedef enum
-{
-  elevateUp,
-  elevateDown,
-  elevateCurrent,
-} elevator_e;
 
 //////////////////////////////////////////////////////////////////
 //
@@ -259,7 +228,6 @@ typedef struct
 typedef struct
 {
   thinker_t thinker;
-  ceiling_e type;
   sector_t __far* sector;
   fixed_t bottomheight;
   fixed_t topheight;
@@ -340,10 +308,6 @@ void T_PlatRaise(plat_t __far* plat);
 // p_doors
 
 void T_VerticalDoor(vldoor_t __far* door);
-
-// p_ceilng
-
-void T_MoveCeiling(ceiling_t __far* ceiling);
 
 // p_floor
 
