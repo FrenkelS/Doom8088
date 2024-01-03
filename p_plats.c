@@ -68,8 +68,6 @@ static void P_RemoveActivePlat(plat_t __far* plat);
 // Passed a plat structure containing all pertinent information about the move
 // No return
 //
-// jff 02/08/98 all cases with labels beginning with gen added to support
-// generalized line type behaviors.
 
 void T_PlatRaise(plat_t __far* plat)
 {

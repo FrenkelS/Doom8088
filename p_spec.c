@@ -356,10 +356,7 @@ void P_SpawnSpecials (void)
     if (!sector->special)
       continue;
 
-    if (sector->special&SECRET_MASK) //jff 3/15/98 count extended
-      _g_totalsecret++;                 // secret sectors too
-
-    switch (sector->special&31)
+    switch (sector->special)
     {
       case 1:
         // random off
@@ -382,8 +379,7 @@ void P_SpawnSpecials (void)
         break;
       case 9:
         // secret sector
-        if (sector->special<32) //jff 3/14/98 bits don't count unless not
-          _g_totalsecret++;        // a generalized sector type
+        _g_totalsecret++;
         break;
 
       case 12:

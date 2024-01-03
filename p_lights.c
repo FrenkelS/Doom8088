@@ -224,7 +224,7 @@ void P_SpawnLightFlash (sector_t __far* sector)
   lightflash_t __far* flash;
 
   // nothing special about it during gameplay
-  sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
+  sector->special = 0;
 
   flash = Z_CallocLevSpec(sizeof(*flash));
 
@@ -269,7 +269,7 @@ void P_SpawnStrobeFlash(sector_t __far* sector, int16_t fastOrSlow, boolean inSy
     flash->minlight = 0;
 
   // nothing special about it during gameplay
-  sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
+  sector->special = 0;
 
   if (!inSync)
     flash->count = (P_Random()&7)+1;
@@ -299,7 +299,7 @@ void P_SpawnGlowingLight(sector_t __far* sector)
   g->thinker.function = T_Glow;
   g->direction = -1;
 
-  sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
+  sector->special = 0;
 }
 
 //////////////////////////////////////////////////////////
