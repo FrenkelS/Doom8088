@@ -155,9 +155,6 @@ void T_PlatRaise(plat_t __far* plat)
         // make plat start sound
         S_StartSound2(&plat->sector->soundorg,sfx_pstart);
       }
-      break; //jff 1/27/98 don't pickup code added later to in_stasis
-
-    case in_stasis: // do nothing if in stasis
       break;
   }
 }

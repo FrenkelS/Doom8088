@@ -92,7 +92,6 @@ typedef enum
   up,
   down,
   waiting,
-  in_stasis
 } plat_e;
 
 typedef enum
