@@ -631,7 +631,7 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
 
     case 8:
       // Build Stairs
-      if (EV_BuildStairs(line,build8))
+      if (EV_BuildStairs(line))
         LN_SPECIAL(line) = 0;
       break;
 

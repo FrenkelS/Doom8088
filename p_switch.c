@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -466,7 +466,7 @@ boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line)
     // Switches (non-retriggerable)
     case 7:
       // Build Stairs
-      if (EV_BuildStairs(line,build8))
+      if (EV_BuildStairs(line))
         P_ChangeSwitchTexture(line,false);
       break;
 

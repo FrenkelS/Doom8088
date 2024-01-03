@@ -591,7 +591,7 @@ static inline int16_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* 
   return start;
 }
 
-boolean EV_BuildStairs(const line_t __far* line, stair_e type)
+boolean EV_BuildStairs(const line_t __far* line)
 {
   /* cph 2001/09/22 - cleaned up this function to save my sanity. A separate
    * outer loop index makes the logic much cleared, and local variables moved
@@ -625,21 +625,10 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
     floor->sector = sec;
     floor->type = buildStair;   //jff 3/31/98 do not leave uninited
 
-    // set up the speed and stepsize according to the stairs type
-    switch(type)
-    {
-      default: // killough -- prevent compiler warning
-      case build8:
-        speed = FLOORSPEED/4;
-        stairsize = 8*FRACUNIT;
-          floor->crush = false; //jff 2/27/98 fix uninitialized crush field
-        break;
-      case turbo16:
-        speed = FLOORSPEED*4;
-        stairsize = 16*FRACUNIT;
-          floor->crush = true;  //jff 2/27/98 fix uninitialized crush field
-        break;
-    }
+    // set up the speed and stepsize
+    speed = FLOORSPEED/4;
+    stairsize = 8*FRACUNIT;
+    floor->crush = false; //jff 2/27/98 fix uninitialized crush field
     floor->speed = speed;
     height = sec->floorheight + stairsize;
     floor->floordestheight = height;
@@ -696,7 +685,7 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
         floor->floordestheight = height;
         floor->type = buildStair; //jff 3/31/98 do not leave uninited
         //jff 2/27/98 fix uninitialized crush field
-          floor->crush = type==build8? false : true;
+          floor->crush = false;
         ok = true;
         break;
       }

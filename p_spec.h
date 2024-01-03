@@ -158,12 +158,6 @@ typedef enum
   buildStair,
 } floor_e;
 
-typedef enum
-{
-  build8, // slowly build by 8
-  turbo16 // quickly build by 16
-
-} stair_e;
 
 typedef enum
 {
@@ -369,7 +363,7 @@ boolean EV_Teleport(const line_t __far* line, int16_t side, mobj_t __far* thing)
 
 // p_floor
 
-boolean EV_BuildStairs(const line_t __far* line, stair_e type);
+boolean EV_BuildStairs(const line_t __far* line);
 
 boolean EV_DoFloor(const line_t __far* line, floor_e floortype);
 
