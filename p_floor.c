@@ -389,7 +389,7 @@ static void T_MoveFloor(floormove_t __far* floor)
       switch(floor->type) // handle texture/type changes
       {
         case donutRaise:
-          floor->sector->special = floor->newspecial;
+          floor->sector->special  = 0;
           floor->sector->floorpic = floor->texture;
           break;
         default:
@@ -728,7 +728,6 @@ boolean EV_DoDonut(const line_t __far* line)
       floor->sector = s2;
       floor->speed = FLOORSPEED / 2;
       floor->texture = s3->floorpic;
-      floor->newspecial = 0;
       floor->floordestheight = s3->floorheight;
 
       //  Spawn lowering donut-hole pillar

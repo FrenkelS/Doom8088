@@ -224,7 +224,6 @@ typedef struct
   floor_e type;
   sector_t __far* sector;
   int16_t direction;
-  int16_t newspecial;
   int16_t texture;
   fixed_t floordestheight;
   fixed_t speed;
