@@ -509,12 +509,10 @@ CONSTFUNC angle_t R_PointToAngle3(fixed_t x, fixed_t y)
 #define R_PointToAngle(x,y) R_PointToAngle3((x)-viewx,(y)-viewy)
 
 
-// killough 5/2/98: move from r_main.c, made static, simplified
-
 #define SLOPEBITS    11
 #define DBITS      (FRACBITS-SLOPEBITS)
 
-static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
+static CONSTFUNC int16_t R_PointToDist(fixed_t x, fixed_t y)
 {
     fixed_t dx = D_abs(x - viewx);
     fixed_t dy = D_abs(y - viewy);
@@ -526,7 +524,7 @@ static CONSTFUNC fixed_t R_PointToDist(fixed_t x, fixed_t y)
         dy = t;
     }
 
-    return (dx / finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT)) << FRACBITS;
+    return dx / finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT);
 }
 
 
@@ -1774,7 +1772,7 @@ inline static int16_t CONSTFUNC Mod(int16_t a, int16_t b)
 //
 static void R_StoreWallRange(const int8_t start, const int8_t stop)
 {
-    fixed_t hyp;
+    int16_t hyp;
     angle_t offsetangle;
 
     // don't overflow and crash
@@ -1806,7 +1804,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
     hyp = (viewx==curline->v1.x && viewy==curline->v1.y)?
                 0 : R_PointToDist (curline->v1.x, curline->v1.y);
 
-    rw_distance = FixedMul(hyp, finecosine(offsetangle>>ANGLETOFINESHIFT));
+    rw_distance = hyp * finecosine(offsetangle>>ANGLETOFINESHIFT);
 
     int16_t rw_x = ds_p->x1 = start;
     ds_p->x2 = stop;
@@ -1963,7 +1961,7 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
 
     if (segtextured)
     {
-        rw_offset = FixedMul (hyp, -finesine(offsetangle >>ANGLETOFINESHIFT));
+        rw_offset = hyp * -finesine(offsetangle >>ANGLETOFINESHIFT);
 
         rw_offset += (((int32_t)sidedef->textureoffset) << FRACBITS) + curline->offset;
 
