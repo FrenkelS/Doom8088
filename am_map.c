@@ -153,7 +153,7 @@ static fixed_t ftom_zoommul = FRACUNIT; // how far the window zooms each tic (fb
 #define PLAYERRADIUS    (16L*(1<<MAPBITS)) // e6y
 
 // translates between frame-buffer and map distances
-#define FTOM(x) FixedMul((((int32_t)x)<<16),scale_ftom)
+#define FTOM(x) ((x)*scale_ftom)
 #define MTOF(x) (FixedMul((x),scale_mtof)>>16)
 // translates between frame-buffer and map coordinates
 #define CXMTOF(x)  (MTOF((x)- m_x))
