@@ -948,7 +948,7 @@ static void R_DrawSprite (const vissprite_t* spr)
 // R_DrawPSprite
 //
 
-#define BASEYCENTER 100
+#define BASEYCENTER (SCREENHEIGHT_VGA / 2L)
 
 static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 {
@@ -988,7 +988,7 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     // store information in a vissprite
     vis = &avis;
     // killough 12/98: fix psprite positioning problem
-    vis->texturemid = (((int32_t)BASEYCENTER)<<FRACBITS) /* +  FRACUNIT/2 */ -
+    vis->texturemid = (BASEYCENTER<<FRACBITS) /* +  FRACUNIT/2 */ -
             (psp->sy-topoffset);
     vis->x1 = x1 < 0 ? 0 : x1;
     vis->x2 = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
