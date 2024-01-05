@@ -20,7 +20,8 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
  - No multiplayer
  - No PWADs
  - No screen resizing
- - No mouse and joystick support
+ - No joystick support
+ - Mouse support
  - PC speaker sound effects
  - Rotating overlaid automap
  - Supports only Doom 1 Episode 1
@@ -33,10 +34,10 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
 ## Controls:
 |Action                 |                        |
 |-----------------------|------------------------|
-|Fire                   |Ctrl                    |
-|Use / Sprint           |Enter, Space & Shift    |
-|Walk                   |Arrow keys              |
-|Strafe                 |< & >                   |
+|Fire                   |Ctrl & any mouse button |
+|Use / Sprint           |Enter, Space, Shift & E |
+|Walk                   |Arrow keys, W & S       |
+|Strafe                 |< & >, A & D            |
 |Automap                |Tab                     |
 |Automap zoom in and out|+ & -                   |
 |Automap follow mode    |F                       |
