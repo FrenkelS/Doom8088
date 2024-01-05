@@ -84,7 +84,7 @@ static musicenum_t mus_playing;
 #define NORM_PRIORITY 64
 #define NORM_SEP      128
 
-#define S_STEREO_SWING		(96L<<FRACBITS)
+#define S_STEREO_SWING		96
 
 
 // These are not used, but should be (menu).
@@ -451,8 +451,8 @@ static void S_StopChannel(int16_t cnum)
 //
 // Changes volume, stereo-separation, and pitch variables
 //  from the norm of a sound effect to be played.
-// If the sound is not audible, returns a 0.
-// Otherwise, modifies parameters and returns 1.
+// If the sound is not audible, returns false.
+// Otherwise, modifies parameters and returns true.
 //
 
 static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int16_t *vol, int16_t *sep)
@@ -508,7 +508,7 @@ static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source,
     angle >>= ANGLETOFINESHIFT;
 
     // stereo separation
-    *sep = 128 - (FixedMul(S_STEREO_SWING,finesine(angle))>>FRACBITS);
+    *sep = 128 - ((S_STEREO_SWING * finesine(angle))>>FRACBITS);
 
 
 	// volume calculation
