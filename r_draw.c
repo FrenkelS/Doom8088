@@ -1600,18 +1600,30 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
         {
             // calculate texture offset
 #if !defined FLAT_WALL
-            int16_t ang = (rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT;
-            fixed_t tan;
-            if (ang < 1024)			//    0 <= ang < 1024
-                tan = -1 * finetangentTable_part_4[1023 - ang];
-            else if (ang < 2048)	// 1024 <= ang < 2048
-                tan = -1 * (fixed_t)finetangentTable_part_3[1023 - (ang - 1024)];
-            else if (ang < 3072)	// 2048 <= ang < 3072
-                tan = (fixed_t)finetangentTable_part_3[ang - 2048];
-            else					// 3072 <= ang < 4096
-                tan = finetangentTable_part_4[ang - 3072];
-
-            texturecolumn = (rw_offset - FixedMul(rw_distance, tan)) >> FRACBITS;
+			texturecolumn = (rw_offset >> FRACBITS);
+			int16_t ang = (rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT;
+			int16_t ahw = rw_distance >> FRACBITS;
+			if (ang < 1024) {			//    0 <= ang < 1024
+				fixed_t tan = finetangentTable_part_4[1023 - ang];
+				uint16_t blw = tan;
+				int16_t bhw = tan >> FRACBITS;
+				uint32_t hl = (uint32_t) ahw * blw;
+				texturecolumn += (((rw_distance * bhw) + hl) >> FRACBITS);
+			} else if (ang < 2048) {	// 1024 <= ang < 2048
+				uint16_t tan = finetangentTable_part_3[1023 - (ang - 1024)];
+				uint32_t hl = (uint32_t) ahw * tan;
+				texturecolumn += (hl >> FRACBITS);
+			} else if (ang < 3072) {	// 2048 <= ang < 3072
+				uint16_t tan = finetangentTable_part_3[ang - 2048];
+				uint32_t hl = (uint32_t) ahw * tan;
+				texturecolumn -= (hl >> FRACBITS);
+			} else {					// 3072 <= ang < 4096
+				fixed_t tan = finetangentTable_part_4[ang - 3072];
+				uint16_t blw = tan;
+				int16_t bhw = tan >> FRACBITS;
+				uint32_t hl = (uint32_t) ahw * blw;
+				texturecolumn -= (((rw_distance * bhw) + hl) >> FRACBITS);
+			}
 #endif
 
             dcvars.iscale = FixedReciprocal((uint32_t)rw_scale);
