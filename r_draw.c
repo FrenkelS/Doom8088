@@ -1608,7 +1608,8 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 				uint16_t blw = tan;
 				int16_t bhw = tan >> FRACBITS;
 				uint32_t hl = (uint32_t) ahw * blw;
-				texturecolumn += (((rw_distance * bhw) + hl) >> FRACBITS);
+				texturecolumn += ((rw_distance * bhw) >> FRACBITS);
+				texturecolumn += (hl >> FRACBITS);
 			} else if (ang < 2048) {	// 1024 <= ang < 2048
 				uint16_t tan = finetangentTable_part_3[1023 - (ang - 1024)];
 				uint32_t hl = (uint32_t) ahw * tan;
@@ -1622,7 +1623,8 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 				uint16_t blw = tan;
 				int16_t bhw = tan >> FRACBITS;
 				uint32_t hl = (uint32_t) ahw * blw;
-				texturecolumn -= (((rw_distance * bhw) + hl) >> FRACBITS);
+				texturecolumn -= ((rw_distance * bhw) >> FRACBITS);
+				texturecolumn -= (hl >> FRACBITS);
 			}
 #endif
 
