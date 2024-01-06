@@ -1143,8 +1143,8 @@ static void R_ClearSprites(void)
 
 static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 {
-  int16_t     anglea = (ANG90 + (visangle - viewangle))      >> ANGLETOFINESHIFT;
-  int16_t     angleb = (ANG90 + (visangle - rw_normalangle)) >> ANGLETOFINESHIFT;
+  int16_t     anglea = (ANG90 + visangle)      >> ANGLETOFINESHIFT;
+  int16_t     angleb = (ANG90 + visangle + viewangle - rw_normalangle) >> ANGLETOFINESHIFT;
 
   int32_t     den = FixedMul(rw_distance, finesine(anglea));
 
@@ -1831,11 +1831,11 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         return;
 
     // calculate scale at both ends and step
-    ds_p->scale1 = rw_scale = R_ScaleFromGlobalAngle (viewangle + xtoviewangle(start));
+    ds_p->scale1 = rw_scale = R_ScaleFromGlobalAngle(xtoviewangle(start));
 
     if (stop > start)
     {
-        ds_p->scale2 = R_ScaleFromGlobalAngle (viewangle + xtoviewangle(stop));
+        ds_p->scale2 = R_ScaleFromGlobalAngle(xtoviewangle(stop));
         ds_p->scalestep = rw_scalestep = (ds_p->scale2 - rw_scale) / (stop - start);
     }
     else
