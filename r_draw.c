@@ -1141,15 +1141,17 @@ static void R_ClearSprites(void)
 // rw_distance must be calculated first.
 //
 
-static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
+static fixed_t R_ScaleFromGlobalAngle(int8_t x)
 {
-  int16_t     anglea = (ANG90 + visangle)      >> ANGLETOFINESHIFT;
-  int16_t     angleb = (ANG90 + visangle + viewangle - rw_normalangle) >> ANGLETOFINESHIFT;
+  int16_t anglea = ANG90 >> FRACBITS;
+  anglea += xtoviewangleTable[x];
+  int16_t angleb = anglea;
+  angleb += (viewangle - rw_normalangle) >> FRACBITS;
 
-  int32_t     den = FixedMul(rw_distance, finesine(anglea));
+  fixed_t den = FixedMul(rw_distance, finesine(anglea >> (ANGLETOFINESHIFT - FRACBITS)));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = VIEWWINDOWHEIGHT * finesine(angleb);
+  fixed_t num = VIEWWINDOWHEIGHT * finesine(angleb >> (ANGLETOFINESHIFT - FRACBITS));
 
   return den > num>>16 ? (num = FixedApproxDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
@@ -1205,7 +1207,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     {
         // choose a different rotation based on player view
         angle_t ang = R_PointToAngle(fx, fy);
-        rot = (ang - thing->angle + (uint32_t)(ANG45/2)*9)>>29;
+        rot = (ang - thing->angle + (angle_t)(ANG45/2)*9)>>29;
     }
 
     const boolean flip = (boolean)SPR_FLIPPED(sprframe, rot);
@@ -1833,11 +1835,11 @@ static void R_StoreWallRange(const int8_t start, const int8_t stop)
         return;
 
     // calculate scale at both ends and step
-    ds_p->scale1 = rw_scale = R_ScaleFromGlobalAngle(xtoviewangle(start));
+    ds_p->scale1 = rw_scale = R_ScaleFromGlobalAngle(start);
 
     if (stop > start)
     {
-        ds_p->scale2 = R_ScaleFromGlobalAngle(xtoviewangle(stop));
+        ds_p->scale2 = R_ScaleFromGlobalAngle(stop);
         ds_p->scalestep = rw_scalestep = (ds_p->scale2 - rw_scale) / (stop - start);
     }
     else
@@ -2409,7 +2411,7 @@ static boolean R_CheckBBox(const int16_t __far* bspcoord)
         /* Either angle1 or angle2 is behind us, so it doesn't matter if we
      * change it to the corect sign
      */
-        if ((angle1 >= ANG180) && (angle1 < ANG270))
+        if (ANG180 <= angle1 && angle1 < ANG270)
             angle1 = INT32_MAX; /* which is ANG180-1 */
         else
             angle2 = INT32_MIN;
