@@ -68,8 +68,8 @@ typedef enum
 typedef struct
 {
   const state_t *state;       /* a NULL state means not active */
-  int32_t     tics;
-  fixed_t sx;
+  int16_t     tics;
+  int16_t sx;
   fixed_t sy;
 } pspdef_t;
 

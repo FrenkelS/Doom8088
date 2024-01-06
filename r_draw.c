@@ -945,11 +945,13 @@ static void R_DrawSprite (const vissprite_t* spr)
 // R_DrawPSprite
 //
 
+#define BASEXCENTER (SCREENWIDTH_VGA  / 2)
 #define BASEYCENTER (SCREENHEIGHT_VGA / 2L)
 
 static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 {
     int16_t           x1, x2;
+    uint32_t hl;
     spritedef_t   __far* sprdef;
     spriteframe_t __far* sprframe;
     vissprite_t   *vis;
@@ -963,13 +965,15 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
 
     const patch_t __far* patch = W_GetLumpByNum(sprframe->lump[0]);
     // calculate edges of the shape
-    fixed_t tx = psp->sx - (SCREENWIDTH_VGA / 2) * FRACUNIT;
+    int16_t tx = psp->sx - BASEXCENTER;
 
-    tx -= ((int32_t)patch->leftoffset) << FRACBITS;
-    x1 = CENTERX + (FixedMul3216(tx, PSPRITESCALE) >> FRACBITS);
+    tx -= patch->leftoffset;
+    hl = (uint32_t) tx * PSPRITESCALE;
+    x1 = CENTERX + (hl >> FRACBITS);
 
-    tx += ((int32_t)patch->width) << FRACBITS;
-    x2 = CENTERX + (FixedMul3216(tx, PSPRITESCALE) >> FRACBITS) - 1;
+    tx += patch->width;
+    hl = (uint32_t) tx * PSPRITESCALE;
+    x2 = CENTERX + (hl >> FRACBITS) - 1;
 
     topoffset = ((int32_t)patch->topoffset) << FRACBITS;
 

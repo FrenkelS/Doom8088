@@ -490,8 +490,17 @@ void A_WeaponReady(player_t *player, pspdef_t *psp)
 
   // bob the weapon based on movement speed
   {
-    int16_t angle = (128*_g_leveltime) & FINEMASK;
-    psp->sx = FRACUNIT  + FixedMul(player->bob, finecosine(angle));
+    int16_t angle = _g_leveltime;
+    angle = (angle * 128) & FINEMASK;
+
+    int16_t ahw = player->bob >> FRACBITS;
+    fixed_t cos = finecosine(angle);
+    uint16_t blw = cos;
+     int16_t bhw = cos >> FRACBITS;
+
+    uint32_t hl = (uint32_t) ahw * blw;
+
+    psp->sx = 1 + ((player->bob * bhw) >> FRACBITS) + (hl >> FRACBITS);
     angle &= FINEANGLES/2-1;
     psp->sy = WEAPONTOP + FixedMul(player->bob, finesine(  angle));
   }
