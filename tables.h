@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -42,6 +42,7 @@
 #ifndef __TABLES__
 #define __TABLES__
 
+#include "doomdef.h"
 #include "m_fixed.h"
 
 #define FINEANGLES              8192
@@ -63,6 +64,7 @@ typedef uint32_t angle_t;
 fixed_t finesine(int16_t x);
 fixed_t finecosine(int16_t x);
 
-angle_t xtoviewangle(int16_t x);
+const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1];
+#define xtoviewangle(x) (((angle_t)xtoviewangleTable[x]) << FRACBITS)
 
 #endif

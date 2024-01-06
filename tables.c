@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -409,7 +409,7 @@ fixed_t finecosine(int16_t x)
 }
 
 
-static const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
+const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
 {
 	0x2008, 0x1F50, 0x1EA0, 0x1DE0,
 	0x1D20, 0x1C50, 0x1B80, 0x1AA8,
@@ -428,8 +428,3 @@ static const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
 	0xE2E0, 0xE220, 0xE160, 0xE0B0,
 	0xDFF8
 };
-
-angle_t xtoviewangle(int16_t x)
-{
-	return ((uint32_t)xtoviewangleTable[x]) << FRACBITS;
-}
