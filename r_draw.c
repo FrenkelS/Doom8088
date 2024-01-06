@@ -1605,7 +1605,9 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
             // calculate texture offset
 #if !defined FLAT_WALL
 			texturecolumn = (rw_offset >> FRACBITS);
-			int16_t ang = (rw_centerangle + xtoviewangle(rw_x)) >> ANGLETOFINESHIFT;
+			int16_t ang = rw_centerangle >> FRACBITS;
+			ang += xtoviewangleTable[rw_x];
+			ang >>= ANGLETOFINESHIFT - FRACBITS;
 			int16_t ahw = rw_distance >> FRACBITS;
 			if (ang < 1024) {			//    0 <= ang < 1024
 				fixed_t tan = finetangentTable_part_4[1023 - ang];
