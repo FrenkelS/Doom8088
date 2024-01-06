@@ -254,7 +254,7 @@ static const fixed_t IPSPRITESCALE  = FRACUNIT * SCREENWIDTH_VGA / VIEWWINDOWWID
 static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT     / SCREENHEIGHT_VGA;
 static const fixed_t IPSPRITEYSCALE = FRACUNIT * SCREENHEIGHT_VGA / SCREENHEIGHT; // = FixedReciprocal(PSPRITEYSCALE)
 
-static const angle_t clipangle = 537395200; //xtoviewangle(0);
+static const angle_t clipangle = 0x20080000; //xtoviewangle(0);
 
 
 #if defined __WATCOMC__
