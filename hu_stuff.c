@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -32,8 +32,6 @@
  *
  *-----------------------------------------------------------------------------
  */
-
-// killough 5/3/98: remove unnecessary headers
 
 #include <stdint.h>
 #include "d_player.h"
@@ -170,8 +168,7 @@ static void HU_Stop(void)
 //
 static void HUlib_clearTextLine(hu_textline_t* t)
 {
-    t->linelen =         // killough 1/23 98: support multiple lines
-            t->len = 0;
+    t->linelen = t->len = 0;
     t->l[0] = 0;
     t->needsupdate = true;
 }
@@ -186,7 +183,6 @@ static void HUlib_clearTextLine(hu_textline_t* t)
 // Returns nothing
 //
 static void HUlib_initTextLine(hu_textline_t* t, int16_t x, int16_t y)
-//jff 2/16/98 add color range parameter
 {
     t->x = x;
     t->y = y;
@@ -223,9 +219,6 @@ static void HUlib_addCharToTextLine(hu_textline_t* t,char ch)
 	if (t->linelen != HU_MAXLINELENGTH)
 	{
 		t->linelen++;
-		if (ch == '\n')
-			t->linelen=0;
-
 		t->l[t->len++] = ch;
 		t->l[t->len] = 0;
 		t->needsupdate = 4;
@@ -246,7 +239,7 @@ static void HUlib_addCharToTextLine(hu_textline_t* t,char ch)
 //
 void HU_Start(void)
 {
-    const char* s; /* cph - const */
+    const char* s;
 
     if (headsupactive)                    // stop before starting
         HU_Stop();
@@ -267,6 +260,7 @@ void HU_Start(void)
     if (_g_gamestate == GS_LEVEL) /* cph - stop SEGV here when not in level */
         s = HU_TITLE;
     else s = "";
+
     while (*s)
         HUlib_addCharToTextLine(&w_title, *(s++));
 
@@ -286,7 +280,7 @@ void HU_Start(void)
 //
 static void HUlib_drawTextLine(hu_textline_t* l)
 {
-	int16_t y = l->y;           // killough 1/18/98 -- support multiple lines
+	int16_t y = l->y;
 
 	// draw the new stuff
 	int16_t x = l->x;
@@ -294,11 +288,7 @@ static void HUlib_drawTextLine(hu_textline_t* l)
 	{
 		char c = toupper(l->l[i]); //jff insure were not getting a cheap toupper conv.
 
-		if (c=='\n')         // killough 1/18/98 -- support multiple lines
-			x=0,y+=8;
-		else if (c=='\t')    // killough 1/23/98 -- support tab stops
-			x=x-x%80+80;
-		else if (HU_FONTSTART <= c && c <= HU_FONTEND)
+		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
 			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
 			int16_t w = patch->width;
@@ -463,7 +453,7 @@ void HU_Ticker(void)
 {
     static int16_t        message_counter = 0;
 
-    player_t* plr = &_g_player;        // killough 3/7/98
+    player_t* plr = &_g_player;
 
     // tick down message counter if message is up
     if (message_counter && !--message_counter)
