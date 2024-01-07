@@ -124,8 +124,8 @@ static void R_MapPlane(uint16_t y, uint16_t x1, uint16_t x2, draw_span_vars_t *d
     int16_t angle = (viewangle + (((angle_t)xtoviewangleTable[x1]) << FRACBITS)) >> ANGLETOFINESHIFT;
 
     // killough 2/28/98: Add offsets
-    uint32_t xfrac =  viewx + FixedMul(finecosine(angle), length);
-    uint32_t yfrac = -viewy - FixedMul(finesine(  angle), length);
+    uint32_t xfrac =  viewx + FixedMulAngle(length, finecosine(angle));
+    uint32_t yfrac = -viewy - FixedMulAngle(length, finesine(  angle));
 
     dsvars->position = ((xfrac << 10) & 0xffff0000) | ((yfrac >> 6)  & 0x0000ffff);
 

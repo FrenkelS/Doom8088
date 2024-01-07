@@ -210,9 +210,9 @@ static void P_HitSlideLine(const line_t __far* ld)
 
     lineangle >>= ANGLETOFINESHIFT;
     deltaangle >>= ANGLETOFINESHIFT;
-    newlen = FixedMul (movelen, finecosine(deltaangle));
-    tmxmove = FixedMul (newlen, finecosine(lineangle));
-    tmymove = FixedMul (newlen, finesine(  lineangle));
+    newlen  = FixedMulAngle(movelen, finecosine(deltaangle));
+    tmxmove = FixedMulAngle(newlen,  finecosine(lineangle));
+    tmymove = FixedMulAngle(newlen,  finesine(  lineangle));
     // phares
 }
 
@@ -1253,8 +1253,8 @@ mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_
 
   th->angle = an;
   an >>= ANGLETOFINESHIFT;
-  th->momx = FixedMul (mobjinfo[th->type].speed, finecosine(an));
-  th->momy = FixedMul (mobjinfo[th->type].speed, finesine(  an));
+  th->momx = FixedMulAngle(mobjinfo[th->type].speed, finecosine(an));
+  th->momy = FixedMulAngle(mobjinfo[th->type].speed, finesine(  an));
 
   dist = P_AproxDistance (dest->x - source->x, dest->y - source->y);
   dist = dist / mobjinfo[th->type].speed;
@@ -1312,8 +1312,8 @@ void P_SpawnPlayerMissile(mobj_t __far* source)
 
 	th->target = source;
 	th->angle  = an;
-	th->momx   = FixedMul(mobjinfo[th->type].speed,finecosine(an >> ANGLETOFINESHIFT));
-	th->momy   = FixedMul(mobjinfo[th->type].speed,finesine(  an >> ANGLETOFINESHIFT));
+	th->momx   = FixedMulAngle(mobjinfo[th->type].speed,finecosine(an >> ANGLETOFINESHIFT));
+	th->momy   = FixedMulAngle(mobjinfo[th->type].speed,finesine(  an >> ANGLETOFINESHIFT));
 	th->momz   = FixedMul(mobjinfo[th->type].speed,slope);
 
 	P_CheckMissileSpawn(th);

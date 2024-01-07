@@ -641,8 +641,8 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
         }
 
       ang >>= ANGLETOFINESHIFT;
-      target->momx += FixedMul (thrust, finecosine(ang));
-      target->momy += FixedMul (thrust, finesine(  ang));
+      target->momx += FixedMulAngle(thrust, finecosine(ang));
+      target->momy += FixedMulAngle(thrust, finesine(  ang));
     }
 
   // player specific

@@ -220,7 +220,6 @@ int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - kill
 int16_t       __far* texturetranslation;
 
 fixed_t  viewcos, viewsin;
-static boolean viewcosint16, viewsinint16;
 
 static fixed_t  topfrac;
 static fixed_t  topstep;
@@ -300,6 +299,33 @@ inline static fixed_t CONSTFUNC FixedMul3232(fixed_t a, fixed_t b)
 	uint32_t ll = (uint32_t) alw * blw;
 	uint32_t hl = (uint32_t) ahw * blw;
 	return (a * bhw) + (ll >> FRACBITS) + hl;
+}
+
+
+//
+// FixedMulAngle
+// b should be coming from finesine() or finecosine(), so it's high word is either 0x0000 or 0xffff
+//
+#if defined __WATCOMC__
+//
+#else
+inline
+#endif
+fixed_t CONSTFUNC FixedMulAngle(fixed_t a, fixed_t b)
+{
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+	uint16_t blw = b;
+	 int16_t bhw = b >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * blw;
+	uint32_t hl = (uint32_t) ahw * blw;
+	fixed_t r = (ll >> FRACBITS) + hl;
+
+	if (bhw != 0)
+		r -= a;
+
+	return r;
 }
 
 
@@ -1148,7 +1174,7 @@ static fixed_t R_ScaleFromGlobalAngle(int16_t x)
   int16_t angleb = anglea;
   angleb += (viewangle - rw_normalangle) >> FRACBITS;
 
-  fixed_t den = FixedMul(rw_distance, finesine(anglea >> (ANGLETOFINESHIFT - FRACBITS)));
+  fixed_t den = FixedMulAngle(rw_distance, finesine(anglea >> (ANGLETOFINESHIFT - FRACBITS)));
 
 // proff 11/06/98: Changed for high-res
   fixed_t num = VIEWWINDOWHEIGHT * finesine(angleb >> (ANGLETOFINESHIFT - FRACBITS));
@@ -1177,8 +1203,8 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     const fixed_t tr_x = fx - viewx;
     const fixed_t tr_y = fy - viewy;
 
-    fixed_t xc = viewcosint16 ? FixedMul3216(tr_x, viewcos) : FixedMul3232(tr_x, viewcos);
-    fixed_t ys = viewsinint16 ? FixedMul3216(tr_y, viewsin) : FixedMul3232(tr_y, viewsin);
+    fixed_t xc = FixedMulAngle(tr_x, viewcos);
+    fixed_t ys = FixedMulAngle(tr_y, viewsin);
     const fixed_t tz = xc - (-ys);
 
     // thing is behind view plane?
@@ -1189,8 +1215,8 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     if(tz > MAXZ)
         return;
 
-    fixed_t yc = viewcosint16 ? FixedMul3216(tr_y, viewcos) : FixedMul3232(tr_y, viewcos);
-    fixed_t xs = viewsinint16 ? FixedMul3216(tr_x, viewsin) : FixedMul3232(tr_x, viewsin);
+    fixed_t yc = FixedMulAngle(tr_y, viewcos);
+    fixed_t xs = FixedMulAngle(tr_x, viewsin);
     fixed_t tx = -(yc + (-xs));
 
     // too far off the side?
@@ -2579,9 +2605,6 @@ static void R_SetupFrame (player_t *player)
 
     viewsin = finesine(  viewangle>>ANGLETOFINESHIFT);
     viewcos = finecosine(viewangle>>ANGLETOFINESHIFT);
-
-    viewsinint16 = viewsin >> FRACBITS == 0;
-    viewcosint16 = viewcos >> FRACBITS == 0;
 
     fullcolormap = &colormaps[0];
 

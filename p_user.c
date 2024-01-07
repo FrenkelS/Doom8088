@@ -76,8 +76,8 @@ static boolean onground; // whether player is on ground or in air
 
 static void P_BobAndThrust(player_t *player, int16_t angle, int8_t move)
 {
-	fixed_t x = FixedMul(move * ORIG_FRICTION_FACTOR,finecosine(angle));
-	fixed_t y = FixedMul(move * ORIG_FRICTION_FACTOR,finesine(  angle));
+	fixed_t x = FixedMulAngle(move * ORIG_FRICTION_FACTOR,finecosine(angle));
+	fixed_t y = FixedMulAngle(move * ORIG_FRICTION_FACTOR,finesine(  angle));
 	player->mo->momx += x;
 	player->mo->momy += y;
 	player->momx     += x;
@@ -130,7 +130,7 @@ static void P_CalcHeight (player_t* player)
     }
 
   angle = (FINEANGLES/20*_g_leveltime)&FINEMASK;
-  bob = FixedMul(player->bob/2,finesine(angle));
+  bob = FixedMulAngle(player->bob/2,finesine(angle));
 
   // move viewheight
 

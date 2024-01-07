@@ -502,7 +502,7 @@ void A_WeaponReady(player_t *player, pspdef_t *psp)
 
     psp->sx = 1 + ((player->bob * bhw) >> FRACBITS) + (hl >> FRACBITS);
     angle &= FINEANGLES/2-1;
-    psp->sy = WEAPONTOP + FixedMul(player->bob, finesine(  angle));
+    psp->sy = WEAPONTOP + FixedMulAngle(player->bob, finesine(angle));
   }
 }
 
