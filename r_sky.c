@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023 Frenkel Smeijers
+ *  Copyright (C) 2023 - 2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -64,17 +64,19 @@ void R_DrawSky(draw_column_vars_t *dcvars)
 		R_DrawColumnFlat(FLAT_SKY_COLOR, dcvars);
 	else
 	{
-		dcvars->texturemid = 100 * FRACUNIT;
+		dcvars->texturemid = (SCREENHEIGHT_VGA / 2) * FRACUNIT;
 
 		if (!(dcvars->colormap = fixedcolormap))
 			dcvars->colormap = fullcolormap;
 
-		dcvars->iscale = (FRACUNIT * 200) / (VIEWWINDOWHEIGHT + 16);
+		dcvars->iscale = (FRACUNIT * SCREENHEIGHT_VGA) / (VIEWWINDOWHEIGHT + 16);
 
-		int16_t xc = (viewangle + xtoviewangle(dcvars->x)) >> ANGLETOSKYSHIFT;
-		int16_t x_c = xc & skywidthmask;
+		int16_t xc = viewangle >> FRACBITS;
+		xc += xtoviewangleTable[dcvars->x];
+		xc >>= ANGLETOSKYSHIFT - FRACBITS;
+		xc &= skywidthmask;
 
-		const column_t __far* column = (const column_t __far*) ((const byte __far*)skypatch + skypatch->columnofs[x_c]);
+		const column_t __far* column = (const column_t __far*) ((const byte __far*)skypatch + skypatch->columnofs[xc]);
 
 		dcvars->source = (const byte __far*)column + 3;
 		R_DrawColumn(dcvars);
@@ -111,7 +113,7 @@ void R_DrawSky(visplane_t __far* pl)
 
 	// Normal Doom sky, only one allowed per level
 	draw_column_vars_t dcvars;
-	dcvars.texturemid = 100 * FRACUNIT;    // Default y-offset
+	dcvars.texturemid = (SCREENHEIGHT_VGA / 2) * FRACUNIT;    // Default y-offset
 
 	// Sky is always drawn full bright, i.e. colormaps[0] is used.
 	// Because of this hack, sky is not affected by INVUL inverse mapping.
@@ -120,16 +122,18 @@ void R_DrawSky(visplane_t __far* pl)
 	if (!(dcvars.colormap = fixedcolormap))
 		dcvars.colormap = fullcolormap;
 
-	dcvars.iscale = (FRACUNIT * 200) / (VIEWWINDOWHEIGHT + 16);
+	dcvars.iscale = (FRACUNIT * SCREENHEIGHT_VGA) / (VIEWWINDOWHEIGHT + 16);
 
 	for (int16_t x = pl->minx; (dcvars.x = x) <= pl->maxx; x++)
 	{
 		if ((dcvars.yl = pl->top[x]) != -1 && dcvars.yl <= (dcvars.yh = pl->bottom[x])) // dropoff overflow
 		{
-			int16_t xc = (viewangle + xtoviewangle(x)) >> ANGLETOSKYSHIFT;
-			int16_t x_c = xc & skywidthmask;
+			int16_t xc = viewangle >> FRACBITS;
+			xc += xtoviewangleTable[x];
+			xc >>= ANGLETOSKYSHIFT - FRACBITS;
+			xc &= skywidthmask;
 
-			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
+			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[xc]);
 
 			dcvars.source = (const byte __far*)column + 3;
 			R_DrawColumn(&dcvars);
