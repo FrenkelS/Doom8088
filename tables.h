@@ -65,6 +65,5 @@ fixed_t finesine(int16_t x);
 fixed_t finecosine(int16_t x);
 
 const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1];
-#define xtoviewangle(x) (((angle_t)xtoviewangleTable[x]) << FRACBITS)
 
 #endif

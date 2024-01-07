@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023 Frenkel Smeijers
+ *  Copyright (C) 2023-2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -121,7 +121,7 @@ static void R_MapPlane(uint16_t y, uint16_t x1, uint16_t x2, draw_span_vars_t *d
     dsvars->step = ((FixedMul(distance,basexscale) << 10) & 0xffff0000) | ((FixedMul(distance,baseyscale) >> 6) & 0x0000ffff);
 
     fixed_t length = FixedMul (distance, distscale(x1));
-    int16_t angle = (viewangle + xtoviewangle(x1)) >> ANGLETOFINESHIFT;
+    int16_t angle = (viewangle + (((angle_t)xtoviewangleTable[x1]) << FRACBITS)) >> ANGLETOFINESHIFT;
 
     // killough 2/28/98: Add offsets
     uint32_t xfrac =  viewx + FixedMul(finecosine(angle), length);
