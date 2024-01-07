@@ -1141,7 +1141,7 @@ static void R_ClearSprites(void)
 // rw_distance must be calculated first.
 //
 
-static fixed_t R_ScaleFromGlobalAngle(int8_t x)
+static fixed_t R_ScaleFromGlobalAngle(int16_t x)
 {
   int16_t anglea = ANG90 >> FRACBITS;
   anglea += xtoviewangleTable[x];
@@ -1736,10 +1736,10 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
     }
 }
 
-static boolean R_CheckOpenings(const int32_t start)
+static boolean R_CheckOpenings(const int16_t start)
 {
-    int32_t pos = lastopening - openings;
-    int32_t need = (rw_stopx - start)*4 + pos;
+    int16_t pos = lastopening - openings;
+    int16_t need = (rw_stopx - start)*4 + pos;
 
 #ifdef RANGECHECK
     if(need > MAXOPENINGS)
@@ -1789,7 +1789,7 @@ inline static int16_t CONSTFUNC Mod(int16_t a, int16_t b)
 // A wall segment will be drawn
 //  between start and stop pixels (inclusive).
 //
-static void R_StoreWallRange(const int8_t start, const int8_t stop)
+static void R_StoreWallRange(const int16_t start, const int16_t stop)
 {
     int16_t hyp;
     angle_t offsetangle;
@@ -2172,7 +2172,7 @@ static void R_RecalcLineFlags(void)
 // Replaces the old R_Clip*WallSegment functions. It draws bits of walls in those
 // columns which aren't solid, and updates the solidcol[] array appropriately
 
-static void R_ClipWallSegment(int8_t first, int8_t last, const boolean solid)
+static void R_ClipWallSegment(int16_t first, int16_t last, const boolean solid)
 {
     byte *p;
     while (first < last)
@@ -2186,7 +2186,7 @@ static void R_ClipWallSegment(int8_t first, int8_t last, const boolean solid)
         }
         else
         {
-            int8_t to;
+            int16_t to;
             if (!(p = memchr(solidcol+first, 1, last-first)))
                 to = last;
             else
