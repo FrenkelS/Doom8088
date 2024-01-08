@@ -277,10 +277,6 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 		uint32_t hl = (uint32_t) ahw * blw;
 		uint32_t hh = (uint32_t) ahw * bhw;
 		return hl + (hh << FRACBITS);
-	} else if (ahw == 0) {
-		uint32_t ll = (uint32_t) alw * blw;
-		uint32_t lh = (uint32_t) alw * bhw;
-		return (ll >> FRACBITS) + lh;
 	} else {
 		uint32_t ll = (uint32_t) alw * blw;
 		uint32_t hl = (uint32_t) ahw * blw;
@@ -2027,10 +2023,10 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     worldtop    >>= 4;
     worldbottom >>= 4;
 
-    topstep = -FixedMul (rw_scalestep, worldtop);
+    topstep = -FixedMul(worldtop, rw_scalestep);
     topfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldtop, rw_scale);
 
-    bottomstep = -FixedMul (rw_scalestep,worldbottom);
+    bottomstep = -FixedMul(worldbottom, rw_scalestep);
     bottomfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldbottom, rw_scale);
 
     if (backsector)
@@ -2041,12 +2037,12 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
         if (worldhigh < worldtop)
         {
             pixhigh = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldhigh, rw_scale);
-            pixhighstep = -FixedMul (rw_scalestep,worldhigh);
+            pixhighstep = -FixedMul(worldhigh, rw_scalestep);
         }
         if (worldlow > worldbottom)
         {
             pixlow = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldlow, rw_scale);
-            pixlowstep = -FixedMul (rw_scalestep,worldlow);
+            pixlowstep = -FixedMul(worldlow, rw_scalestep);
         }
     }
 
