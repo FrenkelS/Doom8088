@@ -85,6 +85,20 @@ static void P_BobAndThrust(player_t *player, int16_t angle, int8_t move)
 }
 
 //
+// FixedSquare
+// return FixedMul(a, a);
+//
+static fixed_t FixedSquare(fixed_t a)
+{
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * alw;
+	return (a + alw) * ahw + (ll >> FRACBITS);
+}
+
+
+//
 // P_CalcHeight
 // Calculate the walking / running height adjustment
 //
@@ -108,8 +122,7 @@ static void P_CalcHeight (player_t* player)
    * it causes bobbing jerkiness when the player moves from ice to non-ice,
    * and vice-versa.
    */
-  player->bob = (FixedMul(player->momx,player->momx) +
-        FixedMul(player->momy,player->momy))>>2;
+  player->bob = (FixedSquare(player->momx) + FixedSquare(player->momy)) >> 2;
 
   if (player->bob > MAXBOB)
     player->bob = MAXBOB;
