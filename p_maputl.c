@@ -674,7 +674,7 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
         ystep = 256*FRACUNIT;
       }
 
-  yintercept = (y1>>MAPBTOFRAC) + FixedMul(partial, ystep);
+  yintercept = (y1>>MAPBTOFRAC) + FixedMul(ystep, partial);
 
   if (yt2 > yt1)
     {
@@ -696,7 +696,7 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
         xstep = 256*FRACUNIT;
       }
 
-  xintercept = (x1>>MAPBTOFRAC) + FixedMul (partial, xstep);
+  xintercept = (x1>>MAPBTOFRAC) + FixedMul(xstep, partial);
 
   // Step through map blocks.
   // Count is present to prevent a round off error

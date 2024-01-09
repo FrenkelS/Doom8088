@@ -9,6 +9,7 @@ nasm i_vmodya.asm -f elf
 nasm m_fixed.asm -f elf
 
 ia16-elf-gcc -c i_vmodey.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 
@@ -41,7 +42,8 @@ export GLOBOBJS+=" p_floor.c"
 export GLOBOBJS+=" p_inter.c"
 export GLOBOBJS+=" p_lights.c"
 export GLOBOBJS+=" p_map.c"
-export GLOBOBJS+=" p_maputl.c"
+#export GLOBOBJS+=" p_maputl.c"
+export GLOBOBJS+=" p_maputl.o"
 export GLOBOBJS+=" p_mobj.c"
 export GLOBOBJS+=" p_plats.c"
 export GLOBOBJS+=" p_pspr.c"
@@ -74,5 +76,6 @@ ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 rm i_vmodya.o
 rm m_fixed.o
 rm i_vmodey.o
+rm p_maputl.o
 rm r_draw.o
 rm tables.o
