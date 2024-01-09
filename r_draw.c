@@ -312,13 +312,12 @@ fixed_t CONSTFUNC FixedMulAngle(fixed_t a, fixed_t b)
 	uint16_t alw = a;
 	 int16_t ahw = a >> FRACBITS;
 	uint16_t blw = b;
-	 int16_t bhw = b >> FRACBITS;
 
 	uint32_t ll = (uint32_t) alw * blw;
 	uint32_t hl = (uint32_t) ahw * blw;
 	fixed_t r = (ll >> FRACBITS) + hl;
 
-	if (bhw != 0)
+	if (b < 0)
 		r -= a;
 
 	return r;
