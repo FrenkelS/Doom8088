@@ -911,6 +911,16 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 }
 
 
+static fixed_t FixedMul3(fixed_t a, fixed_t b, fixed_t c)
+{
+	if (a == 0)
+		return 0;
+
+	fixed_t bc = FixedMul(c, b);
+	return FixedMul(bc, a);
+}
+
+
 //
 // PTR_ShootTraverse
 //
@@ -937,7 +947,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     if (li->flags & ML_TWOSIDED)
     {  // crosses a two sided (really 2s) line
       P_LineOpening (li);
-      fixed_t t = FixedMul(aimslope, FixedMul(attackrange, in->frac)) + shootz;
+      fixed_t t = FixedMul3(aimslope, in->frac, attackrange) + shootz;
 
       if ((LN_FRONTSECTOR(li)->floorheight   == LN_BACKSECTOR(li)->floorheight   || _g_openbottom <= t) &&
           (LN_FRONTSECTOR(li)->ceilingheight == LN_BACKSECTOR(li)->ceilingheight || _g_opentop    >= t))
@@ -950,7 +960,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     frac = in->frac - 4 * FixedReciprocal(attackrange);
     x = _g_trace.x + FixedMul(_g_trace.dx, frac);
     y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-    z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
+    z = shootz + FixedMul3(aimslope, frac, attackrange);
 
     if (LN_FRONTSECTOR(li)->ceilingpic == skyflatnum)
     {
@@ -1008,7 +1018,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   x = _g_trace.x + FixedMul(_g_trace.dx, frac);
   y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-  z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
+  z = shootz  + FixedMul3(aimslope, frac, attackrange);
 
   // Spawn bullet puffs or blod spots,
   // depending on target type.
