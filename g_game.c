@@ -535,7 +535,7 @@ void G_PlayerReborn (void)
 
     p = &_g_player;
 
-    int32_t cheats = p->cheats;
+    int16_t cheats = p->cheats;
     memset (p, 0, sizeof(*p));
     p->cheats = cheats;
 

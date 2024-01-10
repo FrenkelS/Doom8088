@@ -127,7 +127,7 @@ static void P_CalcHeight (player_t* player)
   if (player->bob > MAXBOB)
     player->bob = MAXBOB;
 
-  if (!onground || player->cheats & CF_NOMOMENTUM)
+  if (!onground)
     {
     player->viewz = player->mo->z + VIEWHEIGHT;
 
