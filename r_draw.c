@@ -778,8 +778,8 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 
     curline = ds->curline;  // OPTIMIZE: get rid of LIGHTSEGSHIFT globally
 
-    frontsector = SG_FRONTSECTOR(curline);
-    backsector  = SG_BACKSECTOR(curline);
+    frontsector = &_g_sectors[curline->frontsectornum];
+    backsector  = &_g_sectors[curline->backsectornum];
 
     texnum = _g_sides[curline->sidenum].midtexture;
     texnum = texturetranslation[texnum];
@@ -2295,7 +2295,7 @@ static void R_AddLine(const seg_t __far* line)
     if (x1 >= x2)       // killough 1/31/98 -- change == to >= for robustness
         return;
 
-    backsector = SG_BACKSECTOR(line);
+    backsector = line->backsectornum != NO_INDEX ? &_g_sectors[line->backsectornum] : NULL;
 
     /* cph - roll up linedef properties in flags */
     linedef = &_g_lines[curline->linenum];
