@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -624,8 +624,6 @@ static void G_DoCompleted (void)
     _g_wminfo.maxsecret = _g_totalsecret;
 
     _g_wminfo.partime = TICRATE*pars[_g_gamemap];
-
-    _g_wminfo.pnum = 0;
 
 
     _g_wminfo.plyr[0].in = _g_playeringame;
