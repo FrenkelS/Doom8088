@@ -268,15 +268,6 @@ typedef struct subsector_s
 // OTHER TYPES
 //
 
-// This could be wider for >8 bit display.
-// Indeed, true color support is posibble
-// precalculating 24bpp lightmap/colormap LUT.
-// from darkening PLAYPAL to all black.
-// Could use even more than 32 levels.
-
-typedef byte  lighttable_t;
-
-
 // Patches.
 // A patch holds one or more columns.
 // Patches are used for sprites and all masked pictures,

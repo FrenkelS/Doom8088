@@ -66,17 +66,17 @@ static visplane_t __far*__far* freehead;
 #if defined FLAT_SPAN
 byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
 {
-	const lighttable_t __far* colormap = R_LoadColorMap(lightlevel);
+	const uint8_t __far* colormap = R_LoadColorMap(lightlevel);
 	return colormap[flattranslation[picnum]];
 }
 
 #else
 
 typedef struct {
-  uint32_t            position;
-  uint32_t            step;
-  const byte         __far* source; // start of a 64*64 tile image
-  const lighttable_t __far* colormap;
+  uint32_t             position;
+  uint32_t             step;
+  const byte    __far* source; // start of a 64*64 tile image
+  const uint8_t __far* colormap;
 } draw_span_vars_t;
 
 

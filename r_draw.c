@@ -197,9 +197,8 @@ static fixed_t  rw_midtexturemid;
 static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
-const lighttable_t __far* fullcolormap;
-static const lighttable_t __far* colormaps;
-const lighttable_t __far* fixedcolormap;
+const uint8_t __far* fullcolormap;
+const uint8_t __far* fixedcolormap;
 
 static int16_t extralight;                           // bumped light from gun blasts
 
@@ -557,7 +556,7 @@ static CONSTFUNC int16_t R_PointToDist(fixed_t x, fixed_t y)
 #define NUMCOLORMAPS 32
 
 
-const lighttable_t __far* R_LoadColorMap(int16_t lightlevel)
+const uint8_t __far* R_LoadColorMap(int16_t lightlevel)
 {
     if (fixedcolormap)
         return fixedcolormap;
@@ -642,7 +641,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
 //
 void R_InitColormaps(void)
 {
-	colormaps = W_GetLumpByName("COLORMAP"); // Never freed
+	fullcolormap = W_GetLumpByName("COLORMAP"); // Never freed
 }
 
 
@@ -666,7 +665,7 @@ typedef struct vissprite_s
   int16_t patch_topoffset;
 
   // for color translation and shadow draw, maxbright frames as well
-  const lighttable_t __far* colormap;
+  const uint8_t __far* colormap;
 
 } vissprite_t;
 
@@ -2601,15 +2600,13 @@ static void R_SetupFrame (player_t *player)
     viewsin = finesine(  viewangle>>ANGLETOFINESHIFT);
     viewcos = finecosine(viewangle>>ANGLETOFINESHIFT);
 
-    fullcolormap = &colormaps[0];
-
     if (player->fixedcolormap)
     {
         fixedcolormap = fullcolormap   // killough 3/20/98: use fullcolormap
-                + player->fixedcolormap*256*sizeof(lighttable_t);
+                + player->fixedcolormap*256;
     }
     else
-        fixedcolormap = 0;
+        fixedcolormap = NULL;
 
     validcount++;
 }
