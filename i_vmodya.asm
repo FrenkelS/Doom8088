@@ -25,6 +25,24 @@ extern source
 extern nearcolormap
 extern dest
 
+last_pixel_jump_table:
+	dw last_pixel0,
+	dw last_pixel1,
+	dw last_pixel2,
+	dw last_pixel3,
+	dw last_pixel4,
+	dw last_pixel5,
+	dw last_pixel6,
+	dw last_pixel7,
+	dw last_pixel8,
+	dw last_pixel9,
+	dw last_pixel10,
+	dw last_pixel11,
+	dw last_pixel12,
+	dw last_pixel13,
+	dw last_pixel14,
+	dw last_pixel15
+
 ;
 ; input:
 ;   ax = fracstep
@@ -46,99 +64,355 @@ R_DrawColumn2:
 
 	mov ah, cl						; ah = count
 	shr cl, 1
-	shr cl, 1						; 0 <= cl <= 32 && ch = 0
+	shr cl, 1
+	shr cl, 1
+	shr cl, 1						; 0 <= cl <= 8 && ch = 0
 
-	jcxz last_pixels				; if cx = 0 then jump to last_pixels
+	or cx, cx
+	jz last_pixels					; if cx = 0 then jump to last_pixels
 
 loop_pixels:
+	push cx
+	mov cx, nearcolormap
+
 	mov al, dh						; al = hi byte of frac
 	shr al, 1						; 0 <= al <= 127
 	mov bx, si						; bx = source
 	xlat							; al = source[al]
-	mov bx, nearcolormap			; bx = nearcolormap
+	mov bx, cx						; bx = nearcolormap
 	ss xlat							; al = nearcolormap[al]
-	stosb							; write pixel line 1
+	stosb							; write pixel line
+	add di, PLANEWIDTH-1			; point to next line
 	add dx, bp						; frac += fracstep
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, cx
 	ss xlat
-	mov es:[di+PLANEWIDTH*1-1], al	; write pixel line 2
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, cx
 	ss xlat
-	mov es:[di+PLANEWIDTH*2-1], al	; write pixel line 3
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, cx
 	ss xlat
-	mov es:[di+PLANEWIDTH*3-1], al	; write pixel line 4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
-	add di, PLANEWIDTH*4-1			; dest = next line
-	loop loop_pixels				; if --cx != 0 then jump to loop_pixels
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+	pop cx
+	dec cx
+	jnz loop_pixels					; if --cx != 0 then jump to loop_pixels
+
 
 last_pixels:
-	and ah, 3						; 0 <= count <= 3
-	cmp ah, 3						; if count = 3
-	je last_pixel3					;  then jump to last_pixel3
-	cmp ah, 2						; if count = 2
-	je last_pixel2					;  then jump to last_pixel2
-	or ah, ah						; if count = 1
-	jnz last_pixel1					;  then jump to last_pixel1
+	mov cx, nearcolormap
+	and ah, 15						; 0 <= count <= 15
+	xor bh, bh
+	mov bl, ah
+	shl bx, 1
+	cs jmp last_pixel_jump_table[bx]
 
-	pop bp							; else return
-	pop es
-	pop di
-	pop si
-	push ss
-	pop ds
-	retf
 
+last_pixel15:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel14:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel13:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel12:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel11:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel10:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel9:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel8:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel7:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel6:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel5:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel4:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
 
 last_pixel3:
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, cx
 	ss xlat
-	stosb							; write third to last pixel
-	add dx, bp
+	stosb
 	add di, PLANEWIDTH-1
+	add dx, bp
 
 last_pixel2:
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, cx
 	ss xlat
-	stosb							; write second to last pixel
-	add dx, bp
+	stosb
 	add di, PLANEWIDTH-1
+	add dx, bp
 
 last_pixel1:
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, cx
 	ss xlat
-	stosb							; write last pixel
+	stosb
 
+last_pixel0:
 	pop bp
 	pop es
 	pop di
