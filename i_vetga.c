@@ -46,9 +46,19 @@ static uint8_t __far* _s_screen;
 static uint8_t __far* vgascreen;
 
 
+static const int8_t colors[14] =
+{
+	0,									// normal
+	4, 4, 4, 4, 0x1c, 0x1c, 0x1c, 0x1c,	// red
+	6, 6, 0x1e, 0x1e,					// yellow
+	2									// green
+};
+
+	
 static void I_UploadNewPalette(int8_t pal)
 {
-
+	outp(0x3da, 0x10);
+	outp(0x3de, colors[pal]);
 }
 
 
