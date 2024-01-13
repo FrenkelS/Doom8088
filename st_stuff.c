@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -304,16 +304,6 @@ static int8_t st_palette;
 #define ST_MAXAMMO3Y            (ST_Y+17)
 
 
-// Palette indices.
-// For damage/bonus red-/gold-shifts
-#define STARTREDPALS            1
-#define STARTBONUSPALS          9
-#define NUMREDPALS              8
-#define NUMBONUSPALS            4
-// Radiation suit, green shift.
-#define RADIATIONPAL            13
-
-
 // used to use appopriately pained face
 static int16_t      st_oldhealth = -1;
 
@@ -560,47 +550,56 @@ void ST_Ticker(void)
 }
 
 
+// Palette indices.
+// For damage/bonus red-/gold-shifts
+#define STARTREDPALS            1
+#define STARTBONUSPALS          9
+#define NUMREDPALS              8
+#define NUMBONUSPALS            4
+// Radiation suit, green shift.
+#define RADIATIONPAL            13
+
+
 static void ST_doPaletteStuff(void)
 {
-    int8_t         palette;
+    int8_t  palette;
     int16_t cnt = _g_player.damagecount;
 
     if (_g_player.powers[pw_strength])
     {
         // slowly fade the berzerk out
-        int16_t bzc = 12 - (_g_player.powers[pw_strength]>>6);
+        int16_t bzc = 12 - (_g_player.powers[pw_strength] >> 6);
         if (bzc > cnt)
             cnt = bzc;
     }
 
     if (cnt)
     {
-        palette = (cnt+7)>>3;
+        palette = (cnt + 7) >> 3;
         if (palette >= NUMREDPALS)
-            palette = NUMREDPALS-1;
+            palette = NUMREDPALS - 1;
 
         /* cph 2006/08/06 - if in the menu, reduce the red tint - navigating to
        * load a game can be tricky if the screen is all red */
-        if (_g_menuactive) palette >>=1;
+        if (_g_menuactive)
+            palette >>= 1;
 
         palette += STARTREDPALS;
     }
+    else if (_g_player.bonuscount)
+    {
+        palette = (_g_player.bonuscount + 7) >> 3;
+        if (palette >= NUMBONUSPALS)
+            palette = NUMBONUSPALS - 1;
+        palette += STARTBONUSPALS;
+    }
+    else if (_g_player.powers[pw_ironfeet] > 4 * 32 || _g_player.powers[pw_ironfeet] & 8)
+        palette = RADIATIONPAL;
     else
-        if (_g_player.bonuscount)
-        {
-            palette = (_g_player.bonuscount+7)>>3;
-            if (palette >= NUMBONUSPALS)
-                palette = NUMBONUSPALS-1;
-            palette += STARTBONUSPALS;
-        }
-        else
-            if (_g_player.powers[pw_ironfeet] > 4*32 || _g_player.powers[pw_ironfeet] & 8)
-                palette = RADIATIONPAL;
-            else
-                palette = 0;
+        palette = 0;
 
     if (palette != st_palette) {
-        I_SetPalette(st_palette = palette); // CPhipps - use new palette function
+        I_SetPalette(st_palette = palette);
     }
 }
 
