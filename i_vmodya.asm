@@ -68,8 +68,8 @@ R_DrawColumn2:
 	shr cl, 1
 	shr cl, 1						; 0 <= cl <= 8 && ch = 0
 
-	or cx, cx
-	jz last_pixels					; if cx = 0 then jump to last_pixels
+	or cx, cx						; if cx = 0
+	jz last_pixels					;  then jump to last_pixels
 
 loop_pixels:
 	push cx
@@ -81,7 +81,7 @@ loop_pixels:
 	xlat							; al = source[al]
 	mov bx, cx						; bx = nearcolormap
 	ss xlat							; al = nearcolormap[al]
-	stosb							; write pixel line
+	stosb							; write pixel
 	add di, PLANEWIDTH-1			; point to next line
 	add dx, bp						; frac += fracstep
 
