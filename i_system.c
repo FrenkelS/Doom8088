@@ -37,8 +37,11 @@
 #include "globdata.h"
 
 
-boolean I_IsGraphicsModeSet(void);
+void I_InitGraphicsHardwareSpecificCode(void);
 static void NORETURN_PRE I_Quit(void) NORETURN_POST;
+
+
+static boolean isGraphicsModeSet = false;
 
 
 //**************************************************************************************
@@ -51,6 +54,13 @@ void I_SetScreenMode(uint16_t mode)
 	union REGS regs;
 	regs.w.ax = mode;
 	int86(0x10, &regs, &regs);
+}
+
+
+void I_InitGraphics(void)
+{
+	I_InitGraphicsHardwareSpecificCode();
+	isGraphicsModeSet = true;
 }
 
 
@@ -278,7 +288,7 @@ static void I_ShutdownTimer(void)
 
 static void I_Shutdown(void)
 {
-	if (I_IsGraphicsModeSet())
+	if (isGraphicsModeSet)
 		I_SetScreenMode(3);
 
 	I_ShutdownSound();

@@ -299,16 +299,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 }
 
 
-static boolean isGraphicsModeSet = false;
-
 static int8_t newpal;
-
-
-boolean I_IsGraphicsModeSet(void)
-{
-	return isGraphicsModeSet;
-}
-
 
 #define PEL_WRITE_ADR   0x3c8
 #define PEL_DATA        0x3c9
@@ -363,11 +354,10 @@ void I_SetPalette(int8_t pal)
 }
 
 
-void I_InitGraphics(void)
+void I_InitGraphicsHardwareSpecificCode(void)
 {	
 	I_SetScreenMode(0x13);
 	I_UploadNewPalette(0);
-	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
 	_s_screen = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
