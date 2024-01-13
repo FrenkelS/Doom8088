@@ -260,29 +260,23 @@ void V_FillRect(byte colour)
 }
 
 
-
-static void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
-{
-	outp(SC_INDEX + 1, 1 << (x & 3));
-	_s_screen[y * PLANEWIDTH + x / 4] = color;
-}
-
-
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
 	int16_t dx = abs(x1 - x0);
-	int16_t sx = x0<x1 ? 1 : -1;
+	int16_t sx = x0 < x1 ? 1 : -1;
 
 	int16_t dy = -abs(y1 - y0);
-	int16_t sy = y0<y1 ? 1 : -1;
+	int16_t sy = y0 < y1 ? 1 : -1;
 
 	int16_t err = dx + dy;
 
-	while(true)
-	{
-		V_PlotPixel(x0, y0, color);
+	outp(SC_INDEX + 1, 1 << (x0 & 3));
 
-		if (x0==x1 && y0==y1)
+	while (true)
+	{
+		_s_screen[y0 * PLANEWIDTH + x0 / 4] = color;
+
+		if (x0 == x1 && y0 == y1)
 			break;
 
 		int16_t e2 = 2 * err;
@@ -290,13 +284,14 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 		if (e2 >= dy)
 		{
 			err += dy;
-			x0 += sx;
+			x0  += sx;
+			outp(SC_INDEX + 1, 1 << (x0 & 3));
 		}
 
 		if (e2 <= dx)
 		{
 			err += dx;
-			y0 += sy;
+			y0  += sy;
 		}
 	}
 
