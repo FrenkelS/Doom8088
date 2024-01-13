@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -46,6 +46,8 @@ void NORETURN_PRE I_Error(const char *error, ...) NORETURN_POST;
 void I_InitScreen();
 
 void I_InitGraphics();
+
+void I_SetScreenMode(uint16_t mode);
 
 void I_FinishUpdate(void);
 

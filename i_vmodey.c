@@ -54,13 +54,275 @@
 #define GC_READMAP              4
 #define GC_MODE                 5
 #define GC_MISCELLANEOUS        6
- 
- 
-void I_SetScreenMode(uint16_t mode);
 
+#define PEL_WRITE_ADR   0x3c8
+#define PEL_DATA        0x3c9
+
+ 
 extern const int16_t CENTERY;
 
+
 static uint8_t  __far* _s_screen;
+
+
+static void I_UploadNewPalette(int8_t pal)
+{
+	char lumpName[9] = "PLAYPAL0";
+
+	if(_g_gamma == 0)
+		lumpName[7] = 0;
+	else
+		lumpName[7] = '0' + _g_gamma;
+
+	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
+	if (palette_lump != NULL)
+	{
+		const byte __far* palette = &palette_lump[pal * 256 * 3];
+		outp(PEL_WRITE_ADR, 0);
+		for (int_fast16_t i = 0; i < 256 * 3; i++)
+			outp(PEL_DATA, (*palette++) >> 2);
+
+		Z_ChangeTagToCache(palette_lump);
+	}
+}
+
+
+void I_InitGraphicsHardwareSpecificCode(void)
+{
+	I_SetScreenMode(0x13);
+	I_UploadNewPalette(0);
+
+	__djgpp_nearptr_enable();
+	_s_screen = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
+
+	outp(SC_INDEX, SC_MEMMODE);
+	outp(SC_INDEX + 1, (inp(SC_INDEX + 1) & ~8) | 4);
+
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~0x13);
+
+	outp(GC_INDEX, GC_MISCELLANEOUS);
+	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~2);
+
+	outp(SC_INDEX, SC_MAPMASK);
+	outp(SC_INDEX + 1, 15);
+
+	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
+
+	outp(CRTC_INDEX, CRTC_UNDERLINE);
+	outp(CRTC_INDEX + 1,inp(CRTC_INDEX + 1) & ~0x40);
+
+	outp(CRTC_INDEX, CRTC_MODE);
+	outp(CRTC_INDEX + 1, inp(CRTC_INDEX + 1) | 0x40);
+}
+
+
+static int8_t newpal;
+
+
+void I_SetPalette(int8_t pal)
+{
+	newpal = pal;
+}
+
+
+#define NO_PALETTE_CHANGE 100
+
+void I_FinishUpdate(void)
+{
+	if (newpal != NO_PALETTE_CHANGE)
+	{
+		I_UploadNewPalette(newpal);
+		newpal = NO_PALETTE_CHANGE;
+	}
+
+	// page flip
+	outp(CRTC_INDEX, CRTC_STARTHIGH);
+#if defined _M_I86
+	outp(CRTC_INDEX + 1, D_FP_SEG(_s_screen) >> 4);
+	_s_screen = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff); // flip between segments A000 and A400
+#else
+	outp(CRTC_INDEX + 1, (D_FP_SEG(_s_screen) >> 4) & 0xf0);
+	_s_screen = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
+#endif
+}
+
+
+#define COLEXTRABITS (8 - 1)
+#define COLBITS (8 + 1)
+
+uint8_t nearcolormap[256];
+static uint16_t nearcolormapoffset = 0xffff;
+
+const uint8_t __far* source;
+uint8_t __far* dest;
+
+
+#if defined C_ONLY
+static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
+{
+	while (count--)
+	{
+		*dest = nearcolormap[source[frac >> COLBITS]];
+		dest += PLANEWIDTH;
+		frac += fracstep;
+	}
+}
+#else
+void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
+#endif
+
+
+void R_DrawColumn(const draw_column_vars_t *dcvars)
+{
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
+
+	source = dcvars->source;
+
+	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
+	{
+		_fmemcpy(nearcolormap, dcvars->colormap, 256);
+		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
+	}
+
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
+
+	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
+	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
+
+	// Inner loop that does the actual texture mapping,
+	//  e.g. a DDA-lile scaling.
+	// This is as fast as it gets.
+
+	R_DrawColumn2(fracstep, frac, count);
+}
+
+
+void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
+{
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
+
+	const uint8_t color = texture;
+
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
+
+	while (count--)
+	{
+		*dest = color;
+		dest += PLANEWIDTH;
+	}
+}
+
+
+#define FUZZOFF (PLANEWIDTH)
+#define FUZZTABLE 50
+
+static const int8_t fuzzoffset[FUZZTABLE] =
+{
+	FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
+	FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
+	FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
+	FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
+	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
+};
+
+
+void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
+{
+	int16_t dc_yl = dcvars->yl;
+	int16_t dc_yh = dcvars->yh;
+
+	// Adjust borders. Low...
+	if (dc_yl <= 0)
+		dc_yl = 1;
+
+	// .. and high.
+	if (dc_yh >= VIEWWINDOWHEIGHT - 1)
+		dc_yh = VIEWWINDOWHEIGHT - 2;
+
+	int16_t count = (dc_yh - dc_yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
+
+	if (nearcolormapoffset != D_FP_OFF(&fullcolormap[6 * 256]))
+	{
+		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
+		nearcolormapoffset = D_FP_OFF(&fullcolormap[6 * 256]);
+	}
+
+	uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
+
+	static int16_t fuzzpos = 0;
+
+	do
+	{
+		*dest = nearcolormap[dest[fuzzoffset[fuzzpos]]];
+		dest += PLANEWIDTH;
+
+		fuzzpos++;
+		if (fuzzpos >= FUZZTABLE)
+			fuzzpos = 0;
+
+	} while (--count);
+}
+
+
+void V_FillRect(byte colour)
+{
+	for (int16_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
+		_fmemset(_s_screen + y * PLANEWIDTH, colour, SCREENWIDTH / 4);
+}
+
+
+void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
+{
+	int16_t dx = abs(x1 - x0);
+	int16_t sx = x0 < x1 ? 1 : -1;
+
+	int16_t dy = -abs(y1 - y0);
+	int16_t sy = y0 < y1 ? 1 : -1;
+
+	int16_t err = dx + dy;
+
+	outp(SC_INDEX + 1, 1 << (x0 & 3));
+
+	while (true)
+	{
+		_s_screen[y0 * PLANEWIDTH + x0 / 4] = color;
+
+		if (x0 == x1 && y0 == y1)
+			break;
+
+		int16_t e2 = 2 * err;
+
+		if (e2 >= dy)
+		{
+			err += dy;
+			x0  += sx;
+			outp(SC_INDEX + 1, 1 << (x0 & 3));
+		}
+
+		if (e2 <= dx)
+		{
+			err += dx;
+			y0  += sy;
+		}
+	}
+
+	outp(SC_INDEX + 1, 15);
+}
 
 
 void V_DrawBackground(void)
@@ -85,11 +347,11 @@ void V_DrawBackground(void)
 }
 
 
-static int16_t cachedLumpNum;
-static int16_t cachedLumpHeight;
-
 void V_DrawRaw(int16_t num, uint16_t offset)
 {
+	static int16_t cachedLumpNum;
+	static int16_t cachedLumpHeight;
+
 	if (cachedLumpNum != num)
 	{
 		const uint8_t __far* lump = W_TryGetLumpByNum(num);
@@ -250,268 +512,6 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	}
 
 	outp(SC_INDEX + 1, 15);
-}
-
-
-void V_FillRect(byte colour)
-{
-	for (int16_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
-		_fmemset(_s_screen + y * PLANEWIDTH, colour, SCREENWIDTH / 4);
-}
-
-
-void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
-{
-	int16_t dx = abs(x1 - x0);
-	int16_t sx = x0 < x1 ? 1 : -1;
-
-	int16_t dy = -abs(y1 - y0);
-	int16_t sy = y0 < y1 ? 1 : -1;
-
-	int16_t err = dx + dy;
-
-	outp(SC_INDEX + 1, 1 << (x0 & 3));
-
-	while (true)
-	{
-		_s_screen[y0 * PLANEWIDTH + x0 / 4] = color;
-
-		if (x0 == x1 && y0 == y1)
-			break;
-
-		int16_t e2 = 2 * err;
-
-		if (e2 >= dy)
-		{
-			err += dy;
-			x0  += sx;
-			outp(SC_INDEX + 1, 1 << (x0 & 3));
-		}
-
-		if (e2 <= dx)
-		{
-			err += dx;
-			y0  += sy;
-		}
-	}
-
-	outp(SC_INDEX + 1, 15);
-}
-
-
-static int8_t newpal;
-
-#define PEL_WRITE_ADR   0x3c8
-#define PEL_DATA        0x3c9
-
-static void I_UploadNewPalette(int8_t pal)
-{
-	char lumpName[9] = "PLAYPAL0";
-
-	if(_g_gamma == 0)
-		lumpName[7] = 0;
-	else
-		lumpName[7] = '0' + _g_gamma;
-
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
-	if (palette_lump != NULL)
-	{
-		const byte __far* palette = &palette_lump[pal * 256 * 3];
-		outp(PEL_WRITE_ADR, 0);
-		for (int_fast16_t i = 0; i < 256 * 3; i++)
-			outp(PEL_DATA, (*palette++) >> 2);
-
-		Z_ChangeTagToCache(palette_lump);
-	}
-}
-
-
-#define NO_PALETTE_CHANGE 100
-
-void I_FinishUpdate(void)
-{
-	if (newpal != NO_PALETTE_CHANGE)
-	{
-		I_UploadNewPalette(newpal);
-		newpal = NO_PALETTE_CHANGE;
-	}
-
-	// page flip
-	outp(CRTC_INDEX, CRTC_STARTHIGH);
-#if defined _M_I86
-	outp(CRTC_INDEX + 1, D_FP_SEG(_s_screen) >> 4);
-	_s_screen = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff); // flip between segments A000 and A400
-#else
-	outp(CRTC_INDEX + 1, (D_FP_SEG(_s_screen) >> 4) & 0xf0);
-	_s_screen = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
-#endif
-}
-
-
-void I_SetPalette(int8_t pal)
-{
-	newpal = pal;
-}
-
-
-void I_InitGraphicsHardwareSpecificCode(void)
-{	
-	I_SetScreenMode(0x13);
-	I_UploadNewPalette(0);
-
-	__djgpp_nearptr_enable();
-	_s_screen = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
-
-	outp(SC_INDEX, SC_MEMMODE);
-	outp(SC_INDEX + 1, (inp(SC_INDEX + 1) & ~8) | 4);
-
-	outp(GC_INDEX, GC_MODE);
-	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~0x13);
-
-	outp(GC_INDEX, GC_MISCELLANEOUS);
-	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~2);
-
-	outp(SC_INDEX, SC_MAPMASK);
-	outp(SC_INDEX + 1, 15);
-
-	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
-
-	outp(CRTC_INDEX, CRTC_UNDERLINE);
-	outp(CRTC_INDEX + 1,inp(CRTC_INDEX + 1) & ~0x40);
-
-	outp(CRTC_INDEX, CRTC_MODE);
-	outp(CRTC_INDEX + 1, inp(CRTC_INDEX + 1) | 0x40);
-}
-
-
-#define COLEXTRABITS (8 - 1)
-#define COLBITS (8 + 1)
-
-uint8_t nearcolormap[256];
-static uint16_t nearcolormapoffset = 0xffff;
-
-const uint8_t __far* source;
-uint8_t __far* dest;
-
-
-#if defined C_ONLY
-static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
-{
-	while (count--)
-	{
-		*dest = nearcolormap[source[frac >> COLBITS]];
-		dest += PLANEWIDTH;
-		frac += fracstep;
-	}
-}
-#else
-void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
-#endif
-
-
-void R_DrawColumn(const draw_column_vars_t *dcvars)
-{
-	int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-	// Zero length, column does not exceed a pixel.
-	if (count <= 0)
-		return;
-
-	source = dcvars->source;
-
-	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
-	{
-		_fmemcpy(nearcolormap, dcvars->colormap, 256);
-		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
-	}
-
-	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
-
-	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
-	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
-
-	// Inner loop that does the actual texture mapping,
-	//  e.g. a DDA-lile scaling.
-	// This is as fast as it gets.
-
-	R_DrawColumn2(fracstep, frac, count);
-}
-
-
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
-{
-	int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-	// Zero length, column does not exceed a pixel.
-	if (count <= 0)
-		return;
-
-	const uint8_t color = texture;
-
-	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
-
-	while (count--)
-	{
-		*dest = color;
-		dest += PLANEWIDTH;
-	}
-}
-
-
-#define FUZZOFF (PLANEWIDTH)
-#define FUZZTABLE 50
-
-static const int8_t fuzzoffset[FUZZTABLE] =
-{
-	FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
-	FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
-	FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
-	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
-};
-
-
-void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
-{
-	int16_t dc_yl = dcvars->yl;
-	int16_t dc_yh = dcvars->yh;
-
-	// Adjust borders. Low...
-	if (dc_yl <= 0)
-		dc_yl = 1;
-
-	// .. and high.
-	if (dc_yh >= VIEWWINDOWHEIGHT - 1)
-		dc_yh = VIEWWINDOWHEIGHT - 2;
-
-	int16_t count = (dc_yh - dc_yl) + 1;
-
-	// Zero length, column does not exceed a pixel.
-	if (count <= 0)
-		return;
-
-	if (nearcolormapoffset != D_FP_OFF(&fullcolormap[6 * 256]))
-	{
-		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
-		nearcolormapoffset = D_FP_OFF(&fullcolormap[6 * 256]);
-	}
-
-	uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
-
-	static int16_t fuzzpos = 0;
-
-	do
-	{
-		*dest = nearcolormap[dest[fuzzoffset[fuzzpos]]];
-		dest += PLANEWIDTH;
-
-		fuzzpos++;
-		if (fuzzpos >= FUZZTABLE)
-			fuzzpos = 0;
-
-	} while (--count);
 }
 
 
