@@ -64,10 +64,9 @@ static void I_UploadNewPalette(int8_t pal)
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
-	I_SetScreenMode(3);
-	I_UploadNewPalette(0);
+	// This code is based on https://github.com/roybaer/tandy13h/blob/master/tandy13h.asm
 
-	// This is copied from https://github.com/roybaer/tandy13h/blob/master/tandy13h.asm
+	I_SetScreenMode(3);
 
 	// select 640 dot graphics mode with hi-res clock, disable video
 	outp(0x3d8, 0x13);
