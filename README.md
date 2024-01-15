@@ -55,6 +55,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
 |IDBEHOLDV |Invincibility            |
 |IDBEHOLDS |Berserk                  |
 |IDBEHOLDI |Invisibility             |
+|IDBEHOLDR |Radiation shielding suit |
 |IDBEHOLDA |Auto-map                 |
 |IDBEHOLDL |Lite-Amp Goggles         |
 |IDCLEV    |Exit Level               |
