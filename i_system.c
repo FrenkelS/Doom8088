@@ -87,6 +87,11 @@ static void __interrupt I_KeyboardISR(void)
 	keyboardqueue[kbdhead & (KBDQUESIZE - 1)] = inp(0x60);
 	kbdhead++;
 
+	// Tell the XT keyboard controller to clear the key
+	byte temp;
+	outp(0x61, (temp = inp(0x61)) | 0x80);
+	outp(0x61, temp);
+
 	// acknowledge the interrupt
 	outp(0x20, 0x20);
 }
