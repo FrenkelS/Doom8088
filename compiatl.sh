@@ -5,15 +5,14 @@ unset CFLAGS
 #export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR"
 export RENDER_OPTIONS="-DFLAT_SPAN"
 
-nasm i_vvg13a.asm -f elf
 nasm m_fixed.asm -f elf
 
-ia16-elf-gcc -c i_vtgah.c  $RENDER_OPTIONS -march=i8086 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=i8086 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i8086 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i8086 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c i_vtgal.c  $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i8088 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 
-export CFLAGS="-march=i8086 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops"
+export CFLAGS="-march=i8088 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall                       -funroll-loops"
 #export CFLAGS="$CFLAGS -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
 #export CFLAGS="$CFLAGS -Wall -Wextra"
 
@@ -28,9 +27,7 @@ export GLOBOBJS+=" hu_stuff.c"
 export GLOBOBJS+=" i_audio.c"
 export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
-#export GLOBOBJS+=" i_vtgah.c"
-export GLOBOBJS+=" i_vtgah.o"
-export GLOBOBJS+=" i_vvg13a.o"
+export GLOBOBJS+=" i_vtgal.c"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_fixed.o"
@@ -73,9 +70,8 @@ export GLOBOBJS+=" z_zone.c"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
-rm i_vvg13a.o
 rm m_fixed.o
-rm i_vtgha.o
+rm i_vtgal.o
 rm p_maputl.o
 rm r_draw.o
 rm tables.o

@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for VGA Mode 13h 320x200 256 colors
+ *      Video code for Tandy 160x200 16 color
  *
  *-----------------------------------------------------------------------------*/
  
@@ -39,48 +39,40 @@
 #include "globdata.h"
 
 
+#define PLANEWIDTH        80
+#define SCREENHEIGHT_TGA 200
+
+
 extern const int16_t CENTERY;
 
 // The screen is [SCREENWIDTH * SCREENHEIGHT];
 static uint8_t __far* _s_screen;
-static uint8_t __far* vgascreen;
+static uint8_t __far* videomemory;
 
 
-#define PEL_WRITE_ADR   0x3c8
-#define PEL_DATA        0x3c9
+static const int8_t colors[14] =
+{
+	0,									// normal
+	4, 4, 4, 4, 0x1c, 0x1c, 0x1c, 0x1c,	// red
+	6, 6, 0x1e, 0x1e,					// yellow
+	2									// green
+};
+
 
 static void I_UploadNewPalette(int8_t pal)
 {
-	// This is used to replace the current 256 colour cmap with a new one
-	// Used by 256 colour PseudoColor modes
-
-	char lumpName[9] = "PLAYPAL0";
-
-	if(_g_gamma == 0)
-		lumpName[7] = 0;
-	else
-		lumpName[7] = '0' + _g_gamma;
-
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
-	if (palette_lump != NULL)
-	{
-		const byte __far* palette = &palette_lump[pal * 256 * 3];
-		outp(PEL_WRITE_ADR, 0);
-		for (int_fast16_t i = 0; i < 256 * 3; i++)
-			outp(PEL_DATA, (*palette++) >> 2);
-
-		Z_ChangeTagToCache(palette_lump);
-	}
+	outp(0x3da, 0x10);
+	outp(0x3de, colors[pal]);
 }
 
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
-	I_SetScreenMode(0x13);
+	I_SetScreenMode(8);
 	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
-	vgascreen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_TGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
@@ -93,19 +85,51 @@ void I_ShutdownGraphicsHardwareSpecificCode(void)
 }
 
 
+static const uint8_t VGA_TO_ETGA_LUT[256] =
+{
+	  0,   6,   0,   7, 255,   8,   8,   0,   0, 136,   8,   8,   0, 104, 104, 104,
+	255, 255, 127, 207, 207, 207, 207, 207, 207, 124, 124, 124, 124, 124, 204, 204,
+	204, 204, 108,  76,  76,  76,  12,  12,  68,  68,  68,  68,  68,  68,   4,   4,
+	255, 255, 255, 255, 255, 255, 239, 239, 239, 239, 239, 126, 126, 126, 206, 206,
+	206, 206, 206, 206,  78,  78,  44,  44,  44,  44,  44, 104, 104, 104,   6,   6,
+	255, 255, 255, 255, 255, 255, 255, 255, 255, 127, 127, 127, 127, 127, 127, 127,
+	143, 143,  15, 119, 119, 119, 120, 120, 120,   7,   7,   7, 136, 136, 136,   8,
+	175,  62, 122, 122, 122, 122, 170, 138, 138, 138,  10,  40,  40,   2,   2,   0,
+	127, 127, 207, 111, 111, 111,  94,  94,  94,  60,  60, 103, 103,  71, 104, 104,
+	 94,  94,  94, 103,  44,  44, 104, 104,  30,  30,  30,  39,  54,  54, 136, 136,
+	239, 238, 238, 206, 110,  78, 102, 102, 255, 255, 255, 127, 207, 124, 204,  76,
+	 68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,   4,
+	255, 255, 255, 159, 159, 121, 153,  25,  17,  17,  17,  17,  17,  17,  17,  17,
+	255, 255, 255, 239, 239, 126, 206, 110,  78,  78,  78,  78,  78, 108, 108, 108,
+	255, 255, 255, 239, 239, 238, 238, 238, 108, 108, 102,  70, 104, 104,   6,   6,
+	 17,   1,   1,   1,   1,   0,   0,   0, 238, 238, 223,  93,  93,  93,  85,  79
+};
+
+
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
-	uint8_t __far* dst = vgascreen;
+	uint8_t __far* dst = videomemory;
 
 #if defined DISABLE_STATUS_BAR
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
+	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++) {
 #else
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
+	for (uint_fast8_t y = 0; y < SCREENHEIGHT / 2; y++) {
 #endif
-		_fmemcpy(dst, src, SCREENWIDTH);
-		dst += SCREENWIDTH_VGA;
-		src += SCREENWIDTH;
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
+			*dst++ = VGA_TO_ETGA_LUT[*src];
+			src += 4;
+		}
+
+		dst += 0x2000 - VIEWWINDOWWIDTH;
+
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
+			uint8_t b = VGA_TO_ETGA_LUT[*src];
+			*dst++ = (b << 4 | b >> 4);
+			src += 4;
+		}
+
+		dst -= 0x2000 - (PLANEWIDTH - VIEWWINDOWWIDTH);
 	}
 }
 
@@ -158,30 +182,15 @@ const uint8_t __far* source;
 uint8_t __far* dest;
 
 
-inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, uint16_t frac)
-{
-	uint16_t color = nearcolormap[source[frac>>COLBITS]];
-	color = (color | (color << 8));
-
-	uint16_t __far* d = (uint16_t __far*) dest;
-	*d++ = color;
-	*d   = color;
-}
-
-
-#if defined C_ONLY
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	while (count--)
 	{
-		R_DrawColumnPixel(dest, source, frac);
+		*dest = nearcolormap[source[frac >> COLBITS]];
 		dest += SCREENWIDTH;
 		frac += fracstep;
 	}
 }
-#else
-void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
-#endif
 
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
@@ -221,53 +230,52 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	const uint16_t color = (texture << 8) | texture;
+	const uint8_t color = texture;
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
-	uint16_t __far* d = (uint16_t __far*) dest;
 
 	uint16_t l = count >> 4;
 
 	while (l--)
 	{
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
 
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
 
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
 
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		*d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += SCREENWIDTH;
 	}
 
 	switch (count & 15)
 	{
-		case 15: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 14: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 13: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 12: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 11: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 10: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  9: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  8: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  7: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  6: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  5: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  4: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  3: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  2: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  1: *d++ = color; *d = color;
+		case 15: *dest = color; dest += SCREENWIDTH;
+		case 14: *dest = color; dest += SCREENWIDTH;
+		case 13: *dest = color; dest += SCREENWIDTH;
+		case 12: *dest = color; dest += SCREENWIDTH;
+		case 11: *dest = color; dest += SCREENWIDTH;
+		case 10: *dest = color; dest += SCREENWIDTH;
+		case  9: *dest = color; dest += SCREENWIDTH;
+		case  8: *dest = color; dest += SCREENWIDTH;
+		case  7: *dest = color; dest += SCREENWIDTH;
+		case  6: *dest = color; dest += SCREENWIDTH;
+		case  5: *dest = color; dest += SCREENWIDTH;
+		case  4: *dest = color; dest += SCREENWIDTH;
+		case  3: *dest = color; dest += SCREENWIDTH;
+		case  2: *dest = color; dest += SCREENWIDTH;
+		case  1: *dest = color;
 	}
 }
 
@@ -325,7 +333,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	do
 	{
-		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], 0);
+		*dest = nearcolormap[dest[fuzzoffset[fuzzpos] * 4]];
 		dest += SCREENWIDTH;
 
 		fuzzpos++;
@@ -334,77 +342,6 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	} while(--count);
 }
-
-
-#if !defined FLAT_SPAN
-inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t position)
-{
-	uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
-	color = color | (color << 8);
-
-	uint16_t __far* d = (uint16_t __far*) dest;
-	*d++ = color;
-	*d   = color;
-}
-
-
-void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *dsvars)
-{
-	uint16_t count = (x2 - x1);
-
-	const byte __far* source   = dsvars->source;
-	const byte __far* colormap = dsvars->colormap;
-
-	uint32_t __far* dest = (uint32_t __far*)(_s_screen + (y * SCREENWIDTH) + (x1 << 2));
-
-	const uint32_t step = dsvars->step;
-	uint32_t position = dsvars->position;
-
-	uint16_t l = (count >> 4);
-
-	while (l--)
-	{
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-    }
-
-	switch (count & 15)
-	{
-		case 15:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 14:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 13:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 12:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 11:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 10:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  9:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  8:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  7:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  6:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  5:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  4:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  3:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  2:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  1:    R_DrawSpanPixel(dest, source, colormap, position);
-	}
-}
-#endif
 
 
 //
@@ -437,7 +374,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	while (true)
 	{
-		_s_screen[y0 * SCREENWIDTH + x0] = color;
+		_s_screen[y0 * SCREENWIDTH + (x0 / 4) * 4] = color;
 
 		if (x0 == x1 && y0 == y1)
 			break;
