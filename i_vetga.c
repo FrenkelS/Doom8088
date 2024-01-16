@@ -484,6 +484,49 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 }
 
 
+void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
+{
+	y -= patch->topoffset;
+	x -= patch->leftoffset;
+
+	byte __far* desttop = _s_screen + (y * SCREENWIDTH) + x;
+
+	int16_t width = patch->width;
+
+	for (int16_t col = 0; col < width; col++, desttop++)
+	{
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			const byte __far* source = (const byte __far*)column + 3;
+			byte __far* dest = desttop + (column->topdelta * SCREENWIDTH);
+
+			uint16_t count = column->length;
+
+			uint16_t l = count >> 2;
+			while (l--)
+			{
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+			}
+
+			switch (count & 3)
+			{
+				case 3: *dest = *source++; dest += SCREENWIDTH;
+				case 2: *dest = *source++; dest += SCREENWIDTH;
+				case 1: *dest = *source++;
+			}
+
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+	}
+}
+
+
 void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
 	static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
@@ -531,49 +574,6 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 				*dest = source[frac >> 8];
 				dest += SCREENWIDTH;
 				frac += DYI;
-			}
-
-			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
-		}
-	}
-}
-
-
-void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
-{
-	y -= patch->topoffset;
-	x -= patch->leftoffset;
-
-	byte __far* desttop = _s_screen + (y * SCREENWIDTH) + x;
-
-	int16_t width = patch->width;
-
-	for (int16_t col = 0; col < width; col++, desttop++)
-	{
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
-
-		// step through the posts in a column
-		while (column->topdelta != 0xff)
-		{
-			const byte __far* source = (const byte __far*)column + 3;
-			byte __far* dest = desttop + (column->topdelta * SCREENWIDTH);
-
-			uint16_t count = column->length;
-
-			uint16_t l = count >> 2;
-			while (l--)
-			{
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-			}
-
-			switch (count & 3)
-			{
-				case 3: *dest = *source++; dest += SCREENWIDTH;
-				case 2: *dest = *source++; dest += SCREENWIDTH;
-				case 1: *dest = *source++;
 			}
 
 			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
