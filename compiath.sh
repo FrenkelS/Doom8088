@@ -75,7 +75,7 @@ ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
 rm i_vvg13a.o
 rm m_fixed.o
-rm i_vtgha.o
+rm i_vtgah.o
 rm p_maputl.o
 rm r_draw.o
 rm tables.o
