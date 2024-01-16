@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for Tandy 160x200 16 color
+ *      Video code for Tandy 320x200 16 color
  *
  *-----------------------------------------------------------------------------*/
  
@@ -39,7 +39,7 @@
 #include "globdata.h"
 
 
-#define PLANEWIDTH        80
+#define PLANEWIDTH       160
 #define SCREENHEIGHT_TGA 200
 
 
@@ -68,11 +68,11 @@ static void I_UploadNewPalette(int8_t pal)
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
-	I_SetScreenMode(8);
+	I_SetScreenMode(9);
 	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
-	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_TGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
+	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_TGA - SCREENHEIGHT) / 2) / 4) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH * 2) / 2 + __djgpp_conventional_base);
 
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
@@ -112,23 +112,37 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 	uint8_t __far* dst = videomemory;
 
 #if defined DISABLE_STATUS_BAR
-	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++) {
+	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 4; y++) {
 #else
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT / 2; y++) {
+	for (uint_fast8_t y = 0; y < SCREENHEIGHT / 4; y++) {
 #endif
-		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH * 2; x++) {
 			*dst++ = VGA_TO_ETGA_LUT[*src];
-			src += 4;
+			src += 2;
 		}
 
-		dst += 0x2000 - VIEWWINDOWWIDTH;
+		dst += 0x2000 - VIEWWINDOWWIDTH * 2;
 
-		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH * 2; x++) {
 			*dst++ = VGA_TO_ETGA_LUT[*src];
-			src += 4;
+			src += 2;
 		}
 
-		dst -= 0x2000 - (PLANEWIDTH - VIEWWINDOWWIDTH);
+		dst += 0x2000 - VIEWWINDOWWIDTH * 2;
+
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH * 2; x++) {
+			*dst++ = VGA_TO_ETGA_LUT[*src];
+			src += 2;
+		}
+
+		dst += 0x2000 - VIEWWINDOWWIDTH * 2;
+
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH * 2; x++) {
+			*dst++ = VGA_TO_ETGA_LUT[*src];
+			src += 2;
+		}
+
+		dst -= 0x6000 - (PLANEWIDTH - VIEWWINDOWWIDTH * 2);
 	}
 }
 
@@ -185,8 +199,11 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	while (count--)
 	{
-		*dest = nearcolormap[source[frac >> COLBITS]];
-		dest += SCREENWIDTH;
+		uint8_t c = nearcolormap[source[frac >> COLBITS]];
+		*dest = c;
+		dest += 2;
+		*dest = c;
+		dest += SCREENWIDTH - 2;
 		frac += fracstep;
 	}
 }
@@ -237,44 +254,44 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 
 	while (l--)
 	{
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
 
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
 
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
 
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
 	}
 
 	switch (count & 15)
 	{
-		case 15: *dest = color; dest += SCREENWIDTH;
-		case 14: *dest = color; dest += SCREENWIDTH;
-		case 13: *dest = color; dest += SCREENWIDTH;
-		case 12: *dest = color; dest += SCREENWIDTH;
-		case 11: *dest = color; dest += SCREENWIDTH;
-		case 10: *dest = color; dest += SCREENWIDTH;
-		case  9: *dest = color; dest += SCREENWIDTH;
-		case  8: *dest = color; dest += SCREENWIDTH;
-		case  7: *dest = color; dest += SCREENWIDTH;
-		case  6: *dest = color; dest += SCREENWIDTH;
-		case  5: *dest = color; dest += SCREENWIDTH;
-		case  4: *dest = color; dest += SCREENWIDTH;
-		case  3: *dest = color; dest += SCREENWIDTH;
-		case  2: *dest = color; dest += SCREENWIDTH;
-		case  1: *dest = color;
+		case 15: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case 14: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case 13: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case 12: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case 11: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case 10: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  9: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  8: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  7: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  6: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  5: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  4: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  3: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  2: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
+		case  1: *dest = color; dest += 2; *dest = color;
 	}
 }
 
@@ -373,7 +390,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	while (true)
 	{
-		_s_screen[y0 * SCREENWIDTH + (x0 / 4) * 4] = color;
+		_s_screen[y0 * SCREENWIDTH + (x0 / 2) * 2] = color;
 
 		if (x0 == x1 && y0 == y1)
 			break;
