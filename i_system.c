@@ -38,6 +38,8 @@
 
 
 void I_InitGraphicsHardwareSpecificCode(void);
+void I_ShutdownGraphicsHardwareSpecificCode(void);
+
 static void NORETURN_PRE I_Quit(void) NORETURN_POST;
 
 
@@ -61,6 +63,13 @@ void I_InitGraphics(void)
 {
 	I_InitGraphicsHardwareSpecificCode();
 	isGraphicsModeSet = true;
+}
+
+
+void I_ShutdownGraphics(void)
+{
+	I_ShutdownGraphicsHardwareSpecificCode();
+	I_SetScreenMode(3);
 }
 
 
@@ -294,7 +303,7 @@ static void I_ShutdownTimer(void)
 static void I_Shutdown(void)
 {
 	if (isGraphicsModeSet)
-		I_SetScreenMode(3);
+		I_ShutdownGraphics();
 
 	I_ShutdownSound();
 

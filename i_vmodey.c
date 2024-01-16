@@ -117,6 +117,12 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// Do nothing
+}
+
+
 static int8_t newpal;
 
 

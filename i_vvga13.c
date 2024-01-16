@@ -87,6 +87,12 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// Do nothing
+}
+
+
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;

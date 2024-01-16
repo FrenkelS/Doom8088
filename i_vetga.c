@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for Tandy 640x200 16 color
+ *      Video code for Tandy 640x200 16 color aka Tandy Video II aka ETGA
  *
  *-----------------------------------------------------------------------------*/
  
@@ -43,7 +43,7 @@ extern const int16_t CENTERY;
 
 // The screen is [SCREENWIDTH * SCREENHEIGHT];
 static uint8_t __far* _s_screen;
-static uint8_t __far* vgascreen;
+static uint8_t __far* videomemory;
 
 
 static const int8_t colors[14] =
@@ -62,62 +62,91 @@ static void I_UploadNewPalette(int8_t pal)
 }
 
 
-void I_InitGraphicsHardwareSpecificCode(void)
+static const uint8_t etga_ctrc[19] = {0x71, 0x50, 0x5a, 0xef, 0xff, 6, 0xc8, 0xe2, 2, 0, 0, 0, 0, 0, 0, 0, 0x18,    0, 0x46};
+static const uint8_t text_ctrc[19] = {0x71, 0x50, 0x5a, 0xfe, 0x1c, 1, 0x19, 0x1a, 2, 8, 6, 7, 0, 0, 0, 0, 0x18, 0x20,    7};
+
+static const uint16_t etga_ctrl[5] = {0x0f01, 0x0002, 0x1003, 0x0105, 0x0208};
+static const uint16_t text_ctrl[5] = {0x0f01, 0x0002, 0x1003, 0x0005, 0x0008};
+
+
+static void I_InitGraphicsCommonETGA(boolean graphics)
 {
-	// This code is based on https://github.com/roybaer/tandy13h/blob/master/tandy13h.asm
+	const uint8_t*  crtcTable;
+	const uint16_t* ctrlTable;
 
-	I_SetScreenMode(3);
-
-	// select 640 dot graphics mode with hi-res clock, disable video
-	outp(0x3d8, 0x13);
+	if (graphics)
+	{
+		crtcTable = etga_ctrc;
+		ctrlTable = etga_ctrl;
+	}
+	else
+	{
+		crtcTable = text_ctrc;
+		ctrlTable = text_ctrl;
+	}
 
 	// set CRTC registers
-	outp(0x3d4,  0); outp(0x3d5, 0x71);
-	outp(0x3d4,  1); outp(0x3d5, 0x50);
-	outp(0x3d4,  2); outp(0x3d5, 0x5a);
-	outp(0x3d4,  3); outp(0x3d5, 0xef);
-	outp(0x3d4,  4); outp(0x3d5, 0xff);
-	outp(0x3d4,  5); outp(0x3d5, 0x06);
-	outp(0x3d4,  6); outp(0x3d5, 0xc8);
-	outp(0x3d4,  7); outp(0x3d5, 0xe2);
-	outp(0x3d4,  8); outp(0x3d5, 0x1c);
-	outp(0x3d4,  9); outp(0x3d5,    0);
-	outp(0x3d4, 10); outp(0x3d5,    0);
-	outp(0x3d4, 11); outp(0x3d5,    0);
-	outp(0x3d4, 12); outp(0x3d5,    0);
-	outp(0x3d4, 13); outp(0x3d5,    0);
-	outp(0x3d4, 14); outp(0x3d5,    0);
-	outp(0x3d4, 15); outp(0x3d5,    0);
-	outp(0x3d4, 16); outp(0x3d5,    0);
-	outp(0x3d4, 17); outp(0x3d5, 0x18);
-	outp(0x3d4, 18); outp(0x3d5,    0);
-	outp(0x3d4, 19); outp(0x3d5, 0x46);
+	for (int16_t i = 0; i < 19; i++)
+	{
+		outp(0x3d4, i);
+		outp(0x3d5, *crtcTable++);
+	}
 
 	// set control registers
-	outp(0x3da, 1); outp(0x3de, 0x0f);
-	outp(0x3da, 2); outp(0x3de,    0);
-	outp(0x3da, 3); outp(0x3de, 0x10);
-	outp(0x3da, 5); outp(0x3de, 0x01);
-	outp(0x3da, 8); outp(0x3de, 0x02);
+	for (int16_t i = 0; i < 5; i++)
+	{
+		uint16_t x = *ctrlTable++;
+		outp(0x3da, LOBYTE(x));
+		outp(0x3de, HIBYTE(x));
+	}
 
 	// clear color select register
 	outp(0x3d9, 0);
 
 	// disable extended RAM paging
 	outp(0x3dd, 0);
+}
 
-	// select page 2 for CRT & CPU
+
+void I_InitGraphicsHardwareSpecificCode(void)
+{
+	// This code is based on https://github.com/planet-x3/px3_ose/blob/master/src/video/etga.s
+
+	I_SetScreenMode(3);
+
+	// select 640 dot graphics mode with hi-res clock, disable video
+	outp(0x3d8, 0x13);
+
+	I_InitGraphicsCommonETGA(true);
+
+	// select page bit 2 for CRT & CPU
 	outp(0x3df, 0x24);
 
+	// clear screen
 	__djgpp_nearptr_enable();
-	vgascreen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
-	_fmemset(vgascreen, 0, 1u * SCREENWIDTH_VGA * SCREENHEIGHT_VGA);
+	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
 
 	// select 640 dot graphics mode with hi-res clock, enable video
 	outp(0x3d8, 0x1b);
 
+	videomemory = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
+}
+
+
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// select 80 column text mode, disable video
+	outp(0x3d8, 0x13);
+
+	I_InitGraphicsCommonETGA(false);
+
+	// select page bits 0-2 for CRT & CPU
+	outp(0x3df, 0x3f);
+
+	// select 80 column text mode, enable blinking, enable video
+	outp(0x3d8, 0x29);
 }
 
 
@@ -145,7 +174,7 @@ static const uint8_t VGA_TO_ETGA_LUT[256] =
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
-	uint8_t __far* dst = vgascreen;
+	uint8_t __far* dst = videomemory;
 
 #if defined DISABLE_STATUS_BAR
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
