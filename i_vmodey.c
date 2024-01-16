@@ -403,6 +403,60 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 }
 
 
+void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
+{
+	y -= patch->topoffset;
+	x -= patch->leftoffset;
+
+	int16_t plane = x & 3;
+	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + x / 4;
+
+	int16_t width = patch->width;
+
+	for (int16_t col = 0; col < width; col++)
+	{
+		outp(SC_INDEX + 1, 1 << plane);
+
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			const byte __far* source = (const byte __far*)column + 3;
+			byte __far* dest = desttop + (column->topdelta * PLANEWIDTH);
+
+			uint16_t count = column->length;
+
+			uint16_t l = count >> 2;
+			while (l--)
+			{
+				*dest = *source++; dest += PLANEWIDTH;
+				*dest = *source++; dest += PLANEWIDTH;
+				*dest = *source++; dest += PLANEWIDTH;
+				*dest = *source++; dest += PLANEWIDTH;
+			}
+
+			switch (count & 3)
+			{
+				case 3: *dest = *source++; dest += PLANEWIDTH;
+				case 2: *dest = *source++; dest += PLANEWIDTH;
+				case 1: *dest = *source++;
+			}
+
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+
+		if (++plane == 4)
+		{
+			plane = 0;
+			desttop++;
+		}
+	}
+
+	outp(SC_INDEX + 1, 15);
+}
+
+
 void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
 	static const int32_t DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
@@ -454,60 +508,6 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			}
 
 			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
-		}
-	}
-
-	outp(SC_INDEX + 1, 15);
-}
-
-
-void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
-{
-	y -= patch->topoffset;
-	x -= patch->leftoffset;
-
-	int16_t plane = x & 3;
-	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + x / 4;
-
-	int16_t width = patch->width;
-
-	for (int16_t col = 0; col < width; col++)
-	{
-		outp(SC_INDEX + 1, 1 << plane);
-
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
-
-		// step through the posts in a column
-		while (column->topdelta != 0xff)
-		{
-			const byte __far* source = (const byte __far*)column + 3;
-			byte __far* dest = desttop + (column->topdelta * PLANEWIDTH);
-
-			uint16_t count = column->length;
-
-			uint16_t l = count >> 2;
-			while (l--)
-			{
-				*dest = *source++; dest += PLANEWIDTH;
-				*dest = *source++; dest += PLANEWIDTH;
-				*dest = *source++; dest += PLANEWIDTH;
-				*dest = *source++; dest += PLANEWIDTH;
-			}
-
-			switch (count & 3)
-			{
-				case 3: *dest = *source++; dest += PLANEWIDTH;
-				case 2: *dest = *source++; dest += PLANEWIDTH;
-				case 1: *dest = *source++;
-			}
-
-			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
-		}
-
-		if (++plane == 4)
-		{
-			plane = 0;
-			desttop++;
 		}
 	}
 
