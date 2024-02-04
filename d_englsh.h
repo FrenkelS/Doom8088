@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -36,10 +36,6 @@
 
 #ifndef __D_ENGLSH__
 #define __D_ENGLSH__
-
-/* d_main.c */
-#define D_DEVSTR    "Development mode ON.\n"
-#define D_CDROM     "CD-ROM Version: default.cfg from c:\\doomdata\n"
 
 /* m_menu.c */
 #define PRESSKEY    "press a key."
@@ -84,8 +80,8 @@
 #define GOTROCKET   "Picked up a rocket."
 #define GOTROCKBOX  "Picked up a box of rockets."
 #define GOTSHELLS   "Picked up 4 shotgun shells."
-#define GOTSHELLBOX "Picked up a box of shotgun shells."
-#define GOTBACKPACK "Picked up a backpack full of ammo!"
+#define GOTSHELLBOX "Picked up a box of shotgun shells"
+#define GOTBACKPACK "Picked up a backpack full of ammo"
 
 #define GOTCHAINGUN "You got the chaingun!"
 #define GOTCHAINSAW "A chainsaw!  Find some meat!"
@@ -93,22 +89,9 @@
 #define GOTSHOTGUN  "You got the shotgun!"
 
 /* p_doors.c */
-#define PD_BLUEO    "You need a blue key to activate this object"
-#define PD_REDO     "You need a red key to activate this object"
-#define PD_YELLOWO  "You need a yellow key to activate this object"
-#define PD_BLUEK    "You need a blue key to open this door"
-#define PD_REDK     "You need a red key to open this door"
-#define PD_YELLOWK  "You need a yellow key to open this door"
-/* jff 02/05/98 Create messages specific to card and skull keys */
-#define PD_BLUEC    "You need a blue card to open this door"
-#define PD_REDC     "You need a red card to open this door"
-#define PD_YELLOWC  "You need a yellow card to open this door"
-#define PD_BLUES    "You need a blue skull to open this door"
-#define PD_REDS     "You need a red skull to open this door"
-#define PD_YELLOWS  "You need a yellow skull to open this door"
-#define PD_ANY      "Any key will open this door"
-#define PD_ALL3     "You need all three keys to open this door"
-#define PD_ALL6     "You need all six keys to open this door"
+#define PD_BLUEK    "You need a blue key to open this"
+#define PD_REDK     "You need a red key to open this"
+#define PD_YELLOWK  "You need a yellow key to open this"
 
 /* g_game.c */
 #define GGSAVED     "game saved."

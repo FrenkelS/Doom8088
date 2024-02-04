@@ -48,7 +48,7 @@
 #include "globdata.h"
 
 
-#define HU_MAXLINELENGTH  31
+#define HU_MAXLINELENGTH  34
 
 
 /* Text Line widget
@@ -59,13 +59,8 @@ typedef struct
   int16_t   x;
   int16_t   y;
 
-  int16_t   linelen;
   char  l[HU_MAXLINELENGTH+1]; // line of text
   int16_t   len;                            // current line length
-
-  // whether this line needs to be updated
-  int16_t   needsupdate;
-
 } hu_textline_t;
 
 
@@ -77,8 +72,6 @@ typedef struct
 
   // pointer to boolean stating whether to update window
   boolean*    on;
-  boolean   laston;             // last value of *->on.
-
 } hu_stext_t;
 
 
@@ -88,7 +81,6 @@ static hu_stext_t     w_message;
 
 static boolean    message_on;
 boolean    _g_message_dontfuckwithme;
-static boolean    headsupactive;
 
 
 // global heads up display controls
@@ -146,18 +138,6 @@ void HU_Init(void)
 	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 }
 
-//
-// HU_Stop()
-//
-// Make the heads-up displays inactive
-//
-// Passed nothing, returns nothing
-//
-static void HU_Stop(void)
-{
-    headsupactive = false;
-}
-
 
 //
 // HUlib_clearTextLine()
@@ -168,9 +148,8 @@ static void HU_Stop(void)
 //
 static void HUlib_clearTextLine(hu_textline_t* t)
 {
-    t->linelen = t->len = 0;
+    t->len  = 0;
     t->l[0] = 0;
-    t->needsupdate = true;
 }
 
 
@@ -200,9 +179,7 @@ static void HUlib_initTextLine(hu_textline_t* t, int16_t x, int16_t y)
 //
 static void HUlib_initSText(hu_stext_t* s, boolean* on)
 {
-	s->on     = on;
-	s->laston = true;
-
+	s->on = on;
 	HUlib_initTextLine(&s->l, HU_MSGX, HU_MSGY);
 }
 
@@ -216,12 +193,10 @@ static void HUlib_initSText(hu_stext_t* s, boolean* on)
 //
 static void HUlib_addCharToTextLine(hu_textline_t* t,char ch)
 {
-	if (t->linelen != HU_MAXLINELENGTH)
+	if (t->len != HU_MAXLINELENGTH)
 	{
-		t->linelen++;
 		t->l[t->len++] = ch;
-		t->l[t->len] = 0;
-		t->needsupdate = 4;
+		t->l[t->len]   = 0;
 	}
 }
 
@@ -241,10 +216,6 @@ void HU_Start(void)
 {
     const char* s;
 
-    if (headsupactive)                    // stop before starting
-        HU_Stop();
-
-
     message_on = false;
     _g_message_dontfuckwithme = false;
 
@@ -257,16 +228,12 @@ void HU_Start(void)
     HUlib_initTextLine(&w_title, HU_TITLEX, HU_TITLEY);
 
     // initialize the automap's level title widget
-    if (_g_gamestate == GS_LEVEL) /* cph - stop SEGV here when not in level */
+    if (_g_gamestate == GS_LEVEL)
+    {
         s = HU_TITLE;
-    else s = "";
-
-    while (*s)
-        HUlib_addCharToTextLine(&w_title, *(s++));
-
-
-    // now allow the heads-up display to run
-    headsupactive = true;
+        while (*s)
+            HUlib_addCharToTextLine(&w_title, *(s++));
+    }
 }
 
 
@@ -280,7 +247,7 @@ void HU_Start(void)
 //
 static void HUlib_drawTextLine(hu_textline_t* l)
 {
-	int16_t y = l->y;
+	const int16_t y = l->y;
 
 	// draw the new stuff
 	int16_t x = l->x;
@@ -345,80 +312,7 @@ void HU_Drawer(void)
         HUlib_drawTextLine(&w_title);
     }
 
-    //jff 3/4/98 display last to give priority
-    HU_Erase(); // jff 4/24/98 Erase current lines before drawing current
-    // needed when screen not fullsize
-
-
     HUlib_drawSText(&w_message);
-}
-
-
-//
-// HUlib_eraseTextLine()
-//
-// Erases a hu_textline_t widget when screen border is behind text
-// Sorta called by HU_Erase and just better darn get things straight
-//
-// Passed the hu_textline_t
-// Returns nothing
-//
-static void HUlib_eraseTextLine(hu_textline_t* l)
-{
-    if (l->needsupdate)
-        l->needsupdate--;
-}
-
-
-//
-// HUlib_eraseSText()
-//
-// Erases a hu_stext_t widget, when the screen is not fullsize
-//
-// Passed a hu_stext_t
-// Returns nothing
-//
-static void HUlib_eraseSText(hu_stext_t* s)
-{
-	if (s->laston && !*s->on)
-		s->l.needsupdate = 4;
-
-	HUlib_eraseTextLine(&s->l);
-
-	s->laston = *s->on;
-}
-
-
-//
-// HU_Erase()
-//
-// Erase hud display lines that can be trashed by small screen display
-//
-// Passed nothing, returns nothing
-//
-void HU_Erase(void)
-{
-    // erase the message display or the message review display
-    HUlib_eraseSText(&w_message);
-
-    // erase the automap title
-    HUlib_eraseTextLine(&w_title);
-}
-
-
-//
-// HUlib_addLineToSText()
-//
-// Adds a blank line to a hu_stext_t widget
-//
-// Passed a hu_stext_t
-// Returns nothing
-//
-static void HUlib_addLineToSText(hu_stext_t* s)
-{
-	HUlib_clearTextLine(&s->l);
-
-	s->l.needsupdate = 4;
 }
 
 
@@ -432,7 +326,7 @@ static void HUlib_addLineToSText(hu_stext_t* s)
 //
 static void HUlib_addMessageToSText(hu_stext_t* s, const char* msg)
 {
-	HUlib_addLineToSText(s);
+	HUlib_clearTextLine(&s->l);
 
 	while (*msg)
 		HUlib_addCharToTextLine(&s->l, *(msg++));
@@ -473,7 +367,7 @@ void HU_Ticker(void)
             HUlib_addMessageToSText(&w_message, plr->message);
 
             // clear the message to avoid posting multiple times
-            plr->message = 0;
+            plr->message = NULL;
             // note a message is displayed
             message_on = true;
             // start the message persistence counter
