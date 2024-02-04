@@ -152,7 +152,14 @@ void I_FinishUpdate(void)
 #define COLBITS (8 + 1)
 
 uint8_t nearcolormap[256];
+
+#if defined _M_I86
+#define L_FP_OFF D_FP_OFF
 static uint16_t nearcolormapoffset = 0xffff;
+#else
+#define L_FP_OFF(p) ((uint32_t)(p))
+static uint32_t nearcolormapoffset = 0xffffffff;
+#endif
 
 const uint8_t __far* source;
 uint8_t __far* dest;
@@ -183,10 +190,10 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 
 	source = dcvars->source;
 
-	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
+	if (nearcolormapoffset != L_FP_OFF(dcvars->colormap))
 	{
 		_fmemcpy(nearcolormap, dcvars->colormap, 256);
-		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
+		nearcolormapoffset = L_FP_OFF(dcvars->colormap);
 	}
 
 	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
@@ -256,10 +263,10 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	if (nearcolormapoffset != D_FP_OFF(&fullcolormap[6 * 256]))
+	if (nearcolormapoffset != L_FP_OFF(&fullcolormap[6 * 256]))
 	{
 		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
-		nearcolormapoffset = D_FP_OFF(&fullcolormap[6 * 256]);
+		nearcolormapoffset = L_FP_OFF(&fullcolormap[6 * 256]);
 	}
 
 	uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
