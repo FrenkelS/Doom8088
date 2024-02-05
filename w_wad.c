@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -222,7 +222,7 @@ int16_t W_GetFirstInt16(int16_t num)
 
 	fseek(fileWAD, lump->filepos, SEEK_SET);
 	fread(&firstInt16, sizeof(int16_t), 1, fileWAD);
-	return firstInt16;;
+	return firstInt16;
 }
 
 
