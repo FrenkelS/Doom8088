@@ -525,12 +525,12 @@ static void AM_rotate(fixed_t* x,  fixed_t* y, angle_t a, fixed_t xorig, fixed_t
     yorig>>=FRACTOMAPBITS;
 
     tmpx =
-            FixedMulAngle(*x - xorig,finecosine(a>>ANGLETOFINESHIFT)) -
-            FixedMulAngle(*y - yorig,finesine(  a>>ANGLETOFINESHIFT));
+            FixedMulAngle(*x - xorig,finecosineapprox(a>>ANGLETOFINESHIFT)) -
+            FixedMulAngle(*y - yorig,finesineapprox(  a>>ANGLETOFINESHIFT));
 
     *y   = yorig +
-            FixedMulAngle(*x - xorig,finesine(  a>>ANGLETOFINESHIFT)) +
-            FixedMulAngle(*y - yorig,finecosine(a>>ANGLETOFINESHIFT));
+            FixedMulAngle(*x - xorig,finesineapprox(  a>>ANGLETOFINESHIFT)) +
+            FixedMulAngle(*y - yorig,finecosineapprox(a>>ANGLETOFINESHIFT));
 
     *x = tmpx + xorig;
 }

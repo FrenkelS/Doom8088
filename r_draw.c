@@ -541,7 +541,7 @@ static CONSTFUNC int16_t R_PointToDist(fixed_t x, fixed_t y)
         dy = t;
     }
 
-    return dx / finesine((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT);
+    return dx / finesineapprox((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT);
 }
 
 
@@ -1168,10 +1168,10 @@ static fixed_t R_ScaleFromGlobalAngle(int16_t x)
   int16_t angleb = anglea;
   angleb += (viewangle - rw_normalangle) >> FRACBITS;
 
-  fixed_t den = FixedMulAngle(rw_distance, finesine(anglea >> (ANGLETOFINESHIFT - FRACBITS)));
+  fixed_t den = FixedMulAngle(rw_distance, finesineapprox(anglea >> (ANGLETOFINESHIFT - FRACBITS)));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = VIEWWINDOWHEIGHT * finesine(angleb >> (ANGLETOFINESHIFT - FRACBITS));
+  fixed_t num = VIEWWINDOWHEIGHT * finesineapprox(angleb >> (ANGLETOFINESHIFT - FRACBITS));
 
   return den > num>>16 ? (num = FixedApproxDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
@@ -1843,7 +1843,7 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     hyp = (viewx==curline->v1.x && viewy==curline->v1.y)?
                 0 : R_PointToDist (curline->v1.x, curline->v1.y);
 
-    rw_distance = hyp * finecosine(offsetangle>>ANGLETOFINESHIFT);
+    rw_distance = hyp * finecosineapprox(offsetangle>>ANGLETOFINESHIFT);
 
     int16_t rw_x = ds_p->x1 = start;
     ds_p->x2 = stop;
@@ -2000,7 +2000,7 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
 
     if (segtextured)
     {
-        rw_offset = hyp * -finesine(offsetangle >>ANGLETOFINESHIFT);
+        rw_offset = hyp * -finesineapprox(offsetangle >>ANGLETOFINESHIFT);
 
         rw_offset += (((int32_t)sidedef->textureoffset) << FRACBITS) + curline->offset;
 
@@ -2597,8 +2597,8 @@ static void R_SetupFrame (player_t *player)
 
     extralight = player->extralight;
 
-    viewsin = finesine(  viewangle>>ANGLETOFINESHIFT);
-    viewcos = finecosine(viewangle>>ANGLETOFINESHIFT);
+    viewsin = finesineapprox(  viewangle>>ANGLETOFINESHIFT);
+    viewcos = finecosineapprox(viewangle>>ANGLETOFINESHIFT);
 
     if (player->fixedcolormap)
     {

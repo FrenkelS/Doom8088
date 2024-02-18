@@ -64,6 +64,9 @@ typedef uint32_t angle_t;
 fixed_t finesine(int16_t x);
 fixed_t finecosine(int16_t x);
 
+fixed_t finesineapprox(int16_t x);
+fixed_t finecosineapprox(int16_t x);
+
 extern const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1];
 
 #endif
