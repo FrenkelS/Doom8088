@@ -8,12 +8,12 @@ export RENDER_OPTIONS="-DFLAT_SPAN"
 nasm i_vvg13a.asm -f elf
 nasm m_fixed.asm -f elf
 
-ia16-elf-gcc -c i_vvga13.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
-ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
+ia16-elf-gcc -c i_vvga13.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-and-partition
+ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-and-partition
+ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-and-partition
+ia16-elf-gcc -c tables.c   $RENDER_OPTIONS -march=i286 -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-and-partition
 
-export CFLAGS="-march=i286 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops"
+export CFLAGS="-march=i286 -mcmodel=medium -li86 -Os -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-and-partition -foptimize-strlen -freorder-blocks-algorithm=stc -ftree-loop-vectorize -ftree-slp-vectorize"
 #export CFLAGS="$CFLAGS -Ofast -flto -fwhole-program -fomit-frame-pointer -funroll-loops -fgcse-sm -fgcse-las -fipa-pta -Wno-attributes -Wpedantic"
 #export CFLAGS="$CFLAGS -Wall -Wextra"
 
