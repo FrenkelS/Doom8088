@@ -100,7 +100,13 @@ WC16\DOOM16WC.EXE : $(GLOBOBJS)
 i_vmodey.obj : i_vmodey.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
+p_map.obj : p_map.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
 p_maputl.obj : p_maputl.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
+p_sight.obj : p_sight.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
 r_draw.obj : r_draw.c
