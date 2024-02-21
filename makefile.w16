@@ -109,5 +109,8 @@ r_draw.obj : r_draw.c
 tables.obj : tables.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
+w_wad.obj : w_wad.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
 z_zone.obj : z_zone.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
