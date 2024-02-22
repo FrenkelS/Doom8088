@@ -112,6 +112,9 @@ p_sight.obj : p_sight.c
 r_draw.obj : r_draw.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
+r_plane.obj : r_plane.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
 tables.obj : tables.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
