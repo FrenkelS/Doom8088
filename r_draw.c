@@ -995,16 +995,15 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     hl = (uint32_t) tx * PSPRITESCALE;
     x2 = CENTERX + (hl >> FRACBITS) - 1;
 
-    topoffset = ((int32_t)patch->topoffset) << FRACBITS;
-
-
-
     // off the side
     if (x2 < 0 || x1 > VIEWWINDOWWIDTH)
     {
         Z_ChangeTagToCache(patch);
         return;
     }
+
+    topoffset = ((int32_t)patch->topoffset) << FRACBITS;
+    Z_ChangeTagToCache(patch);
 
     // store information in a vissprite
     vis = &avis;
@@ -1023,9 +1022,7 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     if (vis->x1 > x1)
         vis->startfrac = vis->xiscale*(vis->x1-x1);
 
-    vis->lump_num        = sprframe->lump[0];
-    vis->patch_topoffset = patch->topoffset;
-    Z_ChangeTagToCache(patch);
+    vis->lump_num = sprframe->lump[0];
 
     if (_g_player.powers[pw_invisibility] > 4*32 || _g_player.powers[pw_invisibility] & 8)
         vis->colormap = NULL;                    // shadow draw
