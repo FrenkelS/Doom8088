@@ -531,6 +531,9 @@ CONSTFUNC angle_t R_PointToAngle3(fixed_t x, fixed_t y)
 
 static CONSTFUNC int16_t R_PointToDist(fixed_t x, fixed_t y)
 {
+    if (viewx == x && viewy == y)
+        return 0;
+
     fixed_t dx = D_abs(x - viewx);
     fixed_t dy = D_abs(y - viewy);
 
@@ -541,7 +544,7 @@ static CONSTFUNC int16_t R_PointToDist(fixed_t x, fixed_t y)
         dy = t;
     }
 
-    return dx / finesineapprox((tantoangle(FixedApproxDiv(dy,dx) >> DBITS) + ANG90) >> ANGLETOFINESHIFT);
+    return dx / finecosineapprox((FixedApproxDiv(dy,dx) >> DBITS) / 2);
 }
 
 
@@ -1837,8 +1840,7 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     if (D_abs(offsetangle) > ANG90)
         offsetangle = ANG90;
 
-    hyp = (viewx==curline->v1.x && viewy==curline->v1.y)?
-                0 : R_PointToDist (curline->v1.x, curline->v1.y);
+    hyp = R_PointToDist(curline->v1.x, curline->v1.y);
 
     rw_distance = hyp * finecosineapprox(offsetangle>>ANGLETOFINESHIFT);
 
