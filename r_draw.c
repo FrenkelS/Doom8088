@@ -177,7 +177,7 @@ static visplane_t __far* ceilingplane;
 static angle16_t             rw_angle1;
 
 static angle16_t         rw_normalangle; // angle to line origin
-static fixed_t         rw_distance;
+static int16_t         rw_distance;
 
 static int16_t      rw_stopx;
 
@@ -1340,7 +1340,7 @@ static fixed_t R_ScaleFromGlobalAngle(int16_t x)
   int16_t anglea = ANG90_16 + xtoviewangleTable[x];
   int16_t angleb = anglea + viewangle16 - rw_normalangle;
 
-  fixed_t den = FixedMulAngle(rw_distance, finesineapprox(anglea >> ANGLETOFINESHIFT_16));
+  fixed_t den = rw_distance * finesineapprox(anglea >> ANGLETOFINESHIFT_16);
 
 // proff 11/06/98: Changed for high-res
   fixed_t num = VIEWWINDOWHEIGHT * finesineapprox(angleb >> ANGLETOFINESHIFT_16);
@@ -1800,29 +1800,18 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 #if !defined FLAT_WALL
 			texturecolumn = rw_offset;
 			int16_t ang = (rw_centerangle + xtoviewangleTable[rw_x]) >> ANGLETOFINESHIFT_16;
-			int16_t ahw = rw_distance >> FRACBITS;
 			if (ang < 1024) {			//    0 <= ang < 1024
 				fixed_t tan = finetangentTable_part_4[1023 - ang];
-				uint16_t blw = tan;
-				int16_t bhw = tan >> FRACBITS;
-				uint32_t hl = (uint32_t) ahw * blw;
-				texturecolumn += ((rw_distance * bhw) >> FRACBITS);
-				texturecolumn += (hl >> FRACBITS);
+				texturecolumn += (rw_distance * tan) >> FRACBITS;
 			} else if (ang < 2048) {	// 1024 <= ang < 2048
-				uint16_t tan = finetangentTable_part_3[1023 - (ang - 1024)];
-				uint32_t hl = (uint32_t) ahw * tan;
-				texturecolumn += (hl >> FRACBITS);
+				fixed_t tan = finetangentTable_part_3[1023 - (ang - 1024)];
+				texturecolumn += (rw_distance * tan) >> FRACBITS;
 			} else if (ang < 3072) {	// 2048 <= ang < 3072
-				uint16_t tan = finetangentTable_part_3[ang - 2048];
-				uint32_t hl = (uint32_t) ahw * tan;
-				texturecolumn -= (hl >> FRACBITS);
+				fixed_t tan = finetangentTable_part_3[ang - 2048];
+				texturecolumn -= (rw_distance * tan) >> FRACBITS;
 			} else {					// 3072 <= ang < 4096
 				fixed_t tan = finetangentTable_part_4[ang - 3072];
-				uint16_t blw = tan;
-				int16_t bhw = tan >> FRACBITS;
-				uint32_t hl = (uint32_t) ahw * blw;
-				texturecolumn -= ((rw_distance * bhw) >> FRACBITS);
-				texturecolumn -= (hl >> FRACBITS);
+				texturecolumn -= (rw_distance * tan) >> FRACBITS;
 			}
 #endif
 
@@ -2009,7 +1998,7 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
 
     int16_t hyp = R_PointToDist(curline->v1.x, curline->v1.y);
 
-    rw_distance = hyp * finecosineapprox(offsetangle >> ANGLETOFINESHIFT_16);
+    rw_distance = (hyp * finecosineapprox(offsetangle >> ANGLETOFINESHIFT_16)) >> FRACBITS;
 
     int16_t rw_x = ds_p->x1 = start;
     ds_p->x2 = stop;
