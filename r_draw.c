@@ -440,7 +440,7 @@ static CONSTFUNC int16_t SlopeDiv16(uint16_t n, uint16_t d)
 	if (d == 0)
 		return SLOPERANGE;
 
-	const uint16_t ans = (((uint32_t)n << FRACBITS) << 3) / (((uint32_t)d << FRACBITS) >> 8);
+	const uint16_t ans = ((uint32_t)n << (8 + 3)) / d;
 
 	return (ans <= SLOPERANGE) ? ans : SLOPERANGE;
 }
