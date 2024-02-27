@@ -437,7 +437,7 @@ fixed_t finecosineapprox(int16_t x)
 }
 
 
-const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
+const angle16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
 {
 	0x2008, 0x1F50, 0x1EA0, 0x1DE0,
 	0x1D20, 0x1C50, 0x1B80, 0x1AA8,

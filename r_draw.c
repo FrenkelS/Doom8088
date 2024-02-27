@@ -91,14 +91,14 @@ static int16_t* lastopening;
 
 static const int8_t viewangletoxTable[2027];
 
-static int8_t viewangletox(int16_t viewangle)
+static int8_t viewangletox(int16_t va)
 {
-	if (viewangle < 1046)		//    0 <= viewangle < 1046
+	if (va < 1046)			//    0 <= va < 1046
 		return VIEWWINDOWWIDTH;
-	else if (3073 <= viewangle)	// 3073 <= viewangle < 4096
+	else if (3073 <= va)	// 3073 <= va < 4096
 		return 0;
-	else						// 1046 <= viewangle < 3073
-		return viewangletoxTable[viewangle - 1046];
+	else					// 1046 <= va < 3073
+		return viewangletoxTable[va - 1046];
 }
 
 
@@ -155,6 +155,7 @@ const mapnode_t __far* nodes;
 fixed_t  viewx, viewy, viewz;
 
 angle_t  viewangle;
+static angle16_t viewangle16;
 
 static byte solidcol[VIEWWINDOWWIDTH];
 
@@ -173,9 +174,9 @@ static visplane_t __far* floorplane;
 static visplane_t __far* ceilingplane;
 #endif
 
-static int32_t             rw_angle1;
+static angle16_t             rw_angle1;
 
-static angle_t         rw_normalangle; // angle to line origin
+static angle16_t         rw_normalangle; // angle to line origin
 static fixed_t         rw_distance;
 
 static int16_t      rw_stopx;
@@ -208,8 +209,8 @@ static int16_t   *mceilingclip; // dropoff overflow
 static fixed_t spryscale;
 static fixed_t sprtopscreen;
 
-static angle_t  rw_centerangle;
-static fixed_t  rw_offset;
+static angle16_t  rw_centerangle;
+static int16_t  rw_offset;
 static int16_t      rw_lightlevel;
 
 static int16_t      *maskedtexturecol; // dropoff overflow
@@ -252,7 +253,7 @@ static const fixed_t IPSPRITESCALE  = FRACUNIT * SCREENWIDTH_VGA / VIEWWINDOWWID
 static const uint16_t PSPRITEYSCALE = FRACUNIT * SCREENHEIGHT     / SCREENHEIGHT_VGA;
 static const fixed_t IPSPRITEYSCALE = FRACUNIT * SCREENHEIGHT_VGA / SCREENHEIGHT; // = FixedReciprocal(PSPRITEYSCALE)
 
-static const angle_t clipangle = 0x20080000; //xtoviewangle(0);
+static const angle16_t clipangle = 0x2008; // = xtoviewangleTable[0]
 
 
 #if defined __WATCOMC__
@@ -434,6 +435,17 @@ static CONSTFUNC int16_t SlopeDiv(uint32_t num, uint32_t den)
 }
 
 
+static CONSTFUNC int16_t SlopeDiv16(uint16_t n, uint16_t d)
+{
+	if (d == 0)
+		return SLOPERANGE;
+
+	const uint16_t ans = (((uint32_t)n << FRACBITS) << 3) / (((uint32_t)d << FRACBITS) >> 8);
+
+	return (ans <= SLOPERANGE) ? ans : SLOPERANGE;
+}
+
+
 //
 // R_PointToAngle
 // To get a global angle from cartesian coordinates,
@@ -523,7 +535,169 @@ CONSTFUNC angle_t R_PointToAngle3(fixed_t x, fixed_t y)
     }
 }
 
-#define R_PointToAngle(x,y) R_PointToAngle3((x)-viewx,(y)-viewy)
+
+static angle16_t R_PointToAngle(fixed_t x, fixed_t y)
+{
+    x = x - viewx;
+    y = y - viewy;
+
+    if (!x && !y)
+        return 0;
+
+    if (x >= 0)
+    {
+        // x >= 0
+        if (y >= 0)
+        {
+            // y >= 0
+
+            if (x > y)
+            {
+                // octant 0
+                return tantoangle(SlopeDiv(y, x)) >> FRACBITS;
+            }
+            else
+            {
+                // octant 1
+                return ANG90_16 - 1 - (tantoangle(SlopeDiv(x, y)) >> FRACBITS);
+            }
+        }
+        else
+        {
+            // y < 0
+            y = -y;
+
+            if (x > y)
+            {
+                // octant 8
+                return -(tantoangle(SlopeDiv(y, x)) >> FRACBITS);
+            }
+            else
+            {
+                // octant 7
+                return ANG270_16 + (tantoangle(SlopeDiv(x, y)) >> FRACBITS);
+            }
+        }
+    }
+    else
+    {
+        // x < 0
+        x = -x;
+
+        if (y >= 0)
+        {
+            // y >= 0
+            if (x > y)
+            {
+                // octant 3
+                return ANG180_16 - 1 - (tantoangle(SlopeDiv(y, x)) >> FRACBITS);
+            }
+            else
+            {
+                // octant 2
+                return ANG90_16 + (tantoangle(SlopeDiv(x, y)) >> FRACBITS);
+            }
+        }
+        else
+        {
+            // y < 0
+            y = -y;
+
+            if (x > y)
+            {
+                // octant 4
+                return ANG180_16 + (tantoangle(SlopeDiv(y, x)) >> FRACBITS);
+            }
+            else
+            {
+                // octant 5
+                return ANG270_16 - 1 - (tantoangle(SlopeDiv(x,y)) >> FRACBITS);
+            }
+        }
+    }
+}
+
+
+static angle16_t R_PointToAngle16(int16_t x, int16_t y)
+{
+    x = x - (viewx >> FRACBITS);
+    y = y - (viewy >> FRACBITS);
+
+    if (!x && !y)
+        return 0;
+
+    if (x >= 0)
+    {
+        // x >= 0
+        if (y >= 0)
+        {
+            // y >= 0
+
+            if (x > y)
+            {
+                // octant 0
+                return tantoangle(SlopeDiv16(y, x)) >> FRACBITS;
+            }
+            else
+            {
+                // octant 1
+                return ANG90_16 - 1 - (tantoangle(SlopeDiv16(x, y)) >> FRACBITS);
+            }
+        }
+        else
+        {
+            // y < 0
+            y = -y;
+
+            if (x > y)
+            {
+                // octant 8
+                return -(tantoangle(SlopeDiv16(y, x)) >> FRACBITS);
+            }
+            else
+            {
+                // octant 7
+                return ANG270_16 + (tantoangle(SlopeDiv16(x, y)) >> FRACBITS);
+            }
+        }
+    }
+    else
+    {
+        // x < 0
+        x = -x;
+
+        if (y >= 0)
+        {
+            // y >= 0
+            if (x > y)
+            {
+                // octant 3
+                return ANG180_16 - 1 - (tantoangle(SlopeDiv16(y, x)) >> FRACBITS);
+            }
+            else
+            {
+                // octant 2
+                return ANG90_16 + (tantoangle(SlopeDiv16(x, y)) >> FRACBITS);
+            }
+        }
+        else
+        {
+            // y < 0
+            y = -y;
+
+            if (x > y)
+            {
+                // octant 4
+                return ANG180_16 + (tantoangle(SlopeDiv16(y, x)) >> FRACBITS);
+            }
+            else
+            {
+                // octant 5
+                return ANG270_16 - 1 - (tantoangle(SlopeDiv16(x,y)) >> FRACBITS);
+            }
+        }
+    }
+}
 
 
 #define SLOPEBITS    11
@@ -1163,15 +1337,13 @@ static void R_ClearSprites(void)
 
 static fixed_t R_ScaleFromGlobalAngle(int16_t x)
 {
-  int16_t anglea = ANG90 >> FRACBITS;
-  anglea += xtoviewangleTable[x];
-  int16_t angleb = anglea;
-  angleb += (viewangle - rw_normalangle) >> FRACBITS;
+  int16_t anglea = ANG90_16 + xtoviewangleTable[x];
+  int16_t angleb = anglea + viewangle16 - rw_normalangle;
 
-  fixed_t den = FixedMulAngle(rw_distance, finesineapprox(anglea >> (ANGLETOFINESHIFT - FRACBITS)));
+  fixed_t den = FixedMulAngle(rw_distance, finesineapprox(anglea >> ANGLETOFINESHIFT_16));
 
 // proff 11/06/98: Changed for high-res
-  fixed_t num = VIEWWINDOWHEIGHT * finesineapprox(angleb >> (ANGLETOFINESHIFT - FRACBITS));
+  fixed_t num = VIEWWINDOWHEIGHT * finesineapprox(angleb >> ANGLETOFINESHIFT_16);
 
   return den > num>>16 ? (num = FixedApproxDiv(num, den)) > 64*FRACUNIT ?
     64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
@@ -1226,8 +1398,8 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     if (sprframe->rotate)
     {
         // choose a different rotation based on player view
-        angle_t ang = R_PointToAngle(fx, fy);
-        rot = (ang - thing->angle + (angle_t)(ANG45/2)*9)>>29;
+        angle16_t ang = R_PointToAngle(fx, fy);
+        rot = (ang - (angle16_t)(thing->angle >> FRACBITS) + (angle16_t)(ANG45_16 / 2) * 9) >> 13;
     }
 
     const boolean flip = (boolean)SPR_FLIPPED(sprframe, rot);
@@ -1626,10 +1798,8 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
         {
             // calculate texture offset
 #if !defined FLAT_WALL
-			texturecolumn = (rw_offset >> FRACBITS);
-			int16_t ang = rw_centerangle >> FRACBITS;
-			ang += xtoviewangleTable[rw_x];
-			ang >>= ANGLETOFINESHIFT - FRACBITS;
+			texturecolumn = rw_offset;
+			int16_t ang = (rw_centerangle + xtoviewangleTable[rw_x]) >> ANGLETOFINESHIFT_16;
 			int16_t ahw = rw_distance >> FRACBITS;
 			if (ang < 1024) {			//    0 <= ang < 1024
 				fixed_t tan = finetangentTable_part_4[1023 - ang];
@@ -1811,9 +1981,6 @@ inline static int16_t CONSTFUNC Mod(int16_t a, int16_t b)
 //
 static void R_StoreWallRange(const int16_t start, const int16_t stop)
 {
-    int16_t hyp;
-    angle_t offsetangle;
-
     // don't overflow and crash
     if (ds_p == &_s_drawsegs[MAXDRAWSEGS])
     {
@@ -1833,16 +2000,16 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     linedef = &_g_lines[curline->linenum];
 
     // calculate rw_distance for scale calculation
-    rw_normalangle = curline->angle + ANG90;
+    rw_normalangle = (curline->angle >> FRACBITS) + ANG90_16;
 
-    offsetangle = rw_normalangle-rw_angle1;
+    angle16_t offsetangle = rw_normalangle - rw_angle1;
 
-    if (D_abs(offsetangle) > ANG90)
-        offsetangle = ANG90;
+    if (abs(offsetangle) > ANG90_16)
+        offsetangle = ANG90_16;
 
-    hyp = R_PointToDist(curline->v1.x, curline->v1.y);
+    int16_t hyp = R_PointToDist(curline->v1.x, curline->v1.y);
 
-    rw_distance = hyp * finecosineapprox(offsetangle>>ANGLETOFINESHIFT);
+    rw_distance = hyp * finecosineapprox(offsetangle >> ANGLETOFINESHIFT_16);
 
     int16_t rw_x = ds_p->x1 = start;
     ds_p->x2 = stop;
@@ -1999,11 +2166,11 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
 
     if (segtextured)
     {
-        rw_offset = hyp * -finesineapprox(offsetangle >>ANGLETOFINESHIFT);
+        fixed_t rw_offset32 = hyp * -finesineapprox(offsetangle >> ANGLETOFINESHIFT_16);
+        rw_offset32 += (((fixed_t)sidedef->textureoffset) << FRACBITS) + curline->offset;
+		rw_offset = rw_offset32 >> FRACBITS;
 
-        rw_offset += (((int32_t)sidedef->textureoffset) << FRACBITS) + curline->offset;
-
-        rw_centerangle = ANG90 + viewangle - rw_normalangle;
+        rw_centerangle = ANG90_16 + viewangle16 - rw_normalangle;
 
         rw_lightlevel = frontsector->lightlevel;
     }
@@ -2235,34 +2402,27 @@ static void R_ClipWallSegment(int16_t first, int16_t last, const boolean solid)
 
 static void R_AddLine(const seg_t __far* line)
 {
-    int8_t      x1;
-    int8_t      x2;
-    angle_t  angle1;
-    angle_t  angle2;
-    angle_t  span;
-    angle_t  tspan;
-
     curline = line;
 
-    angle1 = R_PointToAngle (line->v1.x, line->v1.y);
-    angle2 = R_PointToAngle (line->v2.x, line->v2.y);
+    angle16_t angle1 = R_PointToAngle(line->v1.x, line->v1.y);
+    angle16_t angle2 = R_PointToAngle(line->v2.x, line->v2.y);
 
     // Clip to view edges.
-    span = angle1 - angle2;
+    angle16_t span = angle1 - angle2;
 
     // Back side, i.e. backface culling
-    if (span >= ANG180)
+    if (span >= ANG180_16)
         return;
 
     // Global angle needed by segcalc.
     rw_angle1 = angle1;
-    angle1 -= viewangle;
-    angle2 -= viewangle;
+    angle1 -= viewangle16;
+    angle2 -= viewangle16;
 
-    tspan = angle1 + clipangle;
-    if (tspan > 2*clipangle)
+    angle16_t tspan = angle1 + clipangle;
+    if (tspan > 2 * clipangle)
     {
-        tspan -= 2*clipangle;
+        tspan -= 2 * clipangle;
 
         // Totally off the left edge?
         if (tspan >= span)
@@ -2272,22 +2432,22 @@ static void R_AddLine(const seg_t __far* line)
     }
 
     tspan = clipangle - angle2;
-    if (tspan > 2*clipangle)
+    if (tspan > 2 * clipangle)
     {
-        tspan -= 2*clipangle;
+        tspan -= 2 * clipangle;
 
         // Totally off the left edge?
         if (tspan >= span)
             return;
-        angle2 = 0-clipangle;
+        angle2 = -clipangle;
     }
 
     // The seg is in the view range,
     // but not necessarily visible.
 
     // killough 1/31/98: Here is where "slime trails" can SOMETIMES occur:
-    x1 = viewangletox((angle1 + ANG90) >> ANGLETOFINESHIFT);
-    x2 = viewangletox((angle2 + ANG90) >> ANGLETOFINESHIFT);
+    int8_t x1 = viewangletox((angle1 + ANG90_16) >> ANGLETOFINESHIFT_16);
+    int8_t x2 = viewangletox((angle2 + ANG90_16) >> ANGLETOFINESHIFT_16);
 
     // Does not cross a pixel?
     if (x1 >= x2)       // killough 1/31/98 -- change == to >= for robustness
@@ -2302,12 +2462,10 @@ static void R_AddLine(const seg_t __far* line)
     if (linedata->r_validcount != (uint16_t)_g_gametic)
         R_RecalcLineFlags();
 
-    if (linedata->r_flags & RF_IGNORE)
+    if (!(linedata->r_flags & RF_IGNORE))
     {
-        return;
-    }
-    else
         R_ClipWallSegment (x1, x2, linedata->r_flags & RF_CLOSED);
+    }
 }
 
 //
@@ -2404,58 +2562,52 @@ static const byte checkcoord[12][4] =
 
 static boolean R_CheckBBox(const int16_t __far* bspcoord)
 {
-    angle_t angle1, angle2;
+    // Find the corners of the box
+    // that define the edges from current viewpoint.
+    int16_t boxpos = (viewx <= ((fixed_t)bspcoord[BOXLEFT]<<FRACBITS) ? 0 : viewx < ((fixed_t)bspcoord[BOXRIGHT]<<FRACBITS) ? 1 : 2) +
+            (viewy >= ((fixed_t)bspcoord[BOXTOP]<<FRACBITS) ? 0 : viewy > ((fixed_t)bspcoord[BOXBOTTOM]<<FRACBITS) ? 4 : 8);
 
-    {
-        int16_t        boxpos;
-        const byte* check;
+    if (boxpos == 5)
+        return true;
 
-        // Find the corners of the box
-        // that define the edges from current viewpoint.
-        boxpos = (viewx <= ((fixed_t)bspcoord[BOXLEFT]<<FRACBITS) ? 0 : viewx < ((fixed_t)bspcoord[BOXRIGHT]<<FRACBITS) ? 1 : 2) +
-                (viewy >= ((fixed_t)bspcoord[BOXTOP]<<FRACBITS) ? 0 : viewy > ((fixed_t)bspcoord[BOXBOTTOM]<<FRACBITS) ? 4 : 8);
+    const byte* check = checkcoord[boxpos];
+    angle16_t angle1 = R_PointToAngle16(bspcoord[check[0]], bspcoord[check[1]]) - viewangle16;
+    angle16_t angle2 = R_PointToAngle16(bspcoord[check[2]], bspcoord[check[3]]) - viewangle16;
 
-        if (boxpos == 5)
-            return true;
-
-        check = checkcoord[boxpos];
-        angle1 = R_PointToAngle (((fixed_t)bspcoord[check[0]]<<FRACBITS), ((fixed_t)bspcoord[check[1]]<<FRACBITS)) - viewangle;
-        angle2 = R_PointToAngle (((fixed_t)bspcoord[check[2]]<<FRACBITS), ((fixed_t)bspcoord[check[3]]<<FRACBITS)) - viewangle;
-    }
 
     // cph - replaced old code, which was unclear and badly commented
     // Much more efficient code now
-    if ((int32_t)angle1 < (int32_t)angle2)
+    if ((int16_t)angle1 < (int16_t)angle2)
     { /* it's "behind" us */
         /* Either angle1 or angle2 is behind us, so it doesn't matter if we
      * change it to the corect sign
      */
-        if (ANG180 <= angle1 && angle1 < ANG270)
-            angle1 = INT32_MAX; /* which is ANG180-1 */
+        if (ANG180_16 <= angle1 && angle1 < ANG270_16)
+            angle1 = INT16_MAX; /* which is ANG180_16 - 1 */
         else
-            angle2 = INT32_MIN;
+            angle2 = INT16_MIN;
     }
 
-    if ((int32_t)angle2 >=  (int32_t)clipangle) return false; // Both off left edge
-    if ((int32_t)angle1 <= -(int32_t)clipangle) return false; // Both off right edge
-    if ((int32_t)angle1 >=  (int32_t)clipangle) angle1 = clipangle; // Clip at left edge
-    if ((int32_t)angle2 <= -(int32_t)clipangle) angle2 = 0-clipangle; // Clip at right edge
+    if ((int16_t)angle2 >=  (int16_t)clipangle) return false; // Both off left edge
+    if ((int16_t)angle1 <= -(int16_t)clipangle) return false; // Both off right edge
+    if ((int16_t)angle1 >=  (int16_t)clipangle) angle1 =  clipangle; // Clip at left edge
+    if ((int16_t)angle2 <= -(int16_t)clipangle) angle2 = -clipangle; // Clip at right edge
 
     // Find the first clippost
     //  that touches the source post
     //  (adjacent pixels are touching).
-    {
-        int8_t sx1 = viewangletox((angle1 + ANG90) >> ANGLETOFINESHIFT);
-        int8_t sx2 = viewangletox((angle2 + ANG90) >> ANGLETOFINESHIFT);
-        //    const cliprange_t *start;
 
-        // Does not cross a pixel.
-        if (sx1 == sx2)
-            return false;
+    int8_t sx1 = viewangletox((angle1 + ANG90_16) >> ANGLETOFINESHIFT_16);
+    int8_t sx2 = viewangletox((angle2 + ANG90_16) >> ANGLETOFINESHIFT_16);
+    //    const cliprange_t *start;
 
-        if (!memchr(solidcol+sx1, 0, sx2-sx1)) return false;
-        // All columns it covers are already solidly covered
-    }
+    // Does not cross a pixel.
+    if (sx1 == sx2)
+        return false;
+
+    if (!memchr(solidcol+sx1, 0, sx2-sx1)) return false;
+    // All columns it covers are already solidly covered
+
 
     return true;
 }
@@ -2593,11 +2745,12 @@ static void R_SetupFrame (player_t *player)
     viewy = player->mo->y;
     viewz = player->viewz;
     viewangle = player->mo->angle;
+    viewangle16 = viewangle >> FRACBITS;
 
     extralight = player->extralight;
 
-    viewsin = finesineapprox(  viewangle>>ANGLETOFINESHIFT);
-    viewcos = finecosineapprox(viewangle>>ANGLETOFINESHIFT);
+    viewsin = finesineapprox(  viewangle16 >> ANGLETOFINESHIFT_16);
+    viewcos = finecosineapprox(viewangle16 >> ANGLETOFINESHIFT_16);
 
     if (player->fixedcolormap)
     {

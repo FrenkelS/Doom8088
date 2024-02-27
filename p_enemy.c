@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -497,7 +497,7 @@ static boolean P_IsVisible(mobj_t __far* actor, mobj_t __far* mo, boolean allaro
     {
         angle_t an = R_PointToAngle2(actor->x, actor->y, mo->x, mo->y) - actor->angle;
 
-        if (an > ANG90 && an < ANG270 && P_AproxDistance(mo->x-actor->x, mo->y-actor->y) > MELEERANGE)
+        if (ANG90 < an && an < ANG270 && P_AproxDistance(mo->x-actor->x, mo->y-actor->y) > MELEERANGE)
             return false;
     }
     return P_CheckSight(actor, mo);
