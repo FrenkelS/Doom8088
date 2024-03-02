@@ -1,6 +1,6 @@
 /*
 Copyright (C) 1994-1995 Apogee Software, Ltd.
-Copyright (C) 2023 Frenkel Smeijers
+Copyright (C) 2023-2024 Frenkel Smeijers
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -34,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "compiler.h"
 #include "doomtype.h"
 #include "doomdef.h"
 #include "a_pcfx.h"
@@ -177,11 +178,15 @@ typedef struct {
 int16_t PCFX_Play(const void __far* vdata)
 {
 	dmxpcs_t __far* dmxpcs = (dmxpcs_t __far* )vdata;
-	uint_fast16_t i;
+	static segment_t soundsegment = 0;
 
-	pcspkmuse.length = dmxpcs->length;
-	for (i = 0; i < dmxpcs->length; i++)
-		pcspkmuse.data[i] = divisors[dmxpcs->data[i]];
+	if (soundsegment != D_FP_SEG(vdata))
+	{
+		pcspkmuse.length = dmxpcs->length;
+		for (uint_fast16_t i = 0; i < dmxpcs->length; i++)
+			pcspkmuse.data[i] = divisors[dmxpcs->data[i]];
+		soundsegment = D_FP_SEG(vdata);
+	}
 
 	return ASS_PCFX_Play((PCSound *)&pcspkmuse);
 }
