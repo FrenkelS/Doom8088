@@ -178,15 +178,10 @@ typedef struct {
 int16_t PCFX_Play(const void __far* vdata)
 {
 	dmxpcs_t __far* dmxpcs = (dmxpcs_t __far* )vdata;
-	static segment_t soundsegment = 0;
 
-	if (soundsegment != D_FP_SEG(vdata))
-	{
-		pcspkmuse.length = dmxpcs->length;
-		for (uint_fast16_t i = 0; i < dmxpcs->length; i++)
-			pcspkmuse.data[i] = divisors[dmxpcs->data[i]];
-		soundsegment = D_FP_SEG(vdata);
-	}
+	pcspkmuse.length = dmxpcs->length;
+	for (uint_fast16_t i = 0; i < dmxpcs->length; i++)
+		pcspkmuse.data[i] = divisors[dmxpcs->data[i]];
 
 	return ASS_PCFX_Play((PCSound *)&pcspkmuse);
 }
