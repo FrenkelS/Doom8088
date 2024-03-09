@@ -93,6 +93,13 @@ static const int8_t viewangletoxTable[2027];
 
 static int8_t viewangletox(int16_t va)
 {
+#ifdef RANGECHECK
+	if (va < 0)
+		I_Error("viewangletox: va < 0: %i", va);
+	else if (va >= 4096)
+		I_Error("viewangletox: va >= 4096: %i", va);
+#endif
+
 	if (va < 1046)			//    0 <= va < 1046
 		return VIEWWINDOWWIDTH;
 	else if (3073 <= va)	// 3073 <= va < 4096
@@ -1320,7 +1327,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
     {
         // choose a different rotation based on player view
         angle16_t ang = R_PointToAngle(fx, fy);
-        rot = (ang - (angle16_t)(thing->angle >> FRACBITS) + (angle16_t)(ANG45_16 / 2) * 9) >> 13;
+        rot = (angle16_t)(ang - (angle16_t)(thing->angle >> FRACBITS) + (angle16_t)(ANG45_16 / 2) * 9) >> 13;
     }
 
     const boolean flip = (boolean)SPR_FLIPPED(sprframe, rot);
@@ -1720,7 +1727,7 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
             // calculate texture offset
 #if !defined FLAT_WALL
 			texturecolumn = rw_offset;
-			int16_t ang = (rw_centerangle + xtoviewangleTable[rw_x]) >> ANGLETOFINESHIFT_16;
+			int16_t ang = (angle16_t)(rw_centerangle + xtoviewangleTable[rw_x]) >> ANGLETOFINESHIFT_16;
 			if (ang < 1024) {			//    0 <= ang < 1024
 				fixed_t tan = finetangentTable_part_4[1023 - ang];
 				texturecolumn += (rw_distance * tan) >> FRACBITS;
@@ -1914,8 +1921,13 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
 
     angle16_t offsetangle = rw_normalangle - rw_angle1;
 
+#if defined _M_I86
     if (abs(offsetangle) > ANG90_16)
         offsetangle = ANG90_16;
+#else
+    if (D_abs((angle_t)offsetangle << FRACBITS) > ANG90)
+        offsetangle = ANG90_16;
+#endif
 
     int16_t hyp = R_PointToDist(curline->v1.x, curline->v1.y);
 
@@ -2078,7 +2090,7 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     {
         fixed_t rw_offset32 = hyp * -finesineapprox(offsetangle >> ANGLETOFINESHIFT_16);
         rw_offset32 += (((fixed_t)sidedef->textureoffset) << FRACBITS) + curline->offset;
-		rw_offset = rw_offset32 >> FRACBITS;
+        rw_offset = rw_offset32 >> FRACBITS;
 
         rw_centerangle = ANG90_16 + viewangle16 - rw_normalangle;
 
@@ -2356,8 +2368,8 @@ static void R_AddLine(const seg_t __far* line)
     // but not necessarily visible.
 
     // killough 1/31/98: Here is where "slime trails" can SOMETIMES occur:
-    int8_t x1 = viewangletox((angle1 + ANG90_16) >> ANGLETOFINESHIFT_16);
-    int8_t x2 = viewangletox((angle2 + ANG90_16) >> ANGLETOFINESHIFT_16);
+    int8_t x1 = viewangletox((angle16_t)(angle1 + ANG90_16) >> ANGLETOFINESHIFT_16);
+    int8_t x2 = viewangletox((angle16_t)(angle2 + ANG90_16) >> ANGLETOFINESHIFT_16);
 
     // Does not cross a pixel?
     if (x1 >= x2)       // killough 1/31/98 -- change == to >= for robustness
@@ -2507,8 +2519,8 @@ static boolean R_CheckBBox(const int16_t __far* bspcoord)
     //  that touches the source post
     //  (adjacent pixels are touching).
 
-    int8_t sx1 = viewangletox((angle1 + ANG90_16) >> ANGLETOFINESHIFT_16);
-    int8_t sx2 = viewangletox((angle2 + ANG90_16) >> ANGLETOFINESHIFT_16);
+    int8_t sx1 = viewangletox((angle16_t)(angle1 + ANG90_16) >> ANGLETOFINESHIFT_16);
+    int8_t sx2 = viewangletox((angle16_t)(angle2 + ANG90_16) >> ANGLETOFINESHIFT_16);
     //    const cliprange_t *start;
 
     // Does not cross a pixel.
