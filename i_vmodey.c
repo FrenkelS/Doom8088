@@ -424,7 +424,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	{
 		outp(SC_INDEX + 1, 1 << plane);
 
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
@@ -487,7 +487,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		else if (dc_x >= SCREENWIDTH)
 			break;
 
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> 8]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)

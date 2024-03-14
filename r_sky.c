@@ -76,7 +76,7 @@ void R_DrawSky(draw_column_vars_t *dcvars)
 		xc >>= ANGLETOSKYSHIFT - FRACBITS;
 		xc &= skywidthmask;
 
-		const column_t __far* column = (const column_t __far*) ((const byte __far*)skypatch + skypatch->columnofs[xc]);
+		const column_t __far* column = (const column_t __far*) ((const byte __far*)skypatch + (uint16_t)skypatch->columnofs[xc]);
 
 		dcvars->source = (const byte __far*)column + 3;
 		R_DrawColumn(dcvars);
@@ -133,7 +133,7 @@ void R_DrawSky(visplane_t __far* pl)
 			xc >>= ANGLETOSKYSHIFT - FRACBITS;
 			xc &= skywidthmask;
 
-			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[xc]);
+			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[xc]);
 
 			dcvars.source = (const byte __far*)column + 3;
 			R_DrawColumn(&dcvars);

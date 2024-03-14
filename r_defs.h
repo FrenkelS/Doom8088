@@ -279,7 +279,7 @@ typedef struct
     int16_t		height;
     int16_t		leftoffset;	// pixels to the left of origin
     int16_t		topoffset;	// pixels below the origin
-    int32_t		columnofs[8];	// only [width] used
+    int32_t		columnofs[8];	// only [width] used, upper word is always zero
     // the [0] is &columnofs[width]
 } patch_t;
 

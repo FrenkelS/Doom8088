@@ -812,7 +812,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
     while (dcvars.x < VIEWWINDOWWIDTH)
     {
-        const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[frac >> FRACBITS]);
+        const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[frac >> FRACBITS]);
         R_DrawMaskedColumn(colfunc, &dcvars, column);
 
         frac += vis->xiscale;
@@ -934,7 +934,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
             int16_t x_c;
             R_GetColumn(texture, xc, &patch_num, &x_c);
             const patch_t __far* patch = W_GetLumpByNum(patch_num);
-            const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
+            const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[x_c]);
 
             R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
             Z_ChangeTagToCache(patch);
@@ -1581,7 +1581,7 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
 
             if (xc < x2)
             {
-                const column_t __far* patchcol = (const column_t __far*)((const byte __far*)realpatch + realpatch->columnofs[xc - x1]);
+                const column_t __far* patchcol = (const column_t __far*)((const byte __far*)realpatch + (uint16_t)realpatch->columnofs[xc - x1]);
 
                 R_DrawColumnInCache (patchcol, tmpCache, patch->originy, tex->height);
             }
@@ -1612,7 +1612,7 @@ static void R_DrawSegTextureColumn(int16_t texture, int16_t texcolumn, draw_colu
             R_DrawColumnFlat(texture, dcvars);
         else
         {
-            const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + patch->columnofs[x_c]);
+            const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[x_c]);
 
             dcvars->source = (const byte __far*)column + 3;
             R_DrawColumn (dcvars);
