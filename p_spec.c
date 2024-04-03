@@ -421,50 +421,43 @@ void P_SpawnSpecials (void)
 // This is the main scrolling code
 
 typedef struct {
-  thinker_t thinker;   // Thinker structure for scrolling
-  int16_t affectee;        // Number of affected sidedef, sector, tag, or whatever
+	thinker_t thinker;				// Thinker structure for scrolling
+	int16_t __far* textureoffset;	// Affected textureoffset
 } scroll_t;
+
 
 static void T_Scroll(scroll_t __far* s)
 {
-    side_t __far* side  =_g_sides + s->affectee;
-    side->textureoffset++;
+	(*s->textureoffset)++;
 }
+
 
 //
 // Add_Scroller()
 //
 // Add a generalized scroller to the thinker list.
 //
-// type: the enumerated type of scrolling: floor, ceiling, floor carrier,
-//   wall, floor carrier & scroller
-//
-// (dx,dy): the direction and speed of the scrolling or its acceleration
-//
-// control: the sector whose heights control this scroller's effect
-//   remotely, or -1 if no control sector
-//
-// affectee: the index of the affected object (sector or sidedef)
-//
-// accel: non-zero if this is an accelerative effect
+// affectee: the index of the affected sidedef
 //
 
 static void Add_Scroller(int16_t affectee)
 {
-  scroll_t __far* s = Z_CallocLevSpec(sizeof *s);
-  s->thinker.function = T_Scroll;
-  s->affectee = affectee;
-  P_AddThinker(&s->thinker);
+	scroll_t __far* s = Z_CallocLevSpec(sizeof *s);
+	s->thinker.function = T_Scroll;
+	s->textureoffset = &_g_sides[affectee].textureoffset;
+	P_AddThinker(&s->thinker);
 }
+
 
 // Initialize the scrollers
 static void P_SpawnScrollers(void)
 {
-    int16_t i;
-    const line_t __far* l = _g_lines;
+	const line_t __far* line = _g_lines;
 
-    for (i=0;i<_g_numlines;i++,l++)
-        if (LN_SPECIAL(l) == 48)
-            Add_Scroller(_g_lines[i].sidenum[0]);
+	for (int16_t i = 0; i < _g_numlines; i++)
+	{
+		if (LN_SPECIAL(line) == 48)
+			Add_Scroller(line->sidenum[0]);
+		line++;
+	}
 }
-
