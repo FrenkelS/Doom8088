@@ -182,25 +182,6 @@ static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 // and addlines traversers.
 //
 
-/* cph - this is killough's 4/19/98 version of P_InterceptVector and
- *  P_InterceptVector2 (which were interchangeable). We still use this
- *  in compatibility mode. */
-fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
-{
-	fixed_t a = (v1->dy >> FRACBITS) * ((v1->x - v2->x) >> 8);
-	fixed_t b = (v1->dx >> FRACBITS) * ((v2->y - v1->y) >> 8);
-	fixed_t c = FixedMul(v2->dx, v1->dy >> 8);
-	fixed_t d = FixedMul(v2->dy, v1->dx >> 8);
-
-	fixed_t num = a + b;
-	fixed_t den = c - d;
-
-	if (num == 0 || den == 0)
-		return 0;
-	else
-		return FixedDiv(num, den);
-}
-
 static fixed_t PUREFUNC P_InterceptVector3(const divline_t *v2, const divline_t *v1)
 {
 	fixed_t a = (v1->dy >> FRACBITS) * ((v1->x - v2->x) >> 8);
