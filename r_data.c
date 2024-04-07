@@ -77,7 +77,7 @@ typedef PACKEDATTR_PRE struct
 
 typedef PACKEDATTR_PRE struct
 {
-  char       name[8];      // unused
+  char       name[8];
   char       pad2[4];      // unused
   int16_t      width;
   int16_t      height;
