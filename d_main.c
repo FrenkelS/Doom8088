@@ -185,6 +185,7 @@ static void D_Display (void)
         if (automapmode & am_active)
             AM_Drawer();
 
+        ST_doPaletteStuff();  // Do red-/gold-shifts from damage/items
         ST_Drawer();
 
         HU_Drawer();

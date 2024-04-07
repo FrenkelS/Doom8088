@@ -128,12 +128,48 @@ void I_SetPalette(int8_t pal)
 
 #define NO_PALETTE_CHANGE 100
 
+static uint16_t st_needrefresh = 0;
+
 void I_FinishUpdate(void)
 {
+	// palette
 	if (newpal != NO_PALETTE_CHANGE)
 	{
 		I_UploadNewPalette(newpal);
 		newpal = NO_PALETTE_CHANGE;
+	}
+
+	// status bar
+	if (st_needrefresh)
+	{
+		st_needrefresh--;
+
+		if (!st_needrefresh)
+		{
+			// set write mode 1
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+#if defined _M_I86
+			uint8_t __far* src = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff);
+#else
+			uint8_t __far* src = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
+#endif
+			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			for (int16_t y = 0; y < ST_HEIGHT; y++)
+			{
+				for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+				{
+					volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+					dest[y * PLANEWIDTH + x] = 0;
+				}
+			}
+
+			// set write mode 0
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+		}
 	}
 
 	// page flip
@@ -392,8 +428,8 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 		outp(GC_INDEX, GC_MODE);
 		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
 
-		uint8_t __far *src  = D_MK_FP(0xa800, 0 + __djgpp_conventional_base);
-		uint8_t __far *dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
+		uint8_t __far* src  = D_MK_FP(0xa800, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
 		for (int16_t y = 0; y < cachedLumpHeight; y++)
 		{
 			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
@@ -406,6 +442,16 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 		// set write mode 0
 		outp(GC_INDEX, GC_MODE);
 		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+	}
+}
+
+
+void ST_Drawer(void)
+{
+	if (ST_NeedUpdate())
+	{
+		ST_doRefresh();
+		st_needrefresh = 2; //2 screen pages
 	}
 }
 

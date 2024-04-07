@@ -499,6 +499,13 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 }
 
 
+void ST_Drawer(void)
+{
+	if (ST_NeedUpdate())
+		ST_doRefresh();
+}
+
+
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
 	y -= patch->topoffset;
