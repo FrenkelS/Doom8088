@@ -110,8 +110,10 @@ static int8_t viewangletox(int16_t va)
 
 
 static const angle_t tantoangleTable[2049];
+static const angle16_t* tantoangle16Table = ((angle16_t*)&tantoangleTable[0]) + 1;
 
 #define tantoangle(t) tantoangleTable[t]
+#define tantoangle16(t) tantoangle16Table[(t)*2]
 
 
 static const uint16_t finetangentTable_part_3[1024];
@@ -564,12 +566,12 @@ static angle16_t R_PointToAngle16(int16_t x, int16_t y)
             if (x > y)
             {
                 // octant 0
-                return tantoangle(SlopeDiv16(y, x)) >> FRACBITS;
+                return tantoangle16(SlopeDiv16(y, x));
             }
             else
             {
                 // octant 1
-                return ANG90_16 - 1 - (tantoangle(SlopeDiv16(x, y)) >> FRACBITS);
+                return ANG90_16 - 1 - tantoangle16(SlopeDiv16(x, y));
             }
         }
         else
@@ -580,12 +582,12 @@ static angle16_t R_PointToAngle16(int16_t x, int16_t y)
             if (x > y)
             {
                 // octant 8
-                return -(tantoangle(SlopeDiv16(y, x)) >> FRACBITS);
+                return -tantoangle16(SlopeDiv16(y, x));
             }
             else
             {
                 // octant 7
-                return ANG270_16 + (tantoangle(SlopeDiv16(x, y)) >> FRACBITS);
+                return ANG270_16 + tantoangle16(SlopeDiv16(x, y));
             }
         }
     }
@@ -600,12 +602,12 @@ static angle16_t R_PointToAngle16(int16_t x, int16_t y)
             if (x > y)
             {
                 // octant 3
-                return ANG180_16 - 1 - (tantoangle(SlopeDiv16(y, x)) >> FRACBITS);
+                return ANG180_16 - 1 - tantoangle16(SlopeDiv16(y, x));
             }
             else
             {
                 // octant 2
-                return ANG90_16 + (tantoangle(SlopeDiv16(x, y)) >> FRACBITS);
+                return ANG90_16 + tantoangle16(SlopeDiv16(x, y));
             }
         }
         else
@@ -616,12 +618,12 @@ static angle16_t R_PointToAngle16(int16_t x, int16_t y)
             if (x > y)
             {
                 // octant 4
-                return ANG180_16 + (tantoangle(SlopeDiv16(y, x)) >> FRACBITS);
+                return ANG180_16 + tantoangle16(SlopeDiv16(y, x));
             }
             else
             {
                 // octant 5
-                return ANG270_16 - 1 - (tantoangle(SlopeDiv16(x,y)) >> FRACBITS);
+                return ANG270_16 - 1 - tantoangle16(SlopeDiv16(x, y));
             }
         }
     }
