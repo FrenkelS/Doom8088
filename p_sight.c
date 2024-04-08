@@ -75,13 +75,18 @@ static uint16_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t
 {
 	fixed_t a = (v1->dy >> FRACBITS) * ((v1->x - v2->x) >> 8);
 	fixed_t b = (v1->dx >> FRACBITS) * ((v2->y - v1->y) >> 8);
+
+	fixed_t num = a + b;
+
+	if (num == 0)
+		return 0;
+
 	fixed_t c = FixedMul(v2->dx, v1->dy >> 8);
 	fixed_t d = FixedMul(v2->dy, v1->dx >> 8);
 
-	fixed_t num = a + b;
 	fixed_t den = c - d;
 
-	if (num == 0 || den == 0 || (den >> 12) == 0)
+	if (den == 0 || (den >> 12) == 0)
 		return 0;
 
 	fixed_t r = (num << 4) / (den >> 12);
