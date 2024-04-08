@@ -378,6 +378,17 @@ fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 }
 
 
+#if defined __WATCOMC__
+//
+#else
+inline
+#endif
+fixed_t CONSTFUNC FixedApproxDiv3216(fixed_t a, uint16_t b)
+{
+	return FixedMul3232(a, FixedReciprocalSmall(b));
+}
+
+
 //
 // R_PointOnSide
 // Traverse BSP (sub) tree,
