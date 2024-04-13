@@ -90,10 +90,7 @@ static segment_t pointerToSegment(const memblock_t __far* ptr)
 		I_Error("pointerToSegment: pointer is not aligned: 0x%lx", ptr);
 #endif
 
-	uint32_t seg = D_FP_SEG(ptr);
-	uint16_t off = D_FP_OFF(ptr);
-	uint32_t linear = seg * PARAGRAPH_SIZE + off;
-	return linear / PARAGRAPH_SIZE;
+	return D_FP_SEG(ptr);
 }
 
 static memblock_t __far* segmentToPointer(segment_t seg)
@@ -244,7 +241,7 @@ void Z_Init (void)
 
 	// align blocklist
 	uint_fast8_t i = 0;
-	static uint8_t __far mainzone_sentinal_buffer[PARAGRAPH_SIZE * 2];
+	static uint8_t __far mainzone_sentinal_buffer[PARAGRAPH_SIZE];
 	uint32_t b = (uint32_t) &mainzone_sentinal_buffer[i++];
 	while ((b & (PARAGRAPH_SIZE - 1)) != 0)
 		b = (uint32_t) &mainzone_sentinal_buffer[i++];
@@ -304,25 +301,36 @@ void Z_Init (void)
 }
 
 
-void Z_ChangeTagToStatic(const void __far* ptr)
+static void Z_ChangeTag(const void __far* ptr, uint_fast8_t tag)
 {
-	memblock_t __far* block = segmentToPointer(pointerToSegment(ptr) - 1);
+#if defined RANGECHECK
+	if ((((uint32_t) ptr) & (PARAGRAPH_SIZE - 1)) != 0)
+		I_Error("Z_ChangeTag: pointer is not aligned: 0x%lx %s %i", ptr, f, l);
+#endif
+
+#if defined _M_I86
+	memblock_t __far* block = (memblock_t __far*)(((uint32_t)ptr) - 0x00010000);
+#else
+	memblock_t __far* block = (memblock_t __far*)(((uint32_t)ptr) - 0x00010);
+#endif
+
 #if defined ZONEIDCHECK
 	if (block->id != ZONEID)
-		I_Error("Z_ChangeTagToStatic: block has id %x instead of ZONEID", block->id);
+		I_Error("Z_ChangeTag: block has id %x instead of ZONEID", block->id);
 #endif
-	block->tag = PU_STATIC;
+	block->tag = tag;
+}
+
+
+void Z_ChangeTagToStatic(const void __far* ptr)
+{
+	Z_ChangeTag(ptr, PU_STATIC);
 }
 
 
 void Z_ChangeTagToCache(const void __far* ptr)
 {
-	memblock_t __far* block = segmentToPointer(pointerToSegment(ptr) - 1);
-#if defined ZONEIDCHECK
-	if (block->id != ZONEID)
-		I_Error("Z_ChangeTagToCache: block has id %x instead of ZONEID", block->id);
-#endif
-	block->tag = PU_CACHE;
+	Z_ChangeTag(ptr, PU_CACHE);
 }
 
 
@@ -386,7 +394,18 @@ static void Z_FreeBlock(memblock_t __far* block)
 //
 void Z_Free (const void __far* ptr)
 {
-	Z_FreeBlock(segmentToPointer(pointerToSegment(ptr) - 1));
+#if defined RANGECHECK
+	if ((((uint32_t) ptr) & (PARAGRAPH_SIZE - 1)) != 0)
+		I_Error("Z_Free: pointer is not aligned: 0x%lx", ptr);
+#endif
+
+#if defined _M_I86
+	memblock_t __far* block = (memblock_t __far*)(((uint32_t)ptr) - 0x00010000);
+#else
+	memblock_t __far* block = (memblock_t __far*)(((uint32_t)ptr) - 0x00010);
+#endif
+
+	Z_FreeBlock(block);
 }
 
 
@@ -520,7 +539,13 @@ static void __far* Z_TryMalloc(uint16_t size, int8_t tag, void __far*__far* user
     printf("Alloc: %ld (%ld)\n", base->size, running_count);
 #endif
 
-    return segmentToPointer(pointerToSegment(base) + 1);
+#if defined _M_I86
+    memblock_t __far* block = (memblock_t __far*)(((uint32_t)base) + 0x00010000);
+#else
+    memblock_t __far* block = (memblock_t __far*)(((uint32_t)base) + 0x00010);
+#endif
+
+    return block;
 }
 
 
