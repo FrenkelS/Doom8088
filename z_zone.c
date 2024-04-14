@@ -63,8 +63,13 @@
 
 typedef struct
 {
+#if defined _M_I86
+    uint32_t  size;			// including the header and possibly tiny fragments
+    uint16_t  tag;			// purgelevel
+#else
     uint32_t  size:24;		// including the header and possibly tiny fragments
     uint32_t  tag:4;		// purgelevel
+#endif
     void __far*__far*    user;	// NULL if a free block
     segment_t next;
     segment_t prev;
