@@ -246,7 +246,7 @@ void Z_Init (void)
 
 	// align blocklist
 	uint_fast8_t i = 0;
-	static uint8_t __far mainzone_sentinal_buffer[PARAGRAPH_SIZE];
+	static uint8_t __far mainzone_sentinal_buffer[PARAGRAPH_SIZE * 2];
 	uint32_t b = (uint32_t) &mainzone_sentinal_buffer[i++];
 	while ((b & (PARAGRAPH_SIZE - 1)) != 0)
 		b = (uint32_t) &mainzone_sentinal_buffer[i++];
