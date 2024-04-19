@@ -63,7 +63,7 @@
 
 typedef struct
 {
-#if defined _M_I86
+#if SIZE_OF_SEGMENT_T == 2
     uint32_t  size;			// including the header and possibly tiny fragments
     uint16_t  tag;			// purgelevel
 #else
