@@ -395,16 +395,6 @@ static void P_XYMovement(mobj_t __far* mo)
 
     if (!(mo->momx | mo->momy)) // Any momentum?
     {
-        if (mo->flags & MF_SKULLFLY)
-        {
-
-            // the skull slammed into something
-
-            mo->flags &= ~MF_SKULLFLY;
-            mo->momz = 0;
-
-            P_SetMobjState (mo, mobjinfo[mo->type].spawnstate);
-        }
         return;
     }
 
@@ -489,7 +479,7 @@ static void P_XYMovement(mobj_t __far* mo)
     // slow down
 
     /* no friction for missiles or skulls ever, no friction when airborne */
-    if (mo->flags & (MF_MISSILE | MF_SKULLFLY) || mo->z > mo->floorz)
+    if (mo->flags & MF_MISSILE || mo->z > mo->floorz)
         return;
 
     /* killough 8/11/98: add bouncers
@@ -593,7 +583,7 @@ static void P_ZMovement(mobj_t __far* mo)
 
     // float down towards target if too close
 
-    if (!((mo->flags ^ MF_FLOAT) & (MF_FLOAT | MF_SKULLFLY | MF_INFLOAT)) &&
+    if (!((mo->flags ^ MF_FLOAT) & (MF_FLOAT | MF_INFLOAT)) &&
   mo->target)     /* killough 11/98: simplify */
       {
   fixed_t delta;
@@ -607,29 +597,6 @@ static void P_ZMovement(mobj_t __far* mo)
   if (mo->z <= mo->floorz)
     {
     // hit the floor
-
-    /* Note (id):
-     *  somebody left this after the setting momz to 0,
-     *  kinda useless there.
-     * cph - This was the a bug in the linuxdoom-1.10 source which
-     *  caused it not to sync Doom 2 v1.9 demos. Someone
-     *  added the above comment and moved up the following code. So
-     *  demos would desync in close lost soul fights.
-     * cph - revised 2001/04/15 -
-     * This was a bug in the Doom/Doom 2 source; the following code
-     *  is meant to make charging lost souls bounce off of floors, but it 
-     *  was incorrectly placed after momz was set to 0.
-     *  However, this bug was fixed in Doom95 and 
-     *  the v1.10 source release (which is one reason why it failed to sync 
-     *  some Doom2 v1.9 demos)
-     * I've added a comp_soul compatibility option to make this behavior 
-     *  selectable for PrBoom v2.3+. For older demos, we do this here only 
-     *  if we're in a compatibility level above Doom 2 v1.9 (in which case we
-     *  mimic the bug and do it further down instead)
-     */
-
-    if (mo->flags & MF_SKULLFLY)
-      mo->momz = -mo->momz; // the skull slammed into something
 
     if (mo->momz < 0)
       {
@@ -665,13 +632,6 @@ static void P_ZMovement(mobj_t __far* mo)
 
   if (mo->z + mo->height > mo->ceilingz)
     {
-    /* cph 2001/04/15 - 
-     * Lost souls were meant to bounce off of ceilings;
-     *  new comp_soul compatibility option added
-     */
-    if (mo->flags & MF_SKULLFLY)
-      mo->momz = -mo->momz; // the skull slammed into something
-
     // hit the ceiling
 
     if (mo->momz > 0)
@@ -766,12 +726,8 @@ static void P_NightmareRespawn(mobj_t __far* mobj)
 
 void P_MobjThinker (mobj_t __far* mobj)
 {
-    // killough 11/98:
-    // removed old code which looked at target references
-    // (we use pointer reference counting now)
-
     // momentum movement
-    if (mobj->momx | mobj->momy || mobj->flags & MF_SKULLFLY)
+    if (mobj->momx | mobj->momy)
     {
         P_XYMovement(mobj);
         if (mobj->thinker.function != P_MobjThinker) // cph - Must've been removed

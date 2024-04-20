@@ -374,25 +374,6 @@ static boolean PIT_CheckThing(mobj_t __far* thing)
   if (thing == tmthing)
     return true;
 
-  // check for skulls slamming into things
-
-  if (tmthing->flags & MF_SKULLFLY)
-    {
-      // A flying skull is smacking something.
-      // Determine damage amount, and the skull comes to a dead stop.
-
-      int16_t damage = ((P_Random()%8)+1)*mobjinfo[tmthing->type].damage;
-
-      P_DamageMobj (thing, tmthing, tmthing, damage);
-
-      tmthing->flags &= ~MF_SKULLFLY;
-      tmthing->momx = tmthing->momy = tmthing->momz = 0;
-
-      P_SetMobjState (tmthing, mobjinfo[tmthing->type].spawnstate);
-
-      return false;   // stop moving
-    }
-
   // missiles can hit other things
   // killough 8/10/98: bouncing non-solid things can hit other things too
 

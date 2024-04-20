@@ -185,10 +185,6 @@
 //  towards intermission item total.
 #define MF_COUNTITEM    0x00800000UL
 
-// Special handling: skull in flight.
-// Neither a cacodemon nor a missile.
-#define MF_SKULLFLY     0x01000000UL
-
 #define MF_POOLED       0x10000000UL
 
 #define MF_FRIEND       0x80000000UL
