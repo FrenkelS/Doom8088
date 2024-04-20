@@ -223,18 +223,6 @@ static boolean P_Move(mobj_t __far* actor)
 
   if (!try_ok)
     {      // open any specials
-      if (actor->flags & MF_FLOAT && P_IsFloatOk())
-        {
-          if (actor->z < _g_tmfloorz)          // must adjust height
-            actor->z += FLOATSPEED;
-          else
-            actor->z -= FLOATSPEED;
-
-          actor->flags |= MF_INFLOAT;
-
-    return true;
-        }
-
       if (!_g_numspechit)
         return false;
 
@@ -269,12 +257,9 @@ static boolean P_Move(mobj_t __far* actor)
        */
       return good;
     }
-  else
-    actor->flags &= ~MF_INFLOAT;
 
   /* fall more slowly, under gravity */
-  if (!(actor->flags & MF_FLOAT))
-    actor->z = actor->floorz;
+  actor->z = actor->floorz;
 
   return true;
 }
@@ -455,7 +440,7 @@ static void P_NewChaseDir(mobj_t __far* actor)
 
     if (actor->floorz - actor->dropoffz > FRACUNIT*24 &&
             actor->z <= actor->floorz &&
-            !(actor->flags & (MF_DROPOFF|MF_FLOAT)) &&
+            !(actor->flags & MF_DROPOFF) &&
             P_AvoidDropoff(actor)) /* Move away from dropoff */
     {
         P_DoNewChaseDir(actor, dropoff_deltax, dropoff_deltay);

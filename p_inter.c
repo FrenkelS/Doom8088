@@ -514,7 +514,7 @@ static void P_KillMobj(mobj_t __far* source, mobj_t __far* target)
   mobjtype_t item;
   mobj_t     __far* mo;
 
-  target->flags &= ~(MF_SHOOTABLE|MF_FLOAT);
+  target->flags &= ~MF_SHOOTABLE;
   target->flags &= ~MF_NOGRAVITY;
   target->flags |= MF_CORPSE|MF_DROPOFF;
   target->height >>= 2;

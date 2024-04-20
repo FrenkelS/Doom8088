@@ -579,19 +579,6 @@ static void P_ZMovement(mobj_t __far* mo)
 
   mo->z += mo->momz;
 
-  if ((mo->flags & MF_FLOAT) && mo->target)
-
-    // float down towards target if too close
-
-    if (!((mo->flags ^ MF_FLOAT) & (MF_FLOAT | MF_INFLOAT)) &&
-  mo->target)     /* killough 11/98: simplify */
-      {
-  fixed_t delta;
-  if (P_AproxDistance(mo->x - mo->target->x, mo->y - mo->target->y) <
-      D_abs(delta = mo->target->z + (mo->height>>1) - mo->z)*3)
-    mo->z += delta < 0 ? -FLOATSPEED : FLOATSPEED;
-      }
-
   // clip movement
 
   if (mo->z <= mo->floorz)

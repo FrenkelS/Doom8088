@@ -151,9 +151,6 @@
 // Player cheat. ???
 #define MF_NOCLIP       0x00001000UL
 
-// Allow moves to any height, no gravity.
-// For active floaters, e.g. cacodemons, pain elementals.
-#define MF_FLOAT        0x00004000UL
 // Don't cross lines
 //   ??? or look at heights on teleport.
 #define MF_TELEPORT     0x00008000UL
@@ -172,9 +169,6 @@
 // Don't stop moving halfway off a step,
 //  that is, have dead bodies slide down all the way.
 #define MF_CORPSE       0x00100000UL
-// Floating to a height for a move, ???
-//  don't auto float to target's height.
-#define MF_INFLOAT      0x00200000UL
 
 // On kill, count this enemy object
 //  towards intermission kill total.
@@ -301,9 +295,6 @@ typedef struct mobj_s
 
 #define ONFLOORZ        INT32_MIN
 #define ONCEILINGZ      INT32_MAX
-
-
-#define FLOATSPEED      (FRACUNIT*4)
 
 
 mobj_t __far* P_SpawnMobj(fixed_t x, fixed_t y, fixed_t z, mobjtype_t type);
