@@ -238,7 +238,7 @@ static void WI_slamBackground(void)
 {
 	// background
 	int16_t num = W_GetNumForName("WIMAP0");
-	V_DrawRaw(num, 0);
+	V_DrawRawFullScreen(num);
 }
 
 

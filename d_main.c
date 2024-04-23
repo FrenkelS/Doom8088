@@ -343,7 +343,7 @@ void D_PageTicker(void)
 static void D_PageDrawer(void)
 {
 	int16_t num = W_GetNumForName("TITLEPIC");
-	V_DrawRaw(num, 0);
+	V_DrawRawFullScreen(num);
 }
 
 //
