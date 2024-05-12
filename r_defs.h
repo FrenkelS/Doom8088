@@ -176,6 +176,9 @@ typedef PACKEDATTR_PRE struct line_s
 
 } PACKEDATTR_POST line_t;
 
+typedef char assertLineSize[sizeof(line_t) == 47 ? 1 : -1];
+
+
 #define LN_FRONTSECTOR(l) (_g_sides[(l)->sidenum[0]].sector)
 #define LN_BACKSECTOR(l) ((l)->sidenum[1] != NO_INDEX ? _g_sides[(l)->sidenum[1]].sector : NULL)
 

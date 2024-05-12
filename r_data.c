@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -74,6 +74,8 @@ typedef PACKEDATTR_PRE struct
   int16_t colormap;        // unused in Doom but might be used in Phase 2 Boom
 } PACKEDATTR_POST mappatch_t;
 
+typedef char assertMappatchSize[sizeof(mappatch_t) == 10 ? 1 : -1];
+
 
 typedef PACKEDATTR_PRE struct
 {
@@ -85,6 +87,9 @@ typedef PACKEDATTR_PRE struct
   int16_t      patchcount;
   mappatch_t patches[1];
 } PACKEDATTR_POST maptexture_t;
+
+typedef char assertMaptextureSize[sizeof(maptexture_t) == 32 ? 1 : -1];
+
 
 // A maptexture_t describes a rectangular texture, which is composed
 // of one or more mappatch_t structures that arrange graphic patches.

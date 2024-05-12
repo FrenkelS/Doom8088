@@ -150,6 +150,8 @@ typedef PACKEDATTR_PRE struct {
   uint16_t firstseg;    // Index of first one; segs are stored sequentially.
 } PACKEDATTR_POST mapsubsector_t;
 
+typedef char assertMapsubsectorSize[sizeof(mapsubsector_t) == 4 ? 1 : -1];
+
 static void P_LoadSubsectors (int16_t lump)
 {
   const mapsubsector_t __far* data;
@@ -183,6 +185,8 @@ typedef PACKEDATTR_PRE struct {
   int16_t special;
   int16_t tag;
 } PACKEDATTR_POST mapsector_t;
+
+typedef char assertMapsectorSize[sizeof(mapsector_t) == 26 ? 1 : -1];
 
 static int16_t R_FlatNumForFarName(const char __far* far_name)
 {
@@ -300,6 +304,8 @@ typedef PACKEDATTR_PRE struct {
   int16_t midtexture;
   int16_t sector;  // Front sector, towards viewer.
 } PACKEDATTR_POST mapsidedef_t;
+
+typedef char assertMapsidedefSize[sizeof(mapsidedef_t) == 12 ? 1 : -1];
 
 
 //
