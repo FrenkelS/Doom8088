@@ -210,7 +210,7 @@ static boolean P_Move(mobj_t __far* actor)
     return false;
 
 #ifdef RANGECHECK
-  if ((uint16_t)actor->movedir >= 8)
+  if (actor->movedir >= 8)
     I_Error ("P_Move: Weird actor->movedir!");
 #endif
 
@@ -297,8 +297,8 @@ static boolean P_TryWalk(mobj_t __far* actor)
 static void P_DoNewChaseDir(mobj_t __far* actor, fixed_t deltax, fixed_t deltay)
 {
   int16_t xdir, ydir, tdir;
-  int16_t olddir = actor->movedir;
-  int16_t turnaround = olddir;
+  uint8_t olddir = actor->movedir;
+  uint8_t turnaround = olddir;
 
   if (turnaround != DI_NODIR)         // find reverse direction
     turnaround ^= 4;

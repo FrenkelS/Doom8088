@@ -256,11 +256,11 @@ typedef struct mobj_s
 
     // Movement direction, movement generation (zig-zagging).
 
-    uint16_t            movedir: 4;
+    uint8_t            movedir;
 
     // If >0, the current target will be chased no
     // matter what (even if shot by another object)
-    uint16_t            threshold:8;
+    uint8_t            threshold;
 
 
     // killough 9/9/98: How long a monster pursues a target.
