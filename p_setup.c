@@ -274,23 +274,58 @@ static void P_LoadThings (int16_t lump)
 // ??? killough ???
 // Does this mean secrets used to be linedef-based, rather than sector-based?
 //
-// killough 4/4/98: split into two functions, to allow sidedef overloading
-//
-// killough 5/3/98: reformatted, cleaned up
+
+typedef PACKEDATTR_PRE struct
+{
+	vertex_t v1;
+	vertex_t v2;			// Vertices, from v1 to v2.
+	uint16_t lineno;		//line number.
+
+	int16_t dx, dy;			// Precalculated v2 - v1 for side checking.
+
+	uint16_t sidenum[2];	// Visual appearance: SideDefs.
+	fixed_t bbox[4];		// Line bounding box.
+
+	uint8_t flags;			// Animation related.
+	int8_t const_special;
+	int16_t tag;
+	int8_t slopetype;		// To aid move clipping.
+
+} PACKEDATTR_POST packed_line_t;
+
+typedef char assertLineSize[sizeof(packed_line_t) == 47 ? 1 : -1];
 
 static void P_LoadLineDefs (int16_t lump)
 {
-    int16_t  i;
+	_g_numlines = W_LumpLength(lump) / sizeof(packed_line_t);
+	_g_lines    = Z_MallocLevel(_g_numlines * sizeof(line_t), NULL);
+	_g_linedata = Z_CallocLevel(_g_numlines * sizeof(linedata_t));
 
-    _g_numlines = W_LumpLength (lump) / sizeof(line_t);
-    _g_lines = W_GetLumpByNumAutoFree (lump);
+	line_t __far* _w_lines = (line_t __far*) _g_lines;
 
-    _g_linedata = Z_CallocLevel(_g_numlines * sizeof(linedata_t));
+	const packed_line_t __far* lines = W_GetLumpByNum(lump);
 
-    for (i=0; i<_g_numlines; i++)
-    {
-        _g_linedata[i].special = _g_lines[i].const_special;
-    }
+	for (int16_t i = 0; i < _g_numlines; i++)
+	{
+		_w_lines[i].v1         = lines[i].v1;
+		_w_lines[i].v2         = lines[i].v2;
+		_w_lines[i].lineno     = lines[i].lineno;
+		_w_lines[i].dx         = lines[i].dx;
+		_w_lines[i].dy         = lines[i].dy;
+		_w_lines[i].sidenum[0] = lines[i].sidenum[0];
+		_w_lines[i].sidenum[1] = lines[i].sidenum[1];
+		_w_lines[i].bbox[0]    = lines[i].bbox[0];
+		_w_lines[i].bbox[1]    = lines[i].bbox[1];
+		_w_lines[i].bbox[2]    = lines[i].bbox[2];
+		_w_lines[i].bbox[3]    = lines[i].bbox[3];
+		_w_lines[i].flags      = lines[i].flags;
+		_w_lines[i].tag        = lines[i].tag;
+		_w_lines[i].slopetype  = lines[i].slopetype;
+
+		_g_linedata[i].special = lines[i].const_special;
+	}
+
+	Z_Free(lines);
 }
 
 
