@@ -187,6 +187,71 @@ static segment_t Z_InitExpandedMemory(void)
 }
 
 
+uint16_t Z_AllocateExtendedMemoryBlock(uint16_t size);
+void Z_FreeExtendedMemoryBlock(uint16_t handle);
+void Z_MoveExtendedMemoryBlock(const void __far* s);
+
+typedef struct
+{
+	uint32_t Length;		// 32-bit number of bytes to transfer
+	uint16_t SourceHandle;	// Handle of source block
+	uint32_t SourceOffset;	// 32-bit offset into source
+	uint16_t DestHandle;	// Handle of destination block
+	uint32_t DestOffset;	// 32-bit offset into destination block
+} ExtMemMoveStruct_t;
+
+void __far* XMSControl;
+
+static uint16_t xmsHandle;
+static ExtMemMoveStruct_t ExtMemMoveStruct;
+
+
+boolean Z_InitXms(uint32_t size)
+{
+	union REGS regs;
+	struct SREGS sregs;
+
+	// Is an XMS driver installed?
+	regs.w.ax = 0x4300;
+	int86(0x2f, &regs, &regs);
+	if (regs.h.al != 0x80)
+		return false;
+
+	// Get the address of the driver's control function
+	regs.w.ax = 0x4310;
+	int86x(0x2f, &regs, &regs, &sregs);
+	XMSControl = D_MK_FP(sregs.es, regs.w.bx);
+
+	// Allocate Extended Memory Block
+	uint16_t xmsSize = (size + (1024 - 1)) / 1024;
+	xmsHandle = Z_AllocateExtendedMemoryBlock(xmsSize);
+
+	return xmsHandle != 0;
+}
+
+
+void Z_MoveConventionalMemoryToExtendedMemory(uint32_t destOffset, const uint8_t __far* src, uint32_t length)
+{
+	ExtMemMoveStruct.Length       = (length + 1) & ~1;
+	ExtMemMoveStruct.SourceHandle = 0;
+	ExtMemMoveStruct.SourceOffset = (uint32_t)src;
+	ExtMemMoveStruct.DestHandle   = xmsHandle;
+	ExtMemMoveStruct.DestOffset   = destOffset;
+	Z_MoveExtendedMemoryBlock(&ExtMemMoveStruct);
+}
+
+
+void Z_MoveExtendedMemoryToConventionalMemory(void __far* dest, uint32_t src, uint32_t length)
+{
+	ExtMemMoveStruct.Length       = (length + 1) & ~1;
+	ExtMemMoveStruct.SourceHandle = xmsHandle;
+	ExtMemMoveStruct.SourceOffset = src;
+	ExtMemMoveStruct.DestHandle   = 0;
+	ExtMemMoveStruct.DestOffset   = (uint32_t)dest;
+	Z_MoveExtendedMemoryBlock(&ExtMemMoveStruct);
+}
+
+
 void Z_Shutdown(void)
 {
 	if (emsHandle)
@@ -195,6 +260,11 @@ void Z_Shutdown(void)
 		regs.h.ah = EMS_FREEPAGES;
 		regs.w.dx = emsHandle;
 		int86(EMS_INT, &regs, &regs);
+	}
+
+	if (xmsHandle)
+	{
+		Z_FreeExtendedMemoryBlock(xmsHandle);
 	}
 }
 

@@ -4,7 +4,7 @@
 // $Id:$
 //
 // Copyright (C) 1993-1996 by id Software, Inc.
-// Copyright (C) 2023 by Frenkel Smeijers
+// Copyright (C) 2023-2024 by Frenkel Smeijers
 //
 // This source is available for distribution and/or modification
 // only under the terms of the DOOM Source Code License as
@@ -30,6 +30,9 @@
 #include "doomtype.h"
 
 void Z_Init(void);
+boolean Z_InitXms(uint32_t size);
+void Z_MoveConventionalMemoryToExtendedMemory(uint32_t destOffset, const uint8_t __far* src, uint32_t length);
+void Z_MoveExtendedMemoryToConventionalMemory(void __far* dest, uint32_t src, uint32_t length);
 void Z_Shutdown(void);
 boolean Z_IsEnoughFreeMemory(uint16_t size);
 void __far* Z_TryMallocStatic(uint16_t size);

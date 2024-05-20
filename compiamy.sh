@@ -6,7 +6,8 @@ unset CFLAGS
 export RENDER_OPTIONS="-DFLAT_SPAN"
 
 nasm i_vmodya.asm -f elf
-nasm m_fixed.asm -f elf
+nasm m_fixed.asm  -f elf
+nasm z_xms.asm    -f elf
 
 ia16-elf-gcc -c i_vmodey.c $RENDER_OPTIONS -march=i286 -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_map.c    $RENDER_OPTIONS -march=i286 -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
@@ -78,6 +79,7 @@ export GLOBOBJS+=" v_video.c"
 export GLOBOBJS+=" w_wad.o"
 export GLOBOBJS+=" wi_stuff.c"
 export GLOBOBJS+=" z_bmallo.c"
+export GLOBOBJS+=" z_xms.o"
 #export GLOBOBJS+=" z_zone.c"
 export GLOBOBJS+=" z_zone.o"
 
@@ -85,6 +87,8 @@ ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
 rm i_vmodya.o
 rm m_fixed.o
+rm z_xms.o
+
 rm i_vmodey.o
 rm p_map.o
 rm p_maputl.o
