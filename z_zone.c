@@ -214,7 +214,17 @@ void Z_FreeExtendedMemoryBlock(uint16_t handle);
 void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s);
 
 
-#if defined __DJGPP__ || defined _M_I386
+#if defined _M_I86 && defined C_ONLY
+void Z_FreeExtendedMemoryBlock(uint16_t handle)
+{
+	UNUSED(handle);
+}
+
+void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
+{
+	UNUSED(s);
+}
+#elif defined __DJGPP__ || defined _M_I386
 static uint8_t *fakeXMSHandle;
 
 void Z_FreeExtendedMemoryBlock(uint16_t handle)
@@ -235,6 +245,10 @@ void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
 boolean Z_InitXms(uint32_t size)
 {
 #if defined _M_I86
+#if defined C_ONLY
+	UNUSED(size);
+	return false;
+#else
 	union REGS regs;
 	struct SREGS sregs;
 
@@ -254,6 +268,7 @@ boolean Z_InitXms(uint32_t size)
 	xmsHandle = Z_AllocateExtendedMemoryBlock(xmsSize);
 
 	return xmsHandle != 0;
+#endif
 #else
 	xmsHandle = 1;	
 	fakeXMSHandle = malloc(size);
