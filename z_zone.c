@@ -369,6 +369,12 @@ void Z_Init (void)
 		b = (uint32_t) &mainzone_sentinal_buffer[i++];
 	mainzone_sentinal = (memblock_t __far*)b;
 
+#if defined __WATCOMC__ && defined _M_I86
+	// normalize pointer
+	b = D_FP_SEG(mainzone_sentinal) * PARAGRAPH_SIZE + D_FP_OFF(mainzone_sentinal);
+	mainzone_sentinal = D_MK_FP(b / PARAGRAPH_SIZE, 0);
+#endif
+
 	// set the entire zone to one free block
 	memblock_t __far* block = (memblock_t __far*)mainzone;
 	mainzone_rover_segment = pointerToSegment(block);
