@@ -219,6 +219,7 @@ static uint8_t *fakeXMSHandle;
 
 void Z_FreeExtendedMemoryBlock(uint16_t handle)
 {
+	UNUSED(handle);
 }
 
 void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
