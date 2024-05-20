@@ -187,9 +187,10 @@ static segment_t Z_InitExpandedMemory(void)
 }
 
 
-uint16_t Z_AllocateExtendedMemoryBlock(uint16_t size);
-void Z_FreeExtendedMemoryBlock(uint16_t handle);
-void Z_MoveExtendedMemoryBlock(const void __far* s);
+#define	XMS_INT					0x2f
+
+#define	XMS_INSTALLATION_CHECK	0x4300
+#define	XMS_GET_DRIVER_ADDRESS	0x4310
 
 typedef struct
 {
@@ -200,26 +201,51 @@ typedef struct
 	uint32_t DestOffset;	// 32-bit offset into destination block
 } ExtMemMoveStruct_t;
 
+
 void __far* XMSControl;
+
 
 static uint16_t xmsHandle;
 static ExtMemMoveStruct_t ExtMemMoveStruct;
 
 
+uint16_t Z_AllocateExtendedMemoryBlock(uint16_t size);
+void Z_FreeExtendedMemoryBlock(uint16_t handle);
+void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s);
+
+
+#if defined __DJGPP__ || defined _M_I386
+static uint8_t *fakeXMSHandle;
+
+void Z_FreeExtendedMemoryBlock(uint16_t handle)
+{
+}
+
+void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
+{
+	if (s->SourceHandle == 0)
+		memcpy(fakeXMSHandle + s->DestOffset, (uint8_t*)s->SourceOffset, s->Length);
+	else
+		memcpy((uint8_t*)s->DestOffset, fakeXMSHandle + s->SourceOffset, s->Length);
+}
+#endif
+
+
 boolean Z_InitXms(uint32_t size)
 {
+#if defined _M_I86
 	union REGS regs;
 	struct SREGS sregs;
 
 	// Is an XMS driver installed?
-	regs.w.ax = 0x4300;
-	int86(0x2f, &regs, &regs);
+	regs.w.ax = XMS_INSTALLATION_CHECK;
+	int86(XMS_INT, &regs, &regs);
 	if (regs.h.al != 0x80)
 		return false;
 
 	// Get the address of the driver's control function
-	regs.w.ax = 0x4310;
-	int86x(0x2f, &regs, &regs, &sregs);
+	regs.w.ax = XMS_GET_DRIVER_ADDRESS;
+	int86x(XMS_INT, &regs, &regs, &sregs);
 	XMSControl = D_MK_FP(sregs.es, regs.w.bx);
 
 	// Allocate Extended Memory Block
@@ -227,16 +253,21 @@ boolean Z_InitXms(uint32_t size)
 	xmsHandle = Z_AllocateExtendedMemoryBlock(xmsSize);
 
 	return xmsHandle != 0;
+#else
+	xmsHandle = 1;	
+	fakeXMSHandle = malloc(size);
+	return fakeXMSHandle != NULL;
+#endif
 }
 
 
-void Z_MoveConventionalMemoryToExtendedMemory(uint32_t destOffset, const uint8_t __far* src, uint32_t length)
+void Z_MoveConventionalMemoryToExtendedMemory(uint32_t dest, const uint8_t __far* src, uint32_t length)
 {
 	ExtMemMoveStruct.Length       = (length + 1) & ~1;
 	ExtMemMoveStruct.SourceHandle = 0;
 	ExtMemMoveStruct.SourceOffset = (uint32_t)src;
 	ExtMemMoveStruct.DestHandle   = xmsHandle;
-	ExtMemMoveStruct.DestOffset   = destOffset;
+	ExtMemMoveStruct.DestOffset   = dest;
 	Z_MoveExtendedMemoryBlock(&ExtMemMoveStruct);
 }
 
