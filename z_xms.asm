@@ -23,6 +23,14 @@ bits 16
 extern XMSControl
 
 
+; Allocate Extended Memory Block
+;
+; input:
+;   ax = size in kibibytes
+;
+; output:
+;   ax = handle
+
 global Z_AllocateExtendedMemoryBlock
 Z_AllocateExtendedMemoryBlock:
 	mov		dx, ax
@@ -32,6 +40,11 @@ Z_AllocateExtendedMemoryBlock:
 	retf
 
 
+; Free Extended Memory Block
+;
+; input:
+;   ax = handle
+
 global Z_FreeExtendedMemoryBlock
 Z_FreeExtendedMemoryBlock:
 	mov		dx, ax
@@ -39,6 +52,11 @@ Z_FreeExtendedMemoryBlock:
 	call	far [XMSControl]
 	retf
 
+
+; Move Extended Memory Block
+;
+; input:
+;   dx:ax = far pointer to ExtMemMoveStruct
 
 global Z_MoveExtendedMemoryBlock
 Z_MoveExtendedMemoryBlock:
