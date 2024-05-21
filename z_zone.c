@@ -254,8 +254,7 @@ void Z_Init (void)
 
 #if defined __WATCOMC__ && defined _M_I86
 	// normalize pointer
-	b = D_FP_SEG(mainzone_sentinal) * PARAGRAPH_SIZE + D_FP_OFF(mainzone_sentinal);
-	mainzone_sentinal = D_MK_FP(b / PARAGRAPH_SIZE, 0);
+	mainzone_sentinal = D_MK_FP(D_FP_SEG(mainzone_sentinal) + D_FP_OFF(mainzone_sentinal) / PARAGRAPH_SIZE, 0);
 #endif
 
 	// set the entire zone to one free block
