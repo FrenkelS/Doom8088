@@ -144,7 +144,7 @@ static boolean W_LoadWADIntoXMS(void)
 }
 
 
-static void W_ReadData(void __far* dest, uint32_t src, uint32_t length)
+static void W_ReadDataFromFile(void __far* dest, uint32_t src, uint32_t length)
 {
 	fseek(fileWAD, src, SEEK_SET);
 	_ffread(dest, length, fileWAD);
@@ -173,7 +173,7 @@ void W_Init(void)
 		I_Error("Can't open DOOM1.WAD.");
 
 	boolean xms = W_LoadWADIntoXMS();
-	readfunc = xms ? Z_MoveExtendedMemoryToConventionalMemory : W_ReadData;
+	readfunc = xms ? Z_MoveExtendedMemoryToConventionalMemory : W_ReadDataFromFile;
 
 	wadinfo_t header;
 	readfunc(&header, 0, sizeof(header));
@@ -190,7 +190,7 @@ void W_Init(void)
 
 void W_Shutdown(void)
 {
-	readfunc = W_ReadData;
+	readfunc = W_ReadDataFromFile;
 }
 
 
