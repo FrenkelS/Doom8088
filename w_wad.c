@@ -140,8 +140,6 @@ static boolean W_LoadWADIntoXMS(void)
 		Z_MoveConventionalMemoryToExtendedMemory(dest, buffer, size);
 	}
 
-	fclose(fileWAD);
-
 	return true;
 }
 
@@ -187,6 +185,12 @@ void W_Init(void)
 	_fmemset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
 
 	numlumps = header.numlumps;
+}
+
+
+void W_Shutdown(void)
+{
+	readfunc = W_ReadData;
 }
 
 
