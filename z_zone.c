@@ -278,7 +278,7 @@ boolean Z_InitXms(uint32_t size)
 }
 
 
-void Z_MoveConventionalMemoryToExtendedMemory(uint32_t dest, const uint8_t __far* src, uint32_t length)
+void Z_MoveConventionalMemoryToExtendedMemory(uint32_t dest, const void __far* src, uint32_t length)
 {
 	ExtMemMoveStruct.Length       = (length + 1) & ~1;
 	ExtMemMoveStruct.SourceHandle = 0;

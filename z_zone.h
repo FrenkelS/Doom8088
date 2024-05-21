@@ -31,7 +31,7 @@
 
 void Z_Init(void);
 boolean Z_InitXms(uint32_t size);
-void Z_MoveConventionalMemoryToExtendedMemory(uint32_t dest, const uint8_t __far* src, uint32_t length);
+void Z_MoveConventionalMemoryToExtendedMemory(uint32_t dest, const void __far* src, uint32_t length);
 void Z_MoveExtendedMemoryToConventionalMemory(void __far* dest, uint32_t src, uint32_t length);
 void Z_Shutdown(void);
 boolean Z_IsEnoughFreeMemory(uint16_t size);
