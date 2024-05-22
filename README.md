@@ -12,7 +12,7 @@ And 2366 kB of XMS memory, if available.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
 Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
-Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=5EBGY3CC4ZY).
+Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX1-lNuUBY).
 
 **What's special?:**
  - No texture mapped floors and ceilings
