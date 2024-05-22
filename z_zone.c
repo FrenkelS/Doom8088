@@ -187,6 +187,119 @@ static segment_t Z_InitExpandedMemory(void)
 }
 
 
+#define	XMS_INT					0x2f
+
+#define	XMS_INSTALLATION_CHECK	0x4300
+#define	XMS_GET_DRIVER_ADDRESS	0x4310
+
+typedef struct
+{
+	uint32_t Length;		// 32-bit number of bytes to transfer
+	uint16_t SourceHandle;	// Handle of source block
+	uint32_t SourceOffset;	// 32-bit offset into source
+	uint16_t DestHandle;	// Handle of destination block
+	uint32_t DestOffset;	// 32-bit offset into destination block
+} ExtMemMoveStruct_t;
+
+
+void __far* XMSControl;
+
+
+static uint16_t xmsHandle;
+static ExtMemMoveStruct_t ExtMemMoveStruct;
+
+
+#if defined _M_I86
+#if !defined C_ONLY
+uint16_t Z_AllocateExtendedMemoryBlock(uint16_t size);
+void Z_FreeExtendedMemoryBlock(uint16_t handle);
+void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s);
+#else
+static void Z_FreeExtendedMemoryBlock(uint16_t handle)
+{
+	UNUSED(handle);
+}
+
+static void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
+{
+	UNUSED(s);
+}
+#endif
+#elif defined __DJGPP__ || defined _M_I386
+static uint8_t *fakeXMSHandle;
+
+static void Z_FreeExtendedMemoryBlock(uint16_t handle)
+{
+	UNUSED(handle);
+}
+
+static void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
+{
+	if (s->SourceHandle == 0)
+		memcpy(fakeXMSHandle + s->DestOffset, (uint8_t*)s->SourceOffset, s->Length);
+	else
+		memcpy((uint8_t*)s->DestOffset, fakeXMSHandle + s->SourceOffset, s->Length);
+}
+#endif
+
+
+boolean Z_InitXms(uint32_t size)
+{
+#if defined _M_I86
+#if !defined C_ONLY
+	union REGS regs;
+	struct SREGS sregs;
+
+	// Is an XMS driver installed?
+	regs.w.ax = XMS_INSTALLATION_CHECK;
+	int86(XMS_INT, &regs, &regs);
+	if (regs.h.al != 0x80)
+		return false;
+
+	// Get the address of the driver's control function
+	regs.w.ax = XMS_GET_DRIVER_ADDRESS;
+	int86x(XMS_INT, &regs, &regs, &sregs);
+	XMSControl = D_MK_FP(sregs.es, regs.w.bx);
+
+	// Allocate Extended Memory Block
+	uint16_t xmsSize = (size + (1024 - 1)) / 1024;
+	xmsHandle = Z_AllocateExtendedMemoryBlock(xmsSize);
+
+	return xmsHandle != 0;
+#else
+	UNUSED(size);
+	return false;
+#endif
+#else
+	xmsHandle = 1;
+	fakeXMSHandle = malloc(size);
+	return fakeXMSHandle != NULL;
+#endif
+}
+
+
+void Z_MoveConventionalMemoryToExtendedMemory(uint32_t dest, const void __far* src, uint32_t length)
+{
+	ExtMemMoveStruct.Length       = (length + 1) & ~1;
+	ExtMemMoveStruct.SourceHandle = 0;
+	ExtMemMoveStruct.SourceOffset = (uint32_t)src;
+	ExtMemMoveStruct.DestHandle   = xmsHandle;
+	ExtMemMoveStruct.DestOffset   = dest;
+	Z_MoveExtendedMemoryBlock(&ExtMemMoveStruct);
+}
+
+
+void Z_MoveExtendedMemoryToConventionalMemory(void __far* dest, uint32_t src, uint32_t length)
+{
+	ExtMemMoveStruct.Length       = (length + 1) & ~1;
+	ExtMemMoveStruct.SourceHandle = xmsHandle;
+	ExtMemMoveStruct.SourceOffset = src;
+	ExtMemMoveStruct.DestHandle   = 0;
+	ExtMemMoveStruct.DestOffset   = (uint32_t)dest;
+	Z_MoveExtendedMemoryBlock(&ExtMemMoveStruct);
+}
+
+
 void Z_Shutdown(void)
 {
 	if (emsHandle)
@@ -195,6 +308,11 @@ void Z_Shutdown(void)
 		regs.h.ah = EMS_FREEPAGES;
 		regs.w.dx = emsHandle;
 		int86(EMS_INT, &regs, &regs);
+	}
+
+	if (xmsHandle)
+	{
+		Z_FreeExtendedMemoryBlock(xmsHandle);
 	}
 }
 
