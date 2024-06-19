@@ -26,7 +26,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - PC speaker sound effects
  - Rotating overlaid automap
  - Supports only Doom 1 Episode 1
- - Only demo3 is in sync
+ - Only demo3 is in sync, run `<Doom8088 executable> -timedemo demo3` to benchmark Doom8088
 
 **Known bugs:**
  - Some crashes and lockups due to memory issues and divisions by zero
