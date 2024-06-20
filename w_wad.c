@@ -144,14 +144,14 @@ static boolean W_LoadWADIntoXMS(void)
 }
 
 
-static void W_ReadDataFromFile(void __far* dest, uint32_t src, uint32_t length)
+static void W_ReadDataFromFile(void __far* dest, uint32_t src, uint16_t length)
 {
 	fseek(fileWAD, src, SEEK_SET);
 	_ffread(dest, length, fileWAD);
 }
 
 
-typedef void (*W_ReadData_f)(void __far* dest, uint32_t src, uint32_t length);
+typedef void (*W_ReadData_f)(void __far* dest, uint32_t src, uint16_t length);
 static W_ReadData_f readfunc;
 
 
