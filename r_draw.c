@@ -842,41 +842,33 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 
 static void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16_t* patch_num, int16_t* x_c)
 {
-    const uint8_t patchcount = texture->patchcount;
-    const uint16_t widthmask = texture->widthmask;
+	const uint8_t patchcount = texture->patchcount;
 
-    const int16_t xc = texcolumn & widthmask;
+	const int16_t xc = texcolumn & texture->widthmask;
 
-    if (patchcount != 1)
-    {
-        uint8_t i = 0;
+	if (patchcount == 1)
+	{
+		//simple texture.
+		*patch_num = texture->patches[0].patch_num;
+		*x_c = xc;
+	}
+	else
+	{
+		uint8_t i = 0;
 
-        do
-        {
-            const texpatch_t __far* patch = &texture->patches[i];
+		do
+		{
+			const texpatch_t __far* patch = &texture->patches[i];
 
-            const int16_t x1 = patch->originx;
-
-            if (xc < x1)
-                continue;
-
-            const int16_t x2 = x1 + patch->patch_width;
-
-            if (xc < x2)
-            {
-                *patch_num = patch->patch_num;
-                *x_c = xc - x1;
-                return;
-            }
-        } while (++i < patchcount);
-
-        printf("R_GetColumn: can't find texcolumn\n");
-    }
-
-    //patchcount == 1
-    //simple texture.
-    *patch_num = texture->patches[0].patch_num;
-    *x_c = xc;
+			int16_t x = xc - patch->originx;
+			if (0 <= x && x < patch->patch_width)
+			{
+				*patch_num = patch->patch_num;
+				*x_c = x;
+				break;
+			}
+		} while (++i < patchcount);
+	}
 }
 
 
