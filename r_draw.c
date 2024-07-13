@@ -951,6 +951,9 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 	else
 	{
 		//TODO Is this code reachable? Are there masked mid-textures with multiple patches?
+
+		const uint8_t patchcount = texture->patchcount;
+
 		for (dcvars.x = x1 ; dcvars.x <= x2 ; dcvars.x++, spryscale += rw_scalestep)
 		{
 			int16_t xc = maskedtexturecol[dcvars.x];
@@ -967,8 +970,6 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 				int16_t patch_num;
 				int16_t x;
 
-				const uint8_t patchcount = texture->patchcount;
-
 				uint8_t i = 0;
 
 				do
@@ -982,7 +983,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 						break;
 					}
 				} while (++i < patchcount);
-			
+
 				const patch_t __far* patch = W_GetLumpByNum(patch_num);
 				const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[x]);
 
