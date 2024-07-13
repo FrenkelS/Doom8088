@@ -878,76 +878,122 @@ static void R_GetColumn(const texture_t __far* texture, int16_t texcolumn, int16
 
 static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 {
-    int16_t      texnum;
-    draw_column_vars_t dcvars;
+	draw_column_vars_t dcvars;
 
-    // Calculate light table.
-    // Use different light tables
-    //   for horizontal / vertical / diagonal. Diagonal?
+	// Calculate light table.
+	// Use different light tables
+	//   for horizontal / vertical / diagonal. Diagonal?
 
-    curline = ds->curline;  // OPTIMIZE: get rid of LIGHTSEGSHIFT globally
+	curline = ds->curline;  // OPTIMIZE: get rid of LIGHTSEGSHIFT globally
 
-    frontsector = &_g_sectors[curline->frontsectornum];
-    backsector  = &_g_sectors[curline->backsectornum];
+	frontsector = &_g_sectors[curline->frontsectornum];
+	backsector  = &_g_sectors[curline->backsectornum];
 
-    texnum = _g_sides[curline->sidenum].midtexture;
-    texnum = texturetranslation[texnum];
+	int16_t texnum = texturetranslation[_g_sides[curline->sidenum].midtexture];
 
-    // killough 4/13/98: get correct lightlevel for 2s normal textures
-    rw_lightlevel = frontsector->lightlevel;
+	// killough 4/13/98: get correct lightlevel for 2s normal textures
+	rw_lightlevel = frontsector->lightlevel;
 
-    maskedtexturecol = ds->maskedtexturecol;
+	maskedtexturecol = ds->maskedtexturecol;
+	rw_scalestep     = ds->scalestep;
+	spryscale        = ds->scale1 + (x1 - ds->x1) * rw_scalestep;
+	mfloorclip       = ds->sprbottomclip;
+	mceilingclip     = ds->sprtopclip;
 
-    rw_scalestep = ds->scalestep;
-    spryscale    = ds->scale1 + (x1 - ds->x1) * rw_scalestep;
-    mfloorclip   = ds->sprbottomclip;
-    mceilingclip = ds->sprtopclip;
+	// find positioning
+	if (_g_lines[curline->linenum].flags & ML_DONTPEGBOTTOM)
+	{
+		dcvars.texturemid = frontsector->floorheight > backsector->floorheight ? frontsector->floorheight : backsector->floorheight;
+		dcvars.texturemid = dcvars.texturemid + ((int32_t)textureheight[texnum] << FRACBITS) - viewz;
+	}
+	else
+	{
+		dcvars.texturemid =frontsector->ceilingheight<backsector->ceilingheight ? frontsector->ceilingheight : backsector->ceilingheight;
+		dcvars.texturemid = dcvars.texturemid - viewz;
+	}
 
-    // find positioning
-    if (_g_lines[curline->linenum].flags & ML_DONTPEGBOTTOM)
-    {
-        dcvars.texturemid = frontsector->floorheight > backsector->floorheight
-                ? frontsector->floorheight : backsector->floorheight;
-        dcvars.texturemid = dcvars.texturemid + ((int32_t)textureheight[texnum] << FRACBITS) - viewz;
-    }
-    else
-    {
-        dcvars.texturemid =frontsector->ceilingheight<backsector->ceilingheight
-                ? frontsector->ceilingheight : backsector->ceilingheight;
-        dcvars.texturemid = dcvars.texturemid - viewz;
-    }
+	dcvars.texturemid += (((int32_t)_g_sides[curline->sidenum].rowoffset) << FRACBITS);
 
-    dcvars.texturemid += (((int32_t)_g_sides[curline->sidenum].rowoffset) << FRACBITS);
+	dcvars.colormap = R_LoadColorMap(rw_lightlevel);
 
-    const texture_t __far* texture = R_GetTexture(texnum);
+	const texture_t __far* texture = R_GetTexture(texnum);
 
-    dcvars.colormap = R_LoadColorMap(rw_lightlevel);
+	const uint16_t widthmask = texture->widthmask;
 
-    // draw the columns
-    for (dcvars.x = x1 ; dcvars.x <= x2 ; dcvars.x++, spryscale += rw_scalestep)
-    {
-        int16_t xc = maskedtexturecol[dcvars.x];
+	// draw the columns
+	if (texture->patchcount == 1)
+	{
+		//simple texture.
+		const patch_t __far* patch = W_GetLumpByNum(texture->patches[0].patch_num);
 
-        if (xc != SHRT_MAX) // dropoff overflow
-        {
-            sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
+		for (dcvars.x = x1 ; dcvars.x <= x2 ; dcvars.x++, spryscale += rw_scalestep)
+		{
+			int16_t xc = maskedtexturecol[dcvars.x];
 
-            dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
+			if (xc != SHRT_MAX) // dropoff overflow
+			{
+				xc &= widthmask;
 
-            // draw the texture
-            int16_t patch_num;
-            int16_t x_c;
-            R_GetColumn(texture, xc, &patch_num, &x_c);
-            const patch_t __far* patch = W_GetLumpByNum(patch_num);
-            const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[x_c]);
+				sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
-            R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
-            Z_ChangeTagToCache(patch);
-            maskedtexturecol[dcvars.x] = SHRT_MAX; // dropoff overflow
-        }
-    }
+				dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
 
-    curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_LoadColorMap doesn't try using it for other things */
+				// draw the texture
+				const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[xc]);
+
+				R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
+				maskedtexturecol[dcvars.x] = SHRT_MAX; // dropoff overflow
+			}
+		}
+
+		Z_ChangeTagToCache(patch);
+	}
+	else
+	{
+		//TODO Is this code reachable? Are there masked mid-textures with multiple patches?
+		for (dcvars.x = x1 ; dcvars.x <= x2 ; dcvars.x++, spryscale += rw_scalestep)
+		{
+			int16_t xc = maskedtexturecol[dcvars.x];
+
+			if (xc != SHRT_MAX) // dropoff overflow
+			{
+				xc &= widthmask;
+
+				sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
+
+				dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
+
+				// draw the texture
+				int16_t patch_num;
+				int16_t x;
+
+				const uint8_t patchcount = texture->patchcount;
+
+				uint8_t i = 0;
+
+				do
+				{
+					const texpatch_t __far* patch = &texture->patches[i];
+
+					x = xc - patch->originx;
+					if (0 <= x && x < patch->patch_width)
+					{
+						patch_num = patch->patch_num;
+						break;
+					}
+				} while (++i < patchcount);
+			
+				const patch_t __far* patch = W_GetLumpByNum(patch_num);
+				const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[x]);
+
+				R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
+				Z_ChangeTagToCache(patch);
+				maskedtexturecol[dcvars.x] = SHRT_MAX; // dropoff overflow
+			}
+		}
+	}
+
+	curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_LoadColorMap doesn't try using it for other things */
 }
 
 
