@@ -120,6 +120,7 @@ static boolean W_LoadWADIntoXMS(void)
 	}
 
 	printf("Loading WAD into XMS\n");
+	printf("Get Psyched!\n");
 
 	uint8_t* buffer = alloca(BUFFERSIZE);
 
