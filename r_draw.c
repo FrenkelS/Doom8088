@@ -921,78 +921,30 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 	const uint16_t widthmask = texture->widthmask;
 
 	// draw the columns
-	if (texture->patchcount == 1)
+	// simple texture == 1 patch
+	const patch_t __far* patch = W_GetLumpByNum(texture->patches[0].patch_num);
+
+	for (dcvars.x = x1 ; dcvars.x <= x2 ; dcvars.x++, spryscale += rw_scalestep)
 	{
-		//simple texture.
-		const patch_t __far* patch = W_GetLumpByNum(texture->patches[0].patch_num);
+		int16_t xc = maskedtexturecol[dcvars.x];
 
-		for (dcvars.x = x1 ; dcvars.x <= x2 ; dcvars.x++, spryscale += rw_scalestep)
+		if (xc != SHRT_MAX) // dropoff overflow
 		{
-			int16_t xc = maskedtexturecol[dcvars.x];
+			xc &= widthmask;
 
-			if (xc != SHRT_MAX) // dropoff overflow
-			{
-				xc &= widthmask;
+			sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
-				sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
+			dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
 
-				dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
+			// draw the texture
+			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[xc]);
 
-				// draw the texture
-				const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[xc]);
-
-				R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
-				maskedtexturecol[dcvars.x] = SHRT_MAX; // dropoff overflow
-			}
-		}
-
-		Z_ChangeTagToCache(patch);
-	}
-	else
-	{
-		//TODO Is this code reachable? Are there masked mid-textures with multiple patches?
-
-		const uint8_t patchcount = texture->patchcount;
-
-		for (dcvars.x = x1 ; dcvars.x <= x2 ; dcvars.x++, spryscale += rw_scalestep)
-		{
-			int16_t xc = maskedtexturecol[dcvars.x];
-
-			if (xc != SHRT_MAX) // dropoff overflow
-			{
-				xc &= widthmask;
-
-				sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
-
-				dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
-
-				// draw the texture
-				int16_t patch_num;
-				int16_t x;
-
-				uint8_t i = 0;
-
-				do
-				{
-					const texpatch_t __far* patch = &texture->patches[i];
-
-					x = xc - patch->originx;
-					if (0 <= x && x < patch->patch_width)
-					{
-						patch_num = patch->patch_num;
-						break;
-					}
-				} while (++i < patchcount);
-
-				const patch_t __far* patch = W_GetLumpByNum(patch_num);
-				const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[x]);
-
-				R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
-				Z_ChangeTagToCache(patch);
-				maskedtexturecol[dcvars.x] = SHRT_MAX; // dropoff overflow
-			}
+			R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
+			maskedtexturecol[dcvars.x] = SHRT_MAX; // dropoff overflow
 		}
 	}
+
+	Z_ChangeTagToCache(patch);
 
 	curline = NULL; /* cph 2001/11/18 - must clear curline now we're done with it, so R_LoadColorMap doesn't try using it for other things */
 }
