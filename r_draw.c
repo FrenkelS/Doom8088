@@ -399,7 +399,7 @@ fixed_t CONSTFUNC FixedApproxDiv3216(fixed_t a, uint16_t b)
 // Returns side 0 (front) or 1 (back).
 //
 
-static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
+static PUREFUNC int8_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
 {
 	int16_t ix = x >> FRACBITS;
 
@@ -2644,7 +2644,7 @@ static void R_RenderBSPNode(int16_t bspnum)
 //
 // decide which side the view point is on
 //
-	int16_t side = R_PointOnSide(viewx, viewy, bsp);
+	int8_t side = R_PointOnSide(viewx, viewy, bsp);
 
 	R_RenderBSPNode(bsp->children[side]); // recursively divide front space
 
