@@ -579,8 +579,6 @@ void P_SetupLevel(int16_t map)
     for (i = 0; i < MAXPLAYERS; i++)
         _g_player.mo = NULL;
 
-    P_MapStart();
-
     P_LoadThings(lumpnum + ML_THINGS);
 
     // set up world state

@@ -392,8 +392,6 @@ void G_Ticker (void)
 {
     static gamestate_t prevgamestate = 0;
 
-    P_MapStart();
-
     if(_g_playeringame && _g_player.playerstate == PST_REBORN)
         G_DoReborn ();
 

@@ -61,10 +61,10 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y);
 
 void    P_SetSecnodeFirstpoolToNull(void);
 void    P_DelSeclist(void);
+void    P_SetSeclist(msecnode_t __far* sectorList);
 void    P_CreateSecNodeList(mobj_t __far*);
 
-/* cphipps 2004/08/30 */
-void	P_MapStart(void);
+
 void	P_MapEnd(void);
 
 #endif // __P_MAP__

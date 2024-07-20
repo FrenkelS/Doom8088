@@ -283,7 +283,7 @@ void P_UnsetThingPosition(mobj_t __far* thing)
         // If this Thing is being removed entirely, then the calling
         // routine will clear out the nodes in sector_list.
 
-      _g_sector_list = thing->touching_sectorlist;
+      P_SetSeclist(thing->touching_sectorlist);
       thing->touching_sectorlist = NULL; //to be restored by P_SetThingPosition
     }
 
@@ -345,8 +345,6 @@ void P_SetThingPosition(mobj_t __far* thing)
       // added, new sector links are created.
 
       P_CreateSecNodeList(thing);
-      thing->touching_sectorlist = _g_sector_list; // Attach to Thing's mobj_t
-      _g_sector_list = NULL; // clear for next time
     }
 
   // link into blockmap

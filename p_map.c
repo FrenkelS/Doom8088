@@ -80,7 +80,7 @@ const line_t __far* _g_spechit[4];
 int16_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
-msecnode_t __far* _g_sector_list;
+static msecnode_t __far* _s_sector_list;
 
 
 mobj_t __far*   _g_linetarget; // who got hit (or NULL)
@@ -1260,7 +1260,7 @@ static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   {
   msecnode_t __far* node;
 
-  node = _g_sector_list;
+  node = _s_sector_list;
   while (node)
     {
     if (node->m_sector == s)   // Already have a node for this sector?
@@ -1282,9 +1282,9 @@ static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   node->m_sector = s;       // sector
   node->m_thing  = thing;     // mobj
   node->m_tprev  = NULL;    // prev node on Thing thread
-  node->m_tnext  = _g_sector_list;  // next node on Thing thread
-  if (_g_sector_list)
-    _g_sector_list->m_tprev = node; // set back link on Thing
+  node->m_tnext  = _s_sector_list;  // next node on Thing thread
+  if (_s_sector_list)
+    _s_sector_list->m_tprev = node; // set back link on Thing
 
   // Add new node at head of sector thread starting at s->touching_thinglist
 
@@ -1293,7 +1293,7 @@ static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   if (s->touching_thinglist)
     node->m_snext->m_sprev = node;
   s->touching_thinglist = node;
-  _g_sector_list = node;
+  _s_sector_list = node;
   }
 
 
@@ -1345,14 +1345,17 @@ static msecnode_t __far* P_DelSecnode(msecnode_t __far* node)
 
 void P_DelSeclist(void)
 {
-	if (_g_sector_list)
-	{
-		msecnode_t __far* node = _g_sector_list;
-		while (node)
-			node = P_DelSecnode(node);
+	msecnode_t __far* node = _s_sector_list;
+	while (node)
+		node = P_DelSecnode(node);
 
-		_g_sector_list = NULL;
-	}
+	_s_sector_list = NULL;
+}
+
+
+void P_SetSeclist(msecnode_t __far* sectorList)
+{
+	_s_sector_list = sectorList;
 }
 
 
@@ -1414,7 +1417,7 @@ void P_CreateSecNodeList(mobj_t __far* thing)
   // finished, delete all nodes where m_thing is still NULL. These
   // represent the sectors the Thing has vacated.
 
-  msecnode_t __far* node = _g_sector_list;
+  msecnode_t __far* node = _s_sector_list;
   while (node)
     {
     node->m_thing = NULL;
@@ -1449,13 +1452,13 @@ void P_CreateSecNodeList(mobj_t __far* thing)
   // Now delete any nodes that won't be used. These are the ones where
   // m_thing is still NULL.
 
-  node = _g_sector_list;
+  node = _s_sector_list;
   while (node)
     {
     if (node->m_thing == NULL)
       {
-      if (node == _g_sector_list)
-        _g_sector_list = node->m_tnext;
+      if (node == _s_sector_list)
+        _s_sector_list = node->m_tnext;
       node = P_DelSecnode(node);
       }
     else
@@ -1471,13 +1474,9 @@ void P_CreateSecNodeList(mobj_t __far* thing)
    *  Fun. We restore its previous value unless we're in a Boom/MBF demo.
    */
   tmthing = saved_tmthing;
-}
 
-/* cphipps 2004/08/30 - 
- * Must clear tmthing at tic end, as it might contain a pointer to a removed thinker, or the level might have ended/been ended and we clear the objects it was pointing too. Hopefully we don't need to carry this between tics for sync. */
-void P_MapStart(void)
-{
-    if (tmthing) I_Error("P_MapStart: tmthing set!");
+  thing->touching_sectorlist = _s_sector_list; // Attach to Thing's mobj_t
+  _s_sector_list = NULL; // clear for next time
 }
 
 void P_MapEnd(void)
