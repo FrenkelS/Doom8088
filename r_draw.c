@@ -1505,7 +1505,7 @@ static uint16_t CACHE_ENTRY(int16_t column, int16_t texture)
 
 static uint16_t CACHE_HASH(int16_t column, int16_t texture)
 {
-	return ((column >> 1) ^ texture) & CACHE_KEY_MASK;
+	return ((column >> 2) ^ texture) & CACHE_KEY_MASK;
 }
 
 static byte __far columnCache[128*128];
@@ -1541,16 +1541,16 @@ static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 
 static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int16_t texcolumn, uint16_t iscale)
 {
-    uint16_t colmask = 0xfffe;
+    uint16_t colmask = 0xfffc;
 
     if (tex->width > 8)
     {
         if (iscale > 4)
-            colmask = 0xfff0;
+            colmask = 0xffe0;
         else if (iscale > 3)
-            colmask = 0xfff8;
+            colmask = 0xfff0;
         else if (iscale > 2)
-            colmask = 0xfffc;
+            colmask = 0xfff8;
     }
 
 
