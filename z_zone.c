@@ -245,6 +245,9 @@ static void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
 
 boolean Z_InitXms(uint32_t size)
 {
+	if (M_CheckParm("-noxms"))
+		return false;
+
 #if defined _M_I86
 #if !defined C_ONLY
 	union REGS regs;

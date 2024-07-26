@@ -441,7 +441,7 @@ void D_StartTitle (void)
 static int myargc;
 static const char * const * myargv;
 
-static int16_t M_CheckParm(char *check)
+int16_t M_CheckParm(char *check)
 {
 	for (int16_t i = 1; i < myargc; i++)
 		if (!stricmp(check, myargv[i]))
