@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for VGA Mode Y
+ *      Video code for VGA Mode Y 320x200 256 colors
  *
  *-----------------------------------------------------------------------------*/
  
@@ -114,6 +114,12 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	outp(CRTC_INDEX, CRTC_MODE);
 	outp(CRTC_INDEX + 1, inp(CRTC_INDEX + 1) | 0x40);
+}
+
+
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// Do nothing
 }
 
 

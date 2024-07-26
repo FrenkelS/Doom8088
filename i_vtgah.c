@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for VGA Mode 13h 320x200 256 colors
+ *      Video code for Tandy 640x200 16 color aka Tandy Video II aka ETGA
  *
  *-----------------------------------------------------------------------------*/
  
@@ -38,50 +38,98 @@
 
 #include "globdata.h"
 
-
+ 
 extern const int16_t CENTERY;
 
 // The screen is [SCREENWIDTH * SCREENHEIGHT];
 static uint8_t __far* _s_screen;
-static uint8_t __far* vgascreen;
+static uint8_t __far* videomemory;
 
 
-#define PEL_WRITE_ADR   0x3c8
-#define PEL_DATA        0x3c9
+static const int8_t colors[14] =
+{
+	0,									// normal
+	4, 4, 4, 4, 0x1c, 0x1c, 0x1c, 0x1c,	// red
+	6, 6, 0x1e, 0x1e,					// yellow
+	2									// green
+};
 
+	
 static void I_UploadNewPalette(int8_t pal)
 {
-	// This is used to replace the current 256 colour cmap with a new one
-	// Used by 256 colour PseudoColor modes
+	outp(0x3da, 0x10);
+	outp(0x3de, colors[pal]);
+}
 
-	char lumpName[9] = "PLAYPAL0";
 
-	if(_g_gamma == 0)
-		lumpName[7] = 0;
-	else
-		lumpName[7] = '0' + _g_gamma;
+static const uint8_t etga_ctrc[19] = {0x71, 0x50, 0x5a, 0xef, 0xff, 6, 0xc8, 0xe2, 2, 0, 0, 0, 0, 0, 0, 0, 0x18,    0, 0x46};
+static const uint8_t text_ctrc[19] = {0x71, 0x50, 0x5a, 0xfe, 0x1c, 1, 0x19, 0x1a, 2, 8, 6, 7, 0, 0, 0, 0, 0x18, 0x20,    7};
 
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
-	if (palette_lump != NULL)
+static const uint16_t etga_ctrl[5] = {0x0f01, 0x0002, 0x1003, 0x0105, 0x0208};
+static const uint16_t text_ctrl[5] = {0x0f01, 0x0002, 0x1003, 0x0005, 0x0008};
+
+
+static void I_InitGraphicsCommonETGA(boolean graphics)
+{
+	const uint8_t*  crtcTable;
+	const uint16_t* ctrlTable;
+
+	if (graphics)
 	{
-		const byte __far* palette = &palette_lump[pal * 256 * 3];
-		outp(PEL_WRITE_ADR, 0);
-		for (int_fast16_t i = 0; i < 256 * 3; i++)
-			outp(PEL_DATA, (*palette++) >> 2);
-
-		Z_ChangeTagToCache(palette_lump);
+		crtcTable = etga_ctrc;
+		ctrlTable = etga_ctrl;
 	}
+	else
+	{
+		crtcTable = text_ctrc;
+		ctrlTable = text_ctrl;
+	}
+
+	// set CRTC registers
+	for (int16_t i = 0; i < 19; i++)
+	{
+		outp(0x3d4, i);
+		outp(0x3d5, *crtcTable++);
+	}
+
+	// set control registers
+	for (int16_t i = 0; i < 5; i++)
+	{
+		uint16_t x = *ctrlTable++;
+		outp(0x3da, LOBYTE(x));
+		outp(0x3de, HIBYTE(x));
+	}
+
+	// clear color select register
+	outp(0x3d9, 0);
+
+	// disable extended RAM paging
+	outp(0x3dd, 0);
 }
 
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
-	I_SetScreenMode(0x13);
-	I_UploadNewPalette(0);
+	// This code is based on https://github.com/planet-x3/px3_ose/blob/master/src/video/etga.s
 
+	I_SetScreenMode(3);
+
+	// select 640 dot graphics mode with hi-res clock, disable video
+	outp(0x3d8, 0x13);
+
+	I_InitGraphicsCommonETGA(true);
+
+	// select page bit 2 for CRT & CPU
+	outp(0x3df, 0x24);
+
+	// clear screen
 	__djgpp_nearptr_enable();
-	vgascreen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
 
+	// select 640 dot graphics mode with hi-res clock, enable video
+	outp(0x3d8, 0x1b);
+
+	videomemory = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
 }
@@ -89,23 +137,54 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 void I_ShutdownGraphicsHardwareSpecificCode(void)
 {
-	// Do nothing
+	// select 80 column text mode, disable video
+	outp(0x3d8, 0x13);
+
+	I_InitGraphicsCommonETGA(false);
+
+	// select page bits 0-2 for CRT & CPU
+	outp(0x3df, 0x3f);
+
+	// select 80 column text mode, enable blinking, enable video
+	outp(0x3d8, 0x29);
 }
+
+
+static const uint8_t VGA_TO_ETGA_LUT[256] =
+{
+	  0,   6,   0,   7, 255,   8,   8,   0,   0, 136,   8,   8,   0, 104, 104, 104,
+	255, 255, 127, 207, 207, 207, 207, 207, 207, 124, 124, 124, 124, 124, 204, 204,
+	204, 204, 108,  76,  76,  76,  12,  12,  68,  68,  68,  68,  68,  68,   4,   4,
+	255, 255, 255, 255, 255, 255, 239, 239, 239, 239, 239, 126, 126, 126, 206, 206,
+	206, 206, 206, 206,  78,  78,  44,  44,  44,  44,  44, 104, 104, 104,   6,   6,
+	255, 255, 255, 255, 255, 255, 255, 255, 255, 127, 127, 127, 127, 127, 127, 127,
+	143, 143,  15, 119, 119, 119, 120, 120, 120,   7,   7,   7, 136, 136, 136,   8,
+	175,  62, 122, 122, 122, 122, 170, 138, 138, 138,  10,  40,  40,   2,   2,   0,
+	127, 127, 207, 111, 111, 111,  94,  94,  94,  60,  60, 103, 103,  71, 104, 104,
+	 94,  94,  94, 103,  44,  44, 104, 104,  30,  30,  30,  39,  54,  54, 136, 136,
+	239, 238, 238, 206, 110,  78, 102, 102, 255, 255, 255, 127, 207, 124, 204,  76,
+	 68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,  68,   4,
+	255, 255, 255, 159, 159, 121, 153,  25,  17,  17,  17,  17,  17,  17,  17,  17,
+	255, 255, 255, 239, 239, 126, 206, 110,  78,  78,  78,  78,  78, 108, 108, 108,
+	255, 255, 255, 239, 239, 238, 238, 238, 108, 108, 102,  70, 104, 104,   6,   6,
+	 17,   1,   1,   1,   1,   0,   0,   0, 238, 238, 223,  93,  93,  93,  85,  79
+};
 
 
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
-	uint8_t __far* dst = vgascreen;
+	uint8_t __far* dst = videomemory;
 
 #if defined DISABLE_STATUS_BAR
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
 #else
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
 #endif
-		_fmemcpy(dst, src, SCREENWIDTH);
-		dst += SCREENWIDTH_VGA;
-		src += SCREENWIDTH;
+		for (uint_fast8_t x = 0; x < SCREENWIDTH; x++) {
+			*dst++ = VGA_TO_ETGA_LUT[*src++];
+		}
+		dst += SCREENWIDTH_VGA - SCREENWIDTH;
 	}
 }
 
@@ -336,77 +415,6 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 }
 
 
-#if !defined FLAT_SPAN
-inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t position)
-{
-	uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
-	color = color | (color << 8);
-
-	uint16_t __far* d = (uint16_t __far*) dest;
-	*d++ = color;
-	*d   = color;
-}
-
-
-void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *dsvars)
-{
-	uint16_t count = (x2 - x1);
-
-	const byte __far* source   = dsvars->source;
-	const byte __far* colormap = dsvars->colormap;
-
-	uint32_t __far* dest = (uint32_t __far*)(_s_screen + (y * SCREENWIDTH) + (x1 << 2));
-
-	const uint32_t step = dsvars->step;
-	uint32_t position = dsvars->position;
-
-	uint16_t l = (count >> 4);
-
-	while (l--)
-	{
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-    }
-
-	switch (count & 15)
-	{
-		case 15:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 14:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 13:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 12:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 11:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 10:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  9:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  8:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  7:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  6:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  5:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  4:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  3:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  2:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  1:    R_DrawSpanPixel(dest, source, colormap, position);
-	}
-}
-#endif
-
-
 //
 // V_FillRect
 //
@@ -505,13 +513,6 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 }
 
 
-void ST_Drawer(void)
-{
-	if (ST_NeedUpdate())
-		ST_doRefresh();
-}
-
-
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
 	y -= patch->topoffset;
@@ -523,7 +524,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 	for (int16_t col = 0; col < width; col++, desttop++)
 	{
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
@@ -578,7 +579,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		else if (dc_x >= SCREENWIDTH)
 			break;
 
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> 8]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
