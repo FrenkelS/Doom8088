@@ -118,6 +118,9 @@ static uint16_t emsHandle;
 
 static segment_t Z_InitExpandedMemory(void)
 {
+	if (M_CheckParm("-noems"))
+		return 0;
+
 #if defined _M_I86
 	segment_t __far* emsInterruptVectorSegment = D_MK_FP(0, EMS_INT * 4 + 2);
 	uint64_t __far* actualEmsDeviceName = D_MK_FP(*emsInterruptVectorSegment, 0x000a);

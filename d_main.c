@@ -467,6 +467,9 @@ static void D_DoomMainSetup(void)
 {
     // init subsystems
 
+    printf("Z_Init: Init zone memory allocation daemon.\n");
+    Z_Init();
+
     G_ReloadDefaults();    // killough 3/4/98: set defaults just loaded.
 
     // CPhipps - move up netgame init
@@ -521,7 +524,7 @@ void D_DoomMain(int argc, const char * const * argv)
     myargc = argc;
     myargv = argv;
 
-    D_DoomMainSetup(); // CPhipps - setup out of main execution stack
+    D_DoomMainSetup();
 
     D_DoomLoop ();  // never returns
 }

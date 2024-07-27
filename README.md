@@ -8,7 +8,7 @@ Usually these systems are 32-bit or more and have a flat memory model.
 
 Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286, and with VGA or MCGA graphics.
 It uses 64 kB of EMS memory, if available.
-And 2366 kB of XMS memory, if available. (Use command line argument `-noxms` to disable XMS.)
+And 2366 kB of XMS memory, if available.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
 Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
@@ -26,7 +26,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - PC speaker sound effects
  - Rotating overlaid automap
  - Supports only Doom 1 Episode 1
- - Only demo3 is in sync, run `<Doom8088 executable> -timedemo demo3` to benchmark Doom8088
+ - Only demo3 is in sync
 
 **Known bugs:**
  - Some crashes and lockups due to memory issues and divisions by zero
@@ -63,6 +63,13 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |IDCLEV    |Exit Level               |
 |IDROCKET  |Enemy Rockets (GoldenEye)|
 |IDRATE    |Toggle FPS counter       |
+
+## Command line arguments:
+|Command line argument|Effect       |
+|---------------------|-------------|
+|-noems               |Disable EMS  |
+|-noxms               |Disable XMS  |
+|-timedemo demo3      |Run benchmark|
 
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
