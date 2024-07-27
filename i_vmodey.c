@@ -144,16 +144,20 @@ void I_FinishUpdate(void)
 	{
 		st_needrefresh--;
 
-		if (!st_needrefresh)
+		if (st_needrefresh != 2)
 		{
 			// set write mode 1
 			outp(GC_INDEX, GC_MODE);
 			outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
 
 #if defined _M_I86
-			uint8_t __far* src = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff);
+			uint8_t __far* src = (uint8_t __far*)(((uint32_t)_s_screen) - 0x04000000);
+			if ((((uint32_t)src) & 0x9c000000) == 0x9c000000)
+				src = (uint8_t __far*)(((uint32_t)src) + 0x0c000000);
 #else
-			uint8_t __far* src = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
+			uint8_t __far* src = _s_screen - 0x04000;
+			if ((((uint32_t)src) & 0x9c000) == 0x9c000)
+				src += 0x0c000;
 #endif
 			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
 			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
@@ -172,14 +176,18 @@ void I_FinishUpdate(void)
 		}
 	}
 
-	// page flip
+	// page flip between segments A000, A400 and A800
 	outp(CRTC_INDEX, CRTC_STARTHIGH);
 #if defined _M_I86
 	outp(CRTC_INDEX + 1, D_FP_SEG(_s_screen) >> 4);
-	_s_screen = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff); // flip between segments A000 and A400
+	_s_screen = (uint8_t __far*)(((uint32_t)_s_screen) + 0x04000000);
+	if ((((uint32_t)_s_screen) & 0xac000000) == 0xac000000)
+		_s_screen = (uint8_t __far*)(((uint32_t)_s_screen) - 0x0c000000);
 #else
 	outp(CRTC_INDEX + 1, (D_FP_SEG(_s_screen) >> 4) & 0xf0);
-	_s_screen = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
+	_s_screen += 0x04000;
+	if ((((uint32_t)_s_screen) & 0xac000) == 0xac000)
+		_s_screen -= 0x0c000;
 #endif
 }
 
@@ -408,7 +416,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 				outp(SC_INDEX + 1, 1 << plane);
 				for (int16_t y = 0; y < cachedLumpHeight; y++)
 				{
-					uint8_t __far* dest = D_MK_FP(0xa800, y * PLANEWIDTH + __djgpp_conventional_base);
+					uint8_t __far* dest = D_MK_FP(0xac00, y * PLANEWIDTH + __djgpp_conventional_base);
 					for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
 					{
 						*dest++ = lump[y * SCREENWIDTH + (x * 4) + plane];
@@ -428,7 +436,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 		outp(GC_INDEX, GC_MODE);
 		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
 
-		uint8_t __far* src  = D_MK_FP(0xa800, 0 + __djgpp_conventional_base);
+		uint8_t __far* src  = D_MK_FP(0xac00, 0 + __djgpp_conventional_base);
 		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
 		for (int16_t y = 0; y < cachedLumpHeight; y++)
 		{
@@ -451,7 +459,7 @@ void ST_Drawer(void)
 	if (ST_NeedUpdate())
 	{
 		ST_doRefresh();
-		st_needrefresh = 2; //2 screen pages
+		st_needrefresh = 3; //3 screen pages
 	}
 }
 
@@ -660,9 +668,13 @@ static void wipe_initMelt()
 void D_Wipe(void)
 {
 #if defined _M_I86
-	frontbuffer = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff);
+	frontbuffer = (uint8_t __far*)(((uint32_t)_s_screen) - 0x04000000);
+	if ((((uint32_t)frontbuffer) & 0x9c000000) == 0x9c000000)
+		frontbuffer = (uint8_t __far*)(((uint32_t)frontbuffer) + 0x0c000000);
 #else
-	frontbuffer = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
+	frontbuffer	= _s_screen - 0x04000;
+	if ((((uint32_t)frontbuffer) & 0x9c000) == 0x9c000)
+		frontbuffer += 0x0c000;
 #endif
 
 	// set write mode 1
