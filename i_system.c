@@ -38,7 +38,6 @@
 
 
 void I_InitGraphicsHardwareSpecificCode(void);
-static void NORETURN_PRE I_Quit(void) NORETURN_POST;
 
 
 static boolean isGraphicsModeSet = false;
@@ -317,7 +316,7 @@ static void I_Shutdown(void)
 }
 
 
-static void I_Quit(void)
+void I_Quit(void)
 {
 	I_Shutdown();
 

@@ -41,11 +41,12 @@
 void I_InitTimer(void);
 int32_t I_GetTime(void);
 
+void NORETURN_PRE I_Quit(void) NORETURN_POST;
 void NORETURN_PRE I_Error(const char *error, ...) NORETURN_POST;
 
-void I_InitScreen();
+void I_InitScreen(void);
 
-void I_InitGraphics();
+void I_InitGraphics(void);
 
 void I_SetScreenMode(uint16_t mode);
 
@@ -59,6 +60,6 @@ void I_SetPalette(int8_t pal);
  * Quick syncronous operations are performed here.
  * Can call D_PostEvent.
  */
-void I_StartTic();
+void I_StartTic(void);
 
 #endif

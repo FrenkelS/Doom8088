@@ -53,6 +53,7 @@
 #define RUNON       "In a hurry, marine?"
 
 #define ENDGAME     "are you sure you want to\nend the game?\n\n"PRESSYN
+#define QUITMSG	    "are you sure you want to\nquit this great game?\n\n"PRESSYN
 
 
 /* p_inter.c */
