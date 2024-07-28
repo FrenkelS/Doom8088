@@ -132,6 +132,7 @@ static const int16_t key_down        = KEYD_DOWN;
 static const int16_t key_strafeleft  = KEYD_L;
 static const int16_t key_straferight = KEYD_R;
        const int16_t key_fire        = KEYD_B; 
+static const int16_t key_speed       = KEYD_SPEED;
 static const int16_t key_strafe      = KEYD_STRAFE;
 static const int16_t key_use         = KEYD_A;
        const int16_t key_escape      = KEYD_START;
@@ -226,7 +227,7 @@ void G_BuildTiccmd(void)
     strafe = gamekeydown[key_strafe];
 
     //Use button negates the always run setting.
-    speed = (gamekeydown[key_use] ^ _g_alwaysRun);
+    speed = (gamekeydown[key_speed] ^ _g_alwaysRun);
 
     forward = side = 0;
 

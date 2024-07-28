@@ -181,8 +181,10 @@ void I_StartTic(void)
 				break;
 			case SC_ENTER:
 			case SC_SPACE:
-			case SC_RSHIFT:
 				ev.data1 = KEYD_A;
+				break;
+			case SC_RSHIFT:
+				ev.data1 = KEYD_SPEED;
 				break;
 			case SC_UPARROW:
 				ev.data1 = KEYD_UP;

@@ -170,6 +170,7 @@ typedef enum {
 
 
 //GBA Keys
+#define KEYD_SPEED          0
 #define KEYD_A              1
 #define KEYD_B              2
 #define KEYD_L              3
