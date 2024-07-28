@@ -38,7 +38,8 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |Fire                   |Ctrl                    |
 |Use / Sprint           |Enter, Space & Shift    |
 |Walk                   |Arrow keys              |
-|Strafe                 |< & >                   |
+|Strafe                 |Alt                     |
+|Strafe left and right  |< & >                   |
 |Automap                |Tab                     |
 |Automap zoom in and out|+ & -                   |
 |Automap follow mode    |F                       |

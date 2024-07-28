@@ -117,6 +117,7 @@ void I_InitScreen(void)
 #define SC_RSHIFT			0x36
 #define SC_COMMA			0x33
 #define SC_PERIOD			0x34
+#define SC_ALT				0x38
 #define SC_SPACE			0x39
 #define SC_F10				0x44
 #define SC_UPARROW			0x48
@@ -200,6 +201,9 @@ void I_StartTic(void)
 				break;
 			case SC_CTRL:
 				ev.data1 = KEYD_B;
+				break;
+			case SC_ALT:
+				ev.data1 = KEYD_STRAFE;
 				break;
 			case SC_COMMA:
 				ev.data1 = KEYD_L;
