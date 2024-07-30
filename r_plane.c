@@ -361,7 +361,7 @@ visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop
 
 void R_InitFlats(void)
 {
-	firstflat        = W_GetNumForName("F_START") + 1;
+	       firstflat = W_GetNumForName("F_START") + 1;
 
 	int16_t lastflat = W_GetNumForName("F_END")   - 1;
 	int16_t numflats = lastflat - firstflat + 1;
@@ -373,19 +373,38 @@ void R_InitFlats(void)
 	animated_flat_basepic = R_FlatNumForName("NUKAGE1");
 
 #if defined FLAT_SPAN
-	byte __far* source = Z_MallocStatic(64 * 64);
+	byte    __far* source    = Z_MallocStatic( 64 * 64);
+	int16_t __far* histogram = Z_MallocStatic(256 * sizeof(int16_t));
 
 	for (int16_t i = 0; i < numflats; i++)
 	{
 		W_ReadLumpByNum(firstflat + i, source);
-		flattranslation[i] = source[(64 / 2) * 64 + (64 / 2)];
+
+		_fmemset(histogram, 0, 256 * sizeof(int16_t));
+		for (int16_t j = 0; j < 64 * 64; j++)
+			histogram[source[j]]++;
+
+		int16_t maxamount = 0;
+		int16_t maxindex  = 0;
+		for (int16_t j = 0; j < 256; j++)
+		{
+			if (histogram[j] > maxamount)
+			{
+				maxamount = histogram[j];
+				maxindex  = j;
+			}
+		}
+
+		flattranslation[i] = maxindex;
 	}
 
+	Z_Free(histogram);
 	Z_Free(source);
 
-	animated_flat_basepic_color[0] = flattranslation[animated_flat_basepic + 0];
-	animated_flat_basepic_color[1] = flattranslation[animated_flat_basepic + 1];
-	animated_flat_basepic_color[2] = flattranslation[animated_flat_basepic + 2];
+	// Animated Nukage colors
+	animated_flat_basepic_color[0] = 122;
+	animated_flat_basepic_color[1] = 124;
+	animated_flat_basepic_color[2] = 126;
 #else
 	for (int16_t i = 0; i < numflats; i++)
 		flattranslation[i] = i;
