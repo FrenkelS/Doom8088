@@ -82,7 +82,7 @@ void T_PlatRaise(plat_t __far* plat)
       // if a pure raise type, make the plat moving sound
       if (plat->type == raiseToNearestAndChange)
       {
-        if (!(_g_leveltime&7))
+        if (!((int16_t)_g_leveltime&7))
           S_StartSound2(&plat->sector->soundorg, sfx_stnmov);
       }
 

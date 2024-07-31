@@ -379,7 +379,7 @@ static void T_MoveFloor(floormove_t __far* floor)
   // move the floor
   res = T_MovePlaneFloor(floor->sector, floor->speed, floor->floordestheight, floor->direction);
 
-  if (!(_g_leveltime&7))     // make the floormove sound
+  if (!((int16_t)_g_leveltime&7))     // make the floormove sound
     S_StartSound2(&floor->sector->soundorg, sfx_stnmov);
 
   if (res == pastdest)    // if destination height is reached

@@ -306,14 +306,14 @@ static void P_PlayerInSpecialSector (player_t* player)
       case 5:
         // 5/10 unit damage per 31 ticks
         if (!player->powers[pw_ironfeet])
-          if (!(_g_leveltime&0x1f))
+          if (!((int16_t)_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 10);
         break;
 
       case 7:
         // 2/5 unit damage per 31 ticks
         if (!player->powers[pw_ironfeet])
-          if (!(_g_leveltime&0x1f))
+          if (!((int16_t)_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 5);
         break;
 
@@ -322,7 +322,7 @@ static void P_PlayerInSpecialSector (player_t* player)
         if (!player->powers[pw_ironfeet]
             || (P_Random()<5) ) // even with suit, take damage
         {
-          if (!(_g_leveltime&0x1f))
+          if (!((int16_t)_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 20);
         }
         break;
@@ -336,7 +336,7 @@ static void P_PlayerInSpecialSector (player_t* player)
       case 11:
         _g_player.cheats &= ~CF_GODMODE;
 
-        if (!(_g_leveltime&0x1f))
+        if (!((int16_t)_g_leveltime&0x1f))
           P_DamageMobj (player->mo, NULL, NULL, 20);
 
         if (player->health <= 10)

@@ -425,7 +425,7 @@ void P_UpdateAnimatedFlat(void)
 #if defined FLAT_SPAN
 	int16_t pic = FLAT_NUKAGE1_COLOR + (((int16_t)_g_leveltime >> 3) % 3) * 2;
 #else
-	int16_t pic = animated_flat_basepic + ((_g_leveltime >> 3) % 3);
+	int16_t pic = animated_flat_basepic + (((int16_t)_g_leveltime >> 3) % 3);
 #endif
 
 	flattranslation[animated_flat_basepic + 0] = pic;

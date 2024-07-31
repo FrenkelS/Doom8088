@@ -650,7 +650,7 @@ static void G_DoCompleted (void)
    *  the times in seconds shown for each level. Also means our total time
    *  will agree with Compet-n.
    */
-    _g_wminfo.totaltimes = (totalleveltimes += (_g_leveltime - _g_leveltime%35));
+    _g_wminfo.totaltimes = (totalleveltimes += (_g_leveltime - (int16_t)_g_leveltime % TICRATE));
 
     _g_gamestate = GS_INTERMISSION;
     automapmode &= ~am_active;
