@@ -36,9 +36,7 @@ static int16_t firstflat;
 static int16_t  animated_flat_basepic;
 static int16_t __far* flattranslation;             // for global animation
 
-#if defined FLAT_SPAN
-static int16_t animated_flat_basepic_color[3];
-#else
+#if !defined FLAT_SPAN
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
 
@@ -400,11 +398,6 @@ void R_InitFlats(void)
 
 	Z_Free(histogram);
 	Z_Free(source);
-
-	// Animated Nukage colors
-	animated_flat_basepic_color[0] = 122;
-	animated_flat_basepic_color[1] = 124;
-	animated_flat_basepic_color[2] = 126;
 #else
 	for (int16_t i = 0; i < numflats; i++)
 		flattranslation[i] = i;
@@ -425,10 +418,12 @@ int16_t R_FlatNumForName(const char *name)
 }
 
 
+#define FLAT_NUKAGE1_COLOR 122
+
 void P_UpdateAnimatedFlat(void)
 {
 #if defined FLAT_SPAN
-	int16_t pic = animated_flat_basepic_color[(_g_leveltime >> 3) % 3];
+	int16_t pic = FLAT_NUKAGE1_COLOR + (((int16_t)_g_leveltime >> 3) % 3) * 2;
 #else
 	int16_t pic = animated_flat_basepic + ((_g_leveltime >> 3) % 3);
 #endif
