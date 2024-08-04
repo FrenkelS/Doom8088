@@ -62,7 +62,8 @@ R_DrawColumn2:
 	les di, [dest]					; es:di = dest
 	lds si, [source]				; ds:si = source
 
-	push cx							; push count
+	mov bx, cx						; bx = count
+
 	mov ah, cl						; 1 <= ah <= 128
 	mov cl, 4
 	shr ah, cl						; 0 <= ah <= 8
@@ -71,6 +72,8 @@ R_DrawColumn2:
 
 	or ah, ah						; if ah = 0
 	jz last_pixels					;  then jump to last_pixels
+
+	push bx							; push count
 
 loop_pixels:
 	mov al, dh						; al = hi byte of frac
@@ -236,11 +239,11 @@ loop_pixels:
 	dec ah
 	jnz loop_pixels					; if --ah != 0 then jump to loop_pixels
 
+	pop bx							; pop count
 
 last_pixels:
-	pop bx							; pop count
-	and bx, 15						; 0 <= count <= 15
-	shl bx, 1
+	and bl, 15						; 0 <= count <= 15
+	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
 
 
