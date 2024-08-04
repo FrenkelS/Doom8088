@@ -62,7 +62,8 @@ R_DrawColumn2:
 	les di, [dest]					; es:di = dest
 	lds si, [source]				; ds:si = source
 
-	push cx							; push count
+	mov bx, cx						; bx = count
+
 	mov al, cl						; 1 <= al <= 128
 	mov cl, 4
 	shr al, cl						; 0 <= al <= 8
@@ -71,6 +72,8 @@ R_DrawColumn2:
 
 	or al, al						; if al = 0
 	jz last_pixels					;  then jump to last_pixels
+
+	push bx							; push count
 
 loop_pixels:
 	push ax
@@ -271,11 +274,12 @@ loop_pixels:
 	dec al
 	jnz loop_pixels					; if --al != 0 then jump to loop_pixels
 
+	pop bx							; pop count
+
 
 last_pixels:
-	pop bx							; pop count
-	and bx, 15						; 0 <= count <= 15
-	shl bx, 1
+	and bl, 15						; 0 <= count <= 15
+	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
 
 

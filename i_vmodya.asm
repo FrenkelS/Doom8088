@@ -241,6 +241,7 @@ loop_pixels:
 
 	pop bx							; pop count
 
+
 last_pixels:
 	and bl, 15						; 0 <= count <= 15
 	shl bl, 1
