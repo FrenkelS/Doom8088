@@ -15,7 +15,13 @@
 ; along with this program. If not, see <https://www.gnu.org/licenses/>.
 ;
 
+%ifidn CPU, i8088
 cpu 8086
+%elifidn CPU, i286
+cpu 286
+%else
+%error unsupported cpu CPU
+%endif
 
 bits 16
 
@@ -65,8 +71,12 @@ R_DrawColumn2:
 	mov bx, cx						; bx = count
 
 	mov ah, cl						; 1 <= ah <= 128
+%ifidn CPU, i8088
 	mov cl, 4
 	shr ah, cl						; 0 <= ah <= 8
+%else
+	shr ah, 4						; 0 <= ah <= 8
+%endif
 
 	mov cx, nearcolormap
 
