@@ -62,18 +62,18 @@ R_DrawColumn2:
 	les di, [dest]					; es:di = dest
 	lds si, [source]				; ds:si = source
 
-	mov ch, cl						; ch = count
-	shr cl, 1
-	shr cl, 1
-	shr cl, 1
-	shr cl, 1						; 0 <= cl <= 8
+	push cx							; push count
+	mov al, cl						; 1 <= al <= 128
+	mov cl, 4
+	shr al, cl						; 0 <= al <= 8
 
-	or cl, cl						; if cl = 0
+	mov cx, nearcolormap
+
+	or al, al						; if al = 0
 	jz last_pixels					;  then jump to last_pixels
 
 loop_pixels:
-	push cx
-	mov cx, nearcolormap
+	push ax
 
 	mov al, dh						; al = hi byte of frac
 	shr al, 1						; 0 <= al <= 127
@@ -267,17 +267,15 @@ loop_pixels:
 	add di, SCREENWIDTH-4
 	add dx, bp
 
-	pop cx
-	dec cl
-	jnz loop_pixels					; if --cl != 0 then jump to loop_pixels
+	pop ax
+	dec al
+	jnz loop_pixels					; if --al != 0 then jump to loop_pixels
 
 
 last_pixels:
-	and ch, 15						; 0 <= count <= 15
-	xor bh, bh
-	mov bl, ch
+	pop bx							; pop count
+	and bx, 15						; 0 <= count <= 15
 	shl bx, 1
-	mov cx, nearcolormap
 	cs jmp last_pixel_jump_table[bx]
 
 
