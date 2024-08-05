@@ -1566,7 +1566,7 @@ static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t 
     if (cacheEntry != CACHE_ENTRY(xc, texture))
     {
         //misses++;
-        byte tmpCache[128];
+        static byte tmpCache[128];
 
         uint8_t i = 0;
         uint8_t patchcount = tex->patchcount;
