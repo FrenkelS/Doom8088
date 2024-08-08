@@ -1493,9 +1493,9 @@ static void R_DrawColumnInCache(const column_t __far* patch, byte* cache, int16_
 */
 
 #define CACHE_WAYS 4
-
+#define MAX_CACHE_ENTRIES 128
 #define CACHE_MASK (CACHE_WAYS-1)
-#define CACHE_STRIDE (128 / CACHE_WAYS)
+#define CACHE_STRIDE (MAX_CACHE_ENTRIES / CACHE_WAYS)
 #define CACHE_KEY_MASK (CACHE_STRIDE-1)
 
 static uint16_t CACHE_ENTRY(int16_t column, int16_t texture)
@@ -1508,8 +1508,8 @@ static uint16_t CACHE_HASH(int16_t column, int16_t texture)
 	return ((column >> 2) ^ texture) & CACHE_KEY_MASK;
 }
 
-static byte __far columnCache[128*128];
-static uint16_t columnCacheEntries[128];
+static byte __far columnCache[MAX_CACHE_ENTRIES*128];
+static uint16_t columnCacheEntries[MAX_CACHE_ENTRIES];
 
 static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 {
@@ -1531,7 +1531,7 @@ static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
         cc+=CACHE_STRIDE;
         i+=CACHE_STRIDE;
 
-    } while(i < 128);
+    } while(i < MAX_CACHE_ENTRIES);
 
 
     //No space. Random eviction.
