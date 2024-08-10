@@ -1492,20 +1492,12 @@ static void R_DrawColumnInCache(const column_t __far* patch, byte* cache, int16_
  * straight from const patch_t*.
 */
 
-#define CACHE_WAYS 4
 #define MAX_CACHE_ENTRIES 128
-#define CACHE_MASK (CACHE_WAYS-1)
-#define CACHE_STRIDE (MAX_CACHE_ENTRIES / CACHE_WAYS)
-#define CACHE_KEY_MASK (CACHE_STRIDE-1)
+#define MAX_CACHE_TRIES 4
 
 static uint16_t CACHE_ENTRY(int16_t column, int16_t texture)
 {
 	return column | (texture << 8);
-}
-
-static uint16_t CACHE_HASH(int16_t column, int16_t texture)
-{
-	return ((column >> 2) ^ texture) & CACHE_KEY_MASK;
 }
 
 static byte __far columnCache[MAX_CACHE_ENTRIES*128];
@@ -1513,29 +1505,21 @@ static uint16_t columnCacheEntries[MAX_CACHE_ENTRIES];
 
 static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 {
-    uint16_t cx = CACHE_ENTRY(column, texture);
+	uint16_t hash = ((column >> 2) ^ texture) & (MAX_CACHE_ENTRIES - 1);
+	uint16_t key = hash;
 
-    uint16_t key = CACHE_HASH(column, texture);
+	uint16_t cx = CACHE_ENTRY(column, texture);
 
-    uint16_t* cc = &columnCacheEntries[key];
+	for (int16_t i = 0; i < MAX_CACHE_TRIES; i++)
+	{
+		if (columnCacheEntries[key] == 0 || columnCacheEntries[key] == cx)
+			return key;
 
-    uint16_t i = key;
+		key += (MAX_CACHE_ENTRIES / MAX_CACHE_TRIES);
+		key &= (MAX_CACHE_ENTRIES - 1);
+	}
 
-    do
-    {
-        uint16_t cy = *cc;
-
-        if((cy == cx) || (cy == 0))
-            return i;
-
-        cc+=CACHE_STRIDE;
-        i+=CACHE_STRIDE;
-
-    } while(i < MAX_CACHE_ENTRIES);
-
-
-    //No space. Random eviction.
-    return ((M_Random() & CACHE_MASK) * CACHE_STRIDE) + key;
+	return hash;
 }
 
 
