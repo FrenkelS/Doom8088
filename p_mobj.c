@@ -379,6 +379,17 @@ static void P_SlideMove(mobj_t __far* mo)
 }
 
 
+static fixed_t FixedMul32OrigFriction(fixed_t a)
+{
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * ORIG_FRICTION;
+	 int32_t hl = ( int32_t) ahw * ORIG_FRICTION;
+	return (ll >> FRACBITS) + hl;
+}
+
+
 //
 // P_XYMovement
 //
@@ -537,8 +548,8 @@ static void P_XYMovement(mobj_t __far* mo)
        * cph - DEMOSYNC - need old code for Boom demos?
        */
 
-        mo->momx = FixedMul3216(mo->momx, ORIG_FRICTION);
-        mo->momy = FixedMul3216(mo->momy, ORIG_FRICTION);
+        mo->momx = FixedMul32OrigFriction(mo->momx);
+        mo->momy = FixedMul32OrigFriction(mo->momy);
 
         /* killough 10/98: Always decrease player bobbing by ORIG_FRICTION.
        * This prevents problems with bobbing on ice, where it was not being
@@ -548,8 +559,8 @@ static void P_XYMovement(mobj_t __far* mo)
 
         if (player && player->mo == mo)     /* Not voodoo dolls */
         {
-            player->momx = FixedMul3216(player->momx, ORIG_FRICTION);
-            player->momy = FixedMul3216(player->momy, ORIG_FRICTION);
+            player->momx = FixedMul32OrigFriction(player->momx);
+            player->momy = FixedMul32OrigFriction(player->momy);
         }
     }
 }

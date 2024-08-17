@@ -65,7 +65,6 @@ typedef int32_t fixed_t;
 
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b);
 fixed_t CONSTFUNC FixedMulAngle(fixed_t a, fixed_t b);
-fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw);
 
 
 //Approx Reciprocal of v
