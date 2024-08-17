@@ -180,14 +180,14 @@ static boolean P_CrossSubsector(int16_t num)
 
         if (front->floorheight != back->floorheight)
         {
-            fixed_t slope = frac != 0 ? FixedApproxDiv3216(openbottom - los.sightzstart, frac) : INT32_MAX;
+            fixed_t slope = frac != 0 ? ((openbottom - los.sightzstart) >> FRACBITS) * FixedReciprocalSmall(frac) : INT32_MAX;
             if (slope > los.bottomslope)
                 los.bottomslope = slope;
         }
 
         if (front->ceilingheight != back->ceilingheight)
         {
-            fixed_t slope = frac != 0 ? FixedApproxDiv3216(opentop - los.sightzstart, frac) : INT32_MAX;
+            fixed_t slope = frac != 0 ? ((opentop - los.sightzstart) >> FRACBITS) * FixedReciprocalSmall(frac) : INT32_MAX;
             if (slope < los.topslope)
                 los.topslope = slope;
         }

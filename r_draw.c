@@ -312,7 +312,7 @@ inline static fixed_t CONSTFUNC FixedMul3232(fixed_t a, fixed_t b)
 
 //
 // FixedMulAngle
-// b should be coming from finesine() or finecosine(), so it's high word is either 0x0000 or 0xffff
+// b should be coming from finesine() or finecosine(), so its high word is either 0x0000 or 0xffff
 //
 #if defined __WATCOMC__
 //
@@ -352,20 +352,6 @@ fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 }
 
 
-//
-// FixedReciprocalSmall
-// Divide FFFFFFFFh by a 16-bit number.
-//
-
-#if defined C_ONLY
-#define FixedReciprocalSmall(v) (0xffffffffu/(uint16_t)(v))
-#define FixedReciprocalBig(v)   (0xffffffffu/(v))
-#else
-fixed_t  CONSTFUNC FixedReciprocalSmall(uint16_t v);
-uint16_t CONSTFUNC FixedReciprocalBig(fixed_t v);
-#endif
-
-
 //Approx fixed point divide of a/b using reciprocal. -> a * (1/b).
 #if defined __WATCOMC__
 //
@@ -378,17 +364,6 @@ fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 		return FixedMul3232(a, FixedReciprocalSmall(b));
 	else
 		return FixedMul3216(a, FixedReciprocalBig(b));
-}
-
-
-#if defined __WATCOMC__
-//
-#else
-inline
-#endif
-fixed_t CONSTFUNC FixedApproxDiv3216(fixed_t a, uint16_t b)
-{
-	return FixedMul3232(a, FixedReciprocalSmall(b));
 }
 
 
