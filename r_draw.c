@@ -2558,63 +2558,67 @@ static boolean R_RenderBspSubsector(int16_t bspnum)
 //Non recursive version.
 //constant stack space used and easier to
 //performance profile.
-#define MAX_BSP_DEPTH 128
+#define MAX_BSP_DEPTH 64
 
 static void R_RenderBSPNode(int16_t bspnum)
 {
-    int16_t stack[MAX_BSP_DEPTH];
+    static int16_t stack_bsp[MAX_BSP_DEPTH];
+    static int8_t  stack_side[MAX_BSP_DEPTH];
     int16_t sp = 0;
 
     const mapnode_t __far* bsp;
-    int16_t side = 0;
+    int8_t side;
 
-    while(true)
+    while (true)
     {
         //Front sides.
         while (!R_RenderBspSubsector(bspnum))
         {
-            if(sp == MAX_BSP_DEPTH)
+            if (sp == MAX_BSP_DEPTH)
                 break;
 
             bsp = &nodes[bspnum];
-            side = R_PointOnSide (viewx, viewy, bsp);
+            side = R_PointOnSide(viewx, viewy, bsp);
 
-            stack[sp++] = bspnum;
-            stack[sp++] = side;
+            stack_bsp[sp]  = bspnum;
+            stack_side[sp] = side ^ 1;
+            sp++;
 
             bspnum = bsp->children[side];
         }
 
-        if(sp == 0)
+        if (sp == 0)
         {
             //back at root node and not visible. All done!
             return;
         }
 
         //Back sides.
-        side = stack[--sp];
-        bspnum = stack[--sp];
-        bsp = &nodes[bspnum];
+        --sp;
+        side   = stack_side[sp];
+        bspnum = stack_bsp[sp];
+        bsp    = &nodes[bspnum];
 
         // Possibly divide back space.
         //Walk back up the tree until we find
         //a node that has a visible backspace.
-        while(!R_CheckBBox (bsp->bbox[side^1]))
+        while (!R_CheckBBox(bsp->bbox[side]))
         {
-            if(sp == 0)
+            if (sp == 0)
             {
                 //back at root node and not visible. All done!
                 return;
             }
 
             //Back side next.
-            side = stack[--sp];
-            bspnum = stack[--sp];
+            --sp;
+            side   = stack_side[sp];
+            bspnum = stack_bsp[sp];
 
             bsp = &nodes[bspnum];
         }
 
-        bspnum = bsp->children[side^1];
+        bspnum = bsp->children[side];
     }
 }
 #else
