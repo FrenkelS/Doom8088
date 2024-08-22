@@ -451,8 +451,8 @@ static void M_AddToBox(fixed_t* box,fixed_t x,fixed_t y)
 
 static void P_GroupLines (void)
 {
-    register const line_t __far* li;
-    register sector_t __far* sector;
+    const line_t __far* li;
+    sector_t __far* sector;
     int16_t i,j, total = _g_numlines;
 
     // figgi
