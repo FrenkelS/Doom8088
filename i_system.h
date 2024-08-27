@@ -41,8 +41,8 @@
 void I_InitTimer(void);
 int32_t I_GetTime(void);
 
-void NORETURN_PRE I_Quit(void) NORETURN_POST;
-void NORETURN_PRE I_Error(const char *error, ...) NORETURN_POST;
+void _Noreturn I_Quit(void);
+void _Noreturn I_Error(const char *error, ...);
 
 void I_InitScreen(void);
 
