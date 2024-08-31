@@ -118,13 +118,13 @@ void D_PostEvent(event_t *ev)
 static void D_BuildNewTiccmds(void)
 {
     static int32_t lastmadetic = 0;
-    int32_t newtics = I_GetTime() - lastmadetic;
+    int16_t newtics = I_GetTime() - lastmadetic;
     lastmadetic += newtics;
 
     while (newtics--)
     {
         I_StartTic();
-        if (maketic - _g_gametic > 3)
+        if ((int16_t)(maketic - _g_gametic) > 3)
             break;
 
         G_BuildTiccmd();
@@ -210,7 +210,7 @@ static void D_Display (void)
 //? how many ticks to run?
 static void TryRunTics (void)
 {
-    int32_t runtics;
+    int16_t runtics;
     int32_t entertime = I_GetTime();
 
     // Wait for tics to run
@@ -222,7 +222,7 @@ static void TryRunTics (void)
         runtics = maketic - _g_gametic;
         if (runtics <= 0)
         {
-            if (I_GetTime() - entertime > 10)
+            if ((int16_t)(I_GetTime() - entertime) > 10)
             {
                 M_Ticker();
                 return;
