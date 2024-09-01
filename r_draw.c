@@ -1331,7 +1331,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
         return;
     }
 
-    fixed_t xr = CENTERX * FRACUNIT + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale) - FRACUNIT;
+    fixed_t xr = CENTERX * FRACUNIT - FRACUNIT + FixedMul(tx + (((int32_t)patch->width) << FRACBITS), xscale);
     const int16_t x2 = (xr >> FRACBITS);
 
     // off the side?
