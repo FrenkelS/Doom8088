@@ -90,7 +90,7 @@ static void __far*__far* lumpcache;
 static void _ffread(void __far* ptr, uint16_t size, FILE* fp)
 {
 	uint8_t __far* dest = ptr;
-	uint8_t* buffer = alloca(BUFFERSIZE);
+	uint8_t buffer[BUFFERSIZE];
 
 	while (size >= BUFFERSIZE)
 	{
@@ -122,7 +122,7 @@ static boolean W_LoadWADIntoXMS(void)
 	printf("Loading WAD into XMS\n");
 	printf("Get Psyched!\n");
 
-	uint8_t* buffer = alloca(BUFFERSIZE);
+	uint8_t buffer[BUFFERSIZE];
 
 	fseek(fileWAD, 0, SEEK_SET);
 	uint32_t dest = 0;
