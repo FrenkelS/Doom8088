@@ -49,6 +49,33 @@ static uint8_t __far* vgascreen;
 #define PEL_WRITE_ADR   0x3c8
 #define PEL_DATA        0x3c9
 
+
+static const uint8_t colors[14][3] =
+{
+	// normal
+	{0, 0, 0},
+
+	// red
+	{0x07, 0, 0},
+	{0x0e, 0, 0},
+	{0x15, 0, 0},
+	{0x1c, 0, 0},
+	{0x23, 0, 0},
+	{0x2a, 0, 0},
+	{0x31, 0, 0},
+	{0x3b, 0, 0},
+
+	// yellow
+	{0x06, 0x05, 0x02},
+	{0x0d, 0x0b, 0x04},
+	{0x14, 0x11, 0x06},
+	{0x1a, 0x17, 0x08},
+
+	// green
+	{0, 0x08, 0}
+};
+
+
 static void I_UploadNewPalette(int8_t pal)
 {
 	// This is used to replace the current 256 colour cmap with a new one
@@ -70,6 +97,13 @@ static void I_UploadNewPalette(int8_t pal)
 			outp(PEL_DATA, (*palette++) >> 2);
 
 		Z_ChangeTagToCache(palette_lump);
+	}
+	else
+	{
+		outp(PEL_WRITE_ADR, 0);
+		outp(PEL_DATA, colors[pal][0]);
+		outp(PEL_DATA, colors[pal][1]);
+		outp(PEL_DATA, colors[pal][2]);
 	}
 }
 
