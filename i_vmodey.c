@@ -58,7 +58,7 @@
 #define PEL_WRITE_ADR   0x3c8
 #define PEL_DATA        0x3c9
 
- 
+
 extern const int16_t CENTERY;
 
 

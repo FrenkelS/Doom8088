@@ -198,12 +198,12 @@ static void D_Display (void)
 
     D_BuildNewTiccmds();
 
-    if (!wipe)
-        // normal update
-        I_FinishUpdate ();              // page flip or blit buffer
-    else
+    if (wipe)
         // wipe update
         D_Wipe();
+    else
+        // normal update
+        I_FinishUpdate ();              // page flip or blit buffer
 }
 
 

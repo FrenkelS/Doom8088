@@ -38,7 +38,7 @@
 
 #include "globdata.h"
 
- 
+
 extern const int16_t CENTERY;
 
 // The screen is [SCREENWIDTH * SCREENHEIGHT];
