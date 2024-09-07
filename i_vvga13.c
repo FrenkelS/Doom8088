@@ -121,20 +121,31 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
+static boolean drawStatusBar = true;
+
+
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
 	uint8_t __far* dst = vgascreen;
 
-#if defined DISABLE_STATUS_BAR
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
-#else
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
-#endif
+	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
+	{
 		_fmemcpy(dst, src, SCREENWIDTH);
 		dst += SCREENWIDTH_VGA;
 		src += SCREENWIDTH;
 	}
+
+	if (drawStatusBar)
+	{
+		for (uint_fast8_t y = 0; y < ST_HEIGHT; y++)
+		{
+			_fmemcpy(dst, src, SCREENWIDTH);
+			dst += SCREENWIDTH_VGA;
+			src += SCREENWIDTH;
+		}
+	}
+	drawStatusBar = true;
 }
 
 
@@ -537,6 +548,8 @@ void ST_Drawer(void)
 {
 	if (ST_NeedUpdate())
 		ST_doRefresh();
+	else
+		drawStatusBar = false;
 }
 
 
