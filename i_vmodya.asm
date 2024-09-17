@@ -69,6 +69,7 @@ R_DrawColumn2:
 	lds si, [source]				; ds:si = source
 
 	mov bx, cx						; bx = count
+	;mov cx, bx
 
 	mov ah, cl						; 1 <= ah <= 128
 %ifidn CPU, i8088

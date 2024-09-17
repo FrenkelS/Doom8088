@@ -32,10 +32,13 @@
 #
 # --------------------------------------------------------------------------
 
-#CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DFLAT_SPAN -DC_ONLY
-#CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DFLAT_SPAN -DC_ONLY
-CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN -DC_ONLY
-CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN -DC_ONLY
+CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
+CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
+#CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
+#CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
+
+CPU = i8088
+#CPU = i286
 
 GLOBOBJS = &
  a_pcfx.obj &
@@ -50,8 +53,10 @@ GLOBOBJS = &
  i_main.obj &
  i_system.obj &
  i_vmodey.obj &
+ i_vmodya.obj &
  info.obj &
  m_cheat.obj &
+ m_fixed.obj &
  m_menu.obj &
  m_random.obj &
  p_doors.obj &
@@ -84,6 +89,7 @@ GLOBOBJS = &
  w_wad.obj &
  wi_stuff.obj &
  z_bmallo.obj &
+ z_xms.obj &
  z_zone.obj
 
 WC16\DOOM16WC.EXE : $(GLOBOBJS)
@@ -94,32 +100,35 @@ WC16\DOOM16WC.EXE : $(GLOBOBJS)
 .obj : WC16
 
 .c.obj :
- wcc $(CCOPTSS) $[* /fo=WC16\$^&
+ wcc $(CCOPTSS) $[* -fo=WC16\$^&
+
+.asm.obj :
+ nasm $[*.asm -f obj -DCPU=$(CPU) -o WC16\$^&.obj
 
 
 i_vmodey.obj : i_vmodey.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
 
 p_map.obj : p_map.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
 
 p_maputl.obj : p_maputl.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
 
 p_sight.obj : p_sight.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
 
 r_draw.obj : r_draw.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
 
 r_plane.obj : r_plane.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
 
 tables.obj : tables.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
 
 w_wad.obj : w_wad.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
 
 z_zone.obj : z_zone.c
- wcc $(CCOPTST) $[* /fo=WC16\$^&
+ wcc $(CCOPTST) $[* -fo=WC16\$^&
