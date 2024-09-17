@@ -68,7 +68,7 @@ __inline static PUREFUNC uint32_t linearAddress(const void __far* ptr)
 
 __inline static PUREFUNC int16_t iselem(const bmalpool_t __far* pool, size_t size, const void __far* p)
 {
-	int16_t dif = linearAddress(p) - linearAddress(pool);
+	int32_t dif = linearAddress(p) - linearAddress(pool);
 
 	dif -= sizeof(bmalpool_t);
 	dif -= pool->blocks;

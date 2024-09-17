@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -65,14 +65,18 @@ typedef int32_t fixed_t;
 
 fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b);
 fixed_t CONSTFUNC FixedMulAngle(fixed_t a, fixed_t b);
-fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw);
 
 
 //Approx Reciprocal of v
+// Divide FFFFFFFFh by a number.
 #if defined C_ONLY
-#define FixedReciprocal(v) (0xffffffffu/(v))
+#define FixedReciprocal(v)      (0xffffffffu/(v))
+#define FixedReciprocalBig(v)   (0xffffffffu/(v))
+#define FixedReciprocalSmall(v) (0xffffffffu/(uint16_t)(v))
 #else
-fixed_t CONSTFUNC FixedReciprocal(fixed_t v);
+fixed_t  CONSTFUNC FixedReciprocal(fixed_t v);
+uint16_t CONSTFUNC FixedReciprocalBig(fixed_t v);
+fixed_t  CONSTFUNC FixedReciprocalSmall(uint16_t v);
 #endif
 
 

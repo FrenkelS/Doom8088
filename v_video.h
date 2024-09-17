@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -51,6 +51,7 @@
 void V_DrawBackground(void);
 
 void V_DrawRaw(int16_t num, uint16_t offset);
+void V_DrawRawFullScreen(int16_t num);
 
 // V_DrawNumPatchScaled - Draws the patch from lump num
 void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch);

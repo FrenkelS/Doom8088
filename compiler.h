@@ -1,6 +1,6 @@
 //
 //
-// Copyright (C) 2023 Frenkel Smeijers
+// Copyright (C) 2023-2024 Frenkel Smeijers
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -32,6 +32,7 @@
 #endif
 
 typedef uint16_t segment_t;
+#define SIZE_OF_SEGMENT_T 2
 
 #else
 //32-bit
@@ -40,6 +41,7 @@ typedef uint16_t segment_t;
 #define D_FP_OFF(p)  (((uint32_t)p)&15)
 
 typedef uint32_t segment_t;
+#define SIZE_OF_SEGMENT_T 4
 
 #define __far
 

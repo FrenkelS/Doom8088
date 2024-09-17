@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -182,25 +182,6 @@ static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 // and addlines traversers.
 //
 
-/* cph - this is killough's 4/19/98 version of P_InterceptVector and
- *  P_InterceptVector2 (which were interchangeable). We still use this
- *  in compatibility mode. */
-fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
-{
-	fixed_t a = (v1->dy >> FRACBITS) * ((v1->x - v2->x) >> 8);
-	fixed_t b = (v1->dx >> FRACBITS) * ((v2->y - v1->y) >> 8);
-	fixed_t c = FixedMul(v2->dx, v1->dy >> 8);
-	fixed_t d = FixedMul(v2->dy, v1->dx >> 8);
-
-	fixed_t num = a + b;
-	fixed_t den = c - d;
-
-	if (num == 0 || den == 0)
-		return 0;
-	else
-		return FixedDiv(num, den);
-}
-
 static fixed_t PUREFUNC P_InterceptVector3(const divline_t *v2, const divline_t *v1)
 {
 	fixed_t a = (v1->dy >> FRACBITS) * ((v1->x - v2->x) >> 8);
@@ -302,7 +283,7 @@ void P_UnsetThingPosition(mobj_t __far* thing)
         // If this Thing is being removed entirely, then the calling
         // routine will clear out the nodes in sector_list.
 
-      _g_sector_list = thing->touching_sectorlist;
+      P_SetSeclist(thing->touching_sectorlist);
       thing->touching_sectorlist = NULL; //to be restored by P_SetThingPosition
     }
 
@@ -364,8 +345,6 @@ void P_SetThingPosition(mobj_t __far* thing)
       // added, new sector links are created.
 
       P_CreateSecNodeList(thing);
-      thing->touching_sectorlist = _g_sector_list; // Attach to Thing's mobj_t
-      _g_sector_list = NULL; // clear for next time
     }
 
   // link into blockmap

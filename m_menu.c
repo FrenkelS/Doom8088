@@ -37,7 +37,6 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -145,6 +144,7 @@ static void M_LoadGame(int16_t choice);
 static void M_SaveGame(int16_t choice);
 static void M_Options(int16_t choice);
 static void M_EndGame(int16_t choice);
+static void M_QuitDOOM(int16_t choice);
 
 
 static void M_ChangeMessages(int16_t choice);
@@ -196,6 +196,7 @@ enum
 #if !defined DISABLE_SAVE_GAME
   savegame,
 #endif
+  quitdoom,
   main_end
 };
 
@@ -214,6 +215,7 @@ static const menuitem_t MainMenu[]=
 #if !defined DISABLE_SAVE_GAME
   {1,"M_SAVEG", M_SaveGame},
 #endif
+  {1,"M_QUITG", M_QuitDOOM}
 };
 
 static const menu_t MainDef =
@@ -508,6 +510,26 @@ static void M_SaveGame (int16_t choice)
 	M_SetupNextMenu(&SaveDef);
 	M_ReadSaveStrings();
 }
+
+
+/////////////////////////////
+//
+// QUIT DOOM
+//
+
+static void M_QuitResponse(boolean affirmative)
+{
+	if (affirmative)
+		I_Quit();
+}
+
+
+static void M_QuitDOOM(int16_t choice)
+{
+	UNUSED(choice);
+	M_StartMessage(QUITMSG, M_QuitResponse);
+}
+
 
 /////////////////////////////
 //
@@ -805,13 +827,13 @@ boolean M_Responder (event_t* ev)
     if (messageToPrint)
     {
         if (messageNeedsInput == true &&
-                !(ch == 'n' || ch == 'y' || ch == key_escape || ch == key_fire || ch == key_enter))
+                !(ch == 'n' || ch == 'y' || ch == key_escape))
             return false;
 
         _g_menuactive  = messageLastMenuActive;
         messageToPrint = false;
         if (messageRoutine)
-            messageRoutine(ch == 'y' || ch == key_fire || ch == key_enter);
+            messageRoutine(ch == 'y');
 
         _g_menuactive = false;
         S_StartSound(NULL,sfx_swtchx);

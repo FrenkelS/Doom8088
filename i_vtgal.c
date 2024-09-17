@@ -106,30 +106,55 @@ static const uint8_t VGA_TO_ETGA_LUT[256] =
 };
 
 
+static boolean drawStatusBar = true;
+
+
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
 	uint8_t __far* dst = videomemory;
 
-#if defined DISABLE_STATUS_BAR
-	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++) {
-#else
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT / 2; y++) {
-#endif
-		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
+	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++)
+	{
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
+		{
 			*dst++ = VGA_TO_ETGA_LUT[*src];
 			src += 4;
 		}
 
 		dst += 0x2000 - VIEWWINDOWWIDTH;
 
-		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++) {
+		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
+		{
 			*dst++ = VGA_TO_ETGA_LUT[*src];
 			src += 4;
 		}
 
 		dst -= 0x2000 - (PLANEWIDTH - VIEWWINDOWWIDTH);
 	}
+
+	if (drawStatusBar)
+	{
+		for (uint_fast8_t y = 0; y < ST_HEIGHT / 2; y++)
+		{
+			for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
+			{
+				*dst++ = VGA_TO_ETGA_LUT[*src];
+				src += 4;
+			}
+
+			dst += 0x2000 - VIEWWINDOWWIDTH;
+
+			for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
+			{
+				*dst++ = VGA_TO_ETGA_LUT[*src];
+				src += 4;
+			}
+
+			dst -= 0x2000 - (PLANEWIDTH - VIEWWINDOWWIDTH);
+		}
+	}
+	drawStatusBar = true;
 }
 
 
@@ -183,11 +208,47 @@ uint8_t __far* dest;
 
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
-	while (count--)
+	int16_t l = count >> 4;
+	while (l--)
 	{
-		*dest = nearcolormap[source[frac >> COLBITS]];
-		dest += SCREENWIDTH;
-		frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+	}
+
+	switch (count & 15)
+	{
+		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
 	}
 }
 
@@ -441,6 +502,15 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 }
 
 
+void ST_Drawer(void)
+{
+	if (ST_NeedUpdate())
+		ST_doRefresh();
+	else
+		drawStatusBar = false;
+}
+
+
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
 	y -= patch->topoffset;
@@ -452,7 +522,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 	for (int16_t col = 0; col < width; col++, desttop++)
 	{
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
@@ -507,7 +577,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		else if (dc_x >= SCREENWIDTH)
 			break;
 
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> 8]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)

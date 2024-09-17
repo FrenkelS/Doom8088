@@ -147,11 +147,7 @@
 
 
 #if defined __WATCOMC__
-	#define NORETURN_PRE  __declspec(noreturn)
-	#define NORETURN_POST
-#else
-	#define NORETURN_PRE
-	#define NORETURN_POST __attribute__((__noreturn__))
+	#define _Noreturn __declspec(aborts)
 #endif
 
 

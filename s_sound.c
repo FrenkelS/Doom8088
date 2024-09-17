@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -508,7 +508,7 @@ static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source,
     angle >>= ANGLETOFINESHIFT;
 
     // stereo separation
-    *sep = 128 - ((S_STEREO_SWING * finesine(angle))>>FRACBITS);
+    *sep = 128 - ((S_STEREO_SWING * finesineapprox(angle))>>FRACBITS);
 
 
 	// volume calculation

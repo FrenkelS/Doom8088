@@ -409,7 +409,35 @@ fixed_t finecosine(int16_t x)
 }
 
 
-const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
+fixed_t finesineapprox(int16_t x)
+{
+	if (x < 2048) {			//    0 <= x < 2048
+		return finesineTable_part_1[x];
+	} else if (x < 4096) {	// 2048 <= x < 4096
+		return finesineTable_part_1[4095 - x];
+	} else if (x < 6144) {	// 4096 <= x < 6144
+		return 0xffff0000 | -finesineTable_part_1[x - 4096];
+	} else {				// 6144 <= x < 8192
+		return 0xffff0000 | -finesineTable_part_1[8191 - x];
+	}
+}
+
+
+fixed_t finecosineapprox(int16_t x)
+{
+	if (x < 2048) {			//    0 <= x < 2048
+		return finesineTable_part_1[4095 - (x + (FINEANGLES / 4))];
+	} else if (x < 4096) {	// 2048 <= x < 4096
+		return 0xffff0000 | -finesineTable_part_1[(x + (FINEANGLES / 4)) - 4096];
+	} else if (x < 6144) {	// 4096 <= x < 6144
+		return 0xffff0000 | -finesineTable_part_1[8191 - (x + (FINEANGLES / 4))];
+	} else {				// 6144 <= x < 8192
+		return finesineTable_part_1[x - 6144];
+	}
+}
+
+
+const angle16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
 {
 	0x2008, 0x1F50, 0x1EA0, 0x1DE0,
 	0x1D20, 0x1C50, 0x1B80, 0x1AA8,

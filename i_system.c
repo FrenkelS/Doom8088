@@ -40,8 +40,6 @@
 void I_InitGraphicsHardwareSpecificCode(void);
 void I_ShutdownGraphicsHardwareSpecificCode(void);
 
-static void NORETURN_PRE I_Quit(void) NORETURN_POST;
-
 
 static boolean isGraphicsModeSet = false;
 
@@ -66,7 +64,7 @@ void I_InitGraphics(void)
 }
 
 
-void I_ShutdownGraphics(void)
+static void I_ShutdownGraphics(void)
 {
 	I_ShutdownGraphicsHardwareSpecificCode();
 	I_SetScreenMode(3);
@@ -126,6 +124,7 @@ void I_InitScreen(void)
 #define SC_RSHIFT			0x36
 #define SC_COMMA			0x33
 #define SC_PERIOD			0x34
+#define SC_ALT				0x38
 #define SC_SPACE			0x39
 #define SC_F10				0x44
 #define SC_UPARROW			0x48
@@ -189,8 +188,10 @@ void I_StartTic(void)
 				break;
 			case SC_ENTER:
 			case SC_SPACE:
-			case SC_RSHIFT:
 				ev.data1 = KEYD_A;
+				break;
+			case SC_RSHIFT:
+				ev.data1 = KEYD_SPEED;
 				break;
 			case SC_UPARROW:
 				ev.data1 = KEYD_UP;
@@ -209,6 +210,9 @@ void I_StartTic(void)
 				break;
 			case SC_CTRL:
 				ev.data1 = KEYD_B;
+				break;
+			case SC_ALT:
+				ev.data1 = KEYD_STRAFE;
 				break;
 			case SC_COMMA:
 				ev.data1 = KEYD_L;
@@ -315,11 +319,12 @@ static void I_Shutdown(void)
 		restoreInterrupt(KEYBOARDINT, oldkeyboardisr, newkeyboardisr);
 	}
 
+	W_Shutdown();
 	Z_Shutdown();
 }
 
 
-static void I_Quit(void)
+void I_Quit(void)
 {
 	I_Shutdown();
 

@@ -36,9 +36,7 @@ static int16_t firstflat;
 static int16_t  animated_flat_basepic;
 static int16_t __far* flattranslation;             // for global animation
 
-#if defined FLAT_SPAN
-static int16_t animated_flat_basepic_color[3];
-#else
+#if !defined FLAT_SPAN
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
 
@@ -124,8 +122,8 @@ static void R_MapPlane(uint16_t y, uint16_t x1, uint16_t x2, draw_span_vars_t *d
     int16_t angle = (viewangle + (((angle_t)xtoviewangleTable[x1]) << FRACBITS)) >> ANGLETOFINESHIFT;
 
     // killough 2/28/98: Add offsets
-    uint32_t xfrac =  viewx + FixedMulAngle(length, finecosine(angle));
-    uint32_t yfrac = -viewy - FixedMulAngle(length, finesine(  angle));
+    uint32_t xfrac =  viewx + FixedMulAngle(length, finecosineapprox(angle));
+    uint32_t yfrac = -viewy - FixedMulAngle(length, finesineapprox(  angle));
 
     dsvars->position = ((xfrac << 10) & 0xffff0000) | ((yfrac >> 6)  & 0x0000ffff);
 
@@ -361,7 +359,7 @@ visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop
 
 void R_InitFlats(void)
 {
-	firstflat        = W_GetNumForName("F_START") + 1;
+	       firstflat = W_GetNumForName("F_START") + 1;
 
 	int16_t lastflat = W_GetNumForName("F_END")   - 1;
 	int16_t numflats = lastflat - firstflat + 1;
@@ -373,19 +371,33 @@ void R_InitFlats(void)
 	animated_flat_basepic = R_FlatNumForName("NUKAGE1");
 
 #if defined FLAT_SPAN
-	byte __far* source = Z_MallocStatic(64 * 64);
+	byte    __far* source    = Z_MallocStatic( 64 * 64);
+	int16_t __far* histogram = Z_MallocStatic(256 * sizeof(int16_t));
 
 	for (int16_t i = 0; i < numflats; i++)
 	{
 		W_ReadLumpByNum(firstflat + i, source);
-		flattranslation[i] = source[(64 / 2) * 64 + (64 / 2)];
+
+		_fmemset(histogram, 0, 256 * sizeof(int16_t));
+		for (int16_t j = 0; j < 64 * 64; j++)
+			histogram[source[j]]++;
+
+		int16_t maxamount = 0;
+		int16_t maxindex  = 0;
+		for (int16_t j = 0; j < 256; j++)
+		{
+			if (histogram[j] > maxamount)
+			{
+				maxamount = histogram[j];
+				maxindex  = j;
+			}
+		}
+
+		flattranslation[i] = maxindex;
 	}
 
+	Z_Free(histogram);
 	Z_Free(source);
-
-	animated_flat_basepic_color[0] = flattranslation[animated_flat_basepic + 0];
-	animated_flat_basepic_color[1] = flattranslation[animated_flat_basepic + 1];
-	animated_flat_basepic_color[2] = flattranslation[animated_flat_basepic + 2];
 #else
 	for (int16_t i = 0; i < numflats; i++)
 		flattranslation[i] = i;
@@ -406,12 +418,14 @@ int16_t R_FlatNumForName(const char *name)
 }
 
 
+#define FLAT_NUKAGE1_COLOR 122
+
 void P_UpdateAnimatedFlat(void)
 {
 #if defined FLAT_SPAN
-	int16_t pic = animated_flat_basepic_color[(_g_leveltime >> 3) % 3];
+	int16_t pic = FLAT_NUKAGE1_COLOR + (((int16_t)_g_leveltime >> 3) % 3) * 2;
 #else
-	int16_t pic = animated_flat_basepic + ((_g_leveltime >> 3) % 3);
+	int16_t pic = animated_flat_basepic + (((int16_t)_g_leveltime >> 3) % 3);
 #endif
 
 	flattranslation[animated_flat_basepic + 0] = pic;

@@ -62,6 +62,7 @@ typedef PACKEDATTR_PRE struct
   char name2[9];
 } PACKEDATTR_POST switchlist_t; //jff 3/23/98 pack to read from memory
 
+typedef char assertSwitchlistSize[sizeof(switchlist_t) == 18 ? 1 : -1];
 
 static const switchlist_t alphSwitchList[MAXSWITCHES] =
 {

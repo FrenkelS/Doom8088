@@ -55,10 +55,6 @@
 #include "globdata.h"
 
 
-// Maintain player starting spot.
-static mapthing_t playerstart;
-
-
 void A_CyberAttack(mobj_t __far* actor);
 
 
@@ -383,6 +379,17 @@ static void P_SlideMove(mobj_t __far* mo)
 }
 
 
+static fixed_t FixedMul32OrigFriction(fixed_t a)
+{
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * ORIG_FRICTION;
+	 int32_t hl = ( int32_t) ahw * ORIG_FRICTION;
+	return (ll >> FRACBITS) + hl;
+}
+
+
 //
 // P_XYMovement
 //
@@ -399,16 +406,6 @@ static void P_XYMovement(mobj_t __far* mo)
 
     if (!(mo->momx | mo->momy)) // Any momentum?
     {
-        if (mo->flags & MF_SKULLFLY)
-        {
-
-            // the skull slammed into something
-
-            mo->flags &= ~MF_SKULLFLY;
-            mo->momz = 0;
-
-            P_SetMobjState (mo, mobjinfo[mo->type].spawnstate);
-        }
         return;
     }
 
@@ -493,7 +490,7 @@ static void P_XYMovement(mobj_t __far* mo)
     // slow down
 
     /* no friction for missiles or skulls ever, no friction when airborne */
-    if (mo->flags & (MF_MISSILE | MF_SKULLFLY) || mo->z > mo->floorz)
+    if (mo->flags & MF_MISSILE || mo->z > mo->floorz)
         return;
 
     /* killough 8/11/98: add bouncers
@@ -551,8 +548,8 @@ static void P_XYMovement(mobj_t __far* mo)
        * cph - DEMOSYNC - need old code for Boom demos?
        */
 
-        mo->momx = FixedMul3216(mo->momx, ORIG_FRICTION);
-        mo->momy = FixedMul3216(mo->momy, ORIG_FRICTION);
+        mo->momx = FixedMul32OrigFriction(mo->momx);
+        mo->momy = FixedMul32OrigFriction(mo->momy);
 
         /* killough 10/98: Always decrease player bobbing by ORIG_FRICTION.
        * This prevents problems with bobbing on ice, where it was not being
@@ -562,8 +559,8 @@ static void P_XYMovement(mobj_t __far* mo)
 
         if (player && player->mo == mo)     /* Not voodoo dolls */
         {
-            player->momx = FixedMul3216(player->momx, ORIG_FRICTION);
-            player->momy = FixedMul3216(player->momy, ORIG_FRICTION);
+            player->momx = FixedMul32OrigFriction(player->momx);
+            player->momy = FixedMul32OrigFriction(player->momy);
         }
     }
 }
@@ -593,47 +590,11 @@ static void P_ZMovement(mobj_t __far* mo)
 
   mo->z += mo->momz;
 
-  if ((mo->flags & MF_FLOAT) && mo->target)
-
-    // float down towards target if too close
-
-    if (!((mo->flags ^ MF_FLOAT) & (MF_FLOAT | MF_SKULLFLY | MF_INFLOAT)) &&
-  mo->target)     /* killough 11/98: simplify */
-      {
-  fixed_t delta;
-  if (P_AproxDistance(mo->x - mo->target->x, mo->y - mo->target->y) <
-      D_abs(delta = mo->target->z + (mo->height>>1) - mo->z)*3)
-    mo->z += delta < 0 ? -FLOATSPEED : FLOATSPEED;
-      }
-
   // clip movement
 
   if (mo->z <= mo->floorz)
     {
     // hit the floor
-
-    /* Note (id):
-     *  somebody left this after the setting momz to 0,
-     *  kinda useless there.
-     * cph - This was the a bug in the linuxdoom-1.10 source which
-     *  caused it not to sync Doom 2 v1.9 demos. Someone
-     *  added the above comment and moved up the following code. So
-     *  demos would desync in close lost soul fights.
-     * cph - revised 2001/04/15 -
-     * This was a bug in the Doom/Doom 2 source; the following code
-     *  is meant to make charging lost souls bounce off of floors, but it 
-     *  was incorrectly placed after momz was set to 0.
-     *  However, this bug was fixed in Doom95 and 
-     *  the v1.10 source release (which is one reason why it failed to sync 
-     *  some Doom2 v1.9 demos)
-     * I've added a comp_soul compatibility option to make this behavior 
-     *  selectable for PrBoom v2.3+. For older demos, we do this here only 
-     *  if we're in a compatibility level above Doom 2 v1.9 (in which case we
-     *  mimic the bug and do it further down instead)
-     */
-
-    if (mo->flags & MF_SKULLFLY)
-      mo->momz = -mo->momz; // the skull slammed into something
 
     if (mo->momz < 0)
       {
@@ -669,13 +630,6 @@ static void P_ZMovement(mobj_t __far* mo)
 
   if (mo->z + mo->height > mo->ceilingz)
     {
-    /* cph 2001/04/15 - 
-     * Lost souls were meant to bounce off of ceilings;
-     *  new comp_soul compatibility option added
-     */
-    if (mo->flags & MF_SKULLFLY)
-      mo->momz = -mo->momz; // the skull slammed into something
-
     // hit the ceiling
 
     if (mo->momz > 0)
@@ -770,12 +724,8 @@ static void P_NightmareRespawn(mobj_t __far* mobj)
 
 void P_MobjThinker (mobj_t __far* mobj)
 {
-    // killough 11/98:
-    // removed old code which looked at target references
-    // (we use pointer reference counting now)
-
     // momentum movement
-    if (mobj->momx | mobj->momy || mobj->flags & MF_SKULLFLY)
+    if (mobj->momx | mobj->momy)
     {
         P_XYMovement(mobj);
         if (mobj->thinker.function != P_MobjThinker) // cph - Must've been removed
@@ -1013,12 +963,9 @@ static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
 //  between levels.
 //
 
-static void P_SpawnPlayer (const mapthing_t* mthing)
+static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
 {
   player_t* p;
-  fixed_t   x;
-  fixed_t   y;
-  fixed_t   z;
   mobj_t __far*   mobj;
 
   // not playing?
@@ -1031,20 +978,14 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
   if (p->playerstate == PST_REBORN)
     G_PlayerReborn ();
 
-  /* cph 2001/08/14 - use the options field of memorised player starts to
-   * indicate whether the start really exists in the level.
-   */
-  if (!mthing->options)
-    I_Error("P_SpawnPlayer: attempt to spawn player at unavailable start point");
-  
-  x    = ((int32_t)mthing->x) << FRACBITS;
-  y    = ((int32_t)mthing->y) << FRACBITS;
-  z    = ONFLOORZ;
+  fixed_t x = ((int32_t)playerx) << FRACBITS;
+  fixed_t y = ((int32_t)playery) << FRACBITS;
+  fixed_t z = ONFLOORZ;
   mobj = P_SpawnMobj (x,y,z, MT_PLAYER);
 
   // set color translations for player sprites
 
-  mobj->angle      = ANG45 * (mthing->angle/45);
+  mobj->angle      = ANG45 * (playerangle/45);
   mobj->health     = p->health;
 
   p->mo            = mobj;
@@ -1090,16 +1031,13 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     mobj_t __far* mobj;
     fixed_t x;
     fixed_t y;
-    const int16_t options = mthing->options;
 
     // check for players specially
 
     //Only care about start spot for player 1.
     if (mthing->type == 1)
     {
-        playerstart = *mthing;
-        playerstart.options = MTF_EASY;
-        P_SpawnPlayer (&playerstart);
+        P_SpawnPlayer(mthing->x, mthing->y, mthing->angle);
         return;
     }
     else if (mthing->type == 2 || mthing->type == 3 || mthing->type == 4 || mthing->type == 11)
@@ -1111,14 +1049,14 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     // check for apropriate skill level
 
     /* jff "not single" thing flag */
-    if (options & MTF_NOTSINGLE)
+    if (mthing->options & MTF_NOTSINGLE)
         return;
 
     // killough 11/98: simplify
     if (_g_gameskill == sk_baby || _g_gameskill == sk_easy ?
-            !(options & MTF_EASY) :
+            !(mthing->options & MTF_EASY) :
             _g_gameskill == sk_hard || _g_gameskill == sk_nightmare ?
-            !(options & MTF_HARD) : !(options & MTF_NORMAL))
+            !(mthing->options & MTF_HARD) : !(mthing->options & MTF_NORMAL))
         return;
 
     // find which type to spawn
@@ -1141,7 +1079,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
         _g_totalitems++;
 
     mobj->angle = ANG45 * (mthing->angle/45);
-    if (options & MTF_AMBUSH)
+    if (mthing->options & MTF_AMBUSH)
         mobj->flags |= MF_AMBUSH;
 }
 

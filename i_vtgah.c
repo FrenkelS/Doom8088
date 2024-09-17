@@ -171,21 +171,35 @@ static const uint8_t VGA_TO_ETGA_LUT[256] =
 };
 
 
+static boolean drawStatusBar = true;
+
+
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
 	uint8_t __far* dst = videomemory;
 
-#if defined DISABLE_STATUS_BAR
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++) {
-#else
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT; y++) {
-#endif
-		for (uint_fast8_t x = 0; x < SCREENWIDTH; x++) {
+	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
+	{
+		for (uint_fast8_t x = 0; x < SCREENWIDTH; x++)
+		{
 			*dst++ = VGA_TO_ETGA_LUT[*src++];
 		}
 		dst += SCREENWIDTH_VGA - SCREENWIDTH;
 	}
+
+	if (drawStatusBar)
+	{
+		for (uint_fast8_t y = 0; y < ST_HEIGHT; y++)
+		{
+			for (uint_fast8_t x = 0; x < SCREENWIDTH; x++)
+			{
+				*dst++ = VGA_TO_ETGA_LUT[*src++];
+			}
+			dst += SCREENWIDTH_VGA - SCREENWIDTH;
+		}
+	}
+	drawStatusBar = true;
 }
 
 
@@ -251,11 +265,47 @@ inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* sour
 #if defined C_ONLY
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
-	while (count--)
+	int16_t l = count >> 4;
+	while (l--)
 	{
-		R_DrawColumnPixel(dest, source, frac);
-		dest += SCREENWIDTH;
-		frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+	}
+
+	switch (count & 15)
+	{
+		case 15: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case 14: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case 13: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case 12: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case 11: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case 10: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  9: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  8: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  7: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  6: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  5: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  4: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  3: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  2: R_DrawColumnPixel(dest, source, frac); dest += SCREENWIDTH; frac += fracstep;
+		case  1: R_DrawColumnPixel(dest, source, frac);
 	}
 }
 #else
@@ -513,6 +563,15 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 }
 
 
+void ST_Drawer(void)
+{
+	if (ST_NeedUpdate())
+		ST_doRefresh();
+	else
+		drawStatusBar = false;
+}
+
+
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
 	y -= patch->topoffset;
@@ -524,7 +583,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 	for (int16_t col = 0; col < width; col++, desttop++)
 	{
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
@@ -579,7 +638,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		else if (dc_x >= SCREENWIDTH)
 			break;
 
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> 8]);
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)

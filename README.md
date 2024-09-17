@@ -7,10 +7,12 @@ It has been ported to all kinds of systems.
 Usually these systems are 32-bit or more and have a flat memory model.
 
 Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286, and with VGA or MCGA graphics.
+It uses 64 kB of EMS memory, if available.
+And 2366 kB of XMS memory, if available.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
 Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
-Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoGhgmhArKw).
+Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX1-lNuUBY).
 
 **What's special?:**
  - No texture mapped floors and ceilings
@@ -31,18 +33,20 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
  - When there's not enough memory for a texture, one color is drawn
 
 ## Controls:
-|Action                 |                        |
-|-----------------------|------------------------|
-|Fire                   |Ctrl                    |
-|Use / Sprint           |Enter, Space & Shift    |
-|Walk                   |Arrow keys              |
-|Strafe                 |< & >                   |
-|Automap                |Tab                     |
-|Automap zoom in and out|+ & -                   |
-|Automap follow mode    |F                       |
-|Weapon up and down     |[ & ]                   |
-|Menu                   |Esc                     |
-|Quit to DOS            |F10                     |
+|Action                 |             |
+|-----------------------|-------------|
+|Fire                   |Ctrl         |
+|Use                    |Enter & Space|
+|Sprint                 |Shift        |
+|Walk                   |Arrow keys   |
+|Strafe                 |Alt          |
+|Strafe left and right  |< & >        |
+|Automap                |Tab          |
+|Automap zoom in and out|+ & -        |
+|Automap follow mode    |F            |
+|Weapon up and down     |[ & ]        |
+|Menu                   |Esc          |
+|Quit to DOS            |F10          |
 
 ## Cheats:
 |Code      |Effects                  |
@@ -62,15 +66,23 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=qoG
 |IDROCKET  |Enemy Rockets (GoldenEye)|
 |IDRATE    |Toggle FPS counter       |
 
+## Command line arguments:
+|Command line argument|Effect       |
+|---------------------|-------------|
+|-noems               |Disable EMS  |
+|-noxms               |Disable XMS  |
+|-timedemo demo3      |Run benchmark|
+
 ## Building:
-1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) and [NASM](https://www.nasm.us) on Ubuntu.
+1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
 
 2) Run `compiamy.sh` to compile the Mode Y version and `compia13.sh` for the Mode 13h version.
 
 3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
 
-4) Doom8088 needs an IWAD file that has been processed by [GbaWadUtil](https://github.com/doomhack/GbaWadUtil).
-   Some lumps in the WAD need to be replaced by the raw pictures from the WAD directory of this repository.
+4) Doom8088 needs an IWAD file that has been preprocessed by [GbaWadUtil](https://github.com/doomhack/GbaWadUtil).
+   Some lumps in the WAD need to be replaced by the raw images from the WAD directory in this repository.
+   In addition, some manual actions are required. It is best to just use the IWAD of the latest [release](https://github.com/FrenkelS/Doom8088/releases).
 
 It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2).
 First run `setenvdj.bat` once and then `compdj.bat` for DJGPP, and `setenvwc.bat` followed by `compwc32.bat` for Watcom.

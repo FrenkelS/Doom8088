@@ -113,8 +113,6 @@ extern const line_t __far* _g_spechit[4];
 
 extern int16_t _g_numspechit;
 
-// Temporary holder for thing_sectorlist threads
-extern msecnode_t __far* _g_sector_list;
 
 extern mobj_t __far*   _g_linetarget; // who got hit (or NULL)
 

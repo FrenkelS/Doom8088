@@ -50,6 +50,7 @@
 
 // 0x100000000 to 0x2000
 #define ANGLETOFINESHIFT        19
+#define ANGLETOFINESHIFT_16      3
 
 // Binary Angle Measument, BAM.
 #define ANG45   0x20000000
@@ -57,12 +58,21 @@
 #define ANG180  0x80000000
 #define ANG270  0xc0000000
 
+#define ANG45_16   0x2000
+#define ANG90_16   0x4000
+#define ANG180_16  0x8000
+#define ANG270_16  0xc000
+
 
 typedef uint32_t angle_t;
+typedef uint16_t angle16_t;
 
 
 fixed_t finesine(int16_t x);
 fixed_t finecosine(int16_t x);
+
+fixed_t finesineapprox(int16_t x);
+fixed_t finecosineapprox(int16_t x);
 
 extern const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1];
 

@@ -15,7 +15,13 @@
 ; along with this program. If not, see <https://www.gnu.org/licenses/>.
 ;
 
+%ifidn CPU, i8088
 cpu 8086
+%elifidn CPU, i286
+cpu 286
+%else
+%error unsupported cpu CPU
+%endif
 
 bits 16
 
@@ -62,19 +68,24 @@ R_DrawColumn2:
 	les di, [dest]					; es:di = dest
 	lds si, [source]				; ds:si = source
 
-	mov ah, cl						; ah = count
-	shr cl, 1
-	shr cl, 1
-	shr cl, 1
-	shr cl, 1						; 0 <= cl <= 8 && ch = 0
+	mov bx, cx						; bx = count
 
-	or cx, cx						; if cx = 0
-	jz last_pixels					;  then jump to last_pixels
+	mov ah, cl						; 1 <= ah <= 128
+%ifidn CPU, i8088
+	mov cl, 4
+	shr ah, cl						; 0 <= ah <= 8
+%else
+	shr ah, 4						; 0 <= ah <= 8
+%endif
 
-loop_pixels:
-	push cx
 	mov cx, nearcolormap
 
+	or ah, ah						; if ah = 0
+	jz last_pixels					;  then jump to last_pixels
+
+	push bx							; push count
+
+loop_pixels:
 	mov al, dh						; al = hi byte of frac
 	shr al, 1						; 0 <= al <= 127
 	mov bx, si						; bx = source
@@ -235,17 +246,15 @@ loop_pixels:
 	add di, PLANEWIDTH-1
 	add dx, bp
 
-	pop cx
-	dec cx
-	jnz loop_pixels					; if --cx != 0 then jump to loop_pixels
+	dec ah
+	jnz loop_pixels					; if --ah != 0 then jump to loop_pixels
+
+	pop bx							; pop count
 
 
 last_pixels:
-	mov cx, nearcolormap
-	and ah, 15						; 0 <= count <= 15
-	xor bh, bh
-	mov bl, ah
-	shl bx, 1
+	and bl, 15						; 0 <= count <= 15
+	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
 
 

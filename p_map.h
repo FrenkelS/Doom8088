@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -44,7 +44,6 @@
 #define MISSILERANGE    (32*64*FRACUNIT)
 
 boolean P_IsAttackRangeMeleeRange(void);
-boolean P_IsFloatOk(void);
 
 boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y);
 
@@ -62,10 +61,10 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y);
 
 void    P_SetSecnodeFirstpoolToNull(void);
 void    P_DelSeclist(void);
+void    P_SetSeclist(msecnode_t __far* sectorList);
 void    P_CreateSecNodeList(mobj_t __far*);
 
-/* cphipps 2004/08/30 */
-void	P_MapStart(void);
+
 void	P_MapEnd(void);
 
 #endif // __P_MAP__

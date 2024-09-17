@@ -158,7 +158,7 @@ typedef struct linedata_s
     int16_t r_flags;
 } linedata_t;
 
-typedef PACKEDATTR_PRE struct line_s
+typedef struct line_s
 {
     vertex_t v1;
     vertex_t v2;     // Vertices, from v1 to v2.
@@ -169,12 +169,12 @@ typedef PACKEDATTR_PRE struct line_s
     uint16_t sidenum[2];        // Visual appearance: SideDefs.
     fixed_t bbox[4];        //Line bounding box.
 
-    uint8_t flags;           // Animation related.
-    int8_t const_special;
     int16_t tag;
+    uint8_t flags;           // Animation related.
     int8_t slopetype; // To aid move clipping.
 
-} PACKEDATTR_POST line_t;
+} line_t;
+
 
 #define LN_FRONTSECTOR(l) (_g_sides[(l)->sidenum[0]].sector)
 #define LN_BACKSECTOR(l) ((l)->sidenum[1] != NO_INDEX ? _g_sides[(l)->sidenum[1]].sector : NULL)
@@ -279,7 +279,7 @@ typedef struct
     int16_t		height;
     int16_t		leftoffset;	// pixels to the left of origin
     int16_t		topoffset;	// pixels below the origin
-    int32_t		columnofs[8];	// only [width] used
+    int32_t		columnofs[8];	// only [width] used, upper word is always zero
     // the [0] is &columnofs[width]
 } patch_t;
 

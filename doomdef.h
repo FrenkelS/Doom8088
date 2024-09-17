@@ -68,7 +68,7 @@
 
 // SCREENWIDTH and SCREENHEIGHT define the visible size
 #define SCREENWIDTH  240u
-#define SCREENHEIGHT 160
+#define SCREENHEIGHT (VIEWWINDOWHEIGHT+ST_HEIGHT)
 
 #define SCREENWIDTH_VGA  320
 #define SCREENHEIGHT_VGA 200
@@ -80,6 +80,10 @@
 
 // State updates, number of tics / second.
 #define TICRATE          35
+
+
+int16_t M_CheckParm(char *check);
+
 
 // The current state of the game: whether we are playing, gazing
 // at the intermission screen, the game final animation, or a demo.
@@ -166,6 +170,7 @@ typedef enum {
 
 
 //GBA Keys
+#define KEYD_SPEED          0
 #define KEYD_A              1
 #define KEYD_B              2
 #define KEYD_L              3
@@ -180,6 +185,7 @@ typedef enum {
 #define KEYD_PLUS          12
 #define KEYD_BRACKET_LEFT  13
 #define KEYD_BRACKET_RIGHT 14
+#define KEYD_STRAFE        15
 
 #define NUMKEYS   16
 

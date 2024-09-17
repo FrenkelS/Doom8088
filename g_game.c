@@ -132,9 +132,10 @@ static const int16_t key_down        = KEYD_DOWN;
 static const int16_t key_strafeleft  = KEYD_L;
 static const int16_t key_straferight = KEYD_R;
        const int16_t key_fire        = KEYD_B; 
+static const int16_t key_speed       = KEYD_SPEED;
+static const int16_t key_strafe      = KEYD_STRAFE;
 static const int16_t key_use         = KEYD_A;
        const int16_t key_escape      = KEYD_START;
-       const int16_t key_enter       = KEYD_A;
        const int16_t key_map_right   = KEYD_RIGHT;
        const int16_t key_map_left    = KEYD_LEFT;
        const int16_t key_map_up      = KEYD_UP;
@@ -213,6 +214,7 @@ void G_BuildTiccmd(void)
 {
     static int16_t     turnheld = 0;       // for accelerative turning
 
+    boolean strafe;
     int16_t speed;
     int16_t tspeed;
     int16_t forward;
@@ -221,8 +223,10 @@ void G_BuildTiccmd(void)
     /* cphipps - remove needless I_BaseTiccmd call, just set the ticcmd to zero */
     memset(&netcmd,0,sizeof(ticcmd_t));
 
+    strafe = gamekeydown[key_strafe];
+
     //Use button negates the always run setting.
-    speed = (gamekeydown[key_use] ^ _g_alwaysRun);
+    speed = (gamekeydown[key_speed] ^ _g_alwaysRun);
 
     forward = side = 0;
 
@@ -240,10 +244,20 @@ void G_BuildTiccmd(void)
 
     // let movement keys cancel each other out
 
-    if (gamekeydown[key_right])
-        netcmd.angleturn -= angleturn[tspeed];
-    if (gamekeydown[key_left])
-        netcmd.angleturn += angleturn[tspeed];
+    if (strafe)
+    {
+        if (gamekeydown[key_right])
+            side += sidemove[speed];
+        if (gamekeydown[key_left])
+            side -= sidemove[speed];
+    }
+    else
+    {
+        if (gamekeydown[key_right])
+            netcmd.angleturn -= angleturn[tspeed];
+        if (gamekeydown[key_left])
+            netcmd.angleturn += angleturn[tspeed];
+    }
 
     if (gamekeydown[key_up])
         forward += forwardmove[speed];
@@ -391,8 +405,6 @@ void G_Responder (event_t* ev)
 void G_Ticker (void)
 {
     static gamestate_t prevgamestate = 0;
-
-    P_MapStart();
 
     if(_g_playeringame && _g_player.playerstate == PST_REBORN)
         G_DoReborn ();
@@ -637,7 +649,7 @@ static void G_DoCompleted (void)
    *  the times in seconds shown for each level. Also means our total time
    *  will agree with Compet-n.
    */
-    _g_wminfo.totaltimes = (totalleveltimes += (_g_leveltime - _g_leveltime%35));
+    _g_wminfo.totaltimes = (totalleveltimes += (_g_leveltime - (int16_t)_g_leveltime % TICRATE));
 
     _g_gamestate = GS_INTERMISSION;
     automapmode &= ~am_active;

@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -58,18 +58,18 @@ static wbstartstruct_t* wbs;
 static wbplayerstruct_t* plrs;  // wbs->plyr[]
 
 // used for general timing
-static int32_t    cnt;
+static int16_t    cnt;
 
 // used for timing of background animation
-static int32_t    bcnt;
+static int16_t    bcnt;
 
 static int32_t    cnt_time;
 static int32_t    cnt_total_time;
-static int32_t    cnt_par;
-static int32_t    cnt_pause;
+static int16_t    cnt_par;
+static int16_t    cnt_pause;
 
 
-static int32_t  sp_state;
+static int16_t  sp_state;
 
 static int16_t cnt_kills;
 static int16_t cnt_items;
@@ -238,7 +238,7 @@ static void WI_slamBackground(void)
 {
 	// background
 	int16_t num = W_GetNumForName("WIMAP0");
-	V_DrawRaw(num, 0);
+	V_DrawRawFullScreen(num);
 }
 
 
@@ -250,7 +250,7 @@ static void WI_slamBackground(void)
 //
 static void WI_drawLF(void)
 {
-  int32_t y = WI_TITLEY;
+  int16_t y = WI_TITLEY;
   char lname[9];
 
   // draw <LevelName>
@@ -275,7 +275,7 @@ static void WI_drawLF(void)
 //
 static void WI_drawEL(void)
 {
-  int32_t y = WI_TITLEY;
+  int16_t y = WI_TITLEY;
   char lname[9];
 
   /* cph - get the graphic lump name */
@@ -356,10 +356,10 @@ static void WI_drawOnLnode(int8_t n, const char* const c[])
 //fontwidth = num[0]->width;
 #define fontwidth 11
 
-static int32_t WI_drawNum (int32_t x, int32_t y, int16_t n, int32_t digits)
+static int16_t WI_drawNum (int16_t x, int16_t y, int16_t n, int16_t digits)
 {
 	boolean   neg;
-	int32_t   temp;
+	int16_t   temp;
 	char      name[9];  // limited to 8 characters
 
 	if (digits < 0)
@@ -418,7 +418,7 @@ static int32_t WI_drawNum (int32_t x, int32_t y, int16_t n, int32_t digits)
 //          p      -- the percentage value to be drawn, no negatives
 // Returns: void
 // CPhipps - static
-static void WI_drawPercent(int32_t x, int32_t y, int16_t p)
+static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
 {
   if (p < 0)
     return;
@@ -440,7 +440,7 @@ static void WI_drawPercent(int32_t x, int32_t y, int16_t p)
 // CPhipps - static
 //         - largely rewritten to display hours and use slightly better algorithm
 
-static void WI_drawTime(int32_t x, int32_t y, int32_t t)
+static void WI_drawTime(int16_t x, int16_t y, int32_t t)
 {
   int16_t   n;
 
@@ -496,12 +496,11 @@ static void WI_initNoState(void)
 // ====================================================================
 // WI_drawTimeStats
 // Purpose: Put the times on the screen
-// Args:    time, total time, par time, in seconds
+// Args:    none
 // Returns: void
 //
-// cph - pulled from WI_drawStats below
 
-static void WI_drawTimeStats(int32_t cnt_time, int32_t cnt_total_time, int32_t cnt_par)
+static void WI_drawTimeStats(void)
 {
   V_DrawNamePatchScaled(SP_TIMEX, SP_TIMEY, time1);
   WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, SP_TIMEY, cnt_time);
@@ -581,8 +580,8 @@ static void WI_updateShowNextLoc(void)
 //
 static void WI_drawShowNextLoc(void)
 {
-    int32_t   i;
-    int32_t   last;
+    int16_t   i;
+    int16_t   last;
 
     WI_slamBackground();
 
@@ -788,7 +787,7 @@ static void WI_drawStats(void)
 	if (cnt_secret)
 		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + 2 * lineHeight, cnt_secret);
 
-	WI_drawTimeStats(cnt_time, cnt_total_time, cnt_par);
+	WI_drawTimeStats();
 }
 
 // ====================================================================
