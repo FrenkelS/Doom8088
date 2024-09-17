@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for VGA Mode Y
+ *      Video code for VGA Mode Y 320x200 256 colors
  *
  *-----------------------------------------------------------------------------*/
  
