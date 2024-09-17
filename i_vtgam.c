@@ -66,12 +66,33 @@ static void I_UploadNewPalette(int8_t pal)
 }
 
 
+static void I_CheckVideoMemory(void)
+{
+	if (M_CheckParm("-hiddencard"))
+		return;
+
+	if ((*((uint8_t __far*)D_MK_FP(0xF000, 0xFFFE)) == 0xFF) && (*((uint8_t __far*)D_MK_FP(0xFC00, 0)) == 0x21))
+	{
+		// Tandy 1000 detected
+		int16_t videoMemory = *((int16_t __far*)D_MK_FP(0x40, 0x15)) - *((int16_t __far*)D_MK_FP(0x40, 0x13));
+		if (0 < videoMemory && videoMemory < 32)
+		{
+			I_Error("Improper video card! Detected %d kB of video memory.\n"
+			        "If you really have 32 kB of video memory that I am not detecting,\n"
+			        "use the -HIDDENCARD command line parameter!", videoMemory);
+		}
+	}
+}
+
+
 void I_InitGraphicsHardwareSpecificCode(void)
 {
-	I_SetScreenMode(9);
-	I_UploadNewPalette(0);
-
 	__djgpp_nearptr_enable();
+
+	I_CheckVideoMemory();
+
+	I_SetScreenMode(9);
+
 	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_TGA - SCREENHEIGHT) / 2) / 4) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH * 2) / 2 + __djgpp_conventional_base);
 
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);

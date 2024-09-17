@@ -68,10 +68,10 @@ static void I_UploadNewPalette(int8_t pal)
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
-	I_SetScreenMode(8);
-	I_UploadNewPalette(0);
-
 	__djgpp_nearptr_enable();
+
+	I_SetScreenMode(8);
+
 	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_TGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);

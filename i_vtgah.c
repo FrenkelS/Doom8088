@@ -108,8 +108,31 @@ static void I_InitGraphicsCommonETGA(boolean graphics)
 }
 
 
+static void I_CheckVideoMemory(void)
+{
+	if (M_CheckParm("-hiddencard"))
+		return;
+
+	if ((*((uint8_t __far*)D_MK_FP(0xF000, 0xFFFE)) == 0xFF) && (*((uint8_t __far*)D_MK_FP(0xFC00, 0)) == 0x21))
+	{
+		// Tandy 1000 detected
+		int16_t videoMemory = *((int16_t __far*)D_MK_FP(0x40, 0x15)) - *((int16_t __far*)D_MK_FP(0x40, 0x13));
+		if (0 < videoMemory && videoMemory < 64)
+		{
+			I_Error("Improper video card! Detected %d kB of video memory.\n"
+			        "If you really have 64 kB of video memory that I am not detecting,\n"
+			        "use the -HIDDENCARD command line parameter!", videoMemory);
+		}
+	}
+}
+
+
 void I_InitGraphicsHardwareSpecificCode(void)
 {
+	__djgpp_nearptr_enable();
+
+	I_CheckVideoMemory();
+
 	// This code is based on https://github.com/planet-x3/px3_ose/blob/master/src/video/etga.s
 
 	I_SetScreenMode(3);
@@ -123,7 +146,6 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	outp(0x3df, 0x24);
 
 	// clear screen
-	__djgpp_nearptr_enable();
 	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
 
 	// select 640 dot graphics mode with hi-res clock, enable video
