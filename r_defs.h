@@ -66,6 +66,11 @@ typedef struct
   fixed_t x, y;
 } vertex_t;
 
+typedef struct
+{
+  int16_t x, y;
+} vertex16_t;
+
 // Each sector has a degenmobj_t in its center for sound origin purposes.
 typedef struct
 {
@@ -236,8 +241,8 @@ typedef struct
 //
 typedef struct
 {
-    vertex_t v1;
-    vertex_t v2;            // Vertices, from v1 to v2.
+    vertex16_t v1;
+    vertex16_t v2;            // Vertices, from v1 to v2.
 
     fixed_t offset;
     angle_t angle;
