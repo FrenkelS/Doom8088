@@ -244,8 +244,8 @@ typedef struct
     vertex16_t v1;
     vertex16_t v2;            // Vertices, from v1 to v2.
 
-    fixed_t offset;
-    angle_t angle;
+    int16_t offset;
+    angle16_t angle;
 
     uint16_t sidenum;
     uint16_t linenum;
