@@ -80,9 +80,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
 
-4) Doom8088 needs an IWAD file that has been preprocessed by [GbaWadUtil](https://github.com/doomhack/GbaWadUtil).
-   Some lumps in the WAD need to be replaced by the raw images from the WAD directory in this repository.
-   In addition, some manual actions are required. It is best to just use the IWAD of the latest [release](https://github.com/FrenkelS/Doom8088/releases).
+4) Doom8088 needs an IWAD file that has been preprocessed by [jWadUtil](https://github.com/FrenkelS/jWadUtil).
 
 It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2).
 First run `setenvdj.bat` once and then `compdj.bat` for DJGPP, and `setenvwc.bat` followed by `compwc32.bat` for Watcom.
