@@ -1879,7 +1879,7 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     linedef = &_g_lines[curline->linenum];
 
     // calculate rw_distance for scale calculation
-    rw_normalangle = (curline->angle >> FRACBITS) + ANG90_16;
+    rw_normalangle = curline->angle;
 
     angle16_t offsetangle = rw_normalangle - rw_angle1;
 
@@ -2054,8 +2054,8 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     if (segtextured)
     {
         fixed_t rw_offset32 = hyp * -finesineapprox(offsetangle >> ANGLETOFINESHIFT_16);
-        rw_offset32 += (((fixed_t)sidedef->textureoffset) << FRACBITS) + curline->offset;
         rw_offset = rw_offset32 >> FRACBITS;
+        rw_offset += sidedef->textureoffset + curline->offset;
 
         rw_centerangle = ANG90_16 + viewangle16 - rw_normalangle;
 
