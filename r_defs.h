@@ -165,14 +165,14 @@ typedef struct linedata_s
 
 typedef struct line_s
 {
-    vertex_t v1;
-    vertex_t v2;     // Vertices, from v1 to v2.
+    vertex16_t v1;
+    vertex16_t v2;     // Vertices, from v1 to v2.
     uint16_t lineno;         //line number.
 
     int16_t dx, dy;        // Precalculated v2 - v1 for side checking.
 
     uint16_t sidenum[2];        // Visual appearance: SideDefs.
-    fixed_t bbox[4];        //Line bounding box.
+    int16_t bbox[4];        //Line bounding box.
 
     int16_t tag;
     uint8_t flags;           // Animation related.

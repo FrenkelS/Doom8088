@@ -83,10 +83,10 @@ fixed_t CONSTFUNC P_AproxDistance(fixed_t dx, fixed_t dy)
 int16_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* line)
 {
   return
-    !line->dx ? x <= line->v1.x ? line->dy > 0 : line->dy < 0 :
-    !line->dy ? y <= line->v1.y ? line->dx < 0 : line->dx > 0 :
-    //FixedMul(y-line->v1.y, line->dx>>FRACBITS) >= FixedMul(line->dy>>FRACBITS, x-line->v1.x);
-    ((y - line->v1.y) >> 8) * line->dx >= line->dy * ((x - line->v1.x) >> 8);
+    !line->dx ? x <= (fixed_t)line->v1.x<<FRACBITS ? line->dy > 0 : line->dy < 0 :
+    !line->dy ? y <= (fixed_t)line->v1.y<<FRACBITS ? line->dx < 0 : line->dx > 0 :
+    //FixedMul(y-((fixed_t)line->v1.y<<FRACBITS), line->dx>>FRACBITS) >= FixedMul(line->dy>>FRACBITS, x-((fixed_t)line->v1.x<<FRACBITS));
+    ((y - ((fixed_t)line->v1.y<<FRACBITS) >> 8)) * line->dx >= line->dy * ((x - ((fixed_t)line->v1.x<<FRACBITS)) >> 8);
 }
 
 //
@@ -105,11 +105,11 @@ int16_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
     default: // shut up compiler warnings -- killough
     case ST_HORIZONTAL:
         return
-                (tmbox[BOXBOTTOM] > ld->v1.y) == (p = tmbox[BOXTOP] > ld->v1.y) ?
+                (tmbox[BOXBOTTOM] > (fixed_t)ld->v1.y<<FRACBITS) == (p = tmbox[BOXTOP] > (fixed_t)ld->v1.y<<FRACBITS) ?
                     p ^ (ld->dx < 0) : -1;
     case ST_VERTICAL:
         return
-                (tmbox[BOXLEFT] < ld->v1.x) == (p = tmbox[BOXRIGHT] < ld->v1.x) ?
+                (tmbox[BOXLEFT] < (fixed_t)ld->v1.x<<FRACBITS) == (p = tmbox[BOXRIGHT] < (fixed_t)ld->v1.x<<FRACBITS) ?
                     p ^ (ld->dy < 0) : -1;
     case ST_POSITIVE:
         return
@@ -144,8 +144,8 @@ static int16_t PUREFUNC P_PointOnDivlineSide(fixed_t x, fixed_t y, const divline
 
 static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 {
-  dl->x = li->v1.x;
-  dl->y = li->v1.y;
+  dl->x = (fixed_t)li->v1.x<<FRACBITS;
+  dl->y = (fixed_t)li->v1.y<<FRACBITS;
   dl->dx = (fixed_t)li->dx<<FRACBITS;
   dl->dy = (fixed_t)li->dy<<FRACBITS;
 }
@@ -476,8 +476,8 @@ static boolean PIT_AddLineIntercepts(const line_t __far* ld)
   if (_g_trace.dx >  FRACUNIT*16 || _g_trace.dy >  FRACUNIT*16 ||
       _g_trace.dx < -FRACUNIT*16 || _g_trace.dy < -FRACUNIT*16)
     {
-      s1 = P_PointOnDivlineSide (ld->v1.x, ld->v1.y, &_g_trace);
-      s2 = P_PointOnDivlineSide (ld->v2.x, ld->v2.y, &_g_trace);
+      s1 = P_PointOnDivlineSide ((fixed_t)ld->v1.x<<FRACBITS, (fixed_t)ld->v1.y<<FRACBITS, &_g_trace);
+      s2 = P_PointOnDivlineSide ((fixed_t)ld->v2.x<<FRACBITS, (fixed_t)ld->v2.y<<FRACBITS, &_g_trace);
     }
   else
     {
