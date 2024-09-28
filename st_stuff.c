@@ -530,12 +530,6 @@ static void ST_updateWidgets(void)
     for (i=0;i<3;i++)
     {
         keyboxes[i] = _g_player.cards[i] ? i : -1;
-
-        //jff 2/24/98 select double key
-        //killough 2/28/98: preserve traditional keys by config option
-
-        if (_g_player.cards[i+3])
-            keyboxes[i] = i+3;
     }
 
     // refresh everything if this is him coming back to life
