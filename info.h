@@ -418,8 +418,6 @@ typedef enum
   S_LAUN,
   S_SHOT,
   S_COLU,
-  S_DEADTORSO,
-  S_DEADBOTTOM,
   S_GIBS,
   S_CANDLESTIK,
   S_CANDELABRA,
