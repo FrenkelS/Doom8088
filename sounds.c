@@ -103,7 +103,5 @@ const sfxinfo_t S_sfx[] = {
   { "punch" ,  64,  8 },
   { "chgun" ,  64, 18 },
   { "tink"  ,  60,  1 },
-  { "bdopn" , 100, 14 },
-  { "bdcls" , 100, 14 },
   { "getpow",  60, 26 },
 };
