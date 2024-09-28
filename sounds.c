@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -105,6 +105,5 @@ const sfxinfo_t S_sfx[] = {
   { "tink"  ,  60,  1 },
   { "bdopn" , 100, 14 },
   { "bdcls" , 100, 14 },
-  { "itmbk" , 100, 18 },
   { "getpow",  60, 26 },
 };

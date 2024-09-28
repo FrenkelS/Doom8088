@@ -146,7 +146,6 @@ typedef enum {
   sfx_tink,
   sfx_bdopn, //TODO remove me
   sfx_bdcls, //TODO remove me
-  sfx_itmbk,
   sfx_getpow,
   NUMSFX
 } sfxenum_t;
