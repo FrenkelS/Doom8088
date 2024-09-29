@@ -60,7 +60,7 @@
 const char * const sprnames[NUMSPRITES] = {
   "TROO","SHTG","PUNG","PISG","PISF","SHTF","CHGG","CHGF","MISG",
   "MISF","SAWG","BLUD","PUFF","BAL1",
-  "MISL","TFOG","IFOG","PLAY","POSS",
+  "MISL","TFOG","PLAY","POSS",
   "SPOS","SARG",
   "BAL7","BOSS",
   "ARM1","ARM2","BAR1","BEXP",
@@ -177,13 +177,6 @@ const state_t states[NUMSTATES] = {
   {SPR_TFOG,32775,6,NULL,S_TFOG9},  // S_TFOG8
   {SPR_TFOG,32776,6,NULL,S_TFOG10}, // S_TFOG9
   {SPR_TFOG,32777,6,NULL,S_NULL}, // S_TFOG10
-  {SPR_IFOG,32768,6,NULL,S_IFOG01}, // S_IFOG
-  {SPR_IFOG,32769,6,NULL,S_IFOG02}, // S_IFOG01
-  {SPR_IFOG,32768,6,NULL,S_IFOG2},  // S_IFOG02
-  {SPR_IFOG,32769,6,NULL,S_IFOG3},  // S_IFOG2
-  {SPR_IFOG,32770,6,NULL,S_IFOG4},  // S_IFOG3
-  {SPR_IFOG,32771,6,NULL,S_IFOG5},  // S_IFOG4
-  {SPR_IFOG,32772,6,NULL,S_NULL}, // S_IFOG5
   {SPR_PLAY,0,-1,NULL,S_NULL},  // S_PLAY
   {SPR_PLAY,0,4,NULL,S_PLAY_RUN2},  // S_PLAY_RUN1
   {SPR_PLAY,1,4,NULL,S_PLAY_RUN3},  // S_PLAY_RUN2
@@ -405,8 +398,6 @@ const state_t states[NUMSTATES] = {
   {SPR_LAUN,0,-1,NULL,S_NULL},  // S_LAUN
   {SPR_SHOT,0,-1,NULL,S_NULL},  // S_SHOT
   {SPR_COLU,32768,-1,NULL,S_NULL},  // S_COLU
-  {SPR_PLAY,13,-1,NULL,S_NULL}, // S_DEADTORSO
-  {SPR_PLAY,18,-1,NULL,S_NULL}, // S_DEADBOTTOM
   {SPR_POL5,0,-1,NULL,S_NULL},	// S_GIBS
   {SPR_CAND,32768,-1,NULL,S_NULL},	// S_CANDLESTIK
   {SPR_CBRA,32768,-1,NULL,S_NULL},  // S_CANDELABRA
@@ -770,31 +761,6 @@ const mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
   {   // MT_TFOG
     -1,   // doomednum
     S_TFOG,   // spawnstate
-    1000,   // spawnhealth
-    S_NULL,   // seestate
-    sfx_None,   // seesound
-    8,    // reactiontime
-    sfx_None,   // attacksound
-    S_NULL,   // painstate
-    0,    // painchance
-    sfx_None,   // painsound
-    S_NULL,   // meleestate
-    S_NULL,   // missilestate
-    S_NULL,   // deathstate
-    S_NULL,   // xdeathstate
-    sfx_None,   // deathsound
-    0,    // speed
-    20*FRACUNIT,    // radius
-    16*FRACUNIT,    // height
-    100,    // mass
-    0,    // damage
-    sfx_None,   // activesound
-    MF_NOBLOCKMAP|MF_NOGRAVITY // flags
-  },
-
-  {   // MT_IFOG
-    -1,   // doomednum
-    S_IFOG,   // spawnstate
     1000,   // spawnhealth
     S_NULL,   // seestate
     sfx_None,   // seesound

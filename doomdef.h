@@ -116,9 +116,6 @@ typedef enum {
   it_bluecard,
   it_yellowcard,
   it_redcard,
-  it_blueskull,
-  it_yellowskull,
-  it_redskull,
   NUMCARDS
 } card_t;
 
