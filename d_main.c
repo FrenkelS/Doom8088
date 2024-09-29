@@ -354,14 +354,6 @@ void D_AdvanceDemo (void)
     advancedemo = true;
 }
 
-/* killough 11/98: functions to perform demo sequences
- * cphipps 10/99: constness fixes
- */
-
-static void D_SetPageName(const char *name)
-{
-	UNUSED(name);
-}
 
 static void D_DrawTitle1(const char *name)
 {
@@ -372,9 +364,6 @@ static void D_DrawTitle1(const char *name)
 }
 
 
-/* killough 11/98: tabulate demo sequences
- */
-
 static struct
 {
     void (*func)(const char *);
@@ -384,10 +373,6 @@ const demostates[] =
 {
     {D_DrawTitle1, NULL},
     {G_DeferedPlayDemo, "demo3"},
-    {D_SetPageName, NULL},
-    {G_DeferedPlayDemo, "demo1"},
-    {D_SetPageName, NULL},
-    {G_DeferedPlayDemo, "demo2"},
     {NULL, NULL},
 };
 
@@ -395,7 +380,6 @@ static int16_t  demosequence;
 
 /*
  * This cycles through the demo sequences.
- * killough 11/98: made table-driven
  */
 
 void D_DoAdvanceDemo(void)
@@ -404,7 +388,7 @@ void D_DoAdvanceDemo(void)
     advancedemo = _g_usergame = false;
     _g_gameaction = ga_nothing;
 
-    pagetic = TICRATE * 11;         /* killough 11/98: default behavior */
+    pagetic = TICRATE * 11;
     _g_gamestate = GS_DEMOSCREEN;
 
 
