@@ -91,7 +91,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
 
-2) Run `compiamy.sh` to compile the Mode Y version and `compia13.sh` for the Mode 13h version.
+2) Run `compiamy.sh` to compile the Mode Y version, `compia13.sh` for the Mode 13h version, `compiath.sh` for Tandy 1000 640x200, `compiatm.sh` for Tandy 1000 320x200 and `compiatl.sh` for Tandy 1000 160x200.
 
 3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
 
