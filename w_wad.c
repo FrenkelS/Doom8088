@@ -164,14 +164,18 @@ typedef struct
   int32_t  infotableofs;
 } wadinfo_t;
 
+#if !defined WAD_FILE
+#define WAD_FILE "DOOM8088.WAD"
+#endif
+
 void W_Init(void)
 {
-	printf("\tadding doom1.wad\n");
+	printf("\tadding " WAD_FILE "\n");
 	printf("\tshareware version.\n");
 
-	fileWAD = fopen("DOOM1.WAD", "rb");
+	fileWAD = fopen(WAD_FILE, "rb");
 	if (fileWAD == NULL)
-		I_Error("Can't open DOOM1.WAD.");
+		I_Error("Can't open " WAD_FILE ".");
 
 	boolean xms = W_LoadWADIntoXMS();
 	readfunc = xms ? Z_MoveExtendedMemoryToConventionalMemory : W_ReadDataFromFile;
