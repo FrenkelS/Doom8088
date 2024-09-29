@@ -1,6 +1,4 @@
 ## Doom8088
-![Doom8088](readme_imgs/doom8088.png?raw=true)
-
 Doom was originally designed in 1993 for 32-bit DOS computers with 4 MB of RAM.
 It's mostly written in C code with very little assembly code.
 It has been ported to all kinds of systems.
@@ -32,6 +30,20 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - When there's not enough memory for a texture, one color is drawn
  - When there's not enough memory for the intermission screen, the last few frames of gameplay are shown instead
  - When there's not enough memory for a new palette, only the border changes color
+
+## Supported video modes
+
+### VGA Mode Y 256 color 320x200 mode and MCGA Mode 13H 256 color 320x200 mode
+![Doom8088 in 256 colors](readme_imgs/doom256.png?raw=true)
+
+### Tandy 1000 16 color 640x200 mode
+![Doom8088 in 16 colors](readme_imgs/doomth.png?raw=true)
+
+### Tandy 1000 16 color 320 mode
+![Doom8088 in 16 colors](readme_imgs/doomtm.png?raw=true)
+
+### Tandy 1000 16 color 160 mode
+![Doom8088 in 16 colors](readme_imgs/doomtl.png?raw=true)
 
 ## Controls:
 |Action                 |             |
