@@ -8,29 +8,30 @@ Usually these systems are 32-bit or more and have a flat memory model.
 
 Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286, and with VGA or MCGA graphics.
 It uses 64 kB of EMS memory, if available.
-And 2058 kB of XMS memory, if available.
+And 2024 kB of XMS memory, if available.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
 Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
 Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX1-lNuUBY).
 
 **What's special?:**
+ - Supports only Doom 1 Episode 1
+ - Rotating overlaid automap
+ - Only demo3 is supported
+ - PC speaker sound effects
+ - No music
  - No texture mapped floors and ceilings
  - No light diminishing
- - No music
  - No saving and loading
  - No multiplayer
  - No PWADs
  - No screen resizing
  - No mouse and joystick support
- - PC speaker sound effects
- - Rotating overlaid automap
- - Supports only Doom 1 Episode 1
- - Only demo3 is in sync
 
 **Known bugs:**
- - Some crashes and lockups due to memory issues and divisions by zero
  - When there's not enough memory for a texture, one color is drawn
+ - When there's not enough memory for the intermission screen, the last few frames of gameplay are shown instead
+ - When there's not enough memory for a new palette, only the border changes color
 
 ## Controls:
 |Action                 |             |
