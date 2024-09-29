@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -214,19 +214,19 @@ void R_InitSprites(void)
             {
               int8_t frame;
               for (frame = 0; frame < maxframe; frame++)
-                switch ((int16_t) sprtemp[frame].rotate)
+                switch (sprtemp[frame].rotate)
                   {
-                  case -1:
+                  default:
                     // no rotations were found for that frame at all
                     I_Error ("R_InitSprites: No patches found "
                              "for %.8s frame %c", sprnames[i], frame+'A');
                     break;
 
-                  case 0:
+                  case false:
                     // only the first rotation is needed
                     break;
 
-                  case 1:
+                  case true:
                     // must have all 8 frames
                     {
                       int8_t rotation;

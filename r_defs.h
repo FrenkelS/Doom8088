@@ -66,6 +66,11 @@ typedef struct
   fixed_t x, y;
 } vertex_t;
 
+typedef struct
+{
+  int16_t x, y;
+} vertex16_t;
+
 // Each sector has a degenmobj_t in its center for sound origin purposes.
 typedef struct
 {
@@ -160,14 +165,14 @@ typedef struct linedata_s
 
 typedef struct line_s
 {
-    vertex_t v1;
-    vertex_t v2;     // Vertices, from v1 to v2.
+    vertex16_t v1;
+    vertex16_t v2;     // Vertices, from v1 to v2.
     uint16_t lineno;         //line number.
 
     int16_t dx, dy;        // Precalculated v2 - v1 for side checking.
 
     uint16_t sidenum[2];        // Visual appearance: SideDefs.
-    fixed_t bbox[4];        //Line bounding box.
+    int16_t bbox[4];        //Line bounding box.
 
     int16_t tag;
     uint8_t flags;           // Animation related.
@@ -236,11 +241,11 @@ typedef struct
 //
 typedef struct
 {
-    vertex_t v1;
-    vertex_t v2;            // Vertices, from v1 to v2.
+    vertex16_t v1;
+    vertex16_t v2;            // Vertices, from v1 to v2.
 
-    fixed_t offset;
-    angle_t angle;
+    int16_t offset;
+    angle16_t angle;
 
     uint16_t sidenum;
     uint16_t linenum;

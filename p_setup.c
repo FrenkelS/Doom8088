@@ -277,14 +277,13 @@ static void P_LoadThings (int16_t lump)
 
 typedef PACKEDATTR_PRE struct
 {
-	vertex_t v1;
-	vertex_t v2;			// Vertices, from v1 to v2.
-	uint16_t lineno;		//line number.
+	vertex16_t v1;
+	vertex16_t v2;			// Vertices, from v1 to v2.
 
 	int16_t dx, dy;			// Precalculated v2 - v1 for side checking.
 
 	uint16_t sidenum[2];	// Visual appearance: SideDefs.
-	fixed_t bbox[4];		// Line bounding box.
+	int16_t bbox[4];		// Line bounding box.
 
 	uint8_t flags;			// Animation related.
 	int8_t const_special;
@@ -293,7 +292,7 @@ typedef PACKEDATTR_PRE struct
 
 } PACKEDATTR_POST packed_line_t;
 
-typedef char assertLineSize[sizeof(packed_line_t) == 47 ? 1 : -1];
+typedef char assertLineSize[sizeof(packed_line_t) == 29 ? 1 : -1];
 
 static void P_LoadLineDefs (int16_t lump)
 {
@@ -309,7 +308,7 @@ static void P_LoadLineDefs (int16_t lump)
 	{
 		_w_lines[i].v1         = lines[i].v1;
 		_w_lines[i].v2         = lines[i].v2;
-		_w_lines[i].lineno     = lines[i].lineno;
+		_w_lines[i].lineno     = i;
 		_w_lines[i].dx         = lines[i].dx;
 		_w_lines[i].dy         = lines[i].dy;
 		_w_lines[i].sidenum[0] = lines[i].sidenum[0];
@@ -508,8 +507,8 @@ static void P_GroupLines (void)
 
         for(int16_t l = 0; l < sector->linecount; l++)
         {
-            M_AddToBox (bbox, sector->lines[l]->v1.x, sector->lines[l]->v1.y);
-            M_AddToBox (bbox, sector->lines[l]->v2.x, sector->lines[l]->v2.y);
+            M_AddToBox (bbox, (fixed_t)sector->lines[l]->v1.x<<FRACBITS, (fixed_t)sector->lines[l]->v1.y<<FRACBITS);
+            M_AddToBox (bbox, (fixed_t)sector->lines[l]->v2.x<<FRACBITS, (fixed_t)sector->lines[l]->v2.y<<FRACBITS);
         }
 
         sector->soundorg.x = bbox[BOXRIGHT]/2+bbox[BOXLEFT]/2;
