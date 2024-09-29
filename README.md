@@ -33,16 +33,16 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 ## Supported video modes
 
-### VGA Mode Y 256 color 320x200 mode and MCGA Mode 13H 256 color 320x200 mode
+### VGA 256 color 320x200 Mode Y and MCGA 256 color 320x200 Mode 13H
 ![Doom8088 in 256 colors](readme_imgs/doom256.png?raw=true)
 
 ### Tandy 1000 16 color 640x200 mode
 ![Doom8088 in 16 colors](readme_imgs/doomth.png?raw=true)
 
-### Tandy 1000 16 color 320 mode
+### Tandy 1000 16 color 320x200 mode
 ![Doom8088 in 16 colors](readme_imgs/doomtm.png?raw=true)
 
-### Tandy 1000 16 color 160 mode
+### Tandy 1000 16 color 160x200 mode
 ![Doom8088 in 16 colors](readme_imgs/doomtl.png?raw=true)
 
 ## Controls:
