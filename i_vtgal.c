@@ -413,7 +413,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	while (true)
 	{
-		_s_screen[y0 * SCREENWIDTH + (x0 / 4) * 4] = color;
+		_s_screen[y0 * SCREENWIDTH + (x0 & 0xfffc)] = color;
 
 		if (x0 == x1 && y0 == y1)
 			break;
