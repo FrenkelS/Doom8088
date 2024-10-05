@@ -2340,7 +2340,7 @@ static void R_AddLine(const seg_t __far* line)
     if (x1 >= x2)       // killough 1/31/98 -- change == to >= for robustness
         return;
 
-    backsector = line->backsectornum != NO_INDEX ? &_g_sectors[line->backsectornum] : NULL;
+    backsector = line->backsectornum != 0xff ? &_g_sectors[line->backsectornum] : NULL;
 
     /* cph - roll up linedef properties in flags */
     linedef = &_g_lines[curline->linenum];
