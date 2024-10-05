@@ -336,10 +336,10 @@ typedef PACKEDATTR_PRE struct {
   int16_t toptexture;
   int16_t bottomtexture;
   int16_t midtexture;
-  int16_t sector;  // Front sector, towards viewer.
+  uint8_t sector;  // Front sector, towards viewer.
 } PACKEDATTR_POST mapsidedef_t;
 
-typedef char assertMapsidedefSize[sizeof(mapsidedef_t) == 11 ? 1 : -1];
+typedef char assertMapsidedefSize[sizeof(mapsidedef_t) == 10 ? 1 : -1];
 
 
 //
