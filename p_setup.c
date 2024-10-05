@@ -287,12 +287,12 @@ typedef PACKEDATTR_PRE struct
 
 	uint8_t flags;			// Animation related.
 	int8_t const_special;
-	int16_t tag;
+	int8_t tag;
 	int8_t slopetype;		// To aid move clipping.
 
 } PACKEDATTR_POST packed_line_t;
 
-typedef char assertLineSize[sizeof(packed_line_t) == 29 ? 1 : -1];
+typedef char assertLineSize[sizeof(packed_line_t) == 28 ? 1 : -1];
 
 static void P_LoadLineDefs (int16_t lump)
 {
