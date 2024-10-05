@@ -332,14 +332,14 @@ static void P_LoadLineDefs (int16_t lump)
 // by setting textures and offsets.
 typedef PACKEDATTR_PRE struct {
   int16_t textureoffset;
-  int16_t rowoffset;
+  uint8_t rowoffset;
   int16_t toptexture;
   int16_t bottomtexture;
   int16_t midtexture;
   int16_t sector;  // Front sector, towards viewer.
 } PACKEDATTR_POST mapsidedef_t;
 
-typedef char assertMapsidedefSize[sizeof(mapsidedef_t) == 12 ? 1 : -1];
+typedef char assertMapsidedefSize[sizeof(mapsidedef_t) == 11 ? 1 : -1];
 
 
 //
