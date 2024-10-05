@@ -102,12 +102,12 @@
 typedef PACKEDATTR_PRE struct {
   int16_t x;
   int16_t y;
-  int16_t angle;
   int16_t type;
-  int16_t options;
+  int8_t angle;
+  int8_t options;
 } PACKEDATTR_POST mapthing_t;
 
-typedef char assertMapthingSize[sizeof(mapthing_t) == 10 ? 1 : -1];
+typedef char assertMapthingSize[sizeof(mapthing_t) == 8 ? 1 : -1];
 
 
 /* Bounding box coordinate storage. */

@@ -963,7 +963,7 @@ static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
 //  between levels.
 //
 
-static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
+static void P_SpawnPlayer(int16_t playerx, int16_t playery, int8_t playerangle)
 {
   player_t* p;
   mobj_t __far*   mobj;
@@ -985,7 +985,7 @@ static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
 
   // set color translations for player sprites
 
-  mobj->angle      = ANG45 * (playerangle/45);
+  mobj->angle      = ANG45 * playerangle;
   mobj->health     = p->health;
 
   p->mo            = mobj;
@@ -1066,7 +1066,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     if (mobj->flags & MF_COUNTITEM)
         _g_totalitems++;
 
-    mobj->angle = ANG45 * (mthing->angle/45);
+    mobj->angle = ANG45 * mthing->angle;
     if (mthing->options & MTF_AMBUSH)
         mobj->flags |= MF_AMBUSH;
 }
