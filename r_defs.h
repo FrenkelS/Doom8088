@@ -239,7 +239,7 @@ typedef struct
 //
 // The LineSeg.
 //
-typedef PACKEDATTR_PRE struct
+typedef struct
 {
     vertex16_t v1;
     vertex16_t v2;            // Vertices, from v1 to v2.
@@ -252,7 +252,7 @@ typedef PACKEDATTR_PRE struct
 
     uint8_t frontsectornum;
     uint8_t backsectornum;
-} PACKEDATTR_POST seg_t;
+} seg_t;
 
 typedef char assertSegSize[sizeof(seg_t) == 18 ? 1 : -1];
 

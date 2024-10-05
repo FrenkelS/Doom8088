@@ -99,13 +99,13 @@
 
 // Thing definition, position, orientation and type,
 // plus skill/visibility flags and attributes.
-typedef PACKEDATTR_PRE struct {
+typedef struct {
   int16_t x;
   int16_t y;
   int16_t type;
   int8_t angle;
   int8_t options;
-} PACKEDATTR_POST mapthing_t;
+} mapthing_t;
 
 typedef char assertMapthingSize[sizeof(mapthing_t) == 8 ? 1 : -1];
 
@@ -133,6 +133,8 @@ typedef struct {
   // If NF_SUBSECTOR its a subsector, else it's a node of another subtree.
   uint16_t children[2];
 } mapnode_t;
+
+typedef char assertMapnodeSize[sizeof(mapnode_t) == 28 ? 1 : -1];
 
 
 
