@@ -33,7 +33,12 @@
 #define ANGLETOSKYSHIFT         22
 
 
+#if defined FLAT_SPAN
+const int16_t skyflatnum = -2;
+#else
 int16_t skyflatnum;
+#endif
+
 static int16_t skypatchnum;
 static uint16_t skywidthmask;
 
@@ -153,9 +158,11 @@ void R_InitSky(void)
 	skypatchnum  = tex->patches[0].patch_num;
 	skywidthmask = tex->widthmask;
 
+#if !defined FLAT_SPAN
 	// First thing, we have a dummy sky texture name,
 	//  a flat. The data is in the WAD only because
 	//  we look for an actual index, instead of simply
 	//  setting one.
 	skyflatnum = R_FlatNumForName("F_SKY1");
+#endif
 }

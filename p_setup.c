@@ -175,9 +175,24 @@ static void P_LoadSubsectors (int16_t lump)
 //
 // P_LoadSectors
 //
-// killough 5/3/98: reformatted, cleaned up
 
 // Sector definition, from editing.
+#if defined FLAT_SPAN
+typedef struct {
+  int16_t floorheight;
+  int16_t ceilingheight;
+  int16_t floorpic;
+  int16_t ceilingpic;
+  uint8_t lightlevel;
+  int8_t special;
+  int16_t tag;
+} mapsector_t;
+
+typedef char assertMapsectorSize[sizeof(mapsector_t) == 12 ? 1 : -1];
+
+#define R_FlatNumForFarName(p) (p)
+
+#else
 typedef struct {
   int16_t floorheight;
   int16_t ceilingheight;
@@ -196,6 +211,8 @@ static int16_t R_FlatNumForFarName(const char __far* far_name)
 	char* near_name = (char*)&nameint;
 	return R_FlatNumForName(near_name);
 }
+#endif
+
 
 static void P_LoadSectors (int16_t lump)
 {
