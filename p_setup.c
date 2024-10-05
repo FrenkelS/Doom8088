@@ -183,12 +183,12 @@ typedef struct {
   int16_t ceilingheight;
   char  floorpic[8];
   char  ceilingpic[8];
-  int16_t lightlevel;
-  int16_t special;
+  uint8_t lightlevel;
+  int8_t special;
   int16_t tag;
 } mapsector_t;
 
-typedef char assertMapsectorSize[sizeof(mapsector_t) == 26 ? 1 : -1];
+typedef char assertMapsectorSize[sizeof(mapsector_t) == 24 ? 1 : -1];
 
 static int16_t R_FlatNumForFarName(const char __far* far_name)
 {
@@ -216,9 +216,9 @@ static void P_LoadSectors (int16_t lump)
       ss->floorpic   = R_FlatNumForFarName(ms->floorpic);
       ss->ceilingpic = R_FlatNumForFarName(ms->ceilingpic);
 
-      ss->lightlevel = SHORT(ms->lightlevel);
-      ss->special = SHORT(ms->special);
-      ss->oldspecial = SHORT(ms->special);
+      ss->lightlevel = ms->lightlevel;
+      ss->special    = ms->special;
+      ss->oldspecial = ms->special;
       ss->tag = SHORT(ms->tag);
 
       ss->thinglist = NULL;
