@@ -50,6 +50,7 @@
 
 
 #define NO_INDEX ((uint16_t)-1)
+#define NO_INDEX8 (0xff)
 
 //
 // LineDef attributes.
