@@ -28,15 +28,18 @@
 #include "compiler.h"
 #include "r_defs.h"
 #include "r_main.h"
+#include "i_video.h"
 
 #include "globdata.h"
 
 
+#if defined FLAT_SPAN
+static int16_t nukage;
+#else
 static int16_t firstflat;
 static int16_t  animated_flat_basepic;
 static int16_t __far* flattranslation;             // for global animation
 
-#if !defined FLAT_SPAN
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
 
@@ -65,17 +68,14 @@ static visplane_t __far*__far* freehead;
 byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
 {
 	const uint8_t __far* colormap = R_LoadColorMap(lightlevel);
-	return colormap[flattranslation[picnum]];
+
+	if (picnum == -3)
+		picnum = nukage;
+
+	return colormap[picnum];
 }
 
 #else
-
-typedef struct {
-  uint32_t             position;
-  uint32_t             step;
-  const byte    __far* source; // start of a 64*64 tile image
-  const uint8_t __far* colormap;
-} draw_span_vars_t;
 
 
 static const fixed_t yslopeTable[VIEWWINDOWHEIGHT / 2] =
@@ -359,6 +359,7 @@ visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop
 
 void R_InitFlats(void)
 {
+#if !defined FLAT_SPAN
 	       firstflat = W_GetNumForName("F_START") + 1;
 
 	int16_t lastflat = W_GetNumForName("F_END")   - 1;
@@ -370,35 +371,6 @@ void R_InitFlats(void)
 
 	animated_flat_basepic = R_FlatNumForName("NUKAGE1");
 
-#if defined FLAT_SPAN
-	byte    __far* source    = Z_MallocStatic( 64 * 64);
-	int16_t __far* histogram = Z_MallocStatic(256 * sizeof(int16_t));
-
-	for (int16_t i = 0; i < numflats; i++)
-	{
-		W_ReadLumpByNum(firstflat + i, source);
-
-		_fmemset(histogram, 0, 256 * sizeof(int16_t));
-		for (int16_t j = 0; j < 64 * 64; j++)
-			histogram[source[j]]++;
-
-		int16_t maxamount = 0;
-		int16_t maxindex  = 0;
-		for (int16_t j = 0; j < 256; j++)
-		{
-			if (histogram[j] > maxamount)
-			{
-				maxamount = histogram[j];
-				maxindex  = j;
-			}
-		}
-
-		flattranslation[i] = maxindex;
-	}
-
-	Z_Free(histogram);
-	Z_Free(source);
-#else
 	for (int16_t i = 0; i < numflats; i++)
 		flattranslation[i] = i;
 #endif
@@ -410,12 +382,13 @@ void R_InitFlats(void)
 // Retrieval, get a flat number for a flat name.
 //
 //
-
+#if !defined FLAT_SPAN
 int16_t R_FlatNumForName(const char *name)
 {
 	int16_t i = W_GetNumForName(name);
 	return i - firstflat;
 }
+#endif
 
 
 #if !defined FLAT_NUKAGE1_COLOR
@@ -425,12 +398,12 @@ int16_t R_FlatNumForName(const char *name)
 void P_UpdateAnimatedFlat(void)
 {
 #if defined FLAT_SPAN
-	int16_t pic = FLAT_NUKAGE1_COLOR + (((int16_t)_g_leveltime >> 3) % 3) * 2;
+	nukage = FLAT_NUKAGE1_COLOR + (((int16_t)_g_leveltime >> 3) % 3) * 2;
 #else
 	int16_t pic = animated_flat_basepic + (((int16_t)_g_leveltime >> 3) % 3);
-#endif
 
 	flattranslation[animated_flat_basepic + 0] = pic;
 	flattranslation[animated_flat_basepic + 1] = pic;
 	flattranslation[animated_flat_basepic + 2] = pic;
+#endif
 }

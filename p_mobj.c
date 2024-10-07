@@ -963,7 +963,7 @@ static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
 //  between levels.
 //
 
-static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
+static void P_SpawnPlayer(int16_t playerx, int16_t playery, int8_t playerangle)
 {
   player_t* p;
   mobj_t __far*   mobj;
@@ -985,7 +985,7 @@ static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
 
   // set color translations for player sprites
 
-  mobj->angle      = ANG45 * (playerangle/45);
+  mobj->angle      = ANG45 * playerangle;
   mobj->health     = p->health;
 
   p->mo            = mobj;
@@ -1023,7 +1023,6 @@ static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
 #define MTF_HARD                4
 // Deaf monsters/do not react to sound.
 #define MTF_AMBUSH              8
-#define MTF_NOTSINGLE          16
 
 void P_SpawnMapThing(const mapthing_t __far* mthing)
 {
@@ -1040,19 +1039,8 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
         P_SpawnPlayer(mthing->x, mthing->y, mthing->angle);
         return;
     }
-    else if (mthing->type == 2 || mthing->type == 3 || mthing->type == 4 || mthing->type == 11)
-    {
-        // ignore start spot for player 2, 3, 4 and Deathmatch
-        return;
-    }
 
     // check for apropriate skill level
-
-    /* jff "not single" thing flag */
-    if (mthing->options & MTF_NOTSINGLE)
-        return;
-
-    // killough 11/98: simplify
     if (_g_gameskill == sk_baby || _g_gameskill == sk_easy ?
             !(mthing->options & MTF_EASY) :
             _g_gameskill == sk_hard || _g_gameskill == sk_nightmare ?
@@ -1078,7 +1066,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     if (mobj->flags & MF_COUNTITEM)
         _g_totalitems++;
 
-    mobj->angle = ANG45 * (mthing->angle/45);
+    mobj->angle = ANG45 * mthing->angle;
     if (mthing->options & MTF_AMBUSH)
         mobj->flags |= MF_AMBUSH;
 }
