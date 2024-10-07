@@ -294,24 +294,19 @@ static void P_LoadThings (int16_t lump)
 // Does this mean secrets used to be linedef-based, rather than sector-based?
 //
 
-typedef struct
+typedef PACKEDATTR_PRE struct
 {
 	vertex16_t v1;
 	vertex16_t v2;			// Vertices, from v1 to v2.
 
-	int16_t dx, dy;			// Precalculated v2 - v1 for side checking.
-
 	uint16_t sidenum[2];	// Visual appearance: SideDefs.
-	int16_t bbox[4];		// Line bounding box.
 
 	uint8_t flags;			// Animation related.
 	int8_t const_special;
 	int8_t tag;
-	int8_t slopetype;		// To aid move clipping.
+} PACKEDATTR_POST packed_line_t;
 
-} packed_line_t;
-
-typedef char assertLineSize[sizeof(packed_line_t) == 28 ? 1 : -1];
+typedef char assertLineSize[sizeof(packed_line_t) == 15 ? 1 : -1];
 
 static void P_LoadLineDefs (int16_t lump)
 {
@@ -325,20 +320,29 @@ static void P_LoadLineDefs (int16_t lump)
 
 	for (int16_t i = 0; i < _g_numlines; i++)
 	{
-		_w_lines[i].v1         = lines[i].v1;
-		_w_lines[i].v2         = lines[i].v2;
-		_w_lines[i].lineno     = i;
-		_w_lines[i].dx         = lines[i].dx;
-		_w_lines[i].dy         = lines[i].dy;
-		_w_lines[i].sidenum[0] = lines[i].sidenum[0];
-		_w_lines[i].sidenum[1] = lines[i].sidenum[1];
-		_w_lines[i].bbox[0]    = lines[i].bbox[0];
-		_w_lines[i].bbox[1]    = lines[i].bbox[1];
-		_w_lines[i].bbox[2]    = lines[i].bbox[2];
-		_w_lines[i].bbox[3]    = lines[i].bbox[3];
-		_w_lines[i].flags      = lines[i].flags;
-		_w_lines[i].tag        = lines[i].tag;
-		_w_lines[i].slopetype  = lines[i].slopetype;
+		_w_lines[i].v1              = lines[i].v1;
+		_w_lines[i].v2              = lines[i].v2;
+		_w_lines[i].lineno          = i;
+		_w_lines[i].dx              = lines[i].v2.x - lines[i].v1.x; // for side checking.
+		_w_lines[i].dy              = lines[i].v2.y - lines[i].v1.y; // for side checking.
+		_w_lines[i].sidenum[0]      = lines[i].sidenum[0];
+		_w_lines[i].sidenum[1]      = lines[i].sidenum[1];
+		_w_lines[i].bbox[BOXTOP]    = lines[i].v1.y < lines[i].v2.y ? lines[i].v2.y : lines[i].v1.y; // Line bounding box.
+		_w_lines[i].bbox[BOXBOTTOM] = lines[i].v1.y < lines[i].v2.y ? lines[i].v1.y : lines[i].v2.y; // Line bounding box.
+		_w_lines[i].bbox[BOXLEFT]   = lines[i].v1.x < lines[i].v2.x ? lines[i].v1.x : lines[i].v2.x; // Line bounding box.
+		_w_lines[i].bbox[BOXRIGHT]  = lines[i].v1.x < lines[i].v2.x ? lines[i].v2.x : lines[i].v1.x; // Line bounding box.
+		_w_lines[i].flags           = lines[i].flags;
+		_w_lines[i].tag             = lines[i].tag;
+
+		// To aid move clipping.
+		if (_w_lines[i].dx == 0)
+			_w_lines[i].slopetype = ST_VERTICAL;
+		else if (_w_lines[i].dy == 0)
+			_w_lines[i].slopetype = ST_HORIZONTAL;
+		else if (((fixed_t)_w_lines[i].dy << FRACBITS) / _w_lines[i].dx > 0)
+			_w_lines[i].slopetype = ST_POSITIVE;
+		else
+			_w_lines[i].slopetype = ST_NEGATIVE;
 
 		_g_linedata[i].special = lines[i].const_special;
 	}
