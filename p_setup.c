@@ -262,20 +262,21 @@ static void P_LoadNodes (int16_t lump)
  *
  */
 
-static void P_LoadThings (int16_t lump)
+static void P_LoadThings(int16_t lump)
 {
-    int16_t  numthings = W_LumpLength (lump) / sizeof(mapthing_t);
+	_g_thingPoolSize = W_LumpLength(lump) / sizeof(mapthing_t);
+	_g_thingPool     = Z_CallocLevel(_g_thingPoolSize * sizeof(mobj_t));
+
+	for (int16_t i = 0; i < _g_thingPoolSize; i++)
+		_g_thingPool[i].type = MT_NOTHING;
+}
+
+
+static void P_LoadThings2(int16_t lump)
+{
     const mapthing_t __far* data = W_GetLumpByNum(lump);
 
-    _g_thingPool = Z_CallocLevel(numthings * sizeof(mobj_t));
-    _g_thingPoolSize = numthings;
-
-    for (int16_t i = 0; i < numthings; i++)
-    {
-        _g_thingPool[i].type = MT_NOTHING;
-    }
-
-    for (int16_t i=0; i<numthings; i++)
+    for (int16_t i = 0; i < _g_thingPoolSize; i++)
     {
         const mapthing_t __far* mt = &data[i];
 
@@ -374,11 +375,7 @@ static void P_LoadSideDefs (int16_t lump)
 {
   numsides = W_LumpLength(lump) / sizeof(mapsidedef_t);
   _g_sides = Z_CallocLevel(numsides * sizeof(side_t));
-}
 
-
-static void P_LoadSideDefs2(int16_t lump)
-{
     const mapsidedef_t __far* data = W_GetLumpByNum(lump);
 
     for (int16_t i = 0; i < numsides; i++)
@@ -584,14 +581,14 @@ void P_SetupLevel(int16_t map)
 
     lumpnum = W_GetNumForName(lumpname);
 
-    P_LoadSegs      (lumpnum + ML_SEGS);
+    P_LoadThings    (lumpnum + ML_THINGS);
     P_LoadLineDefs  (lumpnum + ML_LINEDEFS);
-    P_LoadNodes     (lumpnum + ML_NODES);
+    P_LoadSegs      (lumpnum + ML_SEGS);
     P_LoadBlockMap  (lumpnum + ML_BLOCKMAP);
-    P_LoadReject    (lumpnum + ML_REJECT);
-    P_LoadSideDefs  (lumpnum + ML_SIDEDEFS);
+    P_LoadNodes     (lumpnum + ML_NODES);
     P_LoadSectors   (lumpnum + ML_SECTORS);
-    P_LoadSideDefs2 (lumpnum + ML_SIDEDEFS);
+    P_LoadSideDefs  (lumpnum + ML_SIDEDEFS);
+    P_LoadReject    (lumpnum + ML_REJECT);
     P_LoadSubsectors(lumpnum + ML_SSECTORS);
 
     P_GroupLines();
@@ -602,7 +599,7 @@ void P_SetupLevel(int16_t map)
     for (i = 0; i < MAXPLAYERS; i++)
         _g_player.mo = NULL;
 
-    P_LoadThings(lumpnum + ML_THINGS);
+    P_LoadThings2(lumpnum + ML_THINGS);
 
     // set up world state
     P_SpawnSpecials();
