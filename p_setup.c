@@ -299,7 +299,8 @@ typedef PACKEDATTR_PRE struct
 	vertex16_t v1;
 	vertex16_t v2;			// Vertices, from v1 to v2.
 
-	uint16_t sidenum[2];	// Visual appearance: SideDefs.
+	int16_t frontsidenum;	// Visual appearance: SideDefs.
+	int16_t backsidenum;
 
 	uint8_t flags;			// Animation related.
 	int8_t const_special;
@@ -325,8 +326,8 @@ static void P_LoadLineDefs (int16_t lump)
 		_w_lines[i].lineno          = i;
 		_w_lines[i].dx              = lines[i].v2.x - lines[i].v1.x; // for side checking.
 		_w_lines[i].dy              = lines[i].v2.y - lines[i].v1.y; // for side checking.
-		_w_lines[i].sidenum[0]      = lines[i].sidenum[0];
-		_w_lines[i].sidenum[1]      = lines[i].sidenum[1];
+		_w_lines[i].sidenum[0]      = lines[i].frontsidenum;
+		_w_lines[i].sidenum[1]      = lines[i].backsidenum;
 		_w_lines[i].bbox[BOXTOP]    = lines[i].v1.y < lines[i].v2.y ? lines[i].v2.y : lines[i].v1.y; // Line bounding box.
 		_w_lines[i].bbox[BOXBOTTOM] = lines[i].v1.y < lines[i].v2.y ? lines[i].v1.y : lines[i].v2.y; // Line bounding box.
 		_w_lines[i].bbox[BOXLEFT]   = lines[i].v1.x < lines[i].v2.x ? lines[i].v1.x : lines[i].v2.x; // Line bounding box.
