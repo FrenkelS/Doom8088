@@ -56,11 +56,11 @@ button_t  _g_buttonlist[MAXBUTTONS];
 
 // switch animation structure type
 
-typedef PACKEDATTR_PRE struct
+typedef struct
 {
   char name1[9];
   char name2[9];
-} PACKEDATTR_POST switchlist_t; //jff 3/23/98 pack to read from memory
+} switchlist_t; //jff 3/23/98 pack to read from memory
 
 typedef char assertSwitchlistSize[sizeof(switchlist_t) == 18 ? 1 : -1];
 

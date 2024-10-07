@@ -65,19 +65,19 @@
 // and possibly other attributes.
 //
 
-typedef PACKEDATTR_PRE struct
+typedef struct
 {
   int16_t originx;
   int16_t originy;
   int16_t patch;
   int16_t stepdir;         // unused in Doom but might be used in Phase 2 Boom
   int16_t colormap;        // unused in Doom but might be used in Phase 2 Boom
-} PACKEDATTR_POST mappatch_t;
+} mappatch_t;
 
 typedef char assertMappatchSize[sizeof(mappatch_t) == 10 ? 1 : -1];
 
 
-typedef PACKEDATTR_PRE struct
+typedef struct
 {
   char       name[8];
   char       pad2[4];      // unused
@@ -86,7 +86,7 @@ typedef PACKEDATTR_PRE struct
   char       pad[4];       // unused in Doom but might be used in Boom Phase 2
   int16_t      patchcount;
   mappatch_t patches[1];
-} PACKEDATTR_POST maptexture_t;
+} maptexture_t;
 
 typedef char assertMaptextureSize[sizeof(maptexture_t) == 32 ? 1 : -1];
 

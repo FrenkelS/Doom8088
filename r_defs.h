@@ -250,9 +250,11 @@ typedef struct
     uint16_t sidenum;
     uint16_t linenum;
 
-    uint16_t frontsectornum;
-    uint16_t backsectornum;
+    uint8_t frontsectornum;
+    uint8_t backsectornum;
 } seg_t;
+
+typedef char assertSegSize[sizeof(seg_t) == 18 ? 1 : -1];
 
 
 //

@@ -90,7 +90,7 @@ const uint8_t __far* R_LoadColorMap(int16_t lightlevel);
 void R_RenderPlayerView(player_t *player);   // Called by G_Drawer.
 
 void R_DrawColumn (const draw_column_vars_t *dcvars);
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars);
 
 void R_DrawPlanes (void);
 visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int16_t lightlevel);

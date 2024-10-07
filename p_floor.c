@@ -366,11 +366,23 @@ result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest,
 // Called once per tick for each moving floor.
 //
 // Passed a floormove_t structure that contains all pertinent info about the
-// move. See P_SPEC.H for fields.
+// move.
 // No return.
 //
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
+
+typedef struct
+{
+  thinker_t thinker;
+  floor_e type;
+  sector_t __far* sector;
+  int16_t direction;
+  int16_t texture;
+  fixed_t floordestheight;
+  fixed_t speed;
+
+} floormove_t;
 
 static void T_MoveFloor(floormove_t __far* floor)
 {
