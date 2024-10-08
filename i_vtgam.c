@@ -315,16 +315,13 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 }
 
 
-void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
 		return;
-
-	uint16_t color = col;
-	color = (color << 8) | col;
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 
