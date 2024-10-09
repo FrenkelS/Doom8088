@@ -166,13 +166,13 @@ static void P_HitSlideLine(const line_t __far* ld)
     /* killough 10/98: only bounce if hit hard (prevents wobbling)
    * cph - DEMOSYNC - should only affect players in Boom demos? */
 
-    if (ld->slopetype == ST_HORIZONTAL)
+    if (ld->dy == 0)
     {
         tmymove = 0; // no more movement in the Y direction
         return;
     }
 
-    if (ld->slopetype == ST_VERTICAL)
+    if (ld->dx == 0)
     {                                                          // phares
         tmxmove = 0; // no more movement in the X direction
         return;
