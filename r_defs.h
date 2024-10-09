@@ -129,9 +129,9 @@ typedef struct
     int16_t textureoffset; // add this to the calculated texture column
     int16_t rowoffset;     // add this to the calculated texture top
 
-    int16_t toptexture:10;
-    int16_t bottomtexture:10;
-    int16_t midtexture:10;
+    int16_t toptexture;
+    int16_t bottomtexture;
+    int16_t midtexture;
 } side_t;
 
 //
