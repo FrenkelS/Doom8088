@@ -186,6 +186,15 @@ void I_FinishUpdate(void)
 
 
 //
+// R_InitColormaps
+//
+void R_InitColormaps(void)
+{
+	fullcolormap = W_GetLumpByName("COLORMAP"); // Never freed
+}
+
+
+//
 // A column is a vertical slice/span from a wall texture that,
 //  given the DOOM style restrictions on the view orientation,
 //  will always have constant z depth.

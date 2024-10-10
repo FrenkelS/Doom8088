@@ -231,6 +231,15 @@ void I_FinishUpdate(void)
 }
 
 
+//
+// R_InitColormaps
+//
+void R_InitColormaps(void)
+{
+	fullcolormap = W_GetLumpByName("COLORMAP"); // Never freed
+}
+
+
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
