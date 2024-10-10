@@ -150,6 +150,12 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// Do nothing
+}
+
+
 static int8_t newpal;
 
 
@@ -222,6 +228,15 @@ void I_FinishUpdate(void)
 	if ((((uint32_t)_s_screen) & 0xac000) == 0xac000)
 		_s_screen -= 0x0c000;
 #endif
+}
+
+
+//
+// R_InitColormaps
+//
+void R_InitColormaps(void)
+{
+	fullcolormap = W_GetLumpByName("COLORMAP"); // Never freed
 }
 
 
