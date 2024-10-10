@@ -236,7 +236,7 @@ sector_t __far* getNextSector(const line_t __far* line, sector_t __far* sec);
 
 boolean P_CheckTag(const line_t __far* line);
 
-void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain);
+void P_ChangeSwitchTexture(line_t __far* line, boolean useAgain);
 
 ////////////////////////////////////////////////////////////////
 //
@@ -313,7 +313,7 @@ void P_UpdateSpecials(void);
 void P_UpdateAnimatedFlat(void);
 
 // when needed
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line);
+boolean P_UseSpecialLine(mobj_t __far* thing, line_t __far* line);
 
 // p_lights
 

@@ -109,7 +109,7 @@ extern const line_t    __far* _g_ceilingline;
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-extern const line_t __far* _g_spechit[4];
+extern line_t __far* _g_spechit[4];
 
 extern int16_t _g_numspechit;
 
@@ -150,8 +150,7 @@ extern subsector_t __far* _g_subsectors;
 
 
 extern int16_t      _g_numlines;
-extern const line_t   __far* _g_lines;
-extern linedata_t __far* _g_linedata;
+extern line_t   __far* _g_lines;
 
 
 extern side_t   __far* _g_sides;

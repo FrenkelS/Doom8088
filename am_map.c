@@ -852,7 +852,7 @@ static void AM_drawWalls(void)
         }
 
         // if line has been seen or IDDT has been used
-        if (_g_linedata[i].r_flags & ML_MAPPED)
+        if (_g_lines[i].r_flags & ML_MAPPED)
         {
             if (_g_lines[i].flags & ML_DONTDRAW)
                 continue;

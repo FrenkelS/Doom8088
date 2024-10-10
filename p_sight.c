@@ -112,14 +112,14 @@ static boolean P_CrossSubsector(int16_t num)
     { // check lines
         int16_t linenum = seg->linenum;
 
-        const line_t __far* line = &_g_lines[linenum];
+        line_t __far* line = &_g_lines[linenum];
         divline_t divl;
 
         // allready checked other side?
-        if(_g_linedata[linenum].validcount == validcount)
+        if(line->validcount == validcount)
             continue;
 
-        _g_linedata[linenum].validcount = validcount;
+        line->validcount = validcount;
 
         if ((fixed_t)line->bbox[BOXLEFT  ]<<FRACBITS > los.bbox[BOXRIGHT ] ||
             (fixed_t)line->bbox[BOXRIGHT ]<<FRACBITS < los.bbox[BOXLEFT  ] ||
