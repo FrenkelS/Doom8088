@@ -167,14 +167,8 @@ void I_FinishUpdate(void)
 }
 
 
-//
-// R_InitColormaps
-//
-void R_InitColormaps(void)
+void R_ReloadColormaps(void)
 {
-	if (fullcolormap == NULL)
-		fullcolormap = Z_MallocStatic(34 * 256); // Never freed
-
 	char* lumpName;
 	if (_g_gamma == 0)
 		lumpName = "COLORMAP";

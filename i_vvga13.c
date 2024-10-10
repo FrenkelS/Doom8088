@@ -185,12 +185,9 @@ void I_FinishUpdate(void)
 }
 
 
-//
-// R_InitColormaps
-//
-void R_InitColormaps(void)
+void R_ReloadColormaps(void)
 {
-	fullcolormap = W_GetLumpByName("COLORMAP"); // Never freed
+	// Do nothing
 }
 
 

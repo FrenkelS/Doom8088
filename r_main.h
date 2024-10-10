@@ -81,6 +81,7 @@ angle_t R_PointToAngle3(fixed_t x, fixed_t y);
 subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 
 void R_InitColormaps(void);
+void R_ReloadColormaps(void);
 const uint8_t __far* R_LoadColorMap(int16_t lightlevel);
 
 //
