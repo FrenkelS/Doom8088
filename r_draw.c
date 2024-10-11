@@ -619,7 +619,7 @@ static angle16_t R_PointToAngle16(int16_t x, int16_t y)
 
 static CONSTFUNC int16_t R_PointToDist(int16_t x, int16_t y)
 {
-    if (viewx >> FRACBITS == x && viewy >> FRACBITS == y)
+    if (viewx == (fixed_t)x << FRACBITS && viewy == (fixed_t)y << FRACBITS)
         return 0;
 
     int16_t dx = abs(x - (viewx >> FRACBITS));
