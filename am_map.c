@@ -884,7 +884,7 @@ static void AM_drawWalls(void)
             if(!backsector)
             {
                 // jff 1/10/98 add new color for 1S secret sector boundary
-                if (mapcolor_secr && P_WasSecret(frontsector))
+                if (P_WasSecret(frontsector))
                     AM_drawMline(&l, mapcolor_secr); // line bounding secret sector
                 else                               //jff 2/16/98 fixed bug
                     AM_drawMline(&l, mapcolor_wall); // special was cleared
@@ -892,11 +892,7 @@ static void AM_drawWalls(void)
             else /* now for 2S lines */
             {
                 // jff 1/10/98 add color change for all teleporter types
-                if
-                        (
-                         mapcolor_tele && !(_g_lines[i].flags & ML_SECRET) &&
-                         (line_special == 97)
-                         )
+                if (!(_g_lines[i].flags & ML_SECRET) && (line_special == 97))
                 { // teleporters
                     AM_drawMline(&l, mapcolor_tele);
                 }
@@ -906,7 +902,6 @@ static void AM_drawWalls(void)
                 }
                 else if
                         (
-                         mapcolor_clsd &&
                          !(_g_lines[i].flags & ML_SECRET) &&    // non-secret closed door
                          ((backsector->floorheight==backsector->ceilingheight) ||
                           (frontsector->floorheight==frontsector->ceilingheight))
@@ -914,7 +909,7 @@ static void AM_drawWalls(void)
                 {
                     AM_drawMline(&l, mapcolor_clsd);      // non-secret closed door
                 } //jff 1/6/98 show secret sector 2S lines
-                else if (mapcolor_secr && (P_WasSecret(frontsector) || P_WasSecret(backsector)))
+                else if (P_WasSecret(frontsector) || P_WasSecret(backsector))
                 {
                     AM_drawMline(&l, mapcolor_secr); // line bounding secret sector
                 } //jff 1/6/98 end secret sector line change
@@ -934,19 +929,7 @@ static void AM_drawWalls(void)
         {
             if (!(_g_lines[i].flags & ML_DONTDRAW)) // invisible flag lines do not show
             {
-                if
-                        (
-                         mapcolor_flat
-                         ||
-                         !backsector
-                         ||
-                         backsector->floorheight
-                         != frontsector->floorheight
-                         ||
-                         backsector->ceilingheight
-                         != frontsector->ceilingheight
-                         )
-                    AM_drawMline(&l, mapcolor_unsn);
+                AM_drawMline(&l, mapcolor_unsn);
             }
         }
     }
