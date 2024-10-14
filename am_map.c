@@ -70,7 +70,6 @@ static const uint8_t mapcolor_ydor = 231;    // yellow door color
 static const uint8_t mapcolor_tele = 119;    // teleporter line color
 static const uint8_t mapcolor_secr = 252;    // secret sector boundary color
 static const uint8_t mapcolor_unsn = 104;    // computer map unseen line color
-static const uint8_t mapcolor_flat = 88;    // line with no floor/ceiling changes
 static const uint8_t mapcolor_sngl = 208;    // single player arrow color
 
 static const int16_t f_w = SCREENWIDTH;
