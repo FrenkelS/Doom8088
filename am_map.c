@@ -923,7 +923,7 @@ static void AM_drawWalls(void)
                 {
                     AM_drawMline(&l, mapcolor_clsd);      // non-secret closed door
                 } //jff 1/6/98 show secret sector 2S lines
-                else if ((P_WasSecret(frontsector) || P_WasSecret(backsector)))
+                else if (P_WasSecret(frontsector) || P_WasSecret(backsector))
                 {
                     AM_drawMline(&l, mapcolor_secr); // line bounding secret sector
                 } //jff 1/6/98 end secret sector line change
