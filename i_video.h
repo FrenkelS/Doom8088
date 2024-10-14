@@ -30,7 +30,7 @@
 #include "r_main.h"
 
 void I_InitGraphicsHardwareSpecificCode(void);
-void I_ReploadPalette(void);
+void I_ReloadPalette(void);
 void I_SetPalette(int8_t pal);
 void I_FinishUpdate(void);
 
