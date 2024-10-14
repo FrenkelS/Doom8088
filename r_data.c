@@ -70,25 +70,21 @@ typedef struct
   int16_t originx;
   int16_t originy;
   int16_t patch;
-  int16_t stepdir;         // unused in Doom but might be used in Phase 2 Boom
-  int16_t colormap;        // unused in Doom but might be used in Phase 2 Boom
 } mappatch_t;
 
-typedef char assertMappatchSize[sizeof(mappatch_t) == 10 ? 1 : -1];
+typedef char assertMappatchSize[sizeof(mappatch_t) == 6 ? 1 : -1];
 
 
 typedef struct
 {
   char       name[8];
-  char       pad2[4];      // unused
   int16_t      width;
   int16_t      height;
-  char       pad[4];       // unused in Doom but might be used in Boom Phase 2
   int16_t      patchcount;
   mappatch_t patches[1];
 } maptexture_t;
 
-typedef char assertMaptextureSize[sizeof(maptexture_t) == 32 ? 1 : -1];
+typedef char assertMaptextureSize[sizeof(maptexture_t) == 20 ? 1 : -1];
 
 
 // A maptexture_t describes a rectangular texture, which is composed
@@ -109,7 +105,7 @@ static void R_LoadTexture(int16_t texture_num)
     texture->width      = mtexture->width;
     texture->height     = mtexture->height;
     texture->patchcount = mtexture->patchcount;
-    //texture->name       = mtexture->name;
+
     int16_t w = 1;
     while (w * 2 <= texture->width)
         w <<= 1;
