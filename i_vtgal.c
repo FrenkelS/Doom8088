@@ -50,6 +50,21 @@ static uint8_t __far* _s_screen;
 static uint8_t __far* videomemory;
 
 
+void I_ReloadPalette(void)
+{
+	char* lumpName;
+	if (_g_gamma == 0)
+		lumpName = "COLORMAP";
+	else
+	{
+		lumpName = "COLORMP0";
+		lumpName[7] = '0' + _g_gamma;
+	}
+
+	W_ReadLumpByNum(W_GetNumForName(lumpName), (void __far*)fullcolormap);
+}
+
+
 static const int8_t colors[14] =
 {
 	0,									// normal
@@ -164,21 +179,6 @@ void I_FinishUpdate(void)
 	}
 
 	I_DrawBuffer(_s_screen);
-}
-
-
-void R_ReloadColormaps(void)
-{
-	char* lumpName;
-	if (_g_gamma == 0)
-		lumpName = "COLORMAP";
-	else
-	{
-		lumpName = "COLORMP0";
-		lumpName[7] = '0' + _g_gamma;
-	}
-
-	W_ReadLumpByNum(W_GetNumForName(lumpName), (void __far*)fullcolormap);
 }
 
 

@@ -75,7 +75,7 @@ static boolean         tmunstuck;     /* killough 8/1/98: whether to allow unsti
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-const line_t __far* _g_spechit[4];
+line_t __far* _g_spechit[4];
 
 int16_t _g_numspechit;
 
@@ -258,7 +258,7 @@ static boolean untouched(const line_t __far* ld)
 // Adjusts tmfloorz and tmceilingz as lines are contacted
 //
 
-static boolean PIT_CheckLine (const line_t __far* ld)
+static boolean PIT_CheckLine (line_t __far* ld)
 {
   if (_g_tmbbox[BOXRIGHT]  <= (fixed_t)ld->bbox[BOXLEFT]   << FRACBITS
    || _g_tmbbox[BOXLEFT]   >= (fixed_t)ld->bbox[BOXRIGHT]  << FRACBITS
@@ -544,7 +544,7 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
 //  crossed. Change is qualified by demo_compatibility.
 //
 // CPhipps - take a line_t pointer instead of a line number, as in MBF
-static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __far* thing)
+static void P_CrossSpecialLine(line_t __far* line, int16_t side, mobj_t __far* thing)
 {
   boolean         ok;
 
@@ -845,7 +845,7 @@ static boolean PTR_AimTraverse (intercept_t* in)
 // of the line, should the sector already be in motion when the line is
 // impacted. Change is qualified by demo_compatibility.
 //
-static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
+static void P_ShootSpecialLine(mobj_t __far* thing, line_t __far* line)
 {
   // Impacts that other things can activate.
   if (!P_MobjIsPlayer(thing))
@@ -904,7 +904,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   if (in->isaline)
   {
-    const line_t __far* li = in->d.line;
+    line_t __far* li = in->d.line;
 
     if (LN_SPECIAL(li))
       P_ShootSpecialLine (shootthing, li);
@@ -1367,7 +1367,7 @@ void P_SetSeclist(msecnode_t __far* sectorList)
 // at this location, so don't bother with checking impassable or
 // blocking lines.
 
-static boolean PIT_GetSectors(const line_t __far* ld)
+static boolean PIT_GetSectors(line_t __far* ld)
   {
   if (_g_tmbbox[BOXRIGHT]  <= (fixed_t)ld->bbox[BOXLEFT]   << FRACBITS ||
       _g_tmbbox[BOXLEFT]   >= (fixed_t)ld->bbox[BOXRIGHT]  << FRACBITS ||

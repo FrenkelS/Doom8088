@@ -170,7 +170,7 @@ static byte solidcol[VIEWWINDOWWIDTH];
 
 static const seg_t     __far* curline;
 static side_t    __far* sidedef;
-static const line_t    __far* linedef;
+static line_t    __far* linedef;
 static sector_t  __far* frontsector;
 static sector_t  __far* backsector;
 static drawseg_t *ds_p;
@@ -619,7 +619,7 @@ static angle16_t R_PointToAngle16(int16_t x, int16_t y)
 
 static CONSTFUNC int16_t R_PointToDist(int16_t x, int16_t y)
 {
-    if (viewx >> FRACBITS == x && viewy >> FRACBITS == y)
+    if (viewx == (fixed_t)x << FRACBITS && viewy == (fixed_t)y << FRACBITS)
         return 0;
 
     int16_t dx = abs(x - (viewx >> FRACBITS));
@@ -1870,13 +1870,11 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     }
 
 
-    linedata_t __far* linedata = &_g_linedata[curline->linenum];
-
-    // mark the segment as visible for auto map
-    linedata->r_flags |= ML_MAPPED;
-
     sidedef = &_g_sides[curline->sidenum];
     linedef = &_g_lines[curline->linenum];
+
+    // mark the segment as visible for auto map
+    linedef->r_flags |= ML_MAPPED;
 
     // calculate rw_distance for scale calculation
     rw_normalangle = curline->angle;
@@ -1956,7 +1954,7 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
         ds_p->sprtopclip = ds_p->sprbottomclip = NULL;
         ds_p->silhouette = SIL_NONE;
 
-        if(linedata->r_flags & RF_CLOSED)
+        if(linedef->r_flags & RF_CLOSED)
         { /* cph - closed 2S line e.g. door */
             // cph - killough's (outdated) comment follows - this deals with both
             // "automap fixes", his and mine
@@ -2190,11 +2188,9 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
 
 static void R_RecalcLineFlags(void)
 {
-    linedata_t __far* linedata = &_g_linedata[linedef->lineno];
-
     const side_t __far* side = &_g_sides[curline->sidenum];
 
-    linedata->r_validcount = _g_gametic;
+    linedef->r_validcount = _g_gametic;
 
     /* First decide if the line is closed, normal, or invisible */
     if (!(linedef->flags & ML_TWOSIDED)
@@ -2216,7 +2212,7 @@ static void R_RecalcLineFlags(void)
                     frontsector->ceilingpic!= skyflatnum)
                 )
             )
-        linedata->r_flags = (RF_CLOSED | (linedata->r_flags & ML_MAPPED));
+        linedef->r_flags = (RF_CLOSED | (linedef->r_flags & ML_MAPPED));
     else
     {
         // Reject empty lines used for triggers
@@ -2232,9 +2228,9 @@ static void R_RecalcLineFlags(void)
                 || backsector->floorpic != frontsector->floorpic
                 || backsector->lightlevel != frontsector->lightlevel)
         {
-            linedata->r_flags = (linedata->r_flags & ML_MAPPED); return;
+            linedef->r_flags = (linedef->r_flags & ML_MAPPED);
         } else
-            linedata->r_flags = (RF_IGNORE | (linedata->r_flags & ML_MAPPED));
+            linedef->r_flags = (RF_IGNORE | (linedef->r_flags & ML_MAPPED));
     }
 }
 
@@ -2344,14 +2340,13 @@ static void R_AddLine(const seg_t __far* line)
 
     /* cph - roll up linedef properties in flags */
     linedef = &_g_lines[curline->linenum];
-    linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
-    if (linedata->r_validcount != (uint16_t)_g_gametic)
+    if (linedef->r_validcount != (uint16_t)_g_gametic)
         R_RecalcLineFlags();
 
-    if (!(linedata->r_flags & RF_IGNORE))
+    if (!(linedef->r_flags & RF_IGNORE))
     {
-        R_ClipWallSegment (x1, x2, linedata->r_flags & RF_CLOSED);
+        R_ClipWallSegment (x1, x2, linedef->r_flags & RF_CLOSED);
     }
 }
 

@@ -72,8 +72,7 @@ subsector_t __far* _g_subsectors;
 
 
 int16_t      _g_numlines;
-const line_t   __far* _g_lines;
-linedata_t __far* _g_linedata;
+line_t   __far* _g_lines;
 
 
 static int16_t      numsides;
@@ -314,39 +313,38 @@ static void P_LoadLineDefs (int16_t lump)
 {
 	_g_numlines = W_LumpLength(lump) / sizeof(packed_line_t);
 	_g_lines    = Z_MallocLevel(_g_numlines * sizeof(line_t), NULL);
-	_g_linedata = Z_CallocLevel(_g_numlines * sizeof(linedata_t));
-
-	line_t __far* _w_lines = (line_t __far*) _g_lines;
 
 	const packed_line_t __far* lines = W_GetLumpByNum(lump);
 
 	for (int16_t i = 0; i < _g_numlines; i++)
 	{
-		_w_lines[i].v1              = lines[i].v1;
-		_w_lines[i].v2              = lines[i].v2;
-		_w_lines[i].lineno          = i;
-		_w_lines[i].dx              = lines[i].v2.x - lines[i].v1.x; // for side checking.
-		_w_lines[i].dy              = lines[i].v2.y - lines[i].v1.y; // for side checking.
-		_w_lines[i].sidenum[0]      = lines[i].frontsidenum;
-		_w_lines[i].sidenum[1]      = lines[i].backsidenum;
-		_w_lines[i].bbox[BOXTOP]    = lines[i].v1.y < lines[i].v2.y ? lines[i].v2.y : lines[i].v1.y; // Line bounding box.
-		_w_lines[i].bbox[BOXBOTTOM] = lines[i].v1.y < lines[i].v2.y ? lines[i].v1.y : lines[i].v2.y; // Line bounding box.
-		_w_lines[i].bbox[BOXLEFT]   = lines[i].v1.x < lines[i].v2.x ? lines[i].v1.x : lines[i].v2.x; // Line bounding box.
-		_w_lines[i].bbox[BOXRIGHT]  = lines[i].v1.x < lines[i].v2.x ? lines[i].v2.x : lines[i].v1.x; // Line bounding box.
-		_w_lines[i].flags           = lines[i].flags;
-		_w_lines[i].tag             = lines[i].tag;
+		_g_lines[i].v1              = lines[i].v1;
+		_g_lines[i].v2              = lines[i].v2;
+		_g_lines[i].dx              = lines[i].v2.x - lines[i].v1.x; // for side checking.
+		_g_lines[i].dy              = lines[i].v2.y - lines[i].v1.y; // for side checking.
+		_g_lines[i].sidenum[0]      = lines[i].frontsidenum;
+		_g_lines[i].sidenum[1]      = lines[i].backsidenum;
+		_g_lines[i].bbox[BOXTOP]    = lines[i].v1.y < lines[i].v2.y ? lines[i].v2.y : lines[i].v1.y; // Line bounding box.
+		_g_lines[i].bbox[BOXBOTTOM] = lines[i].v1.y < lines[i].v2.y ? lines[i].v1.y : lines[i].v2.y; // Line bounding box.
+		_g_lines[i].bbox[BOXLEFT]   = lines[i].v1.x < lines[i].v2.x ? lines[i].v1.x : lines[i].v2.x; // Line bounding box.
+		_g_lines[i].bbox[BOXRIGHT]  = lines[i].v1.x < lines[i].v2.x ? lines[i].v2.x : lines[i].v1.x; // Line bounding box.
+		_g_lines[i].tag             = lines[i].tag;
+		_g_lines[i].flags           = lines[i].flags;
 
 		// To aid move clipping.
-		if (_w_lines[i].dx == 0)
-			_w_lines[i].slopetype = ST_VERTICAL;
-		else if (_w_lines[i].dy == 0)
-			_w_lines[i].slopetype = ST_HORIZONTAL;
-		else if (((fixed_t)_w_lines[i].dy << FRACBITS) / _w_lines[i].dx > 0)
-			_w_lines[i].slopetype = ST_POSITIVE;
+		if (_g_lines[i].dx == 0)
+			_g_lines[i].slopetype = ST_VERTICAL;
+		else if (_g_lines[i].dy == 0)
+			_g_lines[i].slopetype = ST_HORIZONTAL;
+		else if (((fixed_t)_g_lines[i].dy << FRACBITS) / _g_lines[i].dx > 0)
+			_g_lines[i].slopetype = ST_POSITIVE;
 		else
-			_w_lines[i].slopetype = ST_NEGATIVE;
+			_g_lines[i].slopetype = ST_NEGATIVE;
 
-		_g_linedata[i].special = lines[i].const_special;
+		_g_lines[i].validcount   = 0;
+		_g_lines[i].r_validcount = 0;
+		_g_lines[i].r_flags      = 0;
+		_g_lines[i].special      = lines[i].const_special;
 	}
 
 	Z_Free(lines);

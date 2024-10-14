@@ -172,7 +172,7 @@ static void P_StartButton(const line_t __far* line, bwhere_e w, int16_t texture,
 // 1 second, in ticks.
 #define BUTTONTIME  TICRATE
 
-void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
+void P_ChangeSwitchTexture(line_t __far* line, boolean useAgain)
 {
     /* Rearranged a bit to avoid too much code duplication */
     int16_t     i;
@@ -247,7 +247,7 @@ void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
 //
 // Passed the line activating the door and the thing activating it
 //
-static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
+static void EV_VerticalDoor(line_t __far* line, mobj_t __far* thing)
 {
   player_t* player;
   sector_t __far* sec;
@@ -415,7 +415,7 @@ static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
 // Passed the thing using the line and the line being used
 // Returns true if a thinker was created
 //
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line)
+boolean P_UseSpecialLine(mobj_t __far* thing, line_t __far* line)
 {
   // Switches that other things can activate.
   if (!P_MobjIsPlayer(thing))

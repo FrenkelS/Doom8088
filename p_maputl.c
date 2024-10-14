@@ -388,7 +388,7 @@ void P_SetThingPosition(mobj_t __far* thing)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(const line_t __far*))
+boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(line_t __far*))
 {
 
     if (!(0 <= x && x < _g_bmapwidth && 0 <= y && y <_g_bmapheight))
@@ -412,14 +412,12 @@ boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(const line_t __f
     {
         const int16_t lineno = *list;
 
-        linedata_t __far* lt = &_g_linedata[lineno];
+        line_t __far* ld = &_g_lines[lineno];
 
-        if (lt->validcount == vcount)
+        if (ld->validcount == vcount)
             continue;       // line has already been checked
 
-        lt->validcount = vcount;
-
-        const line_t __far* ld = &_g_lines[lineno];
+        ld->validcount = vcount;
 
         if (!func(ld))
             return false;
@@ -465,7 +463,7 @@ static boolean check_intercept(void)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-static boolean PIT_AddLineIntercepts(const line_t __far* ld)
+static boolean PIT_AddLineIntercepts(line_t __far* ld)
 {
   int16_t       s1;
   int16_t       s2;
