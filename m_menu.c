@@ -765,6 +765,7 @@ static void M_ChangeGamma(int16_t choice)
 			_g_gamma++;
 		  break;
     }
+	I_ReloadPalette();
 	I_SetPalette(0);
 
     G_SaveSettings();

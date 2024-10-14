@@ -46,6 +46,22 @@ static uint8_t __far* _s_screen;
 static uint8_t __far* vgascreen;
 
 
+static int16_t palettelumpnum;
+
+
+void I_ReloadPalette(void)
+{
+	char lumpName[9] = "PLAYPAL0";
+
+	if (_g_gamma == 0)
+		lumpName[7] = 0;
+	else
+		lumpName[7] = '0' + _g_gamma;
+
+	palettelumpnum = W_GetNumForName(lumpName);
+}
+
+
 #define PEL_WRITE_ADR   0x3c8
 #define PEL_DATA        0x3c9
 
@@ -81,14 +97,7 @@ static void I_UploadNewPalette(int8_t pal)
 	// This is used to replace the current 256 colour cmap with a new one
 	// Used by 256 colour PseudoColor modes
 
-	char lumpName[9] = "PLAYPAL0";
-
-	if(_g_gamma == 0)
-		lumpName[7] = 0;
-	else
-		lumpName[7] = '0' + _g_gamma;
-
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
+	const uint8_t __far* palette_lump = W_TryGetLumpByNum(palettelumpnum);
 	if (palette_lump != NULL)
 	{
 		const byte __far* palette = &palette_lump[pal * 256 * 3];
@@ -111,6 +120,7 @@ static void I_UploadNewPalette(int8_t pal)
 void I_InitGraphicsHardwareSpecificCode(void)
 {
 	I_SetScreenMode(0x13);
+	I_ReloadPalette();
 	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
