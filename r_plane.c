@@ -391,7 +391,9 @@ int16_t R_FlatNumForName(const char *name)
 #endif
 
 
+#if !defined FLAT_NUKAGE1_COLOR
 #define FLAT_NUKAGE1_COLOR 122
+#endif
 
 void P_UpdateAnimatedFlat(void)
 {
