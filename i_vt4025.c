@@ -68,7 +68,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 	{
 		*dst++ = 177;
-		*dst++ = 0;
+		dst++;
 	}
 
 	_s_screen = Z_MallocStatic(VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
@@ -117,32 +117,18 @@ uint8_t __far* dest;
 #if defined C_ONLY
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
-	int16_t l = count >> 4;
-	while (l--)
+	switch (count)
 	{
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-	}
-
-	switch (count & 15)
-	{
+		case 25: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 24: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 23: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 22: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 21: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 20: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 19: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 18: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 17: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 16: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
 		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
 		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
 		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
@@ -198,33 +184,18 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
-	uint16_t l = count >> 4;
-
-	while (l--)
+	switch (count)
 	{
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-		*dest = color; dest += VIEWWINDOWWIDTH;
-	}
-
-	switch (count & 15)
-	{
+		case 25: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 24: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 23: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 22: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 21: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 20: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 19: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 18: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 17: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 16: *dest = color; dest += VIEWWINDOWWIDTH;
 		case 15: *dest = color; dest += VIEWWINDOWWIDTH;
 		case 14: *dest = color; dest += VIEWWINDOWWIDTH;
 		case 13: *dest = color; dest += VIEWWINDOWWIDTH;
