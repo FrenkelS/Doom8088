@@ -41,7 +41,6 @@
 
 extern const int16_t CENTERY;
 
-// The screen is [SCREENWIDTH * SCREENHEIGHT];
 static uint8_t __far* _s_screen;
 static uint8_t __far* videomemory;
 
@@ -115,6 +114,7 @@ const uint8_t __far* source;
 uint8_t __far* dest;
 
 
+#if defined C_ONLY
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	int16_t l = count >> 4;
@@ -160,6 +160,9 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
 	}
 }
+#else
+void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
+#endif
 
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
