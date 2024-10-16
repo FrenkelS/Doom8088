@@ -381,6 +381,13 @@ void ST_Drawer(void)
 }
 
 
+void V_DrawCharacter(int16_t x, int16_t y, char c)
+{
+	_s_screen[y * PLANEWIDTH + (x << 1) - 1] = c;
+	_s_screen[y * PLANEWIDTH + (x << 1)    ] = 12;
+}
+
+
 void V_DrawString(int16_t y, char* s)
 {
 	int16_t x = 0;
