@@ -58,7 +58,7 @@ typedef struct
   int16_t   y;
 
   char  lineoftext[HU_MAXLINELENGTH+1];
-  int16_t   len;                            // current line length
+  size_t   len;                            // current line length
 } hu_textline_t;
 
 
@@ -95,6 +95,9 @@ static int16_t font_lump_offset;
 void HU_Init(void)
 {
 	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
+
+	w_message.y = HU_MSGY;
+	w_title.y   = HU_TITLEY;
 }
 
 
@@ -133,25 +136,12 @@ void HU_Start(void)
 
 	// create the message widget
 	// messages to player in upper-left of screen
-	w_message.y             = HU_MSGY;
 	w_message.len           = 0;
 	w_message.lineoftext[0] = 0;
 
 	// create the map title widget - map title display in lower left of automap
-	w_title.y               = HU_TITLEY;
-	w_title.len             = 0;
-	w_title.lineoftext[0]   = 0;
-
-	// initialize the automap's level title widget
-	if (_g_gamestate == GS_LEVEL)
-	{
-		const char* c = mapnames[_g_gamemap - 1];
-		while (*c && w_title.len != HU_MAXLINELENGTH)
-		{
-			w_title.lineoftext[w_title.len++] = *c++;
-			w_title.lineoftext[w_title.len]   = 0;
-		}
-	}
+	w_title.len       = strlen(mapnames[_g_gamemap - 1]);
+	strcpy(w_title.lineoftext, mapnames[_g_gamemap - 1]);
 }
 
 
@@ -169,7 +159,7 @@ static void HUlib_drawTextLine(hu_textline_t* textline)
 
 	// draw the new stuff
 	int16_t x = 0;
-	for (int16_t i = 0; i < textline->len; i++)
+	for (size_t i = 0; i < textline->len; i++)
 	{
 		char c = toupper(textline->lineoftext[i]); //jff insure were not getting a cheap toupper conv.
 
@@ -220,27 +210,6 @@ void HU_Drawer(void)
 
 
 //
-// HUlib_addMessageToSText()
-//
-// Adds a message line to a hu_stext_t widget
-//
-// Passed a hu_stext_t and a message string
-// Returns nothing
-//
-static void HUlib_addMessageToSText(const char* msg)
-{
-	w_message.len           = 0;
-	w_message.lineoftext[0] = 0;
-
-	while (*msg && w_message.len != HU_MAXLINELENGTH)
-	{
-		w_message.lineoftext[w_message.len++] = *msg++;
-		w_message.lineoftext[w_message.len]   = 0;
-	}
-}
-
-
-//
 // HU_Ticker()
 //
 // Update the hud displays once per frame
@@ -270,7 +239,8 @@ void HU_Ticker(void)
 		if (plr->message)
 		{
 			//post the message to the message widget
-			HUlib_addMessageToSText(plr->message);
+			w_message.len = strlen(plr->message);
+			strcpy(w_message.lineoftext, plr->message);
 
 			// clear the message to avoid posting multiple times
 			plr->message = NULL;
