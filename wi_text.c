@@ -48,6 +48,9 @@
 #include "globdata.h"
 
 
+void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
+
+
 // used to accelerate or skip a stage
 boolean   _g_acceleratestage;
 
@@ -173,14 +176,6 @@ static int16_t V_NamePatchWidth(const char *name)
 	return V_NumPatchWidth(W_GetNumForName(name));
 }
 
-static int16_t V_NamePatchHeight(const char *name)
-{
-	const patch_t __far* patch = W_GetLumpByName(name);
-	int16_t height = patch->height;
-	Z_ChangeTagToCache(patch);
-	return height;
-}
-
 
 //
 // Builtin map names.
@@ -198,18 +193,6 @@ static const char *const mapnames[] =
     HUSTR_E1M9,
 };
 
-
-/* ====================================================================
- * WI_levelNameLump
- * Purpore: Returns the name of the graphic lump containing the name of
- *          the given level.
- * Args:    Level, and buffer (must by 9 chars) to write to
- * Returns: void
- */
-static void WI_levelNameLump(int16_t map, char* buf)
-{
-  sprintf(buf, "WILV0%d", map);
-}
 
 // ====================================================================
 // WI_slamBackground
@@ -231,7 +214,6 @@ static void WI_slamBackground(void)
 // Args:    none
 // Returns: void
 //
-void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
 static void WI_drawLF(void)
 {
 	int16_t x;
