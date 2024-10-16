@@ -622,17 +622,17 @@ static CONSTFUNC int16_t R_PointToDist(int16_t x, int16_t y)
     if (viewx == (fixed_t)x << FRACBITS && viewy == (fixed_t)y << FRACBITS)
         return 0;
 
-    int16_t dx = abs(x - (viewx >> FRACBITS));
-    int16_t dy = abs(y - (viewy >> FRACBITS));
+    fixed_t dx = D_abs(((fixed_t)x << FRACBITS) - viewx);
+    fixed_t dy = D_abs(((fixed_t)y << FRACBITS) - viewy);
 
     if (dy > dx)
     {
-        int16_t t = dx;
+        fixed_t t = dx;
         dx = dy;
         dy = t;
     }
 
-    return ((fixed_t)dx << FRACBITS) / finecosineapprox(((((fixed_t)dy << FRACBITS) / dx) >> DBITS) / 2);
+    return dx / finecosineapprox((FixedApproxDiv(dy,dx) >> DBITS) / 2);
 }
 
 
