@@ -62,6 +62,11 @@
 #include "globdata.h"
 
 
+void V_DrawCharacter(int16_t x, int16_t y, char c);
+void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
+void wipe_StartScreen(void);
+
+
 #define DISABLE_SAVE_GAME
 #define DISABLE_SOUND_OPTIONS
 
@@ -73,7 +78,7 @@
 typedef struct
 {
   int16_t status; // 0 = no cursor here, 1 = ok, 2 = arrows ok
-  char  name[10];
+  char* name;
 
   // choice = menu item #.
   // if status = 2,
@@ -126,12 +131,12 @@ static void (*messageRoutine)(boolean affirmative);
 
 // we are going to be entering a savegame string
 
-#define SKULLXOFF  -32
-#define LINEHEIGHT  16
+#define SKULLXOFF  -2
+#define LINEHEIGHT  1
 
 // graphic name of skulls
 
-static const char skullName[2][9] = {"M_SKULL1","M_SKULL2"};
+static const char skullName[2] = {'\x02', '\x01'};
 
 
 // end of externs added for setup menus
@@ -210,13 +215,13 @@ enum
 
 static const menuitem_t MainMenu[]=
 {
-  {1,"M_NGAME", M_NewGame},
-  {1,"M_OPTION",M_Options},
-  {1,"M_LOADG", M_LoadGame},
+  {1,"New Game",  M_NewGame},
+  {1,"Options",   M_Options},
+  {1,"Load game", M_LoadGame},
 #if !defined DISABLE_SAVE_GAME
-  {1,"M_SAVEG", M_SaveGame},
+  {1,"Save game", M_SaveGame},
 #endif
-  {1,"M_QUITG", M_QuitDOOM}
+  {1,"Quit Game", M_QuitDOOM}
 };
 
 static const menu_t MainDef =
@@ -224,7 +229,7 @@ static const menu_t MainDef =
   main_end,       // number of menu items
   MainMenu,       // table that defines menu items
   M_DrawMainMenu, // drawing routine
-  97,64,          // initial cursor position
+  (VIEWWINDOWWIDTH - 9) / 2,5,          // initial cursor position
   NULL,0,
 };
 
@@ -234,8 +239,8 @@ static const menu_t MainDef =
 
 static void M_DrawMainMenu(void)
 {
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(94, 2, "M_DOOM");
+	int16_t x = (VIEWWINDOWWIDTH - 4) / 2;
+	V_DrawString(x, 0, 14, "DOOM");
 }
 
 
@@ -255,11 +260,11 @@ enum
 
 static const menuitem_t NewGameMenu[]=
 {
-  {1,"M_JKILL", M_ChooseSkill},
-  {1,"M_ROUGH", M_ChooseSkill},
-  {1,"M_HURT",  M_ChooseSkill},
-  {1,"M_ULTRA", M_ChooseSkill},
-  {1,"M_NMARE", M_ChooseSkill}
+  {1,"I'm too young to die.", M_ChooseSkill},
+  {1,"Hey, not too rough.",   M_ChooseSkill},
+  {1,"Hurt me plenty.",       M_ChooseSkill},
+  {1,"Ultra-Violence.",       M_ChooseSkill},
+  {1,"Nightmare!",            M_ChooseSkill}
 };
 
 static const menu_t NewDef =
@@ -267,7 +272,7 @@ static const menu_t NewDef =
   newg_end,       // # of menu items
   NewGameMenu,    // menuitem_t ->
   M_DrawNewGame,  // drawing routine ->
-  48,63,          // x,y
+  (VIEWWINDOWWIDTH - 21) / 2,5,          // x,y
   &MainDef,0,
 };
 
@@ -278,9 +283,13 @@ static const menu_t NewDef =
 
 static void M_DrawNewGame(void)
 {
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(96, 14, "M_NEWG");
-  V_DrawNamePatchScaled(54, 38, "M_SKILL");
+	int16_t x;
+	
+	x = (VIEWWINDOWWIDTH - 8) / 2;
+	V_DrawString(x, 0, 12, "NEW GAME");
+
+	x = (VIEWWINDOWWIDTH - 19) / 2;
+	V_DrawString(x, 1, 12, "CHOOSE SKILL LEVEL:");
 }
 
 static void M_NewGame(int16_t choice)
@@ -351,7 +360,7 @@ static const menu_t LoadDef =
   load_end,
   LoadMenue,
   M_DrawLoad,
-  64,34, //jff 3/15/98 move menu up
+  (VIEWWINDOWWIDTH - 0) / 2,5,
   &MainDef,2,
 };
 
@@ -365,7 +374,10 @@ static void M_DrawSaveLoad(const char* name)
 {
 	int8_t i, j;
 
-	V_DrawNamePatchScaled(72 ,LOADGRAPHIC_Y, name);
+	int16_t x;
+
+	x = (VIEWWINDOWWIDTH - strlen(name)) / 2;
+	V_DrawString(x, 0, 12, name);
 
 	const patch_t __far* lpatch = W_GetLumpByName("M_LSLEFT");
 	const patch_t __far* mpatch = W_GetLumpByName("M_LSCNTR");
@@ -396,7 +408,7 @@ static void M_DrawSaveLoad(const char* name)
 
 static void M_DrawLoad(void)
 {
-	M_DrawSaveLoad("M_LOADG");
+	M_DrawSaveLoad("Load game");
 }
 
 
@@ -453,7 +465,7 @@ static const menu_t SaveDef =
   load_end, // same number of slots as the Load Game screen
   SaveMenu,
   M_DrawSave,
-  80,34, //jff 3/15/98 move menu up
+  (VIEWWINDOWWIDTH - 0) / 2,5,
   &MainDef,3,
 };
 
@@ -471,7 +483,7 @@ static void M_ReadSaveStrings(void)
 //
 static void M_DrawSave(void)
 {
-	M_DrawSaveLoad("M_SAVEG");
+	M_DrawSaveLoad("Save game");
 }
 
 //
@@ -556,12 +568,12 @@ enum
 static const menuitem_t OptionsMenu[]=
 {
   // killough 4/6/98: move setup to be a sub-menu of OPTIONs
-  {1,"M_ENDGAM", M_EndGame},
-  {1,"M_MESSG",  M_ChangeMessages},
-  {1,"M_ARUN",   M_ChangeAlwaysRun},
-  {2,"M_GAMMA",  M_ChangeGamma},
+  {1,"End Game",     M_EndGame},
+  {1,"Messages:",    M_ChangeMessages},
+  {1,"Always Run:",  M_ChangeAlwaysRun},
+  {2,"Gamma Boost:", M_ChangeGamma},
 #if !defined DISABLE_SOUND_OPTIONS
-  {1,"M_SVOL",   M_Sound}
+  {1,"Sound Volume", M_Sound}
 #endif
 };
 
@@ -570,7 +582,7 @@ static const menu_t OptionsDef =
   opt_end,
   OptionsMenu,
   M_DrawOptions,
-  60,37,
+  (VIEWWINDOWWIDTH - 12) / 2,5,
   &MainDef,1,
 };
 
@@ -621,9 +633,9 @@ enum
 
 static const menuitem_t SoundMenu[]=
 {
-  {2,"M_SFXVOL",M_SfxVol},
+  {2,"Sfx Volume",   M_SfxVol},
   {-1,"",0},
-  {2,"M_MUSVOL",M_MusicVol},
+  {2,"Music Volume", M_MusicVol},
   {-1,"",0}
 };
 
@@ -632,7 +644,7 @@ static const menu_t SoundDef =
   sound_end,
   SoundMenu,
   M_DrawSound,
-  80,64,
+  (VIEWWINDOWWIDTH - 12) / 2,5,
   &OptionsDef,4,
 };
 
@@ -1053,14 +1065,12 @@ void M_Drawer (void)
             for (i=0;i<max;i++)
             {
                 if (currentMenu->menuitems[i].name[0])
-                    V_DrawNamePatchScaled(x,y,currentMenu->menuitems[i].name);
+                    V_DrawString(x, y, 12, currentMenu->menuitems[i].name);
                 y += LINEHEIGHT;
             }
 
             // DRAW SKULL
-
-            // CPhipps - patch drawing updated
-            V_DrawNamePatchScaled(x + SKULLXOFF, currentMenu->y - 5 + itemOn*LINEHEIGHT, skullName[whichSkull]);
+            V_DrawCharacter(x + SKULLXOFF, currentMenu->y + itemOn*LINEHEIGHT, skullName[whichSkull]);
         }
 }
 
@@ -1073,6 +1083,7 @@ static void M_ClearMenus (void)
 {
   _g_menuactive = false;
   itemOn = 0;
+  wipe_StartScreen();
 }
 
 //
