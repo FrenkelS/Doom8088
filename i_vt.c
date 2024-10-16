@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for Text mode 40x25 16 color
+ *      Video code for Text modes 80x25 and 40x25 16 color
  *
  *-----------------------------------------------------------------------------*/
  
