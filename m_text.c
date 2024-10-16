@@ -49,7 +49,6 @@
 #include "v_video.h"
 #include "w_wad.h"
 #include "r_main.h"
-#include "hu_stuff.h"
 #include "g_game.h"
 #include "s_sound.h"
 #include "sounds.h"
@@ -239,7 +238,7 @@ static const menu_t MainDef =
 static void M_DrawMainMenu(void)
 {
 	int16_t x = (VIEWWINDOWWIDTH - 4) / 2;
-	V_DrawString(x, 0, 14, "DOOM");
+	V_DrawString(x, 1, 14, "DOOM");
 }
 
 
@@ -285,10 +284,10 @@ static void M_DrawNewGame(void)
 	int16_t x;
 	
 	x = (VIEWWINDOWWIDTH - 8) / 2;
-	V_DrawString(x, 0, 12, "NEW GAME");
+	V_DrawString(x, 2, 12, "NEW GAME");
 
 	x = (VIEWWINDOWWIDTH - 19) / 2;
-	V_DrawString(x, 1, 12, "Choose Skill Level:");
+	V_DrawString(x, 4, 12, "Choose Skill Level:");
 }
 
 static void M_NewGame(int16_t choice)
@@ -359,7 +358,7 @@ static const menu_t LoadDef =
   load_end,
   LoadMenue,
   M_DrawLoad,
-  (VIEWWINDOWWIDTH - 0) / 2,4,
+  (VIEWWINDOWWIDTH - 5) / 2,4,
   &MainDef,2,
 };
 
@@ -371,38 +370,18 @@ static const menu_t LoadDef =
 
 static void M_DrawSaveLoad(const char* name)
 {
-	int8_t i, j;
+	int8_t i;
 
 	int16_t x;
 
 	x = (VIEWWINDOWWIDTH - strlen(name)) / 2;
-	V_DrawString(x, 0, 12, name);
-
-	const patch_t __far* lpatch = W_GetLumpByName("M_LSLEFT");
-	const patch_t __far* mpatch = W_GetLumpByName("M_LSCNTR");
-	const patch_t __far* rpatch = W_GetLumpByName("M_LSRGHT");
+	V_DrawString(x, 2, 12, name);
 
 	for (i = 0; i < load_end; i++)
 	{
-		//
-		// Draw border for the savegame description
-		//
-		int16_t x = LoadDef.x;
-		const int16_t y = 27 + 13 * i + 7;
-		V_DrawPatchNotScaled(x - 8, y, lpatch);
-		for (j = 0; j < 12; j++)
-		{
-			V_DrawPatchNotScaled(x, y, mpatch);
-			x += 8;
-		}
-		V_DrawPatchNotScaled(x, y, rpatch);
-
-		M_WriteText(LoadDef.x, y - 7, _g_savegamestrings[i]);
+		x = LoadDef.x;
+		M_WriteText(LoadDef.x, i + 4, _g_savegamestrings[i]);
 	}
-
-	Z_ChangeTagToCache(lpatch);
-	Z_ChangeTagToCache(mpatch);
-	Z_ChangeTagToCache(rpatch);
 }
 
 static void M_DrawLoad(void)
@@ -464,7 +443,7 @@ static const menu_t SaveDef =
   load_end, // same number of slots as the Load Game screen
   SaveMenu,
   M_DrawSave,
-  (VIEWWINDOWWIDTH - 0) / 2,5,
+  (VIEWWINDOWWIDTH - 5) / 2,5,
   &MainDef,3,
 };
 
@@ -588,20 +567,21 @@ static const menu_t OptionsDef =
 //
 // M_Options
 //
-static const char msgNames[2][9]  = {"M_MSGOFF","M_MSGON"};
+static const char msgNames[2][4]  = {"Off","On"};
 
 
 static void M_DrawOptions(void)
 {
-  // CPhipps - patch drawing updated
-  // proff/nicolas 09/20/98 -- changed for hi-res
-  V_DrawNamePatchScaled(108, 15, "M_OPTTTL");
+	int16_t x;
+	
+	x = (VIEWWINDOWWIDTH - 7) / 2;
+	V_DrawString(x, 2, 12, "OPTIONS");
 
-  V_DrawNamePatchScaled(OptionsDef.x + 120, OptionsDef.y+LINEHEIGHT*messages, msgNames[showMessages]);
+	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * messages,  12, msgNames[showMessages]);
 
-  V_DrawNamePatchScaled(OptionsDef.x + 146, OptionsDef.y+LINEHEIGHT*alwaysrun, msgNames[_g_alwaysRun]);
+	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * alwaysrun, 12, msgNames[_g_alwaysRun]);
 
-  M_DrawThermo(OptionsDef.x + 158, OptionsDef.y+LINEHEIGHT*gamma+2,6,_g_gamma);
+	M_DrawThermo(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * gamma, 6, _g_gamma);
 }
 
 static void M_Options(int16_t choice)
@@ -1132,41 +1112,13 @@ static void M_StartMessage (const char* string, void (*routine)(boolean))
 // M_DrawThermo draws the thermometer graphic for Mouse Sensitivity,
 // Sound Volume, etc.
 //
-// proff/nicolas 09/20/98 -- changed for hi-res
-// CPhipps - patch drawing updated
 //
 static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot )
 {
-    int16_t          xx;
-    int16_t           i;
-    /*
-   * Modification By Barry Mead to allow the Thermometer to have vastly
-   * larger ranges. (the thermWidth parameter can now have a value as
-   * large as 200.      Modified 1-9-2000  Originally I used it to make
-   * the sensitivity range for the mouse better. It could however also
-   * be used to improve the dynamic range of music and sound affect
-   * volume controls for example.
-   */
-    int16_t horizScaler; //Used to allow more thermo range for mouse sensitivity.
-    thermWidth = (thermWidth > 200) ? 200 : thermWidth; //Clamp to 200 max
-    horizScaler = (thermWidth > 23) ? (200 / thermWidth) : 8; //Dynamic range
-    xx = x;
+	for (int16_t w = 0; w < thermWidth; w++)
+		V_DrawCharacter(x + w, y, '-');
 
-    int16_t thermm_lump = W_GetNumForName("M_THERMM");
-
-    V_DrawNamePatchScaled(xx, y, "M_THERML");
-
-    xx += 8;
-    for (i=0;i<thermWidth;i++)
-    {
-        V_DrawNumPatchScaled(xx, y, thermm_lump);
-        xx += horizScaler;
-    }
-
-    xx += (8 - horizScaler);  /* make the right end look even */
-
-    V_DrawNamePatchScaled(xx, y, "M_THERMR");
-    V_DrawNamePatchScaled((x+8)+thermDot*horizScaler,y, "M_THERMO");
+	V_DrawCharacter(x + thermDot, y, '|');
 }
 
 /////////////////////////////
