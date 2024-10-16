@@ -57,13 +57,10 @@
 #include "am_map.h"
 #include "i_system.h"
 #include "i_sound.h"
+#include "i_video.h"
+#include "i_vtext.h"
 
 #include "globdata.h"
-
-
-void V_DrawCharacter(int16_t x, int16_t y, char c);
-void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
-void wipe_StartScreen(void);
 
 
 #define DISABLE_SAVE_GAME
@@ -262,7 +259,7 @@ static const menuitem_t NewGameMenu[]=
   {1,"Hey, not too rough.",   M_ChooseSkill},
   {1,"Hurt me plenty.",       M_ChooseSkill},
   {1,"Ultra-Violence.",       M_ChooseSkill},
-  {1,"Nightmare!",            M_ChooseSkill}
+  {1,"NIGHTMARE!",            M_ChooseSkill}
 };
 
 static const menu_t NewDef =
@@ -1049,7 +1046,7 @@ void M_Drawer (void)
             }
 
             // DRAW SKULL
-            V_DrawCharacter(x + SKULLXOFF, currentMenu->y + itemOn*LINEHEIGHT, skullName[whichSkull]);
+            V_DrawCharacter(x + SKULLXOFF, currentMenu->y + itemOn*LINEHEIGHT, 12, skullName[whichSkull]);
         }
 }
 
@@ -1116,9 +1113,9 @@ static void M_StartMessage (const char* string, void (*routine)(boolean))
 static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot )
 {
 	for (int16_t w = 0; w < thermWidth; w++)
-		V_DrawCharacter(x + w, y, '-');
+		V_DrawCharacter(x + w, y, 8, '-');
 
-	V_DrawCharacter(x + thermDot, y, '|');
+	V_DrawCharacter(x + thermDot, y, 9, '|');
 }
 
 /////////////////////////////
@@ -1159,7 +1156,7 @@ static void M_WriteText (int16_t x, int16_t y, const char __far* string)
 			continue;
 		}
 
-		V_DrawCharacter(cx, cy, c);
+		V_DrawCharacter(cx, cy, 12, c);
 		cx++;
 	}
 }

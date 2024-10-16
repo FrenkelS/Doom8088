@@ -39,6 +39,7 @@
 
 #include "d_player.h"
 #include "d_event.h"
+#include "i_vtext.h"
 #include "v_video.h"
 #include "w_wad.h"
 #include "s_sound.h"
@@ -152,11 +153,6 @@ void F_Ticker(void)
 // the Get_TextSpeed function so that the speed of writing the      //   ^
 // text can be increased, and there's still time to read what's     //   |
 // written.                                                         // phares
-// CPhipps - reformatted
-
-#include "hu_stuff.h"
-
-void V_DrawCharacter(int16_t x, int16_t y, char c);
 
 static void F_TextWrite (void)
 {
@@ -184,7 +180,7 @@ static void F_TextWrite (void)
 			continue;
 		}
 
-		V_DrawCharacter(cx, cy, c);
+		V_DrawCharacter(cx, cy, 12, c);
 		cx++;
 	}
 }

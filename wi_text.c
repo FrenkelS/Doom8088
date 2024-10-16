@@ -37,6 +37,7 @@
 
 #include "d_englsh.h"
 #include "d_player.h"
+#include "i_vtext.h"
 #include "m_random.h"
 #include "w_wad.h"
 #include "g_game.h"
@@ -46,9 +47,6 @@
 #include "sounds.h"
 
 #include "globdata.h"
-
-
-void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
 
 
 // used to accelerate or skip a stage

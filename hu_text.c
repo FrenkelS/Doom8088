@@ -35,10 +35,11 @@
  */
 
 #include <stdint.h>
+
 #include "d_player.h"
+#include "i_vtext.h"
 #include "r_defs.h"
 #include "hu_stuff.h"
-#include "st_stuff.h" /* jff 2/16/98 need loc of status bar */
 #include "w_wad.h"
 #include "s_sound.h"
 #include "d_englsh.h"
@@ -147,9 +148,6 @@ void HU_Start(void)
 //
 
 static int16_t message_clearer = 0;
-
-void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
-void V_ClearString(int16_t y, size_t len);
 
 void HU_Drawer(void)
 {

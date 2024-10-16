@@ -31,6 +31,7 @@
 
 #include "i_system.h"
 #include "i_video.h"
+#include "i_vtext.h"
 #include "m_random.h"
 #include "r_defs.h"
 #include "v_video.h"
@@ -470,10 +471,10 @@ void ST_Drawer(void)
 }
 
 
-void V_DrawCharacter(int16_t x, int16_t y, char c)
+void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c)
 {
 	_s_screen[y * PLANEWIDTH + (x << 1) - 1] = c;
-	_s_screen[y * PLANEWIDTH + (x << 1)    ] = 12;
+	_s_screen[y * PLANEWIDTH + (x << 1)    ] = color;
 }
 
 

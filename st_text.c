@@ -43,6 +43,7 @@
 #include "d_player.h"
 #include "m_random.h"
 #include "i_system.h"
+#include "i_vtext.h"
 #include "w_wad.h"
 #include "st_stuff.h"
 #include "r_main.h"
