@@ -73,11 +73,20 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	I_SetScreenMode(SCREEN_MODE);
 
-	// disable blinking
+	// disable blinking Jr, PS, TANDY 1000, EGA, VGA
 	union REGS regs;
 	regs.w.ax = 0x1003;
 	regs.w.bx = 0x0000;
 	int86(0x10, &regs, &regs);
+
+	// disable blinking CGA
+#if VIEWWINDOWWIDTH == 40
+	outp(0x3d8, 8);
+#elif VIEWWINDOWWIDTH == 80
+	outp(0x3d8, 9);
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 
 	_s_screen = D_MK_FP(PAGE1, 1 + __djgpp_conventional_base);
 
