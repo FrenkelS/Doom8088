@@ -39,8 +39,22 @@
 #include "globdata.h"
 
 
-#define PLANEWIDTH 80
+#if VIEWWINDOWWIDTH == 40
+#define SCREEN_MODE	1
+#define PAGE_SIZE	0x0080
+#elif VIEWWINDOWWIDTH == 80
+#define SCREEN_MODE 3
+#define PAGE_SIZE	0x0100
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 
+#define PAGE0		0xb800
+#define PAGE1		(PAGE0+PAGE_SIZE)
+#define PAGE2		(PAGE1+PAGE_SIZE)
+#define PAGE3		(PAGE2+PAGE_SIZE)
+
+#define PLANEWIDTH (VIEWWINDOWWIDTH*2)
 
 extern const int16_t CENTERY;
 
@@ -57,7 +71,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 {
 	__djgpp_nearptr_enable();
 
-	I_SetScreenMode(1);
+	I_SetScreenMode(SCREEN_MODE);
 
 	// disable blinking
 	union REGS regs;
@@ -68,15 +82,15 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	_s_screen = D_MK_FP(0xb880, 1 + __djgpp_conventional_base);
 
 	uint16_t __far* dst;
-	dst = D_MK_FP(0xb800, 0 + __djgpp_conventional_base);
+	dst = D_MK_FP(PAGE0, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 		*dst++ = 0x00b1;
 
-	dst = D_MK_FP(0xb880, 0 + __djgpp_conventional_base);
+	dst = D_MK_FP(PAGE1, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 		*dst++ = 0x00b1;
 
-	dst = D_MK_FP(0xb900, 0 + __djgpp_conventional_base);
+	dst = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 		*dst++ = 0x00b1;
 
@@ -93,11 +107,13 @@ void I_SetPalette(int8_t pal)
 
 void I_FinishUpdate(void)
 {
-	// page flip between segments B800, B880, B900
-	outp(0x3d5, (D_FP_SEG(_s_screen) >> 5) & 0x0f);
-	_s_screen = (uint8_t __far*)(((uint32_t)_s_screen) + 0x00800000);
-	if (D_FP_SEG(_s_screen) == 0xb980)
-		_s_screen = D_MK_FP(0xb800, 1 + __djgpp_conventional_base);
+	// page flip between segments
+	// B800, B880, B900 for 40x25
+	// B800, B900, BA00 for 80x25
+	outp(0x3d5, (D_FP_SEG(_s_screen) >> 5) & 0x1c);
+	_s_screen = D_MK_FP(D_FP_SEG(_s_screen) + PAGE_SIZE, 1 + __djgpp_conventional_base);
+	if (D_FP_SEG(_s_screen) == PAGE3)
+		_s_screen = D_MK_FP(PAGE0, 1 + __djgpp_conventional_base);
 }
 
 
