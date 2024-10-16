@@ -287,12 +287,35 @@ void V_FillRect(byte colour)
 
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
-	UNUSED(x0);
-	UNUSED(y0);
-	UNUSED(x1);
-	UNUSED(y1);
-	UNUSED(color);
-	// TODO implement me
+	int16_t dx = abs(x1 - x0);
+	int16_t sx = x0 < x1 ? 1 : -1;
+
+	int16_t dy = -abs(y1 - y0);
+	int16_t sy = y0 < y1 ? 1 : -1;
+
+	int16_t err = dx + dy;
+
+	while (true)
+	{
+		_s_screen[y0 * PLANEWIDTH + (x0 << 1)] = color;
+
+		if (x0 == x1 && y0 == y1)
+			break;
+
+		int16_t e2 = 2 * err;
+
+		if (e2 >= dy)
+		{
+			err += dy;
+			x0  += sx;
+		}
+
+		if (e2 <= dx)
+		{
+			err += dx;
+			y0  += sy;
+		}
+	}
 }
 
 
