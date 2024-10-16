@@ -497,7 +497,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 			// scroll down columns, which are still visible
 			if (wipe_y_lookup[i] < VIEWWINDOWHEIGHT)
 			{
-				int16_t dy = (wipe_y_lookup[i] < 16) ? wipe_y_lookup[i] + 1 : VIEWWINDOWHEIGHT / 25;
+				int16_t dy = 1;
 				// At most dy shall be so that the column is shifted by VIEWWINDOWHEIGHT (i.e. just invisible)
 				if (wipe_y_lookup[i] + dy >= VIEWWINDOWHEIGHT)
 					dy = VIEWWINDOWHEIGHT - wipe_y_lookup[i];
