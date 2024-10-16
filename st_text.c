@@ -641,7 +641,7 @@ static void STlib_drawNum(st_number_t* n)
   int16_t   numdigits = n->width;
   int16_t   num = *n->num;
 
-  const int16_t   w = V_NumPatchWidth(n->p[0]);
+  const int16_t   w = 1;
   int16_t   x = n->x;
 
   // CPhipps - compact some code, use num instead of *n->num
