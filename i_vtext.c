@@ -299,23 +299,45 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 {
 	UNUSED(offset);
 
-	const uint8_t __far* lump = W_TryGetLumpByNum(num);
+	static int16_t cachedLumpNum;
 
-	if (lump != NULL)
+	if (cachedLumpNum != num)
 	{
-		uint8_t __far* src = (uint8_t __far*)lump;
+		const uint8_t __far* lump = W_TryGetLumpByNum(num);
+
+		if (lump != NULL)
+		{
+			uint8_t __far* src = (uint8_t __far*)lump;
+			uint8_t __far* dst = D_MK_FP(PAGE3, 1 + __djgpp_conventional_base);
+			for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
+			{
+				for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+				{
+					*dst++ = *src;
+					src += (SCREENWIDTH / VIEWWINDOWWIDTH);
+					dst++;
+				}
+				src += ((SCREENHEIGHT / VIEWWINDOWHEIGHT) - 1) * SCREENWIDTH;
+			}
+			Z_ChangeTagToCache(lump);
+
+			cachedLumpNum = num;
+		}
+	}
+
+	if (cachedLumpNum == num)
+	{
+		uint8_t __far* src = D_MK_FP(PAGE3, 1 + __djgpp_conventional_base);
 		uint8_t __far* dst = _s_screen;
 		for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
 		{
 			for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
 			{
-				*dst++ = *src;
-				src += (SCREENWIDTH / VIEWWINDOWWIDTH);
+				*dst++ = *src++;
+				src++;
 				dst++;
 			}
-			src += ((SCREENHEIGHT / VIEWWINDOWHEIGHT) - 1) * SCREENWIDTH;
 		}
-		Z_ChangeTagToCache(lump);
 	}
 }
 
