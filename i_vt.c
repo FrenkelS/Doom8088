@@ -63,7 +63,7 @@ static uint8_t __far* _s_screen;
 
 void I_ReloadPalette(void)
 {
-
+	// TODO implement me
 }
 
 
@@ -102,6 +102,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 void I_SetPalette(int8_t pal)
 {
 	UNUSED(pal);
+	// TODO implement me
 }
 
 
@@ -273,6 +274,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 void V_FillRect(byte colour)
 {
 	UNUSED(colour);
+	// TODO implement me
 }
 
 
@@ -283,12 +285,13 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 	UNUSED(x1);
 	UNUSED(y1);
 	UNUSED(color);
+	// TODO implement me
 }
 
 
 void V_DrawBackground(void)
 {
-
+	// TODO implement me
 }
 
 
@@ -296,12 +299,13 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 {
 	UNUSED(num);
 	UNUSED(offset);
+	// TODO implement me
 }
 
 
 void ST_Drawer(void)
 {
-
+	// TODO implement me
 }
 
 
@@ -310,6 +314,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	UNUSED(x);
 	UNUSED(y);
 	UNUSED(patch);
+	// TODO implement me
 }
 
 
@@ -318,6 +323,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	UNUSED(x);
 	UNUSED(y);
 	UNUSED(patch);
+	// TODO implement me
 }
 
 
