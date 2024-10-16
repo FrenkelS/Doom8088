@@ -55,30 +55,18 @@
  *  (parent of Scrolling Text and Input Text widgets) */
 typedef struct
 {
-  // left-justified position of scrolling text window
-  int16_t   x;
   int16_t   y;
 
-  char  l[HU_MAXLINELENGTH+1]; // line of text
-  int16_t   len;                            // current line length
+  char  lineoftext[HU_MAXLINELENGTH+1];
+  size_t   len;                            // current line length
 } hu_textline_t;
-
-
-// Scrolling Text window widget
-//  (child of Text Line widget)
-typedef struct
-{
-  hu_textline_t l; // text line to draw
-
-  // pointer to boolean stating whether to update window
-  boolean*    on;
-} hu_stext_t;
 
 
 // widgets
 static hu_textline_t  w_title;
-static hu_stext_t     w_message;
+static hu_textline_t  w_message;
 
+// boolean stating whether to update window
 static boolean    message_on;
 boolean    _g_message_dontfuckwithme;
 
@@ -88,39 +76,10 @@ boolean    _g_message_dontfuckwithme;
 //
 // Locally used constants, shortcuts.
 //
-// Ty 03/28/98 -
-// These shortcuts modifed to reflect char ** of mapnames[]
-#define HU_TITLE  (mapnames[_g_gamemap-1])
-#define HU_TITLEX 0
-//jff 2/16/98 change 167 to ST_Y-1
-// CPhipps - changed to ST_TY
-// proff - changed to 200-ST_HEIGHT for stretching
-#define HU_TITLEY ((SCREENHEIGHT - ST_HEIGHT) - 1 - HU_FONT_HEIGHT)
 
+#define HU_TITLEY (VIEWWINDOWHEIGHT - 1 - HU_FONT_HEIGHT)
 
-#define HU_MSGX         0
 #define HU_MSGY         0
-
-
-//
-// Builtin map names.
-//
-// Ty 03/27/98 - externalized map name arrays - now in d_deh.c
-// and converted to arrays of pointers to char *
-// DOOM map names.
-// CPhipps - const**const
-static const char *const mapnames[] =
-{
-    HUSTR_E1M1,
-    HUSTR_E1M2,
-    HUSTR_E1M3,
-    HUSTR_E1M4,
-    HUSTR_E1M5,
-    HUSTR_E1M6,
-    HUSTR_E1M7,
-    HUSTR_E1M8,
-    HUSTR_E1M9,
-};
 
 
 static int16_t font_lump_offset;
@@ -136,69 +95,27 @@ static int16_t font_lump_offset;
 void HU_Init(void)
 {
 	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
+
+	w_message.y = HU_MSGY;
+	w_title.y   = HU_TITLEY;
 }
 
 
 //
-// HUlib_clearTextLine()
+// Builtin map names.
 //
-// Blank the internal text line in a hu_textline_t widget
-//
-// Passed a hu_textline_t, returns nothing
-//
-static void HUlib_clearTextLine(hu_textline_t* t)
+static const char *const mapnames[] =
 {
-    t->len  = 0;
-    t->l[0] = 0;
-}
-
-
-//
-// HUlib_initTextLine()
-//
-// Initialize a hu_textline_t widget. Set the position.
-//
-// Passed a hu_textline_t, and the values used to initialize
-// Returns nothing
-//
-static void HUlib_initTextLine(hu_textline_t* t, int16_t x, int16_t y)
-{
-    t->x = x;
-    t->y = y;
-    HUlib_clearTextLine(t);
-}
-
-
-//
-// HUlib_initSText()
-//
-// Initialize a hu_stext_t widget. Set whether enabled.
-//
-// Passed a hu_stext_t, and the values used to initialize
-// Returns nothing
-//
-static void HUlib_initSText(hu_stext_t* s, boolean* on)
-{
-	s->on = on;
-	HUlib_initTextLine(&s->l, HU_MSGX, HU_MSGY);
-}
-
-
-//
-// HUlib_addCharToTextLine()
-//
-// Adds a character at the end of the text line in a hu_textline_t widget
-//
-// Passed the hu_textline_t and the char to add
-//
-static void HUlib_addCharToTextLine(hu_textline_t* t,char ch)
-{
-	if (t->len != HU_MAXLINELENGTH)
-	{
-		t->l[t->len++] = ch;
-		t->l[t->len]   = 0;
-	}
-}
+    HUSTR_E1M1,
+    HUSTR_E1M2,
+    HUSTR_E1M3,
+    HUSTR_E1M4,
+    HUSTR_E1M5,
+    HUSTR_E1M6,
+    HUSTR_E1M7,
+    HUSTR_E1M8,
+    HUSTR_E1M9,
+};
 
 
 //
@@ -214,26 +131,17 @@ static void HUlib_addCharToTextLine(hu_textline_t* t,char ch)
 //
 void HU_Start(void)
 {
-    const char* s;
+	message_on = false;
+	_g_message_dontfuckwithme = false;
 
-    message_on = false;
-    _g_message_dontfuckwithme = false;
+	// create the message widget
+	// messages to player in upper-left of screen
+	w_message.len           = 0;
+	w_message.lineoftext[0] = 0;
 
-    // create the message widget
-    // messages to player in upper-left of screen
-    HUlib_initSText(&w_message, &message_on);
-
-    //jff 2/16/98 added some HUD widgets
-    // create the map title widget - map title display in lower left of automap
-    HUlib_initTextLine(&w_title, HU_TITLEX, HU_TITLEY);
-
-    // initialize the automap's level title widget
-    if (_g_gamestate == GS_LEVEL)
-    {
-        s = HU_TITLE;
-        while (*s)
-            HUlib_addCharToTextLine(&w_title, *(s++));
-    }
+	// create the map title widget - map title display in lower left of automap
+	w_title.len       = strlen(mapnames[_g_gamemap - 1]);
+	strcpy(w_title.lineoftext, mapnames[_g_gamemap - 1]);
 }
 
 
@@ -245,15 +153,15 @@ void HU_Start(void)
 // Passed the hu_textline_t and flag whether to draw a cursor
 // Returns nothing
 //
-static void HUlib_drawTextLine(hu_textline_t* l)
+static void HUlib_drawTextLine(hu_textline_t* textline)
 {
-	const int16_t y = l->y;
+	const int16_t y = textline->y;
 
 	// draw the new stuff
-	int16_t x = l->x;
-	for (int16_t i = 0; i < l->len; i++)
+	int16_t x = 0;
+	for (size_t i = 0; i < textline->len; i++)
 	{
-		char c = toupper(l->l[i]); //jff insure were not getting a cheap toupper conv.
+		char c = toupper(textline->lineoftext[i]); //jff insure were not getting a cheap toupper conv.
 
 		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
@@ -279,24 +187,6 @@ static void HUlib_drawTextLine(hu_textline_t* l)
 
 
 //
-// HUlib_drawSText()
-//
-// Displays a hu_stext_t widget
-//
-// Passed a hu_stext_t
-// Returns nothing
-//
-static void HUlib_drawSText(hu_stext_t* s)
-{
-	if (!*s->on)
-		return; // if not on, don't draw
-
-	// draw everything
-	HUlib_drawTextLine(&s->l); // no cursor, please
-}
-
-
-//
 // HU_Drawer()
 //
 // Draw all the pieces of the heads-up display
@@ -312,24 +202,10 @@ void HU_Drawer(void)
         HUlib_drawTextLine(&w_title);
     }
 
-    HUlib_drawSText(&w_message);
-}
-
-
-//
-// HUlib_addMessageToSText()
-//
-// Adds a message line to a hu_stext_t widget
-//
-// Passed a hu_stext_t and a message string
-// Returns nothing
-//
-static void HUlib_addMessageToSText(hu_stext_t* s, const char* msg)
-{
-	HUlib_clearTextLine(&s->l);
-
-	while (*msg)
-		HUlib_addCharToTextLine(&s->l, *(msg++));
+    if (message_on)
+    {
+        HUlib_drawTextLine(&w_message);
+    }
 }
 
 
@@ -345,36 +221,36 @@ static void HUlib_addMessageToSText(hu_stext_t* s, const char* msg)
 
 void HU_Ticker(void)
 {
-    static int16_t        message_counter = 0;
+	static int16_t        message_counter = 0;
 
-    player_t* plr = &_g_player;
+	player_t* plr = &_g_player;
 
-    // tick down message counter if message is up
-    if (message_counter && !--message_counter)
-    {
-        message_on = false;
-    }
+	// tick down message counter if message is up
+	if (message_counter && !--message_counter)
+	{
+		message_on = false;
+	}
 
+	// if messages on, or "Messages Off" is being displayed
+	// this allows the notification of turning messages off to be seen
+	if (showMessages || _g_message_dontfuckwithme)
+	{
+		// display message if necessary
+		if (plr->message)
+		{
+			//post the message to the message widget
+			w_message.len = strlen(plr->message);
+			strcpy(w_message.lineoftext, plr->message);
 
-    // if messages on, or "Messages Off" is being displayed
-    // this allows the notification of turning messages off to be seen
-    if (showMessages || _g_message_dontfuckwithme)
-    {
-        // display message if necessary
-        if (plr->message)
-        {
-            //post the message to the message widget
-            HUlib_addMessageToSText(&w_message, plr->message);
+			// clear the message to avoid posting multiple times
+			plr->message = NULL;
+			// note a message is displayed
+			message_on = true;
+			// start the message persistence counter
+			message_counter = HU_MSGTIMEOUT;
 
-            // clear the message to avoid posting multiple times
-            plr->message = NULL;
-            // note a message is displayed
-            message_on = true;
-            // start the message persistence counter
-            message_counter = HU_MSGTIMEOUT;
-
-            // clear the flag that "Messages Off" is being posted
-            _g_message_dontfuckwithme = false;
-        }
-    }
+			// clear the flag that "Messages Off" is being posted
+			_g_message_dontfuckwithme = false;
+		}
+	}
 }

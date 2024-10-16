@@ -339,9 +339,8 @@ static void G_DoLoadLevel (void)
     // clear cmd building stuff
     memset(gamekeydown, 0, sizeof(gamekeydown));
 
-    // killough 5/13/98: in case netdemo has consoleplayer other than green
-    ST_Start();
-    HU_Start();
+    ST_Start(); // wake up the status bar
+    HU_Start(); // wake up the heads up text
 }
 
 
