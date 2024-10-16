@@ -467,7 +467,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 void ST_Drawer(void)
 {
-	// TODO implement me
+	ST_doRefresh();
 }
 
 
