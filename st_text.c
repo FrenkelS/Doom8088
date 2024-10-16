@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -116,8 +116,6 @@ typedef struct
 #define ST_NUMFACES \
           (ST_FACESTRIDE*ST_NUMPAINFACES+ST_NUMEXTRAFACES)
 
-
-static int16_t statusbarnum;
 
 // 0-9, tall numbers
 static int16_t tallnum[10];
@@ -702,19 +700,9 @@ static void ST_drawWidgets(void)
 }
 
 
-static void ST_refreshBackground(void)
-{
-	static const uint16_t st_offset = (SCREENHEIGHT - ST_HEIGHT) * SCREENWIDTH;
-	V_DrawRaw(statusbarnum, st_offset);
-}
-
-
 void ST_doRefresh(void)
 {
 #if !defined DISABLE_STATUS_BAR
-  // draw status bar background to off-screen buff
-  ST_refreshBackground();
-
   // and refresh all widgets
   ST_drawWidgets();
 #endif
@@ -770,8 +758,6 @@ static void ST_loadData(void)
 {
     int8_t  i, facenum;
     char namebuf[9];
-
-    statusbarnum = W_GetNumForName("STBAR");
 
     // Load the numbers, tall and short
     for (i=0;i<10;i++)
