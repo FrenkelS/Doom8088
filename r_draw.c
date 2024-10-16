@@ -1712,9 +1712,6 @@ static void R_DrawSegTextureColumn(const texture_t __far* tex, int16_t texture, 
 // CALLED: CORE LOOPING ROUTINE.
 //
 
-#define HEIGHTBITS 12
-#define HEIGHTUNIT (1<<HEIGHTBITS)
-
 static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor, boolean markceiling)
 {
     draw_column_vars_t dcvars;
@@ -1726,8 +1723,8 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
     {
         // mark floor / ceiling areas
 
-        int16_t yh = bottomfrac>>HEIGHTBITS;
-        int16_t yl = (topfrac+HEIGHTUNIT-1)>>HEIGHTBITS;
+        int16_t yh = bottomfrac>>FRACBITS;
+        int16_t yl = (topfrac+FRACUNIT-1)>>FRACBITS;
 
         int16_t cc_rwx = ceilingclip[rw_x];
         int16_t fc_rwx = floorclip[rw_x];
@@ -1837,7 +1834,7 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
             if (toptexture)
             {
                 // top wall
-                int16_t mid = pixhigh>>HEIGHTBITS;
+                int16_t mid = pixhigh>>FRACBITS;
                 pixhigh += pixhighstep;
 
                 if (mid >= fc_rwx)
@@ -1865,7 +1862,7 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 
             if (bottomtexture)          // bottom wall
             {
-                int16_t mid = (pixlow+HEIGHTUNIT-1)>>HEIGHTBITS;
+                int16_t mid = (pixlow+FRACUNIT-1)>>FRACBITS;
                 pixlow += pixlowstep;
 
                 // no space above wall?
@@ -2177,28 +2174,22 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
         markceiling = false;
 
     // calculate incremental stepping values for texture edges
-    worldtop    >>= 4;
-    worldbottom >>= 4;
-
     topstep = -FixedMul(worldtop, rw_scalestep);
-    topfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldtop, rw_scale);
+    topfrac = (CENTERY * FRACUNIT) - FixedMul(worldtop, rw_scale);
 
     bottomstep = -FixedMul(worldbottom, rw_scalestep);
-    bottomfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldbottom, rw_scale);
+    bottomfrac = (CENTERY * FRACUNIT) - FixedMul(worldbottom, rw_scale);
 
     if (backsector)
     {
-        worldhigh >>= 4;
-        worldlow  >>= 4;
-
         if (worldhigh < worldtop)
         {
-            pixhigh = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldhigh, rw_scale);
+            pixhigh = (CENTERY * FRACUNIT) - FixedMul(worldhigh, rw_scale);
             pixhighstep = -FixedMul(worldhigh, rw_scalestep);
         }
         if (worldlow > worldbottom)
         {
-            pixlow = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldlow, rw_scale);
+            pixlow = (CENTERY * FRACUNIT) - FixedMul(worldlow, rw_scale);
             pixlowstep = -FixedMul(worldlow, rw_scalestep);
         }
     }
