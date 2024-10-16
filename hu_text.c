@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -148,7 +148,7 @@ void HU_Start(void)
 
 static int16_t message_clearer = 0;
 
-void V_DrawString(int16_t y, char* s);
+void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
 void V_ClearString(int16_t y, size_t len);
 
 void HU_Drawer(void)
@@ -158,7 +158,7 @@ void HU_Drawer(void)
 
 	if (automapmode & am_active)
 	{
-        V_DrawString(HU_TITLEY, w_title.lineoftext);
+        V_DrawString(0, HU_TITLEY, 12, w_title.lineoftext);
 		am_clearer = 3; // 3 screen pages
 	}
 	else
@@ -179,7 +179,7 @@ void HU_Drawer(void)
 	}
 
     if (message_on)
-		V_DrawString(HU_MSGY, w_message.lineoftext);
+		V_DrawString(0, HU_MSGY, 12, w_message.lineoftext);
 }
 
 

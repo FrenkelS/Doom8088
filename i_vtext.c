@@ -388,10 +388,9 @@ void V_DrawCharacter(int16_t x, int16_t y, char c)
 }
 
 
-void V_DrawString(int16_t y, char* s)
+void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s)
 {
-	int16_t x = 0;
-
+	x <<= 1;
 	while (*s)
 	{
 		char c = toupper(*s);
@@ -400,7 +399,7 @@ void V_DrawString(int16_t y, char* s)
 			c = ' ';
 
 		_s_screen[y * PLANEWIDTH + x - 1] = c;
-		_s_screen[y * PLANEWIDTH + x    ] = 12;
+		_s_screen[y * PLANEWIDTH + x    ] = color;
 
 		x += 2;
 		s++;
@@ -424,7 +423,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	UNUSED(x);
 	UNUSED(y);
 	UNUSED(patch);
-	// TODO implement me
+	// Do nothing
 }
 
 
@@ -433,13 +432,35 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	UNUSED(x);
 	UNUSED(y);
 	UNUSED(patch);
-	// TODO implement me
+	// Do nothing
 }
 
 
 void wipe_StartScreen(void)
 {
-	// Do nothing
+	// Initialize the 3 screen pages again
+
+	uint8_t __far* dst;
+	dst = D_MK_FP(PAGE0, 0 + __djgpp_conventional_base);
+	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
+	{
+		*dst++ = 0xb1;
+		dst++;
+	}
+
+	dst = D_MK_FP(PAGE1, 0 + __djgpp_conventional_base);
+	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
+	{
+		*dst++ = 0xb1;
+		dst++;
+	}
+
+	dst = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
+	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
+	{
+		*dst++ = 0xb1;
+		dst++;
+	}
 }
 
 
