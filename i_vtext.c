@@ -297,9 +297,26 @@ void V_DrawBackground(void)
 
 void V_DrawRaw(int16_t num, uint16_t offset)
 {
-	UNUSED(num);
 	UNUSED(offset);
-	// TODO implement me
+
+	const uint8_t __far* lump = W_TryGetLumpByNum(num);
+
+	if (lump != NULL)
+	{
+		uint8_t __far* src = (uint8_t __far*)lump;
+		uint8_t __far* dst = _s_screen;
+		for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
+		{
+			for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+			{
+				*dst++ = *src;
+				src += (SCREENWIDTH / VIEWWINDOWWIDTH);
+				dst++;
+			}
+			src += ((SCREENHEIGHT / VIEWWINDOWHEIGHT) - 1) * SCREENWIDTH;
+		}
+		Z_ChangeTagToCache(lump);
+	}
 }
 
 
