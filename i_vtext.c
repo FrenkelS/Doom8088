@@ -437,7 +437,7 @@ void D_Wipe(void)
 {
 	frontbuffer = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, 1 + __djgpp_conventional_base);
 	if (D_FP_SEG(frontbuffer) == (PAGE0 - PAGE_SIZE))
-		frontbuffer = D_MK_FP(PAGE3, 1 + __djgpp_conventional_base);
+		frontbuffer = D_MK_FP(PAGE2, 1 + __djgpp_conventional_base);
 
 	wipe_initMelt();
 
