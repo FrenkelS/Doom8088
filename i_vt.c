@@ -323,11 +323,120 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 void wipe_StartScreen(void)
 {
+	// Do nothing
+}
 
+
+static uint8_t __far* frontbuffer;
+static int16_t __far* wipe_y_lookup;
+
+
+static boolean wipe_ScreenWipe(int16_t ticks)
+{
+	boolean done = true;
+
+	uint8_t __far* backbuffer = _s_screen;
+
+	while (ticks--)
+	{
+		for (int16_t i = 0; i < VIEWWINDOWWIDTH; i++)
+		{
+			if (wipe_y_lookup[i] < 0)
+			{
+				wipe_y_lookup[i]++;
+				done = false;
+				continue;
+			}
+
+			// scroll down columns, which are still visible
+			if (wipe_y_lookup[i] < VIEWWINDOWHEIGHT)
+			{
+				int16_t dy = (wipe_y_lookup[i] < 16) ? wipe_y_lookup[i] + 1 : VIEWWINDOWHEIGHT / 25;
+				// At most dy shall be so that the column is shifted by VIEWWINDOWHEIGHT (i.e. just invisible)
+				if (wipe_y_lookup[i] + dy >= VIEWWINDOWHEIGHT)
+					dy = VIEWWINDOWHEIGHT - wipe_y_lookup[i];
+
+				uint8_t __far* s = &frontbuffer[i<<1] + ((VIEWWINDOWHEIGHT - 1 - dy) * PLANEWIDTH);
+				uint8_t __far* d = &frontbuffer[i<<1] + ((VIEWWINDOWHEIGHT - 1)      * PLANEWIDTH);
+
+				// scroll down the column. Of course we need to copy from the bottom... up to
+				// VIEWWINDOWHEIGHT - yLookup - dy
+
+				for (int16_t j = VIEWWINDOWHEIGHT - wipe_y_lookup[i] - dy; j; j--)
+				{
+					*d = *s;
+					d += -PLANEWIDTH;
+					s += -PLANEWIDTH;
+				}
+
+				// copy new screen. We need to copy only between y_lookup and + dy y_lookup
+				s = &backbuffer[i<<1]  + wipe_y_lookup[i] * PLANEWIDTH;
+				d = &frontbuffer[i<<1] + wipe_y_lookup[i] * PLANEWIDTH;
+
+				for (int16_t j = 0 ; j < dy; j++)
+				{
+					*d = *s;
+					d += PLANEWIDTH;
+					s += PLANEWIDTH;
+				}
+
+				wipe_y_lookup[i] += dy;
+				done = false;
+			}
+		}
+	}
+
+	return done;
+}
+
+
+static void wipe_initMelt()
+{
+	wipe_y_lookup = Z_MallocStatic(VIEWWINDOWWIDTH * sizeof(int16_t));
+
+	// setup initial column positions (y<0 => not ready to scroll yet)
+	wipe_y_lookup[0] = -(M_Random() % 16);
+	for (int16_t i = 1; i < VIEWWINDOWWIDTH; i++)
+	{
+		int16_t r = (M_Random() % 3) - 1;
+
+		wipe_y_lookup[i] = wipe_y_lookup[i - 1] + r;
+
+		if (wipe_y_lookup[i] > 0)
+			wipe_y_lookup[i] = 0;
+		else if (wipe_y_lookup[i] == -16)
+			wipe_y_lookup[i] = -15;
+	}
 }
 
 
 void D_Wipe(void)
 {
+	frontbuffer = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, 1 + __djgpp_conventional_base);
+	if (D_FP_SEG(frontbuffer) == (PAGE0 - PAGE_SIZE))
+		frontbuffer = D_MK_FP(PAGE3, 1 + __djgpp_conventional_base);
 
+	wipe_initMelt();
+
+	boolean done;
+	int32_t wipestart = I_GetTime() - 1;
+
+	do
+	{
+		int32_t nowtime;
+		int16_t tics;
+		do
+		{
+			nowtime = I_GetTime();
+			tics = nowtime - wipestart;
+		} while (!tics);
+
+		wipestart = nowtime;
+		done = wipe_ScreenWipe(tics);
+
+		M_Drawer();                   // menu is drawn even on top of wipes
+
+	} while (!done);
+
+	Z_Free(wipe_y_lookup);
 }
