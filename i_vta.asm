@@ -17,7 +17,7 @@
 
 bits 16
 
-PLANEWIDTH equ 40
+PLANEWIDTH equ 80
 
 extern source
 extern nearcolormap

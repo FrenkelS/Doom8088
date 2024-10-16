@@ -39,10 +39,12 @@
 #include "globdata.h"
 
 
+#define PLANEWIDTH 80
+
+
 extern const int16_t CENTERY;
 
 static uint8_t __far* _s_screen;
-static uint8_t __far* videomemory;
 
 
 void I_ReloadPalette(void)
@@ -63,32 +65,23 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	regs.w.bx = 0x0000;
 	int86(0x10, &regs, &regs);
 
-	videomemory = D_MK_FP(0xb800, 0 + __djgpp_conventional_base);
-	uint8_t __far* dst = videomemory;
+	_s_screen = D_MK_FP(0xb880, 1 + __djgpp_conventional_base);
+
+	uint16_t __far* dst;
+	dst = D_MK_FP(0xb800, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-	{
-		*dst++ = 177;
-		dst++;
-	}
+		*dst++ = 0x00b1;
 
-	_s_screen = Z_MallocStatic(VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
-	_fmemset(_s_screen, 0, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
-}
+	dst = D_MK_FP(0xb880, 0 + __djgpp_conventional_base);
+	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
+		*dst++ = 0x00b1;
+
+	dst = D_MK_FP(0xb900, 0 + __djgpp_conventional_base);
+	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
+		*dst++ = 0x00b1;
 
 
-static void I_DrawBuffer(uint8_t __far* buffer)
-{
-	uint8_t __far* src = buffer;
-	uint8_t __far* dst = videomemory + 1;
-
-	for (uint_fast8_t y = 0; y < VIEWWINDOWHEIGHT; y++)
-	{
-		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
-		{
-			*dst++ = *src++;			
-			dst++;
-		}
-	}
+	outp(0x3d4, 0xc);
 }
 
 
@@ -100,7 +93,11 @@ void I_SetPalette(int8_t pal)
 
 void I_FinishUpdate(void)
 {
-	I_DrawBuffer(_s_screen);
+	// page flip between segments B800, B880, B900
+	outp(0x3d5, (D_FP_SEG(_s_screen) >> 5) & 0x0f);
+	_s_screen = (uint8_t __far*)(((uint32_t)_s_screen) + 0x00800000);
+	if (D_FP_SEG(_s_screen) == 0xb980)
+		_s_screen = D_MK_FP(0xb800, 1 + __djgpp_conventional_base);
 }
 
 
@@ -119,30 +116,30 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	switch (count)
 	{
-		case 25: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 24: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 23: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 22: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 21: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 20: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 19: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 18: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 17: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 16: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 25: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 24: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 23: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 22: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 21: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 20: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 19: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 18: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 17: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 16: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
 		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
 	}
 }
@@ -166,7 +163,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
 	}
 
-	dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + (dcvars->x << 1);
 
 	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
 	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
@@ -182,34 +179,34 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + (dcvars->x << 1);
 
 	switch (count)
 	{
-		case 25: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 24: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 23: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 22: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 21: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 20: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 19: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 18: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 17: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 16: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 15: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 14: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 13: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 12: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 11: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 10: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  9: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  8: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  7: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  6: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  5: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  4: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  3: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  2: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 25: *dest = color; dest += PLANEWIDTH;
+		case 24: *dest = color; dest += PLANEWIDTH;
+		case 23: *dest = color; dest += PLANEWIDTH;
+		case 22: *dest = color; dest += PLANEWIDTH;
+		case 21: *dest = color; dest += PLANEWIDTH;
+		case 20: *dest = color; dest += PLANEWIDTH;
+		case 19: *dest = color; dest += PLANEWIDTH;
+		case 18: *dest = color; dest += PLANEWIDTH;
+		case 17: *dest = color; dest += PLANEWIDTH;
+		case 16: *dest = color; dest += PLANEWIDTH;
+		case 15: *dest = color; dest += PLANEWIDTH;
+		case 14: *dest = color; dest += PLANEWIDTH;
+		case 13: *dest = color; dest += PLANEWIDTH;
+		case 12: *dest = color; dest += PLANEWIDTH;
+		case 11: *dest = color; dest += PLANEWIDTH;
+		case 10: *dest = color; dest += PLANEWIDTH;
+		case  9: *dest = color; dest += PLANEWIDTH;
+		case  8: *dest = color; dest += PLANEWIDTH;
+		case  7: *dest = color; dest += PLANEWIDTH;
+		case  6: *dest = color; dest += PLANEWIDTH;
+		case  5: *dest = color; dest += PLANEWIDTH;
+		case  4: *dest = color; dest += PLANEWIDTH;
+		case  3: *dest = color; dest += PLANEWIDTH;
+		case  2: *dest = color; dest += PLANEWIDTH;
 		case  1: *dest = color;
 	}
 }
@@ -240,14 +237,14 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + (dcvars->x << 1);
 
 	static int16_t fuzzpos = 0;
 
 	do
 	{
 		*dest = fuzzcolors[fuzzpos];
-		dest += VIEWWINDOWWIDTH;
+		dest += PLANEWIDTH;
 
 		fuzzpos++;
 		if (fuzzpos >= FUZZTABLE)
