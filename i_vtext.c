@@ -63,15 +63,74 @@ static uint8_t __far* _s_screen;
 
 void I_ReloadPalette(void)
 {
-	// TODO implement me
+	char* lumpName;
+
+	if (_g_gamma == 0)
+		lumpName = "COLORMAP";
+	else
+	{
+		lumpName = "COLORMP0";
+		lumpName[7] = '0' + _g_gamma;
+	}
+
+	W_ReadLumpByNum(W_GetNumForName(lumpName), (void __far*)fullcolormap);
 }
 
 
-void I_InitGraphicsHardwareSpecificCode(void)
+static const int8_t colors_tandy[14] =
 {
-	__djgpp_nearptr_enable();
+	0,									// normal
+	4, 4, 4, 4, 0x1c, 0x1c, 0x1c, 0x1c,	// red
+	6, 6, 0x1e, 0x1e,					// yellow
+	2									// green
+};
 
-	I_SetScreenMode(SCREEN_MODE);
+
+static const uint8_t colors_vga[14][3] =
+{
+	// normal
+	{0, 0, 0},
+
+	// red
+	{0x07, 0, 0},
+	{0x0e, 0, 0},
+	{0x15, 0, 0},
+	{0x1c, 0, 0},
+	{0x23, 0, 0},
+	{0x2a, 0, 0},
+	{0x31, 0, 0},
+	{0x3b, 0, 0},
+
+	// yellow
+	{0x06, 0x05, 0x02},
+	{0x0d, 0x0b, 0x04},
+	{0x14, 0x11, 0x06},
+	{0x1a, 0x17, 0x08},
+
+	// green
+	{0, 0x08, 0}
+};
+
+
+static void I_UploadNewPalette(int8_t pal)
+{
+	// TODO detect video card
+
+	// Tandy 1000
+	outp(0x3da, 0x10);
+	outp(0x3de, colors_tandy[pal]);
+
+	// VGA
+	outp(0x3c8, 0);
+	outp(0x3c9, colors_vga[pal][0]);
+	outp(0x3c9, colors_vga[pal][1]);
+	outp(0x3c9, colors_vga[pal][2]);
+}
+
+
+static void I_DisableBlinking(void)
+{
+	// TODO detect video card
 
 	// disable blinking Jr, PS, TANDY 1000, EGA, VGA
 	union REGS regs;
@@ -87,6 +146,16 @@ void I_InitGraphicsHardwareSpecificCode(void)
 #else
 #error unsupported VIEWWINDOWWIDTH value
 #endif
+}
+
+
+void I_InitGraphicsHardwareSpecificCode(void)
+{
+	__djgpp_nearptr_enable();
+
+	I_SetScreenMode(SCREEN_MODE);
+
+	I_DisableBlinking();
 
 	_s_screen = D_MK_FP(PAGE1, 1 + __djgpp_conventional_base);
 
@@ -111,15 +180,26 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
+static int8_t newpal;
+
+
 void I_SetPalette(int8_t pal)
 {
-	UNUSED(pal);
-	// TODO implement me
+	newpal = pal;
 }
+
+
+#define NO_PALETTE_CHANGE 100
 
 
 void I_FinishUpdate(void)
 {
+	if (newpal != NO_PALETTE_CHANGE)
+	{
+		I_UploadNewPalette(newpal);
+		newpal = NO_PALETTE_CHANGE;
+	}
+
 	// page flip between segments
 	// B800, B880, B900 for 40x25
 	// B800, B900, BA00 for 80x25
