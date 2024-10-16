@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for VGA Mode 13h 320x200 256 colors
+ *      Video code for Tandy 640x200 16 color aka Tandy Video II aka ETGA
  *
  *-----------------------------------------------------------------------------*/
  
@@ -38,94 +38,135 @@
 
 #include "globdata.h"
 
-
+ 
 extern const int16_t CENTERY;
 
 // The screen is [SCREENWIDTH * SCREENHEIGHT];
 static uint8_t __far* _s_screen;
-static uint8_t __far* vgascreen;
-
-
-static int16_t palettelumpnum;
+static uint8_t __far* videomemory;
 
 
 void I_ReloadPalette(void)
 {
-	char lumpName[9] = "PLAYPAL0";
-
+	char* lumpName;
 	if (_g_gamma == 0)
-		lumpName[7] = 0;
+		lumpName = "COLORMAP";
 	else
+	{
+		lumpName = "COLORMP0";
 		lumpName[7] = '0' + _g_gamma;
+	}
 
-	palettelumpnum = W_GetNumForName(lumpName);
+	W_ReadLumpByNum(W_GetNumForName(lumpName), (void __far*)fullcolormap);
 }
 
 
-#define PEL_WRITE_ADR   0x3c8
-#define PEL_DATA        0x3c9
-
-
-static const uint8_t colors[14][3] =
+static const int8_t colors[14] =
 {
-	// normal
-	{0, 0, 0},
-
-	// red
-	{0x07, 0, 0},
-	{0x0e, 0, 0},
-	{0x15, 0, 0},
-	{0x1c, 0, 0},
-	{0x23, 0, 0},
-	{0x2a, 0, 0},
-	{0x31, 0, 0},
-	{0x3b, 0, 0},
-
-	// yellow
-	{0x06, 0x05, 0x02},
-	{0x0d, 0x0b, 0x04},
-	{0x14, 0x11, 0x06},
-	{0x1a, 0x17, 0x08},
-
-	// green
-	{0, 0x08, 0}
+	0,									// normal
+	4, 4, 4, 4, 0x1c, 0x1c, 0x1c, 0x1c,	// red
+	6, 6, 0x1e, 0x1e,					// yellow
+	2									// green
 };
 
-
+	
 static void I_UploadNewPalette(int8_t pal)
 {
-	// This is used to replace the current 256 colour cmap with a new one
-	// Used by 256 colour PseudoColor modes
+	outp(0x3da, 0x10);
+	outp(0x3de, colors[pal]);
+}
 
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(palettelumpnum);
-	if (palette_lump != NULL)
+
+static const uint8_t etga_ctrc[19] = {0x71, 0x50, 0x5a, 0xef, 0xff, 6, 0xc8, 0xe2, 2, 0, 0, 0, 0, 0, 0, 0, 0x18,    0, 0x46};
+static const uint8_t text_ctrc[19] = {0x71, 0x50, 0x5a, 0xfe, 0x1c, 1, 0x19, 0x1a, 2, 8, 6, 7, 0, 0, 0, 0, 0x18, 0x20,    7};
+
+static const uint16_t etga_ctrl[5] = {0x0f01, 0x0002, 0x1003, 0x0105, 0x0208};
+static const uint16_t text_ctrl[5] = {0x0f01, 0x0002, 0x1003, 0x0005, 0x0008};
+
+
+static void I_InitGraphicsCommonETGA(boolean graphics)
+{
+	const uint8_t*  crtcTable;
+	const uint16_t* ctrlTable;
+
+	if (graphics)
 	{
-		const byte __far* palette = &palette_lump[pal * 256 * 3];
-		outp(PEL_WRITE_ADR, 0);
-		for (int_fast16_t i = 0; i < 256 * 3; i++)
-			outp(PEL_DATA, (*palette++) >> 2);
-
-		Z_ChangeTagToCache(palette_lump);
+		crtcTable = etga_ctrc;
+		ctrlTable = etga_ctrl;
 	}
 	else
 	{
-		outp(PEL_WRITE_ADR, 0);
-		outp(PEL_DATA, colors[pal][0]);
-		outp(PEL_DATA, colors[pal][1]);
-		outp(PEL_DATA, colors[pal][2]);
+		crtcTable = text_ctrc;
+		ctrlTable = text_ctrl;
+	}
+
+	// set CRTC registers
+	for (int16_t i = 0; i < 19; i++)
+	{
+		outp(0x3d4, i);
+		outp(0x3d5, *crtcTable++);
+	}
+
+	// set control registers
+	for (int16_t i = 0; i < 5; i++)
+	{
+		uint16_t x = *ctrlTable++;
+		outp(0x3da, LOBYTE(x));
+		outp(0x3de, HIBYTE(x));
+	}
+
+	// clear color select register
+	outp(0x3d9, 0);
+
+	// disable extended RAM paging
+	outp(0x3dd, 0);
+}
+
+
+static void I_CheckVideoMemory(void)
+{
+	if (M_CheckParm("-hiddencard"))
+		return;
+
+	if ((*((uint8_t __far*)D_MK_FP(0xF000, 0xFFFE)) == 0xFF) && (*((uint8_t __far*)D_MK_FP(0xFC00, 0)) == 0x21))
+	{
+		// Tandy 1000 detected
+		int16_t videoMemory = *((int16_t __far*)D_MK_FP(0x40, 0x15)) - *((int16_t __far*)D_MK_FP(0x40, 0x13));
+		if (0 < videoMemory && videoMemory < 64)
+		{
+			I_Error("Improper video card! Detected %d kB of video memory.\n"
+			        "If you really have 64 kB of video memory that I am not detecting,\n"
+			        "use the -HIDDENCARD command line parameter!", videoMemory);
+		}
 	}
 }
 
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
-	I_SetScreenMode(0x13);
-	I_ReloadPalette();
-	I_UploadNewPalette(0);
-
 	__djgpp_nearptr_enable();
-	vgascreen = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 
+	I_CheckVideoMemory();
+
+	// This code is based on https://github.com/planet-x3/px3_ose/blob/master/src/video/etga.s
+
+	I_SetScreenMode(3);
+
+	// select 640 dot graphics mode with hi-res clock, disable video
+	outp(0x3d8, 0x13);
+
+	I_InitGraphicsCommonETGA(true);
+
+	// select page bit 2 for CRT & CPU
+	outp(0x3df, 0x24);
+
+	// clear screen
+	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
+
+	// select 640 dot graphics mode with hi-res clock, enable video
+	outp(0x3d8, 0x1b);
+
+	videomemory = D_MK_FP(0xa000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
 }
@@ -133,7 +174,16 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 void I_ShutdownGraphicsHardwareSpecificCode(void)
 {
-	// Do nothing
+	// select 80 column text mode, disable video
+	outp(0x3d8, 0x13);
+
+	I_InitGraphicsCommonETGA(false);
+
+	// select page bits 0-2 for CRT & CPU
+	outp(0x3df, 0x3f);
+
+	// select 80 column text mode, enable blinking, enable video
+	outp(0x3d8, 0x29);
 }
 
 
@@ -143,7 +193,7 @@ static boolean drawStatusBar = true;
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
 	uint8_t __far* src = buffer;
-	uint8_t __far* dst = vgascreen;
+	uint8_t __far* dst = videomemory;
 
 	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
 	{
@@ -426,77 +476,6 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	} while(--count);
 }
-
-
-#if !defined FLAT_SPAN
-inline static void R_DrawSpanPixel(uint32_t __far* dest, const byte __far* source, const byte __far* colormap, uint32_t position)
-{
-	uint16_t color = colormap[source[((position >> 4) & 0x0fc0) | (position >> 26)]];
-	color = color | (color << 8);
-
-	uint16_t __far* d = (uint16_t __far*) dest;
-	*d++ = color;
-	*d   = color;
-}
-
-
-void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *dsvars)
-{
-	uint16_t count = (x2 - x1);
-
-	const byte __far* source   = dsvars->source;
-	const byte __far* colormap = dsvars->colormap;
-
-	uint32_t __far* dest = (uint32_t __far*)(_s_screen + (y * SCREENWIDTH) + (x1 << 2));
-
-	const uint32_t step = dsvars->step;
-	uint32_t position = dsvars->position;
-
-	uint16_t l = (count >> 4);
-
-	while (l--)
-	{
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-    }
-
-	switch (count & 15)
-	{
-		case 15:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 14:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 13:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 12:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 11:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case 10:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  9:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  8:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  7:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  6:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  5:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  4:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  3:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  2:    R_DrawSpanPixel(dest, source, colormap, position); dest++; position+=step;
-		case  1:    R_DrawSpanPixel(dest, source, colormap, position);
-	}
-}
-#endif
 
 
 //
