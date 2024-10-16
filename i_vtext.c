@@ -94,6 +94,9 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 		*dst++ = 0x00b1;
 
+	dst = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
+	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
+		*dst++ = 0x00b1;
 
 	outp(0x3d4, 0xc);
 }
@@ -368,25 +371,44 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 	}
 
 	if (cachedLumpNum == num)
-	{
-		uint8_t __far* src = D_MK_FP(PAGE3, 1 + __djgpp_conventional_base);
-		uint8_t __far* dst = _s_screen;
-		for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
-		{
-			for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
-			{
-				*dst++ = *src++;
-				src++;
-				dst++;
-			}
-		}
-	}
+		_fmemcpy(_s_screen - 1, D_MK_FP(PAGE3, 0 + __djgpp_conventional_base), PLANEWIDTH * VIEWWINDOWHEIGHT);
 }
 
 
 void ST_Drawer(void)
 {
 	// TODO implement me
+}
+
+
+void V_DrawString(int16_t y, char* s)
+{
+	int16_t x = 0;
+
+	while (*s)
+	{
+		char c = toupper(*s);
+
+		if (!(HU_FONTSTART <= c && c <= HU_FONTEND))
+			c = ' ';
+
+		_s_screen[y * PLANEWIDTH + x - 1] = c;
+		_s_screen[y * PLANEWIDTH + x    ] = 12;
+
+		x += 2;
+		s++;
+	}
+}
+
+
+void V_ClearString(int16_t y, size_t len)
+{
+	uint8_t __far* dst = _s_screen + y * PLANEWIDTH - 1;
+	for (int16_t x = 0; x < len; x++)
+	{
+		*dst++ = 0xb1;
+		dst++;
+	}
 }
 
 
