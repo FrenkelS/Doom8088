@@ -108,9 +108,6 @@ static int16_t tallnum[10];
 // 0-9, short, yellow (,different!) numbers
 static int16_t shortnum[10];
 
-static int16_t keys[NUMCARDS];
-
-
 // weapon ownership patches
 static int16_t arms[6][2];
 
@@ -123,9 +120,6 @@ static st_number_t st_health;
 // weapon ownership widgets
 static st_multicon_t w_arms[6];
 
-// keycard widgets
-static st_multicon_t w_keyboxes[3];
-
 // ammo widgets
 static st_number_t w_ammo[4];
 
@@ -137,9 +131,6 @@ static st_number_t  st_armor;
 
 // used for evil grin
 static boolean  oldweaponsowned[NUMWEAPONS];
-
-// holds key-type for each key box on bar
-static int16_t      keyboxes[3];
 
 // a random number per tick
 static int16_t      st_randomnumber;
@@ -198,20 +189,6 @@ static int8_t st_palette;
 // proff 08/18/98: Changed for high-res
 #define ST_ARMORX               (ST_X+166)
 #define ST_ARMORY               (ST_Y+6)
-
-
-// proff 08/18/98: Changed for high-res
-#define ST_KEY0X                (ST_X+178)
-#define ST_KEY0Y                (ST_Y+3)
-
-// proff 08/18/98: Changed for high-res
-#define ST_KEY1X                (ST_X+178)
-#define ST_KEY1Y                (ST_Y+13)
-
-// proff 08/18/98: Changed for high-res
-#define ST_KEY2X                (ST_X+178)
-#define ST_KEY2Y                (ST_Y+23)
-
 
 // Ammunition counter.
 #define ST_AMMO0WIDTH           3
@@ -277,13 +254,6 @@ static void ST_updateWidgets(void)
         w_ready.num = &largeammo;
     else
         w_ready.num = &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo];
-
-
-    // update keycard multiple widgets
-    for (i=0;i<3;i++)
-    {
-        keyboxes[i] = _g_player.cards[i] ? i : -1;
-    }
 }
 
 void ST_Ticker(void)
@@ -439,16 +409,46 @@ static void ST_drawWidgets(void)
     STlib_drawNum(&st_health);
     STlib_drawNum(&st_armor);
 
-    for (int8_t i = 0; i < 3 ;i++)
-        STlib_updateMultIcon(&w_keyboxes[i]);
+	// keys
+	if (_g_player.cards[0])
+		V_DrawCharacter(8, 20, 9, '\x14');
+	else
+		V_DrawCharacter(8, 20, 7, '\xf9');
+
+	if (_g_player.cards[1])
+		V_DrawCharacter(9, 20, 14, '\x14');
+	else
+		V_DrawCharacter(9, 20, 7, '\xf9');
+
+	if (_g_player.cards[2])
+		V_DrawCharacter(10, 20, 12, '\x14');
+	else
+		V_DrawCharacter(10, 20, 7, '\xf9');
 
     for (int8_t i = 0; i < 6; i++)
         STlib_updateMultIcon(&w_arms[i]);
 }
 
 
+static void ST_refreshBackground(void)
+{
+	V_DrawString(1, 20, 7, "Keys   ");
+	V_DrawString(1, 21, 7, "Health ");
+	V_DrawString(1, 22, 7, "Armor  ");
+	V_DrawString(1, 23, 7, "Ammo   ");
+
+	V_DrawString(VIEWWINDOWWIDTH - 13, 20, 7, "Bull ");
+	V_DrawString(VIEWWINDOWWIDTH - 13, 21, 7, "Shel ");
+	V_DrawString(VIEWWINDOWWIDTH - 13, 22, 7, "Rckt ");
+	V_DrawString(VIEWWINDOWWIDTH - 13, 23, 7, "Cell ");
+}
+
+
 void ST_doRefresh(void)
 {
+  // draw status bar background to off-screen buff
+  ST_refreshBackground();
+
   // and refresh all widgets
   ST_drawWidgets();
 }
@@ -474,13 +474,6 @@ static void ST_loadData(void)
         shortnum[i] = W_GetNumForName(namebuf);
     }
 
-    // key cards
-    for (i=0;i<NUMCARDS;i++)
-    {
-        sprintf(namebuf, "STKEYS%d", i);
-        keys[i] = W_GetNumForName(namebuf);
-    }
-
     // arms ownership widgets
     for (i=0;i<6;i++)
     {
@@ -503,9 +496,6 @@ static void ST_initData(void)
 
     for (i=0;i<NUMWEAPONS;i++)
         oldweaponsowned[i] = _g_player.weaponowned[i];
-
-    for (i=0;i<3;i++)
-        keyboxes[i] = -1;
 }
 
 
@@ -566,11 +556,6 @@ static void ST_createWidgets(void)
         STlib_initMultIcon(&w_arms[i], ST_ARMSX+(i%3)*ST_ARMSXSPACE, ST_ARMSY+(i/3)*ST_ARMSYSPACE, arms[i], &_g_player.weaponowned[i+1]);
     }
 	
-    // keyboxes 0-2
-    STlib_initMultIcon(&w_keyboxes[0], ST_KEY0X, ST_KEY0Y, keys, &keyboxes[0]);
-    STlib_initMultIcon(&w_keyboxes[1], ST_KEY1X, ST_KEY1Y, keys, &keyboxes[1]);
-    STlib_initMultIcon(&w_keyboxes[2], ST_KEY2X, ST_KEY2Y, keys, &keyboxes[2]);			
-			
 	// ammo count (all four kinds)
 	STlib_initNum(&w_ammo[0], ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
 	STlib_initNum(&w_ammo[1], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
