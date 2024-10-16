@@ -79,7 +79,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	regs.w.bx = 0x0000;
 	int86(0x10, &regs, &regs);
 
-	_s_screen = D_MK_FP(0xb880, 1 + __djgpp_conventional_base);
+	_s_screen = D_MK_FP(PAGE1, 1 + __djgpp_conventional_base);
 
 	uint16_t __far* dst;
 	dst = D_MK_FP(PAGE0, 0 + __djgpp_conventional_base);
