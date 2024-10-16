@@ -38,12 +38,12 @@
 #define __D_ENGLSH__
 
 /* m_menu.c */
-#define PRESSKEY    "press a key."
-#define PRESSYN     "press y or n."
-#define SAVEDEAD    "you can't save if\nyou aren't playing!\n\n"PRESSKEY
+#define PRESSKEY    "Press a key."
+#define PRESSYN     "Press y or n."
+#define SAVEDEAD    "You can't save if\nyou aren't playing!\n\n"PRESSKEY
 
 #define NIGHTMARE \
-  "are you sure? this skill level\n"\
+  "Are you sure? This skill level\n"\
   "isn't even remotely fair.\n\n"PRESSYN
 
 #define MSGOFF      "Messages OFF"
@@ -52,8 +52,8 @@
 #define RUNOFF      "Take your time."
 #define RUNON       "In a hurry, marine?"
 
-#define ENDGAME     "are you sure you want to\nend the game?\n\n"PRESSYN
-#define QUITMSG	    "are you sure you want to\nquit this great game?\n\n"PRESSYN
+#define ENDGAME     "Are you sure you want to\nend the game?\n\n"PRESSYN
+#define QUITMSG	    "Are you sure you want to\nquit this great game?\n\n"PRESSYN
 
 
 /* p_inter.c */

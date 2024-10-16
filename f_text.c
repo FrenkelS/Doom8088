@@ -184,9 +184,6 @@ static void F_TextWrite (void)
 			continue;
 		}
 
-		c = toupper(c);
-		if (!(HU_FONTSTART <= c && c <= HU_FONTEND))
-			c = ' ';
 		V_DrawCharacter(cx, cy, c);
 		cx++;
 	}

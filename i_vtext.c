@@ -480,14 +480,10 @@ void V_DrawCharacter(int16_t x, int16_t y, char c)
 void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s)
 {
 	x <<= 1;
+
 	while (*s)
 	{
-		char c = toupper(*s);
-
-		if (!(HU_FONTSTART <= c && c <= HU_FONTEND))
-			c = ' ';
-
-		_s_screen[y * PLANEWIDTH + x - 1] = c;
+		_s_screen[y * PLANEWIDTH + x - 1] = *s;
 		_s_screen[y * PLANEWIDTH + x    ] = color;
 
 		x += 2;

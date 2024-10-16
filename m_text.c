@@ -174,7 +174,6 @@ static void M_DrawSave(void);
 static void M_SetupNextMenu(const menu_t *menudef);
 static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot);
 static void M_WriteText(int16_t x, int16_t y, const char __far* string);
-static int16_t M_StringWidth(const char __far* string);
 static int16_t M_StringHeight(const char *string);
 static void M_StartMessage(const char *string,void (*routine)(boolean));
 static void M_ClearMenus (void);
@@ -229,7 +228,7 @@ static const menu_t MainDef =
   main_end,       // number of menu items
   MainMenu,       // table that defines menu items
   M_DrawMainMenu, // drawing routine
-  (VIEWWINDOWWIDTH - 9) / 2,5,          // initial cursor position
+  (VIEWWINDOWWIDTH - 9) / 2,8,          // initial cursor position
   NULL,0,
 };
 
@@ -272,7 +271,7 @@ static const menu_t NewDef =
   newg_end,       // # of menu items
   NewGameMenu,    // menuitem_t ->
   M_DrawNewGame,  // drawing routine ->
-  (VIEWWINDOWWIDTH - 21) / 2,5,          // x,y
+  (VIEWWINDOWWIDTH - 21) / 2,8,          // x,y
   &MainDef,0,
 };
 
@@ -289,7 +288,7 @@ static void M_DrawNewGame(void)
 	V_DrawString(x, 0, 12, "NEW GAME");
 
 	x = (VIEWWINDOWWIDTH - 19) / 2;
-	V_DrawString(x, 1, 12, "CHOOSE SKILL LEVEL:");
+	V_DrawString(x, 1, 12, "Choose Skill Level:");
 }
 
 static void M_NewGame(int16_t choice)
@@ -360,7 +359,7 @@ static const menu_t LoadDef =
   load_end,
   LoadMenue,
   M_DrawLoad,
-  (VIEWWINDOWWIDTH - 0) / 2,5,
+  (VIEWWINDOWWIDTH - 0) / 2,4,
   &MainDef,2,
 };
 
@@ -582,7 +581,7 @@ static const menu_t OptionsDef =
   opt_end,
   OptionsMenu,
   M_DrawOptions,
-  (VIEWWINDOWWIDTH - 12) / 2,5,
+  (VIEWWINDOWWIDTH - 12) / 2,4,
   &MainDef,1,
 };
 
@@ -644,7 +643,7 @@ static const menu_t SoundDef =
   sound_end,
   SoundMenu,
   M_DrawSound,
-  (VIEWWINDOWWIDTH - 12) / 2,5,
+  (VIEWWINDOWWIDTH - 12) / 2,8,
   &OptionsDef,4,
 };
 
@@ -1033,7 +1032,7 @@ void M_Drawer (void)
         char __far* ms = Z_Strdup(messageString);
         char __far* p = ms;
 
-        int16_t y = 80 - M_StringHeight(messageString)/2;
+        int16_t y = (VIEWWINDOWHEIGHT - M_StringHeight(messageString)) / 2;
         while (*p)
         {
             char __far* string = p;
@@ -1041,8 +1040,8 @@ void M_Drawer (void)
             while ((c = *p) && *p != '\n')
                 p++;
             *p = 0;
-            M_WriteText(120 - M_StringWidth(string)/2, y, string);
-            y += HU_FONT_HEIGHT;
+            M_WriteText((VIEWWINDOWWIDTH - _fstrlen(string)) / 2, y, string);
+            y += 1;
             if ((*p = c))
                 p++;
         }
@@ -1175,42 +1174,16 @@ static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t therm
 // String-drawing Routines
 //
 
-static int16_t font_lump_offset;
-
-//
-// Find string width from hu_font chars
-//
-
-static int16_t M_StringWidth(const char __far* string)
-{
-	int16_t	w = 0;
-
-	for (size_t i = 0; i < _fstrlen(string); i++)
-	{
-		char c = string[i];
-		c = toupper(c);
-		if (HU_FONTSTART <= c && c <= HU_FONTEND)
-		{
-			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
-			w += patch->width;
-			Z_ChangeTagToCache(patch);
-		} else
-			w += HU_FONT_SPACE_WIDTH;
-	}
-
-	return w;
-}
-
 //
 //    Find string height from hu_font chars
 //
 
 static int16_t M_StringHeight(const char* string)
 {
-	int16_t i, h = HU_FONT_HEIGHT;
-	for (i = 0; string[i]; i++)            // killough 1/31/98
+	int16_t i, h = 1;
+	for (i = 0; string[i]; i++)
 		if (string[i] == '\n')
-			h += HU_FONT_HEIGHT;
+			h += 1;
 	return h;
 }
 
@@ -1230,20 +1203,12 @@ static void M_WriteText (int16_t x, int16_t y, const char __far* string)
 
 		if (c == '\n') {
 			cx = x;
-			cy += 12;
+			cy += 1;
 			continue;
 		}
 
-		c = toupper(c);
-		if (HU_FONTSTART <= c && c <= HU_FONTEND)
-		{
-			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
-			V_DrawPatchNotScaled(cx, cy, patch);
-			cx += patch->width;
-			Z_ChangeTagToCache(patch);
-		} else {
-			cx += HU_FONT_SPACE_WIDTH;
-		}
+		V_DrawCharacter(cx, cy, c);
+		cx++;
 	}
 }
 
@@ -1265,8 +1230,6 @@ void M_Init(void)
 	messageToPrint        = false;
 	messageString         = NULL;
 	messageLastMenuActive = _g_menuactive;
-
-	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 
 	G_UpdateSaveGameStrings();
 }
