@@ -123,9 +123,6 @@ static st_number_t w_maxammo[4];
 // armor widget
 static st_number_t  st_armor;
 
-// used for evil grin
-static boolean  oldweaponsowned[NUMWEAPONS];
-
 // a random number per tick
 static int16_t      st_randomnumber;
 
@@ -460,12 +457,7 @@ static void ST_loadData(void)
 
 static void ST_initData(void)
 {
-    int8_t i;
-
     st_palette = -1;
-
-    for (i=0;i<NUMWEAPONS;i++)
-        oldweaponsowned[i] = _g_player.weaponowned[i];
 }
 
 
