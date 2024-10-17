@@ -83,119 +83,11 @@ typedef struct
 } st_number_t;
 
 
-// Multiple Icon widget
-typedef struct
-{
-  // center-justified location of icons
-  int16_t     x;
-  int16_t     y;
-
-  // last icon number
-  int16_t     oldinum;
-
-  // pointer to current icon
-  int16_t*    inum;
-
-  // list of icons
-  int16_t*   p;
-
-} st_multicon_t;
-
-
-// 0-9, tall numbers
-static int16_t tallnum[10];
-
-// 0-9, short, yellow (,different!) numbers
-static int16_t shortnum[10];
-
 // ready-weapon widget
 static st_number_t w_ready;
 
-// ammo widgets
-static st_number_t w_ammo[4];
-
-// max ammo widgets
-static st_number_t w_maxammo[4];
-
-// a random number per tick
-static int16_t      st_randomnumber;
 
 static int8_t st_palette;
-
-
-// Size of statusbar.
-// Now sensitive for scaling.
-
-// proff 08/18/98: Changed for high-res
-#define ST_Y      (SCREENHEIGHT - ST_HEIGHT)
-
-
-//
-// STATUS BAR DATA
-//
-
-// Location of status bar
-#define ST_X                    0
-
-
-// Location and size of statistics,
-//  justified according to widget type.
-// Problem is, within which space? STbar? Screen?
-// Note: this could be read in by a lump.
-//       Problem is, is the stuff rendered
-//       into a buffer,
-//       or into the frame buffer?
-// I dunno, why don't you go and find out!!!  killough
-
-// AMMO number pos.
-#define ST_AMMOWIDTH            3
-// proff 08/18/98: Changed for high-res
-#define ST_AMMOX                (ST_X+32)
-#define ST_AMMOY                (ST_Y+6)
-
-// Ammunition counter.
-#define ST_AMMO0WIDTH           3
-// proff 08/18/98: Changed for high-res
-#define ST_AMMO0X               (ST_X+220)
-#define ST_AMMO0Y               (ST_Y+5)
-
-#define ST_AMMO1WIDTH           ST_AMMO0WIDTH
-// proff 08/18/98: Changed for high-res
-#define ST_AMMO1X               (ST_X+220)
-#define ST_AMMO1Y               (ST_Y+11)
-
-#define ST_AMMO2WIDTH           ST_AMMO0WIDTH
-// proff 08/18/98: Changed for high-res
-#define ST_AMMO2X               (ST_X+220)
-#define ST_AMMO2Y               (ST_Y+23)
-
-#define ST_AMMO3WIDTH           ST_AMMO0WIDTH
-// proff 08/18/98: Changed for high-res
-#define ST_AMMO3X               (ST_X+220)
-#define ST_AMMO3Y               (ST_Y+17)
-
-
-// Indicate maximum ammunition.
-// Only needed because backpack exists.
-#define ST_MAXAMMO0WIDTH        3
-// proff 08/18/98: Changed for high-res
-#define ST_MAXAMMO0X            (ST_X+238)
-#define ST_MAXAMMO0Y            (ST_Y+5)
-
-#define ST_MAXAMMO1WIDTH        ST_MAXAMMO0WIDTH
-// proff 08/18/98: Changed for high-res
-#define ST_MAXAMMO1X            (ST_X+238)
-#define ST_MAXAMMO1Y            (ST_Y+11)
-
-#define ST_MAXAMMO2WIDTH        ST_MAXAMMO0WIDTH
-// proff 08/18/98: Changed for high-res
-#define ST_MAXAMMO2X            (ST_X+238)
-#define ST_MAXAMMO2Y            (ST_Y+23)
-
-#define ST_MAXAMMO3WIDTH        ST_MAXAMMO0WIDTH
-// proff 08/18/98: Changed for high-res
-#define ST_MAXAMMO3X            (ST_X+238)
-#define ST_MAXAMMO3Y            (ST_Y+17)
 
 
 //
@@ -205,24 +97,10 @@ static int8_t st_palette;
 static void ST_Stop(void);
 
 
-static int16_t largeammo = 1994; // means "n/a"
-
-static void ST_updateWidgets(void)
-{
-    int8_t         i;
-
-    if(_g_fps_show)
-        w_ready.num = &_g_fps_framerate;
-    else if (weaponinfo[_g_player.readyweapon].ammo == am_noammo)
-        w_ready.num = &largeammo;
-    else
-        w_ready.num = &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo];
-}
-
 void ST_Ticker(void)
 {
-  st_randomnumber = M_Random();
-  ST_updateWidgets();
+    if(_g_fps_show)
+        w_ready.num = &_g_fps_framerate;
 }
 
 
@@ -277,84 +155,6 @@ void ST_doPaletteStuff(void)
     if (palette != st_palette) {
         I_SetPalette(st_palette = palette);
     }
-}
-
-
-//
-// STlib_updateMultIcon()
-//
-// Draw a st_multicon_t widget, used for a multigraphic display
-// like the status bar's keys. Displays each when the control
-// numbers change
-//
-// Passed a st_multicon_t widget
-// Returns nothing.
-//
-static void STlib_updateMultIcon(st_multicon_t* mi)
-{
-    if(!mi->p)
-        return;
-
-    if (*mi->inum != -1)  // killough 2/16/98: redraw only if != -1
-		V_DrawNumPatchNotScaled(mi->x, mi->y, mi->p[*mi->inum]);
-
-    mi->oldinum = *mi->inum;
-
-}
-
-
-/*
- * STlib_drawNum()
- *
- * A fairly efficient way to draw a number based on differences from the
- * old number.
- *
- * Passed a st_number_t widget
- * Returns nothing
- *
- * jff 2/16/98 add color translation to digit output
- * cphipps 10/99 - const pointer to colour trans table, made function static
- */
-static void STlib_drawNumber(st_number_t* n)
-{
-
-  int16_t   numdigits = n->width;
-  int16_t   num = *n->num;
-
-  const int16_t   w = 1;
-  int16_t   x = n->x;
-
-  // CPhipps - compact some code, use num instead of *n->num
-  if ((n->oldnum = num) < 0)
-  {
-    if (numdigits == 2 && num < -9)
-      num = -9;
-    else if (numdigits == 3 && num < -99)
-      num = -99;
-
-    num = -num;
-  }
-
-  // clear the area
-  x = n->x - numdigits*w;
-
-  // if non-number, do not draw it
-  if (num == largeammo)
-    return;
-
-  x = n->x;
-
-  // in the special case of 0, you draw 0
-  if (!num)
-    V_DrawNumPatchNotScaled(x - w, n->y, n->p[0]);
-
-  // draw the new number
-  while (num && numdigits--)
-  {
-    x -= w;
-    V_DrawNumPatchNotScaled(x, n->y, n->p[num % 10]);
-    num /= 10;
-  }
 }
 
 
@@ -448,91 +248,11 @@ void ST_Drawer(void)
 }
 
 
-//
-// ST_loadData
-//
-// CPhipps - Loads graphics needed for status bar
-//
-static void ST_loadData(void)
-{
-    int8_t  i;
-    char namebuf[9];
-
-    // Load the numbers, tall and short
-    for (i=0;i<10;i++)
-    {
-		sprintf(namebuf, "STGANUM%d", i); //Special GBA Doom II Red Numbers ~Kippykip
-        tallnum[i] = W_GetNumForName(namebuf);
-
-        sprintf(namebuf, "STYSNUM%d", i);
-        shortnum[i] = W_GetNumForName(namebuf);
-    }
-}
-
-
 static void ST_initData(void)
 {
     st_palette = -1;
 }
 
-
-//
-// STlib_initMultIcon()
-//
-// Initialize a st_multicon_t widget, used for a multigraphic display
-// like the status bar's keys.
-//
-// Passed a st_multicon_t widget, the position, the graphic patches, and a pointer
-// to the numbers representing what to display
-// Returns nothing.
-//
-static void STlib_initMultIcon(st_multicon_t* i, int16_t x, int16_t y, int16_t* il, int16_t* inum)
-{
-	i->x       = x;
-	i->y       = y;
-	i->oldinum = -1;
-	i->inum    = inum;
-	i->p       = il;
-}
-
-
-//
-// STlib_initNum()
-//
-// Initializes an st_number_t widget
-//
-// Passed the widget, its position, the patches for the digits, a pointer
-// to the value displayed, and the width
-// Returns nothing
-//
-static void STlib_initNum(st_number_t* n, int16_t x, int16_t y, int16_t* pl, int16_t* num, int16_t width)
-{
-	n->x      = x;
-	n->y      = y;
-	n->oldnum = 0;
-	n->width  = width;
-	n->num    = num;
-	n->p      = pl;
-}
-
-
-static void ST_createWidgets(void)
-{
-    // ready weapon ammo
-    STlib_initNum(&w_ready, ST_AMMOX, ST_AMMOY, tallnum, &_g_player.ammo[weaponinfo[_g_player.readyweapon].ammo], ST_AMMOWIDTH);
-
-	// ammo count (all four kinds)
-	STlib_initNum(&w_ammo[0], ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
-	STlib_initNum(&w_ammo[1], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
-	STlib_initNum(&w_ammo[2], ST_AMMO2X, ST_AMMO2Y, shortnum, &_g_player.ammo[2], ST_AMMO2WIDTH);
-	STlib_initNum(&w_ammo[3], ST_AMMO3X, ST_AMMO3Y, shortnum, &_g_player.ammo[3], ST_AMMO3WIDTH);
-
-	// max ammo count (all four kinds)
-	STlib_initNum(&w_maxammo[0], ST_MAXAMMO0X, ST_MAXAMMO0Y, shortnum, &_g_player.maxammo[0], ST_MAXAMMO0WIDTH);
-	STlib_initNum(&w_maxammo[1], ST_MAXAMMO1X, ST_MAXAMMO1Y, shortnum, &_g_player.maxammo[1], ST_MAXAMMO1WIDTH);
-	STlib_initNum(&w_maxammo[2], ST_MAXAMMO2X, ST_MAXAMMO2Y, shortnum, &_g_player.maxammo[2], ST_MAXAMMO2WIDTH);
-	STlib_initNum(&w_maxammo[3], ST_MAXAMMO3X, ST_MAXAMMO3Y, shortnum, &_g_player.maxammo[3], ST_MAXAMMO3WIDTH);
-}
 
 static boolean st_stopped = true;
 
@@ -541,7 +261,6 @@ void ST_Start(void)
   if (!st_stopped)
     ST_Stop();
   ST_initData();
-  ST_createWidgets();
   st_stopped = false;
 }
 
@@ -555,5 +274,5 @@ static void ST_Stop(void)
 
 void ST_Init(void)
 {
-  ST_loadData();
+	// Do nothing
 }
