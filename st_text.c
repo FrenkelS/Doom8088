@@ -384,8 +384,14 @@ static void STlib_drawNum(int16_t x, int16_t y, uint8_t color, int16_t num)
 
 static void ST_drawWidgets(void)
 {
-    STlib_drawNumber(&w_ready);
-	
+	// ammo
+	if (_g_fps_show)
+		STlib_drawNum(8, 23, 12, _g_fps_framerate);
+	else if (weaponinfo[_g_player.readyweapon].ammo != am_noammo)
+		STlib_drawNum(8, 23, 12, _g_player.ammo[weaponinfo[_g_player.readyweapon].ammo]);
+	else
+		V_DrawString(8, 23, 12, "   ");
+
 	// Restore the ammo numbers for backpack stats I guess, etc ~Kippykip
 	for (int8_t i = 0; i < 4; i++)
     {
