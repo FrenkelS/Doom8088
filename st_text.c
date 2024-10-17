@@ -55,38 +55,6 @@
 #include "globdata.h"
 
 
-//
-// Typedefs of widgets
-//
-
-// Number widget
-
-typedef struct
-{
-  // upper right-hand corner
-  //  of the number (right-justified)
-  int16_t   x;
-  int16_t   y;
-
-  // max # of digits in number
-  int16_t width;
-
-  // last number value
-  int16_t   oldnum;
-
-  // pointer to current value
-  int16_t*  num;
-
-  // list of patches for 0-9
-  int16_t* p;
-
-} st_number_t;
-
-
-// ready-weapon widget
-static st_number_t w_ready;
-
-
 static int8_t st_palette;
 
 
@@ -99,8 +67,15 @@ static void ST_Stop(void);
 
 void ST_Ticker(void)
 {
-    if(_g_fps_show)
-        w_ready.num = &_g_fps_framerate;
+	// Somehow removing this code results in a linker error:
+	//
+	// /usr/lib/x86_64-linux-gnu/gcc/ia16-elf/6.3.0/../../../../../ia16-elf/bin/ld: BFD (GNU Binutils) 2.39 internal error, aborting at ../../bfd/linker.c:2204 in _bfd_generic_link_output_symbols
+	//
+	// /usr/lib/x86_64-linux-gnu/gcc/ia16-elf/6.3.0/../../../../../ia16-elf/bin/ld: Please report this bug.
+
+	static int16_t num;
+	if (_g_fps_show)
+		num = _g_fps_framerate;
 }
 
 
