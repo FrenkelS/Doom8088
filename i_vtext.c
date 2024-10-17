@@ -78,38 +78,12 @@ void I_ReloadPalette(void)
 }
 
 
-static const int8_t colors_tandy[14] =
+static const int8_t colors[14] =
 {
-	0,									// normal
-	4, 4, 4, 4, 0x1c, 0x1c, 0x1c, 0x1c,	// red
-	6, 6, 0x1e, 0x1e,					// yellow
-	2									// green
-};
-
-
-static const uint8_t colors_vga[14][3] =
-{
-	// normal
-	{0, 0, 0},
-
-	// red
-	{0x07, 0, 0},
-	{0x0e, 0, 0},
-	{0x15, 0, 0},
-	{0x1c, 0, 0},
-	{0x23, 0, 0},
-	{0x2a, 0, 0},
-	{0x31, 0, 0},
-	{0x3b, 0, 0},
-
-	// yellow
-	{0x06, 0x05, 0x02},
-	{0x0d, 0x0b, 0x04},
-	{0x14, 0x11, 0x06},
-	{0x1a, 0x17, 0x08},
-
-	// green
-	{0, 0x08, 0}
+	0,							// normal
+	4, 4, 4, 4, 12, 12, 12, 12,	// red
+	6, 6, 14, 14,				// yellow
+	2							// green
 };
 
 
@@ -117,15 +91,15 @@ static void I_UploadNewPalette(int8_t pal)
 {
 	// TODO detect video card
 
-	// Tandy 1000
-	outp(0x3da, 0x10);
-	outp(0x3de, colors_tandy[pal]);
+	// PCjr,Tandy,EGA,MCGA,VGA
+	union REGS regs;
+	regs.w.ax = 0x1000;
+	regs.h.bl = 0x00;
+	regs.h.bh = colors_cga[pal];
+	int86(0x10, &regs, &regs);
 
-	// VGA
-	outp(0x3c8, 0);
-	outp(0x3c9, colors_vga[pal][0]);
-	outp(0x3c9, colors_vga[pal][1]);
-	outp(0x3c9, colors_vga[pal][2]);
+	// CGA
+	outp(0x3d9, colors_cga[pal]);
 }
 
 
