@@ -95,11 +95,11 @@ static void I_UploadNewPalette(int8_t pal)
 	union REGS regs;
 	regs.w.ax = 0x1000;
 	regs.h.bl = 0x00;
-	regs.h.bh = colors_cga[pal];
+	regs.h.bh = colors[pal];
 	int86(0x10, &regs, &regs);
 
 	// CGA
-	outp(0x3d9, colors_cga[pal]);
+	outp(0x3d9, colors[pal]);
 }
 
 
