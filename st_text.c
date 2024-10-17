@@ -185,11 +185,11 @@ static void ST_drawWidgets(void)
 {
 	// ammo
 	if (_g_fps_show)
-		STlib_drawFps(7, 23, 12, _g_fps_framerate);
+		STlib_drawFps(7, 23, 4, _g_fps_framerate);
 	else if (weaponinfo[_g_player.readyweapon].ammo != am_noammo)
-		STlib_drawNum(8, 23, 12, _g_player.ammo[weaponinfo[_g_player.readyweapon].ammo]);
+		STlib_drawNum(8, 23, 4, _g_player.ammo[weaponinfo[_g_player.readyweapon].ammo]);
 	else
-		V_DrawString(8, 23, 12, "   ");
+		V_DrawString(8, 23, 4, "   ");
 
 	for (int16_t i = 0; i < NUMAMMO; i++)
 	{
@@ -197,8 +197,10 @@ static void ST_drawWidgets(void)
 		STlib_drawNum(VIEWWINDOWWIDTH - 4, 20 + i, 14, _g_player.maxammo[i]);
 	}
 
-	STlib_drawNum(8, 21, 12, _g_player.health);
-	STlib_drawNum(8, 22, 12, _g_player.armorpoints);
+	int16_t healthcolor = _g_player.health < 40 ? 12 : 4;
+	STlib_drawNum(8, 21, healthcolor, _g_player.health);
+
+	STlib_drawNum(8, 22, 4, _g_player.armorpoints);
 
 	// keys
 	if (_g_player.cards[0])
