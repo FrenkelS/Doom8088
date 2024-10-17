@@ -392,12 +392,11 @@ static void ST_drawWidgets(void)
 	else
 		V_DrawString(8, 23, 12, "   ");
 
-	// Restore the ammo numbers for backpack stats I guess, etc ~Kippykip
-	for (int8_t i = 0; i < 4; i++)
-    {
-		STlib_drawNumber(&w_ammo[i]);
-		STlib_drawNumber(&w_maxammo[i]);
-    }
+	for (int16_t i = 0; i < NUMAMMO; i++)
+	{
+		STlib_drawNum(VIEWWINDOWWIDTH - 8, 20 + i, 14, _g_player.ammo[i]);
+		STlib_drawNum(VIEWWINDOWWIDTH - 4, 20 + i, 14, _g_player.maxammo[i]);
+	}
 
 	STlib_drawNum(8, 21, 12, _g_player.health);
 	STlib_drawNum(8, 22, 12, _g_player.armorpoints);
@@ -429,8 +428,13 @@ static void ST_refreshBackground(void)
 
 	V_DrawString(VIEWWINDOWWIDTH - 13, 20, 7, "Bull ");
 	V_DrawString(VIEWWINDOWWIDTH - 13, 21, 7, "Shel ");
-	V_DrawString(VIEWWINDOWWIDTH - 13, 22, 7, "Rckt ");
-	V_DrawString(VIEWWINDOWWIDTH - 13, 23, 7, "Cell ");
+	V_DrawString(VIEWWINDOWWIDTH - 13, 22, 7, "Cell ");
+	V_DrawString(VIEWWINDOWWIDTH - 13, 23, 7, "Rckt ");
+
+	V_DrawCharacter(VIEWWINDOWWIDTH - 5, 20, 7, '/');
+	V_DrawCharacter(VIEWWINDOWWIDTH - 5, 21, 7, '/');
+	V_DrawCharacter(VIEWWINDOWWIDTH - 5, 22, 7, '/');
+	V_DrawCharacter(VIEWWINDOWWIDTH - 5, 23, 7, '/');
 }
 
 
