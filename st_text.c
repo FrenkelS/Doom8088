@@ -157,11 +157,35 @@ static void STlib_drawNum(int16_t x, int16_t y, uint8_t color, int16_t num)
 }
 
 
+static void STlib_drawFps(int16_t x, int16_t y, uint8_t color, int16_t num)
+{
+	if (0 <= num && num <= 9)
+	{
+		V_DrawCharacter(x + 3, y, color, '0' + num);
+		V_DrawCharacter(x + 1, y, color, '0');
+		V_DrawCharacter(x + 0, y, color, ' ');
+	}
+	else if (10 <= num && num <= 99)
+	{
+		V_DrawCharacter(x + 3, y, color, '0' + (num % 10));
+		V_DrawCharacter(x + 1, y, color, '0' + (num / 10));
+		V_DrawCharacter(x + 0, y, color, ' ');
+	}
+	else
+	{
+		V_DrawCharacter(x + 3, y, color, '0' + (num % 10));
+		num /= 10;
+		V_DrawCharacter(x + 1, y, color, '0' + (num % 10));
+		V_DrawCharacter(x + 0, y, color, '0' + (num / 10));
+	}
+}
+
+
 static void ST_drawWidgets(void)
 {
 	// ammo
 	if (_g_fps_show)
-		STlib_drawNum(8, 23, 12, _g_fps_framerate);
+		STlib_drawFps(7, 23, 12, _g_fps_framerate);
 	else if (weaponinfo[_g_player.readyweapon].ammo != am_noammo)
 		STlib_drawNum(8, 23, 12, _g_player.ammo[weaponinfo[_g_player.readyweapon].ammo]);
 	else
@@ -199,7 +223,11 @@ static void ST_refreshBackground(void)
 	V_DrawString(1, 20, 7, "Keys   ");
 	V_DrawString(1, 21, 7, "Health ");
 	V_DrawString(1, 22, 7, "Armor  ");
-	V_DrawString(1, 23, 7, "Ammo   ");
+
+	if (_g_fps_show)
+		V_DrawString(1, 23, 7, "FPS     .");
+	else
+		V_DrawString(1, 23, 7, "Ammo   ");
 
 	V_DrawString(VIEWWINDOWWIDTH - 13, 20, 7, "Bull ");
 	V_DrawString(VIEWWINDOWWIDTH - 13, 21, 7, "Shel ");
