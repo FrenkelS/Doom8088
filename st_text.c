@@ -334,7 +334,7 @@ static void STlib_updateMultIcon(st_multicon_t* mi)
  * jff 2/16/98 add color translation to digit output
  * cphipps 10/99 - const pointer to colour trans table, made function static
  */
-static void STlib_drawNum(st_number_t* n)
+static void STlib_drawNumber(st_number_t* n)
 {
 
   int16_t   numdigits = n->width;
@@ -377,19 +377,45 @@ static void STlib_drawNum(st_number_t* n)
 }
 
 
+static void STlib_drawNum(int16_t x, int16_t y, uint8_t color, int16_t num)
+{
+	if (0 <= num && num <= 9)
+	{
+		V_DrawCharacter(x + 2, y, color, '0' + num);
+		V_DrawCharacter(x + 1, y, color, ' ');
+		V_DrawCharacter(x + 0, y, color, ' ');
+	}
+	else if (10 <= num && num <= 99)
+	{
+		V_DrawCharacter(x + 2, y, color, '0' + (num % 10));
+		V_DrawCharacter(x + 1, y, color, '0' + (num / 10));
+		V_DrawCharacter(x + 0, y, color, ' ');
+	}
+	else
+	{
+		V_DrawCharacter(x + 2, y, color, '0' + (num % 10));
+		num /= 10;
+		V_DrawCharacter(x + 1, y, color, '0' + (num % 10));
+		V_DrawCharacter(x + 0, y, color, '0' + (num / 10));
+	}
+}
+
+
 static void ST_drawWidgets(void)
 {
-    STlib_drawNum(&w_ready);
+    STlib_drawNumber(&w_ready);
 	
 	// Restore the ammo numbers for backpack stats I guess, etc ~Kippykip
 	for (int8_t i = 0; i < 4; i++)
     {
-		STlib_drawNum(&w_ammo[i]);
-		STlib_drawNum(&w_maxammo[i]);
+		STlib_drawNumber(&w_ammo[i]);
+		STlib_drawNumber(&w_maxammo[i]);
     }
 
-    STlib_drawNum(&st_health);
-    STlib_drawNum(&st_armor);
+    STlib_drawNumber(&st_health);
+    STlib_drawNumber(&st_armor);
+
+	STlib_drawNum(8, 22, 12, _g_player.armorpoints);
 
 	// keys
 	if (_g_player.cards[0])
