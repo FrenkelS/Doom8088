@@ -120,9 +120,6 @@ static st_number_t w_ammo[4];
 // max ammo widgets
 static st_number_t w_maxammo[4];
 
-// armor widget
-static st_number_t  st_armor;
-
 // a random number per tick
 static int16_t      st_randomnumber;
 
@@ -164,13 +161,6 @@ static int8_t st_palette;
 // proff 08/18/98: Changed for high-res
 #define ST_HEALTHX              (ST_X+66)
 #define ST_HEALTHY              (ST_Y+6)
-
-
-// ARMOR number pos.
-#define ST_ARMORWIDTH           3
-// proff 08/18/98: Changed for high-res
-#define ST_ARMORX               (ST_X+166)
-#define ST_ARMORY               (ST_Y+6)
 
 // Ammunition counter.
 #define ST_AMMO0WIDTH           3
@@ -413,7 +403,6 @@ static void ST_drawWidgets(void)
     }
 
     STlib_drawNumber(&st_health);
-    STlib_drawNumber(&st_armor);
 
 	STlib_drawNum(8, 22, 12, _g_player.armorpoints);
 
@@ -535,9 +524,6 @@ static void ST_createWidgets(void)
     // health percentage
     STlib_initNum(&st_health, ST_HEALTHX, ST_HEALTHY, tallnum, &_g_player.health, ST_HEALTHWIDTH);
 					  
-    // armor percentage - should be colored later
-    STlib_initNum(&st_armor, ST_ARMORX, ST_ARMORY, tallnum, &_g_player.armorpoints, ST_ARMORWIDTH);
-
 	// ammo count (all four kinds)
 	STlib_initNum(&w_ammo[0], ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
 	STlib_initNum(&w_ammo[1], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
