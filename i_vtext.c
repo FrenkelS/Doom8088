@@ -465,12 +465,6 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 }
 
 
-void ST_Drawer(void)
-{
-	ST_doRefresh();
-}
-
-
 void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c)
 {
 	_s_screen[y * PLANEWIDTH + (x << 1) - 1] = c;

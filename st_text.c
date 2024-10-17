@@ -444,7 +444,7 @@ static void ST_refreshBackground(void)
 }
 
 
-void ST_doRefresh(void)
+void ST_Drawer(void)
 {
   // draw status bar background to off-screen buff
   ST_refreshBackground();
