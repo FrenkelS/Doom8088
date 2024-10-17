@@ -108,17 +108,11 @@ static int16_t tallnum[10];
 // 0-9, short, yellow (,different!) numbers
 static int16_t shortnum[10];
 
-// weapon ownership patches
-static int16_t arms[6][2];
-
 // ready-weapon widget
 static st_number_t w_ready;
 
 // health widget
 static st_number_t st_health;
-
-// weapon ownership widgets
-static st_multicon_t w_arms[6];
 
 // ammo widgets
 static st_number_t w_ammo[4];
@@ -173,15 +167,6 @@ static int8_t st_palette;
 // proff 08/18/98: Changed for high-res
 #define ST_HEALTHX              (ST_X+66)
 #define ST_HEALTHY              (ST_Y+6)
-
-
-// Weapon pos.
-// proff 08/18/98: Changed for high-res
-#define ST_ARMSX                (ST_X+82)
-#define ST_ARMSY                (ST_Y+4)
-
-#define ST_ARMSXSPACE           8
-#define ST_ARMSYSPACE           10
 
 
 // ARMOR number pos.
@@ -424,9 +409,6 @@ static void ST_drawWidgets(void)
 		V_DrawCharacter(10, 20, 12, '\x14');
 	else
 		V_DrawCharacter(10, 20, 7, '\xf9');
-
-    for (int8_t i = 0; i < 6; i++)
-        STlib_updateMultIcon(&w_arms[i]);
 }
 
 
@@ -472,18 +454,6 @@ static void ST_loadData(void)
 
         sprintf(namebuf, "STYSNUM%d", i);
         shortnum[i] = W_GetNumForName(namebuf);
-    }
-
-    // arms ownership widgets
-    for (i=0;i<6;i++)
-    {
-        sprintf(namebuf, "STGNUM%d", i+2);
-
-        // gray #
-        arms[i][0] = W_GetNumForName(namebuf);
-
-        // yellow #
-        arms[i][1] = shortnum[i+2];
     }
 }
 
@@ -550,12 +520,6 @@ static void ST_createWidgets(void)
     // armor percentage - should be colored later
     STlib_initNum(&st_armor, ST_ARMORX, ST_ARMORY, tallnum, &_g_player.armorpoints, ST_ARMORWIDTH);
 
-    // weapons owned
-    for(int8_t i = 0; i < 6; i++)
-    {
-        STlib_initMultIcon(&w_arms[i], ST_ARMSX+(i%3)*ST_ARMSXSPACE, ST_ARMSY+(i/3)*ST_ARMSYSPACE, arms[i], &_g_player.weaponowned[i+1]);
-    }
-	
 	// ammo count (all four kinds)
 	STlib_initNum(&w_ammo[0], ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
 	STlib_initNum(&w_ammo[1], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
