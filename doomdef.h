@@ -63,12 +63,18 @@
 #define HIBYTE(w)	(((uint8_t *)&w)[1])
 
 
+#if !defined VIEWWINDOWWIDTH
 #define VIEWWINDOWWIDTH  60
+#endif
+
+#if !defined VIEWWINDOWHEIGHT
 #define VIEWWINDOWHEIGHT 128
+#endif
+
 
 // SCREENWIDTH and SCREENHEIGHT define the visible size
 #define SCREENWIDTH  240u
-#define SCREENHEIGHT (VIEWWINDOWHEIGHT+ST_HEIGHT)
+#define SCREENHEIGHT 160 /*(VIEWWINDOWHEIGHT+ST_HEIGHT)*/
 
 #define SCREENWIDTH_VGA  320
 #define SCREENHEIGHT_VGA 200
