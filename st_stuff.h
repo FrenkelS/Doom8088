@@ -51,6 +51,7 @@
 // Called by main loop.
 void ST_Ticker(void);
 
+void ST_initPalette(void);
 void ST_doPaletteStuff(void);
 
 // Called by main loop.

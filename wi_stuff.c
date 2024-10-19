@@ -180,28 +180,6 @@ static const char total[] = {"WIMSTT"};
 // CODE
 //
 
-
-/* cph -
- * Functions to return width & height of a patch.
- * Doesn't really belong here, but is often used in conjunction with
- * this code.
- */
-int16_t V_NumPatchWidth(int16_t num)
-{
-	const patch_t __far* patch = W_GetLumpByNum(num);
-	int16_t width = patch->width;
-	Z_ChangeTagToCache(patch);
-	return width;
-}
-
-int16_t V_NumPatchWidthDontCache(int16_t num)
-{
-	if (W_IsLumpCached(num))
-		return V_NumPatchWidth(num);
-	else
-		return W_GetFirstInt16(num);
-}
-
 static int16_t V_NamePatchWidth(const char *name)
 {
 	return V_NumPatchWidth(W_GetNumForName(name));

@@ -50,6 +50,7 @@ set CFLAGS=%CFLAGS% -DFLAT_SPAN -DC_ONLY
 @set GLOBOBJS=%GLOBOBJS% r_things.c
 @set GLOBOBJS=%GLOBOBJS% s_sound.c
 @set GLOBOBJS=%GLOBOBJS% sounds.c
+@set GLOBOBJS=%GLOBOBJS% st_pal.c
 @set GLOBOBJS=%GLOBOBJS% st_stuff.c
 @set GLOBOBJS=%GLOBOBJS% tables.c
 @set GLOBOBJS=%GLOBOBJS% v_video.c

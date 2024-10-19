@@ -78,6 +78,7 @@ GLOBOBJS = &
  r_things.obj &
  s_sound.obj &
  sounds.obj &
+ st_pal.obj &
  st_stuff.obj &
  tables.obj &
  v_video.obj &
