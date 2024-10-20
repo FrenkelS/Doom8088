@@ -90,6 +90,30 @@ static boolean snl_pointeron;
 //#define SP_TIMEY      (SCREENHEIGHT-32)
 
 
+typedef struct
+{
+  int16_t   x;       // x/y coordinate pair structure
+  int16_t   y;
+} point_t;
+
+#define NUMMAPS     9
+
+static const point_t lnodes[NUMMAPS] =
+{
+	{185 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA, 164 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}, // location of level 1
+	{148 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA, 143 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}, // location of level 2
+	{ 69 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA, 122 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}, // location of level 3
+	{209 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA, 102 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}, // location of level 4
+	{116 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA,  89 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}, // location of level 5
+	{166 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA,  55 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}, // location of level 6
+	{ 71 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA,  56 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}, // location of level 7
+	{135 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA,  29 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}, // location of level 8
+	{ 71 * VIEWWINDOWWIDTH / SCREENWIDTH_VGA,  24 * VIEWWINDOWHEIGHT / SCREENHEIGHT_VGA}  // location of level 9
+};
+
+
+
+
 //
 // GENERAL DATA
 //
@@ -446,10 +470,27 @@ static void WI_updateShowNextLoc(void)
 //
 static void WI_drawShowNextLoc(void)
 {
-    WI_slamBackground();
+	int16_t   i;
+	int16_t   last;
 
-    // draws which level you are entering..
-    WI_drawEL();
+	WI_slamBackground();
+
+	last = (wbs->last == 8) ? wbs->next - 1 : wbs->last;
+
+	// draw a splat on taken cities.
+	for (i=0 ; i<=last ; i++)
+		V_DrawCharacterForeground(lnodes[i].x, lnodes[i].y, 12, '\x0f');
+
+	// splat the secret level?
+	if (wbs->didsecret)
+		V_DrawCharacterForeground(lnodes[8].x, lnodes[8].y, 12, '\x0f');
+
+	// draw flashing ptr
+	if (snl_pointeron)
+		V_DrawCharacterForeground(lnodes[wbs->next].x, lnodes[wbs->next].y, 12, '\x02');
+
+	// draws which level you are entering..
+	WI_drawEL();
 }
 
 // ====================================================================

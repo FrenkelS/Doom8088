@@ -446,6 +446,15 @@ void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c)
 }
 
 
+void V_DrawCharacterForeground(int16_t x, int16_t y, uint8_t color, char c)
+{
+	_s_screen[y * PLANEWIDTH + (x << 1) - 1] = c;
+
+	uint8_t background = _s_screen[y * PLANEWIDTH + (x << 1)] & 0xf0;
+	_s_screen[y * PLANEWIDTH + (x << 1)] = background | color;
+}
+
+
 void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s)
 {
 	x <<= 1;

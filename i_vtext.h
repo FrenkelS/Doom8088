@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
 #define __I_TEXT_MODE__
 
 void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c);
+void V_DrawCharacterForeground(int16_t x, int16_t y, uint8_t color, char c);
 void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
 void V_ClearString(int16_t y, size_t len);
 
