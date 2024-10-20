@@ -140,40 +140,40 @@ static const point_t lnodes[NUMMAPS] =
 //
 
 // You Are Here graphic
-static const char* const yah[2] = { "WIURH0", "WIURH1" };
+static const char* const yah = "WIURH0";
 
 // splat
 static const char* const splat = "WISPLAT";
 
 // %, : graphics
-static const char percent[] = {"WIPCNT"};
-static const char colon[] = {"WICOLON"};
+static const char* const percent = "WIPCNT";
+static const char* const colon = "WICOLON";
 
 
 
 // minus sign
-static const char wiminus[] = {"WIMINUS"};
+static const char* const wiminus = "WIMINUS";
 
 // "Finished!" graphics
-static const char finished[] = {"WIF"};
+static const char* const finished = "WIF";
 
 // "Entering" graphic
-static const char entering[] = {"WIENTER"};
+static const char* const entering = "WIENTER";
 
 // "secret"
-static const char sp_secret[] = {"WISCRT2"};
+static const char* const sp_secret = "WISCRT2";
 
 // "Kills", "Scrt", "Items", "Frags"
-static const char kills[] = {"WIOSTK"};
-static const char items[] = {"WIOSTI"};
+static const char* const kills = "WIOSTK";
+static const char* const items = "WIOSTI";
 
 // Time sucks.
-static const char time1[] = {"WITIME"};
-static const char par[] = {"WIPAR"};
-static const char sucks[] = {"WISUCKS"};
+static const char* const time1 = "WITIME";
+static const char* const par = "WIPAR";
+static const char* const sucks = "WISUCKS";
 
 // "Total", your face, your dead face
-static const char total[] = {"WIMSTT"};
+static const char* const total = "WIMSTT";
 
 
 //
@@ -268,56 +268,6 @@ static void WI_drawEL(void)
 
   // CPhipps - patch drawing updated
   V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
-}
-
-
-/* ====================================================================
- * WI_drawOnLnode
- * Purpose: Draw patches at a location based on episode/map
- * Args:    n   -- index to map# within episode
- *          c[] -- array of names of patches to be drawn
- * Returns: void
- */
-static void WI_drawOnLnode(int8_t n, const char* const c[])
-{
-	int8_t   i;
-	boolean fits = false;
-
-	i = 0;
-	do
-	{
-		int16_t            left;
-		int16_t            top;
-		int16_t            right;
-		int16_t            bottom;
-		const patch_t __far* patch = W_GetLumpByName(c[i]);
-
-		left = lnodes[n].x - patch->leftoffset;
-		top = lnodes[n].y - patch->topoffset;
-		right = left + patch->width;
-		bottom = top + patch->height;
-		Z_ChangeTagToCache(patch);
-
-		if (0 <= left && right < SCREENWIDTH_VGA && 0 <= top && bottom < SCREENHEIGHT_VGA)
-		{
-			fits = true;
-		}
-		else
-		{
-			i++;
-		}
-	} while (!fits && i != 2);
-
-	if (fits && i < 2)
-	{
-		// CPhipps - patch drawing updated
-		V_DrawNamePatchScaled(lnodes[n].x, lnodes[n].y, c[i]);
-	}
-	else
-	{
-		// DEBUG
-		printf("Could not place patch on level %d\n", n + 1);
-	}
 }
 
 
@@ -567,15 +517,15 @@ static void WI_drawShowNextLoc(void)
 
     // draw a splat on taken cities.
     for (i=0 ; i<=last ; i++)
-        WI_drawOnLnode(i, &splat);
+        V_DrawNamePatchScaled(lnodes[i].x, lnodes[i].y, splat);
 
     // splat the secret level?
     if (wbs->didsecret)
-        WI_drawOnLnode(8, &splat);
+        V_DrawNamePatchScaled(lnodes[8].x, lnodes[8].y, splat);
 
     // draw flashing ptr
     if (snl_pointeron)
-        WI_drawOnLnode(wbs->next, yah);
+        V_DrawNamePatchScaled(lnodes[i].x, lnodes[i].y, yah);
 
     // draws which level you are entering..
     WI_drawEL();
