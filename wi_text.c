@@ -70,26 +70,6 @@ static int16_t cnt_secret;
 static boolean snl_pointeron;
 
 
-//
-// Data needed to add patches to full screen intermission pics.
-// Patches are statistics messages, and animations.
-// Loads of by-pixel layout and placement, offsets etc.
-//
-
-
-// GLOBAL LOCATIONS
-#define WI_TITLEY      2
-
-// SINGLE-PLAYER STUFF
-#define SP_STATSX     50
-#define SP_STATSY     50
-
-#define SP_TIMEX      8
-// proff/nicolas 09/20/98 -- changed for hi-res
-#define SP_TIMEY      160
-//#define SP_TIMEY      (SCREENHEIGHT-32)
-
-
 typedef struct
 {
   int16_t   x;       // x/y coordinate pair structure
@@ -126,34 +106,6 @@ static const point_t lnodes[NUMMAPS] =
 // in seconds
 #define SHOWNEXTLOCDELAY  4
 //#define SHOWLASTLOCDELAY  SHOWNEXTLOCDELAY
-
-//
-//  GRAPHICS
-//
-
-// %, : graphics
-static const char percent[] = {"WIPCNT"};
-static const char colon[] = {"WICOLON"};
-
-
-
-// minus sign
-static const char wiminus[] = {"WIMINUS"};
-
-// "secret"
-static const char sp_secret[] = {"WISCRT2"};
-
-// "Kills", "Scrt", "Items", "Frags"
-static const char kills[] = {"WIOSTK"};
-static const char items[] = {"WIOSTI"};
-
-// Time sucks.
-static const char time1[] = {"WITIME"};
-static const char par[] = {"WIPAR"};
-static const char sucks[] = {"WISUCKS"};
-
-// "Total", your face, your dead face
-static const char total[] = {"WIMSTT"};
 
 
 //
@@ -235,16 +187,11 @@ static void WI_drawEL(void)
 //          n      -- the number to be drawn
 //          digits -- number of digits minimum or zero
 // Returns: new x position after drawing (note we are going to the left)
-// CPhipps - static
-
-//fontwidth = num[0]->width;
-#define fontwidth 11
 
 static int16_t WI_drawNum (int16_t x, int16_t y, int16_t n, int16_t digits)
 {
 	boolean   neg;
 	int16_t   temp;
-	char      name[9];  // limited to 8 characters
 
 	if (digits < 0)
 	{
@@ -278,17 +225,14 @@ static int16_t WI_drawNum (int16_t x, int16_t y, int16_t n, int16_t digits)
 	// draw the new number
 	while (digits--)
 	{
-		x -= fontwidth;
-		// CPhipps - patch drawing updated
-		sprintf(name, "WINUM%d", n % 10);
-		V_DrawNamePatchScaled(x, y, name);
+		x -= 1;
+		V_DrawCharacter(x, y, 12, '0' + n % 10);
 		n /= 10;
 	}
 
 	// draw a minus sign if necessary
 	if (neg)
-		// CPhipps - patch drawing updated
-		V_DrawNamePatchScaled(x-=8, y, wiminus);
+		V_DrawCharacter(x-=1, y, 12, '-');
 
 	return x;
 }
@@ -307,8 +251,7 @@ static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
   if (p < 0)
     return;
 
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(x, y, percent);
+  V_DrawCharacter(x, y, 12, '%');
   WI_drawNum(x, y, p, -1);
 }
 
@@ -335,16 +278,15 @@ static void WI_drawTime(int16_t x, int16_t y, int32_t t)
     for(;;) {
       n = t % 60;
       t /= 60;
-      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - V_NumPatchWidth(W_GetNumForName(colon));
+      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - 1;
 
       // draw
       if (t)
-  // CPhipps - patch drawing updated
-        V_DrawNamePatchScaled(x, y, colon);
+        V_DrawCharacter(x, y, 12, ':');
       else break;
     }
   else // "sucks" (maybe should be "addicted", even I've never had a 100 hour game ;)
-    V_DrawNamePatchScaled(x - V_NumPatchWidth(W_GetNumForName(sucks)), y, sucks);
+    V_DrawString(x - 5, y, 12, "Sucks");
 }
 
 
@@ -386,19 +328,14 @@ static void WI_initNoState(void)
 
 static void WI_drawTimeStats(void)
 {
-  V_DrawNamePatchScaled(SP_TIMEX, SP_TIMEY, time1);
-  WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, SP_TIMEY, cnt_time);
+  V_DrawString(1, 22, 12, "Time");
+  WI_drawTime(14, 22, cnt_time);
 
-  V_DrawNamePatchScaled(SP_TIMEX, (SP_TIMEY + SCREENHEIGHT_VGA) / 2, total);
-  WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, (SP_TIMEY + SCREENHEIGHT_VGA) / 2, cnt_total_time);
+  V_DrawString(1, 23, 12, "Total");
+  WI_drawTime(14, 23, cnt_total_time);
 
-  // Ty 04/11/98: redid logic: should skip only if with pwad but
-  // without deh patch
-  // killough 2/22/98: skip drawing par times on pwads
-  // Ty 03/17/98: unless pars changed with deh patch
-
-  V_DrawNamePatchScaled(SCREENWIDTH_VGA / 2 + SP_TIMEX, SP_TIMEY, par);
-  WI_drawTime(SCREENWIDTH_VGA - SP_TIMEX, SP_TIMEY, cnt_par);
+  V_DrawString(VIEWWINDOWWIDTH - 12, 22, 12, "Par");
+  WI_drawTime(VIEWWINDOWWIDTH - 1, 22, cnt_par);
 }
 
 // ====================================================================
@@ -428,15 +365,7 @@ static void WI_initShowNextLoc(void)
 
   state = ShowNextLoc;
   _g_acceleratestage = false;
-  
-  // e6y: That was pretty easy - only a HEX editor and luck
-  // There is no more desync on ddt-tas.zip\e4tux231.lmp
-  // --------- tasdoom.idb ---------
-  // .text:00031194 loc_31194:      ; CODE XREF: WI_updateStats+3A9j
-  // .text:00031194                 mov     ds:state, 1
-  // .text:0003119E                 mov     ds:acceleratestage, 0
-  // .text:000311A8                 mov     ds:cnt, 3Ch
-  // nowhere no hide
+
     cnt = SHOWNEXTLOCDELAY * TICRATE;
 }
 
@@ -646,12 +575,6 @@ static void WI_updateStats(void)
 // Args:    none
 // Returns: void
 //
-// proff/nicolas 09/20/98 -- changed for hi-res
-// CPhipps - patch drawing updated
-
-
-//lineHeight = (3 * num[0]->height) / 2;
-#define lineHeight 18
 
 static void WI_drawStats(void)
 {
@@ -659,17 +582,17 @@ static void WI_drawStats(void)
 
 	WI_drawLF();
 
-	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY, kills);
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 4, 12, "Kills");
 	if (cnt_kills)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY, cnt_kills);
+		WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 4, cnt_kills);
 
-	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY + lineHeight, items);
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 5, 12, "Items");
 	if (cnt_items)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + lineHeight, cnt_items);
+		WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 5, cnt_items);
 
-	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY + 2 * lineHeight, sp_secret);
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 6, 12, "Secret");
 	if (cnt_secret)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + 2 * lineHeight, cnt_secret);
+		WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 6, cnt_secret);
 
 	WI_drawTimeStats();
 }
