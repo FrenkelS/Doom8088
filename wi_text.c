@@ -160,12 +160,6 @@ static const char total[] = {"WIMSTT"};
 // CODE
 //
 
-static int16_t V_NamePatchWidth(const char *name)
-{
-	return V_NumPatchWidth(W_GetNumForName(name));
-}
-
-
 //
 // Builtin map names.
 //
@@ -341,7 +335,7 @@ static void WI_drawTime(int16_t x, int16_t y, int32_t t)
     for(;;) {
       n = t % 60;
       t /= 60;
-      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - V_NamePatchWidth(colon);
+      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - V_NumPatchWidth(W_GetNumForName(colon));
 
       // draw
       if (t)
@@ -350,7 +344,7 @@ static void WI_drawTime(int16_t x, int16_t y, int32_t t)
       else break;
     }
   else // "sucks" (maybe should be "addicted", even I've never had a 100 hour game ;)
-    V_DrawNamePatchScaled(x - V_NamePatchWidth(sucks), y, sucks);
+    V_DrawNamePatchScaled(x - V_NumPatchWidth(W_GetNumForName(sucks)), y, sucks);
 }
 
 
