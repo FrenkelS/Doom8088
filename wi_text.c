@@ -583,16 +583,13 @@ static void WI_drawStats(void)
 	WI_drawLF();
 
 	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 4, 12, "Kills");
-	if (cnt_kills)
-		WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 4, cnt_kills);
+	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 4, cnt_kills);
 
 	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 5, 12, "Items");
-	if (cnt_items)
-		WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 5, cnt_items);
+	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 5, cnt_items);
 
 	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 6, 12, "Secret");
-	if (cnt_secret)
-		WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 6, cnt_secret);
+	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 6, cnt_secret);
 
 	WI_drawTimeStats();
 }

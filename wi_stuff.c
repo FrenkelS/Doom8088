@@ -704,16 +704,13 @@ static void WI_drawStats(void)
 	WI_drawLF();
 
 	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY, kills);
-	if (cnt_kills)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY, cnt_kills);
+	WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY, cnt_kills);
 
 	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY + lineHeight, items);
-	if (cnt_items)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + lineHeight, cnt_items);
+	WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + lineHeight, cnt_items);
 
 	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY + 2 * lineHeight, sp_secret);
-	if (cnt_secret)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + 2 * lineHeight, cnt_secret);
+	WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + 2 * lineHeight, cnt_secret);
 
 	WI_drawTimeStats();
 }
