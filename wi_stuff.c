@@ -482,6 +482,18 @@ static void WI_updateShowNextLoc(void)
 }
 
 
+static void WI_drawSplat(int16_t i)
+{
+	V_DrawNamePatchScaled(lnodes[i].x, lnodes[i].y, splat);
+}
+
+
+static void WI_drawYouAreHere(int16_t i)
+{
+	V_DrawNamePatchScaled(lnodes[i].x, lnodes[i].y, yah);
+}
+
+
 // ====================================================================
 // WI_drawShowNextLoc
 // Purpose: Show the next level's location on animated backgrounds
@@ -496,15 +508,15 @@ static void WI_drawShowNextLoc(void)
 
     // draw a splat on taken cities.
     for (int16_t i=0 ; i<=last ; i++)
-        V_DrawNamePatchScaled(lnodes[i].x, lnodes[i].y, splat);
+        WI_drawSplat(i);
 
     // splat the secret level?
     if (wbs->didsecret)
-        V_DrawNamePatchScaled(lnodes[8].x, lnodes[8].y, splat);
+        WI_drawSplat(8);
 
     // draw flashing ptr
     if (snl_pointeron)
-        V_DrawNamePatchScaled(lnodes[wbs->next].x, lnodes[wbs->next].y, yah);
+        WI_drawYouAreHere(wbs->next);
 
     // draws which level you are entering..
     WI_drawEL();

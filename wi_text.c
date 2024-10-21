@@ -371,6 +371,18 @@ static void WI_updateShowNextLoc(void)
 }
 
 
+static void WI_drawSplat(int16_t i)
+{
+	V_DrawCharacterForeground(lnodes[i].x, lnodes[i].y, 12, '\x0f');
+}
+
+
+static void WI_drawYouAreHere(int16_t i)
+{
+	V_DrawCharacterForeground(lnodes[i].x, lnodes[i].y, 12, '\x02');
+}
+
+
 // ====================================================================
 // WI_drawShowNextLoc
 // Purpose: Show the next level's location on animated backgrounds
@@ -379,24 +391,21 @@ static void WI_updateShowNextLoc(void)
 //
 static void WI_drawShowNextLoc(void)
 {
-	int16_t   i;
-	int16_t   last;
-
 	WI_slamBackground();
 
-	last = (wbs->last == 8) ? wbs->next - 1 : wbs->last;
+	int16_t last = (wbs->last == 8) ? wbs->next - 1 : wbs->last;
 
 	// draw a splat on taken cities.
-	for (i=0 ; i<=last ; i++)
-		V_DrawCharacterForeground(lnodes[i].x, lnodes[i].y, 12, '\x0f');
+	for (int16_t i=0 ; i<=last ; i++)
+		WI_drawSplat(i);
 
 	// splat the secret level?
 	if (wbs->didsecret)
-		V_DrawCharacterForeground(lnodes[8].x, lnodes[8].y, 12, '\x0f');
+		WI_drawSplat(8);
 
 	// draw flashing ptr
 	if (snl_pointeron)
-		V_DrawCharacterForeground(lnodes[wbs->next].x, lnodes[wbs->next].y, 12, '\x02');
+		WI_drawYouAreHere(wbs->next);
 
 	// draws which level you are entering..
 	WI_drawEL();
