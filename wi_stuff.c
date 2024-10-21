@@ -150,10 +150,6 @@ static const char* const percent = "WIPCNT";
 static const char* const colon = "WICOLON";
 
 
-
-// minus sign
-static const char* const wiminus = "WIMINUS";
-
 // "Finished!" graphics
 static const char* const finished = "WIF";
 
@@ -284,40 +280,9 @@ static void WI_drawEL(void)
 //fontwidth = num[0]->width;
 #define fontwidth 11
 
-static int16_t WI_drawNum (int16_t x, int16_t y, int16_t n, int16_t digits)
+static int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits)
 {
-	boolean   neg;
-	int16_t   temp;
 	char      name[9];  // limited to 8 characters
-
-	if (digits < 0)
-	{
-		if (!n)
-		{
-			// make variable-length zeros 1 digit long
-			digits = 1;
-		}
-		else
-		{
-			// figure out # of digits in #
-			digits = 0;
-			temp = n;
-
-			while (temp)
-			{
-				temp /= 10;
-				digits++;
-			}
-		}
-	}
-
-	neg = n < 0;
-	if (neg)
-		n = -n;
-
-	// if non-number, do not draw it
-	if (n == 1994)
-		return 0;
 
 	// draw the new number
 	while (digits--)
@@ -329,12 +294,31 @@ static int16_t WI_drawNum (int16_t x, int16_t y, int16_t n, int16_t digits)
 		n /= 10;
 	}
 
-	// draw a minus sign if necessary
-	if (neg)
-		// CPhipps - patch drawing updated
-		V_DrawNamePatchScaled(x-=8, y, wiminus);
-
 	return x;
+}
+
+
+static int16_t WI_calculateDigits(int16_t n)
+{
+	if (n == 0)
+	{
+		// make variable-length zeros 1 digit long
+		return 1;
+	}
+	else
+	{
+		// figure out # of digits in #
+		int16_t digits = 0;
+		int16_t temp = n;
+
+		while (temp)
+		{
+			temp /= 10;
+			digits++;
+		}
+
+		return digits;
+	}
 }
 
 
@@ -353,7 +337,7 @@ static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
 
   // CPhipps - patch drawing updated
   V_DrawNamePatchScaled(x, y, percent);
-  WI_drawNum(x, y, p, -1);
+  WI_drawNum(x, y, p, WI_calculateDigits(p));
 }
 
 
