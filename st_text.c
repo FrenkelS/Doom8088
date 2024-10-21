@@ -165,8 +165,8 @@ static void ST_refreshBackground(void)
 
 	V_DrawString(VIEWWINDOWWIDTH - 13, 20, 7, "Bull ");
 	V_DrawString(VIEWWINDOWWIDTH - 13, 21, 7, "Shel ");
-	V_DrawString(VIEWWINDOWWIDTH - 13, 22, 7, "Cell ");
-	V_DrawString(VIEWWINDOWWIDTH - 13, 23, 7, "Rckt ");
+	V_DrawString(VIEWWINDOWWIDTH - 13, 22, 7, "Rckt ");
+	V_DrawString(VIEWWINDOWWIDTH - 13, 23, 7, "Cell ");
 
 	V_DrawCharacter(VIEWWINDOWWIDTH - 5, 20, 7, '/');
 	V_DrawCharacter(VIEWWINDOWWIDTH - 5, 21, 7, '/');
