@@ -354,14 +354,12 @@ static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
 
 static void WI_drawTime(int16_t x, int16_t y, int32_t t)
 {
-  int16_t   n;
-
   if (t<0)
     return;
 
-  if (t < 100L*60*60)
+  if (t < 24L*60*60)
     for(;;) {
-      n = t % 60;
+      int16_t n = t % 60;
       t /= 60;
       x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - V_NamePatchWidth(colon);
 
@@ -371,7 +369,7 @@ static void WI_drawTime(int16_t x, int16_t y, int32_t t)
         V_DrawNamePatchScaled(x, y, colon);
       else break;
     }
-  else // "sucks" (maybe should be "addicted", even I've never had a 100 hour game ;)
+  else // "sucks" (maybe should be "addicted", even I've never had a 24 hour game ;)
     V_DrawNamePatchScaled(x - V_NamePatchWidth(sucks), y, sucks);
 }
 

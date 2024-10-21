@@ -257,14 +257,12 @@ static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
 
 static void WI_drawTime(int16_t x, int16_t y, int32_t t)
 {
-  int16_t   n;
-
   if (t<0)
     return;
 
-  if (t < 100L*60*60)
+  if (t < 24L*60*60)
     for(;;) {
-      n = t % 60;
+      int16_t n = t % 60;
       t /= 60;
       x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - 1;
 
@@ -273,8 +271,8 @@ static void WI_drawTime(int16_t x, int16_t y, int32_t t)
         V_DrawCharacter(x, y, 12, ':');
       else break;
     }
-  else // "sucks" (maybe should be "addicted", even I've never had a 100 hour game ;)
-    V_DrawString(x - 5, y, 12, "Sucks");
+  else // "sucks" (maybe should be "addicted", even I've never had a 24 hour game ;)
+    V_DrawString(x - 8, y, 12, "Sucks");
 }
 
 
@@ -317,12 +315,12 @@ static void WI_initNoState(void)
 static void WI_drawTimeStats(void)
 {
   V_DrawString(1, 22, 12, "Time");
-  WI_drawTime(14, 22, cnt_time);
+  WI_drawTime(15, 22, cnt_time);
 
   V_DrawString(1, 23, 12, "Total");
-  WI_drawTime(14, 23, cnt_total_time);
+  WI_drawTime(15, 23, cnt_total_time);
 
-  V_DrawString(VIEWWINDOWWIDTH - 12, 22, 12, "Par");
+  V_DrawString(VIEWWINDOWWIDTH - 13, 22, 12, "Par");
   WI_drawTime(VIEWWINDOWWIDTH - 1, 22, cnt_par);
 }
 
