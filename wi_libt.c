@@ -115,7 +115,7 @@ void WI_drawPercentSign(int16_t x, int16_t y)
 //          n      -- the number to be drawn
 //          digits -- number of digits minimum or zero
 // Returns: new x position after drawing (note we are going to the left)
-
+//
 int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits)
 {
 	// draw the new number
@@ -127,6 +127,35 @@ int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits)
 	}
 
 	return x;
+}
+
+
+// ====================================================================
+// WI_drawStats
+// Purpose: Put the solo stats on the screen
+// Args:    none
+// Returns: void
+//
+void WI_drawStats(int16_t cnt_kills, int16_t cnt_items, int16_t cnt_secret, int32_t cnt_time, int32_t cnt_total_time, int16_t cnt_par)
+{
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 4, 12, "Kills");
+	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 4, cnt_kills);
+
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 5, 12, "Items");
+	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 5, cnt_items);
+
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 6, 12, "Secret");
+	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 6, cnt_secret);
+
+	// Put the times on the screen
+	V_DrawString(1, 22, 12, "Time");
+	WI_drawTime(15, 22, cnt_time);
+
+	V_DrawString(1, 23, 12, "Total");
+	WI_drawTime(15, 23, cnt_total_time);
+
+	V_DrawString(VIEWWINDOWWIDTH - 13, 22, 12, "Par");
+	WI_drawTime(VIEWWINDOWWIDTH - 1, 22, cnt_par);
 }
 
 

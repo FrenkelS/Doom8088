@@ -36,8 +36,12 @@ void WI_drawSucks(int16_t x, int16_t y);
 void WI_drawPercentSign(int16_t x, int16_t y);
 
 int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits);
+void WI_drawStats(int16_t cnt_kills, int16_t cnt_items, int16_t cnt_secret, int32_t cnt_time, int32_t cnt_total_time, int16_t cnt_par);
 
 void WI_drawSplat(int16_t i);
 void WI_drawYouAreHere(int16_t i);
+
+void WI_drawPercent(int16_t x, int16_t y, int16_t p);
+void WI_drawTime(int16_t x, int16_t y, int32_t t);
 
 #endif

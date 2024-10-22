@@ -135,7 +135,7 @@ static int16_t WI_calculateDigits(int16_t n)
 //          p      -- the percentage value to be drawn, no negatives
 // Returns: void
 // CPhipps - static
-static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
+void WI_drawPercent(int16_t x, int16_t y, int16_t p)
 {
   if (p < 0)
     return;
@@ -156,7 +156,7 @@ static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
 // CPhipps - static
 //         - largely rewritten to display hours and use slightly better algorithm
 
-static void WI_drawTime(int16_t x, int16_t y, int32_t t)
+void WI_drawTime(int16_t x, int16_t y, int32_t t)
 {
   if (t<0)
     return;
@@ -205,25 +205,6 @@ static void WI_initNoState(void)
   cnt = 10;
 }
 
-
-// ====================================================================
-// WI_drawTimeStats
-// Purpose: Put the times on the screen
-// Args:    none
-// Returns: void
-//
-
-static void WI_drawTimeStats(void)
-{
-  V_DrawString(1, 22, 12, "Time");
-  WI_drawTime(15, 22, cnt_time);
-
-  V_DrawString(1, 23, 12, "Total");
-  WI_drawTime(15, 23, cnt_total_time);
-
-  V_DrawString(VIEWWINDOWWIDTH - 13, 22, 12, "Par");
-  WI_drawTime(VIEWWINDOWWIDTH - 1, 22, cnt_par);
-}
 
 // ====================================================================
 // WI_updateNoState
@@ -453,30 +434,6 @@ static void WI_updateStats(void)
   }
 }
 
-// ====================================================================
-// WI_drawStats
-// Purpose: Put the solo stats on the screen
-// Args:    none
-// Returns: void
-//
-
-static void WI_drawStats(void)
-{
-	WI_slamBackground();
-
-	WI_drawLF(wbs->last);
-
-	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 4, 12, "Kills");
-	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 4, cnt_kills);
-
-	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 5, 12, "Items");
-	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 5, cnt_items);
-
-	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 6, 12, "Secret");
-	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 6, cnt_secret);
-
-	WI_drawTimeStats();
-}
 
 // ====================================================================
 // WI_checkForAccelerate
@@ -561,7 +518,9 @@ void WI_Drawer (void)
   switch (state)
   {
     case StatCount:
-           WI_drawStats();
+           WI_slamBackground();
+           WI_drawLF(wbs->last);
+           WI_drawStats(cnt_kills, cnt_items, cnt_secret, cnt_time, cnt_total_time, cnt_par);
          break;
 
     case ShowNextLoc:

@@ -34,6 +34,14 @@
 #define WI_TITLEY      2
 
 
+// SINGLE-PLAYER STUFF
+#define SP_STATSX     50
+#define SP_STATSY     50
+
+#define SP_TIMEX      8
+#define SP_TIMEY      160
+
+
 // "Finished!" graphics
 static const char* const finished = "WIF";
 
@@ -60,6 +68,20 @@ static const char* const yah = "WIURH0";
 
 // splat
 static const char* const splat = "WISPLAT";
+
+
+// "Kills", "Items"
+static const char* const kills = "WIOSTK";
+static const char* const items = "WIOSTI";
+
+
+// "secret"
+static const char* const sp_secret = "WISCRT2";
+
+
+static const char* const time1 = "WITIME";
+static const char* const total = "WIMSTT";
+static const char* const par = "WIPAR";
 
 
 /* ====================================================================
@@ -186,6 +208,42 @@ int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits)
 	}
 
 	return x;
+}
+
+
+// ====================================================================
+// WI_drawStats
+// Purpose: Put the solo stats on the screen
+// Args:    none
+// Returns: void
+//
+// proff/nicolas 09/20/98 -- changed for hi-res
+// CPhipps - patch drawing updated
+
+
+//lineHeight = (3 * num[0]->height) / 2;
+#define lineHeight 18
+
+void WI_drawStats(int16_t cnt_kills, int16_t cnt_items, int16_t cnt_secret, int32_t cnt_time, int32_t cnt_total_time, int16_t cnt_par)
+{
+	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY, kills);
+	WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY, cnt_kills);
+
+	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY + lineHeight, items);
+	WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + lineHeight, cnt_items);
+
+	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY + 2 * lineHeight, sp_secret);
+	WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + 2 * lineHeight, cnt_secret);
+
+	// Put the times on the screen
+	V_DrawNamePatchScaled(SP_TIMEX, SP_TIMEY, time1);
+	WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, SP_TIMEY, cnt_time);
+
+	V_DrawNamePatchScaled(SP_TIMEX, (SP_TIMEY + SCREENHEIGHT_VGA) / 2, total);
+	WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, (SP_TIMEY + SCREENHEIGHT_VGA) / 2, cnt_total_time);
+
+	V_DrawNamePatchScaled(SCREENWIDTH_VGA / 2 + SP_TIMEX, SP_TIMEY, par);
+	WI_drawTime(SCREENWIDTH_VGA - SP_TIMEX, SP_TIMEY, cnt_par);
 }
 
 
