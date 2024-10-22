@@ -59,7 +59,7 @@
 enum automapmode_e automapmode; // Mode that the automap is in
 
 
-#if NR_OF_COLORS == 16
+#if NR_OF_COLORS == 136
 static const uint8_t mapcolor_back = 0x00;
 static const uint8_t mapcolor_wall = 0x44;
 static const uint8_t mapcolor_fchg = 0x66;
