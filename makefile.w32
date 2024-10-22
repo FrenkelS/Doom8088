@@ -33,6 +33,7 @@ GLOBOBJS = &
  d_items.obj &
  d_main.obj &
  f_finale.obj &
+ f_lib.obj &
  g_game.obj &
  hu_stuff.obj &
  i_audio.obj &

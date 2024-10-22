@@ -19,6 +19,7 @@ file am_map.obj
 file d_items.obj
 file d_main.obj
 file f_finale.obj
+file f_lib.obj
 file g_game.obj
 file hu_stuff.obj
 file i_audio.obj
