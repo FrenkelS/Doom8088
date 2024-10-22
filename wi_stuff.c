@@ -39,6 +39,7 @@
 #include "w_wad.h"
 #include "g_game.h"
 #include "r_main.h"
+#include "wi_lib.h"
 #include "wi_stuff.h"
 #include "s_sound.h"
 #include "sounds.h"
@@ -145,16 +146,9 @@ static const char* const yah = "WIURH0";
 // splat
 static const char* const splat = "WISPLAT";
 
-// %, : graphics
+// % graphic
 static const char* const percent = "WIPCNT";
-static const char* const colon = "WICOLON";
 
-
-// "Finished!" graphics
-static const char* const finished = "WIF";
-
-// "Entering" graphic
-static const char* const entering = "WIENTER";
 
 // "secret"
 static const char* const sp_secret = "WISCRT2";
@@ -163,10 +157,10 @@ static const char* const sp_secret = "WISCRT2";
 static const char* const kills = "WIOSTK";
 static const char* const items = "WIOSTI";
 
-// Time sucks.
+
 static const char* const time1 = "WITIME";
 static const char* const par = "WIPAR";
-static const char* const sucks = "WISUCKS";
+
 
 // "Total", your face, your dead face
 static const char* const total = "WIMSTT";
@@ -175,32 +169,6 @@ static const char* const total = "WIMSTT";
 //
 // CODE
 //
-
-static int16_t V_NamePatchWidth(const char *name)
-{
-	return V_NumPatchWidth(W_GetNumForName(name));
-}
-
-static int16_t V_NamePatchHeight(const char *name)
-{
-	const patch_t __far* patch = W_GetLumpByName(name);
-	int16_t height = patch->height;
-	Z_ChangeTagToCache(patch);
-	return height;
-}
-
-
-/* ====================================================================
- * WI_levelNameLump
- * Purpore: Returns the name of the graphic lump containing the name of
- *          the given level.
- * Args:    Level, and buffer (must by 9 chars) to write to
- * Returns: void
- */
-static void WI_levelNameLump(int16_t map, char* buf)
-{
-  sprintf(buf, "WILV0%d", map);
-}
 
 // ====================================================================
 // WI_slamBackground
@@ -213,57 +181,6 @@ static void WI_slamBackground(void)
 	// background
 	int16_t num = W_GetNumForName("WIMAP0");
 	V_DrawRawFullScreen(num);
-}
-
-
-// ====================================================================
-// WI_drawLF
-// Purpose: Draw the "Finished" level name before showing stats
-// Args:    none
-// Returns: void
-//
-static void WI_drawLF(void)
-{
-  int16_t y = WI_TITLEY;
-  char lname[9];
-
-  // draw <LevelName>
-  /* cph - get the graphic lump name and use it */
-  WI_levelNameLump(wbs->last, lname);
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
-
-  // draw "Finished!"
-  y += (5*V_NamePatchHeight(lname))/4;
-
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(finished))/2, y, finished);
-}
-
-
-// ====================================================================
-// WI_drawEL
-// Purpose: Draw introductory "Entering" and level name
-// Args:    none
-// Returns: void
-//
-static void WI_drawEL(void)
-{
-  int16_t y = WI_TITLEY;
-  char lname[9];
-
-  /* cph - get the graphic lump name */
-  WI_levelNameLump(wbs->next, lname);
-
-  // draw "Entering"
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(entering))/2, y, entering);
-
-  // draw level
-  y += (5*V_NamePatchHeight(lname))/4;
-
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
 }
 
 
@@ -361,16 +278,16 @@ static void WI_drawTime(int16_t x, int16_t y, int32_t t)
     for(;;) {
       int16_t n = t % 60;
       t /= 60;
-      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - V_NamePatchWidth(colon);
+      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - WI_getColonWidth();
 
       // draw
       if (t)
   // CPhipps - patch drawing updated
-        V_DrawNamePatchScaled(x, y, colon);
+        WI_drawColon(x, y);
       else break;
     }
   else // "sucks" (maybe should be "addicted", even I've never had a 24 hour game ;)
-    V_DrawNamePatchScaled(x - V_NamePatchWidth(sucks), y, sucks);
+    WI_drawSucks(x, y);
 }
 
 
@@ -519,7 +436,7 @@ static void WI_drawShowNextLoc(void)
         WI_drawYouAreHere(wbs->next);
 
     // draws which level you are entering..
-    WI_drawEL();
+    WI_drawEL(wbs->next);
 }
 
 // ====================================================================
@@ -692,7 +609,7 @@ static void WI_drawStats(void)
 {
 	WI_slamBackground();
 
-	WI_drawLF();
+	WI_drawLF(wbs->last);
 
 	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY, kills);
 	WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY, cnt_kills);

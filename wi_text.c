@@ -31,6 +31,7 @@
 #include "w_wad.h"
 #include "g_game.h"
 #include "r_main.h"
+#include "wi_lib.h"
 #include "wi_stuff.h"
 #include "s_sound.h"
 #include "sounds.h"
@@ -112,23 +113,6 @@ static const point_t lnodes[NUMMAPS] =
 // CODE
 //
 
-//
-// Builtin map names.
-//
-static const char *const mapnames[] =
-{
-    HUSTR_E1M1,
-    HUSTR_E1M2,
-    HUSTR_E1M3,
-    HUSTR_E1M4,
-    HUSTR_E1M5,
-    HUSTR_E1M6,
-    HUSTR_E1M7,
-    HUSTR_E1M8,
-    HUSTR_E1M9,
-};
-
-
 // ====================================================================
 // WI_slamBackground
 // Purpose: Put the full-screen background up prior to patches
@@ -140,42 +124,6 @@ static void WI_slamBackground(void)
 	// background
 	int16_t num = W_GetNumForName("WIMAP0");
 	V_DrawRawFullScreen(num);
-}
-
-
-// ====================================================================
-// WI_drawLF
-// Purpose: Draw the "Finished" level name before showing stats
-// Args:    none
-// Returns: void
-//
-static void WI_drawLF(void)
-{
-	int16_t x;
-
-	x = (VIEWWINDOWWIDTH - strlen(mapnames[wbs->last])) / 2;
-	V_DrawString(x, 0, 15, mapnames[wbs->last]);
-
-	x = (VIEWWINDOWWIDTH - 8) / 2;
-	V_DrawString(x, 1, 12, "FINISHED");
-}
-
-
-// ====================================================================
-// WI_drawEL
-// Purpose: Draw introductory "Entering" and level name
-// Args:    none
-// Returns: void
-//
-static void WI_drawEL(void)
-{
-	int16_t x;
-
-	x = (VIEWWINDOWWIDTH - 8) / 2;
-	V_DrawString(x, 0, 12, "ENTERING");
-
-	x = (VIEWWINDOWWIDTH - strlen(mapnames[wbs->next])) / 2;
-	V_DrawString(x, 1, 15, mapnames[wbs->next]);
 }
 
 
@@ -264,15 +212,15 @@ static void WI_drawTime(int16_t x, int16_t y, int32_t t)
     for(;;) {
       int16_t n = t % 60;
       t /= 60;
-      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - 1;
+      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - WI_getColonWidth();
 
       // draw
       if (t)
-        V_DrawCharacter(x, y, 12, ':');
+        WI_drawColon(x, y);
       else break;
     }
   else // "sucks" (maybe should be "addicted", even I've never had a 24 hour game ;)
-    V_DrawString(x - 8, y, 12, "Sucks");
+    WI_drawSucks(x, y);
 }
 
 
@@ -408,7 +356,7 @@ static void WI_drawShowNextLoc(void)
 		WI_drawYouAreHere(wbs->next);
 
 	// draws which level you are entering..
-	WI_drawEL();
+	WI_drawEL(wbs->next);
 }
 
 // ====================================================================
@@ -575,7 +523,7 @@ static void WI_drawStats(void)
 {
 	WI_slamBackground();
 
-	WI_drawLF();
+	WI_drawLF(wbs->last);
 
 	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 4, 12, "Kills");
 	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 4, cnt_kills);
