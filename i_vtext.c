@@ -78,6 +78,65 @@ void I_ReloadPalette(void)
 }
 
 
+typedef enum
+{
+	mda,
+	cga,
+	pcjr,
+	tandy,
+	ega,
+	vga,
+	mcga
+} videocardsenum_t;
+
+
+static videocardsenum_t videocard;
+
+
+static videocardsenum_t I_DetectVideoCard(void)
+{
+	// This code is based on Jason M. Knight's Paku Paku code
+
+	union REGS regs;
+	regs.w.ax = 0x1200;
+	regs.h.bl = 0x32;
+	int86(0x10, &regs, &regs);
+
+	if (regs.h.al == 0x12)
+	{
+		regs.w.ax = 0x1a00;
+		regs.h.bl = 0;
+		int86(0x10, &regs, &regs);
+		return (0x0a <= regs.h.bl && regs.h.bl <= 0x0c) ? mcga : vga;
+	}
+
+	regs.h.ah = 0x12;
+	regs.h.bl = 0x10;
+	int86(0x10, &regs, &regs);
+	if (regs.h.bl & 3)
+		return ega;
+
+	regs.h.ah = 0x0f;
+	int86(0x10, &regs, &regs);
+	if (regs.h.al == 7)
+		return mda;
+
+	uint8_t __far* fp;
+	fp = D_MK_FP(0xffff, 0x000e);
+	if (*fp == 0xfd)
+		return pcjr;
+
+	if (*fp == 0xff)
+	{
+		fp = D_MK_FP(0xfc00, 0);
+		if (*fp == 0x21)
+			return tandy;
+	}
+
+	return cga;
+}
+
+
 static const int8_t colors[14] =
 {
 	0,							// normal
@@ -89,44 +148,54 @@ static const int8_t colors[14] =
 
 static void I_UploadNewPalette(int8_t pal)
 {
-	// TODO detect video card
-
-	// PCjr,Tandy,EGA,MCGA,VGA
-	union REGS regs;
-	regs.w.ax = 0x1000;
-	regs.h.bl = 0x00;
-	regs.h.bh = colors[pal];
-	int86(0x10, &regs, &regs);
-
-	// CGA
-	outp(0x3d9, colors[pal]);
+	if (videocard == cga)
+		outp(0x3d9, colors[pal]);
+	else
+	{
+		union REGS regs;
+		regs.w.ax = 0x1000;
+		regs.h.bl = 0x00;
+		regs.h.bh = colors[pal];
+		int86(0x10, &regs, &regs);
+	}
 }
 
 
 static void I_DisableBlinking(void)
 {
-	// TODO detect video card
-
-	// disable blinking Jr, PS, TANDY 1000, EGA, VGA
-	union REGS regs;
-	regs.w.ax = 0x1003;
-	regs.w.bx = 0x0000;
-	int86(0x10, &regs, &regs);
-
-	// disable blinking CGA
+	if (videocard == cga)
+	{
 #if VIEWWINDOWWIDTH == 40
-	outp(0x3d8, 8);
+		outp(0x3d8, 8);
 #elif VIEWWINDOWWIDTH == 80
-	outp(0x3d8, 9);
+		outp(0x3d8, 9);
 #else
 #error unsupported VIEWWINDOWWIDTH value
 #endif
+	}
+	else
+	{
+		union REGS regs;
+		regs.w.ax = 0x1003;
+		regs.w.bx = 0x0000;
+		int86(0x10, &regs, &regs);
+	}
 }
 
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
 	__djgpp_nearptr_enable();
+
+	videocard = I_DetectVideoCard();
+	if (videocard == vga)
+	{
+		// 8x8 font
+		union REGS regs;
+		regs.w.ax = 0x1102;
+		regs.h.bl = 0;
+		int86(0x10, &regs, &regs);
+	}
 
 	I_SetScreenMode(SCREEN_MODE);
 
