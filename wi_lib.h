@@ -33,6 +33,7 @@ void WI_drawEL(int16_t map);
 int16_t WI_getColonWidth(void);
 void WI_drawColon(int16_t x, int16_t y);
 void WI_drawSucks(int16_t x, int16_t y);
+void WI_drawPercentSign(int16_t x, int16_t y);
 
 int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits);
 

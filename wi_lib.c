@@ -50,6 +50,10 @@ static const char* const colon = "WICOLON";
 static const char* const sucks = "WISUCKS";
 
 
+// % graphic
+static const char* const percent = "WIPCNT";
+
+
 /* ====================================================================
  * WI_levelNameLump
  * Purpore: Returns the name of the graphic lump containing the name of
@@ -138,6 +142,12 @@ void WI_drawColon(int16_t x, int16_t y)
 void WI_drawSucks(int16_t x, int16_t y)
 {
 	V_DrawNamePatchScaled(x - V_NamePatchWidth(sucks), y, sucks);
+}
+
+
+void WI_drawPercentSign(int16_t x, int16_t y)
+{
+	V_DrawNamePatchScaled(x, y, percent);
 }
 
 

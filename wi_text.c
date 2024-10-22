@@ -164,7 +164,7 @@ static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
   if (p < 0)
     return;
 
-  V_DrawCharacter(x, y, 12, '%');
+  WI_drawPercentSign(x, y);
   WI_drawNum(x, y, p, WI_calculateDigits(p));
 }
 

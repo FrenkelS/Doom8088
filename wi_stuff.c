@@ -146,10 +146,6 @@ static const char* const yah = "WIURH0";
 // splat
 static const char* const splat = "WISPLAT";
 
-// % graphic
-static const char* const percent = "WIPCNT";
-
-
 // "secret"
 static const char* const sp_secret = "WISCRT2";
 
@@ -221,8 +217,7 @@ static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
   if (p < 0)
     return;
 
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(x, y, percent);
+  WI_drawPercentSign(x, y);
   WI_drawNum(x, y, p, WI_calculateDigits(p));
 }
 

@@ -101,6 +101,12 @@ void WI_drawSucks(int16_t x, int16_t y)
 }
 
 
+void WI_drawPercentSign(int16_t x, int16_t y)
+{
+	V_DrawCharacter(x, y, 12, '%');
+}
+
+
 // ====================================================================
 // WI_drawNum
 // Purpose: Draws a number.  If digits > 0, then use that many digits
