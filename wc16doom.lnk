@@ -58,6 +58,7 @@ file st_stuff.obj
 file tables.obj
 file v_video.obj
 file w_wad.obj
+file wi_lib.obj
 file wi_stuff.obj
 file z_bmallo.obj
 file z_zone.obj

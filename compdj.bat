@@ -55,6 +55,7 @@ set CFLAGS=%CFLAGS% -DFLAT_SPAN -DC_ONLY
 @set GLOBOBJS=%GLOBOBJS% tables.c
 @set GLOBOBJS=%GLOBOBJS% v_video.c
 @set GLOBOBJS=%GLOBOBJS% w_wad.c
+@set GLOBOBJS=%GLOBOBJS% wi_lib.c
 @set GLOBOBJS=%GLOBOBJS% wi_stuff.c
 @set GLOBOBJS=%GLOBOBJS% z_bmallo.c
 @set GLOBOBJS=%GLOBOBJS% z_zone.c
