@@ -97,21 +97,6 @@ static void WI_levelNameLump(int16_t map, char* buf)
 }
 
 
-static int16_t V_NamePatchWidth(const char *name)
-{
-	return V_NumPatchWidth(W_GetNumForName(name));
-}
-
-
-static int16_t V_NamePatchHeight(const char *name)
-{
-	const patch_t __far* patch = W_GetLumpByName(name);
-	int16_t height = patch->height;
-	Z_ChangeTagToCache(patch);
-	return height;
-}
-
-
 // ====================================================================
 // WI_drawLF
 // Purpose: Draw the "Finished" level name before showing stats
@@ -125,12 +110,16 @@ void WI_drawLF(int16_t map)
 
 	// draw <LevelName>
 	WI_levelNameLump(map, lname);
-	V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
+	const patch_t __far* patch = W_GetLumpByName(lname);
+	V_DrawPatchScaled((SCREENWIDTH_VGA - patch->width)/2, y, patch);
+
+	y += (5 * patch->height) / 4;
+	Z_ChangeTagToCache(patch);
 
 	// draw "Finished!"
-	y += (5*V_NamePatchHeight(lname))/4;
-
-  	V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(finished))/2, y, finished);
+	const patch_t __far* finishedpatch = W_GetLumpByName(finished);
+	V_DrawPatchScaled((SCREENWIDTH_VGA - finishedpatch->width)/2, y, finishedpatch);
+	Z_ChangeTagToCache(finished);
 }
 
 
@@ -146,20 +135,23 @@ void WI_drawEL(int16_t map)
 	char lname[9];
 
 	WI_levelNameLump(map, lname);
+	const patch_t __far* patch = W_GetLumpByName(lname);
 
 	// draw "Entering"
-	V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(entering))/2, y, entering);
+	const patch_t __far* enteringpatch = W_GetLumpByName(entering);
+	V_DrawPatchScaled((SCREENWIDTH_VGA - enteringpatch->width)/2, y, enteringpatch);
+	Z_ChangeTagToCache(enteringpatch);
 
 	// draw level
-	y += (5*V_NamePatchHeight(lname))/4;
-
-	V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
+	y += (5 * patch->height) / 4;
+	V_DrawPatchScaled((SCREENWIDTH_VGA - patch->width)/2, y, patch);
+	Z_ChangeTagToCache(patch);
 }
 
 
 int16_t WI_getColonWidth(void)
 {
-	return V_NamePatchWidth(colon);
+	return V_NumPatchWidth(W_GetNumForName(colon));
 }
 
 
@@ -171,7 +163,9 @@ void WI_drawColon(int16_t x, int16_t y)
 
 void WI_drawSucks(int16_t x, int16_t y)
 {
-	V_DrawNamePatchScaled(x - V_NamePatchWidth(sucks), y, sucks);
+	const patch_t __far* patch = W_GetLumpByName(sucks);
+	V_DrawPatchScaled(x - patch->width, y, patch);
+	Z_ChangeTagToCache(patch);
 }
 
 
@@ -189,7 +183,6 @@ void WI_drawPercentSign(int16_t x, int16_t y)
 //          n      -- the number to be drawn
 //          digits -- number of digits minimum or zero
 // Returns: new x position after drawing (note we are going to the left)
-// CPhipps - static
 
 //fontwidth = num[0]->width;
 #define fontwidth 11
@@ -216,10 +209,6 @@ int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits)
 // Purpose: Put the solo stats on the screen
 // Args:    none
 // Returns: void
-//
-// proff/nicolas 09/20/98 -- changed for hi-res
-// CPhipps - patch drawing updated
-
 
 //lineHeight = (3 * num[0]->height) / 2;
 #define lineHeight 18
@@ -257,15 +246,15 @@ typedef struct
 
 static const point_t lnodes[NUMMAPS] =
 {
-    { 185, 164 }, // location of level 0 (CJ)
-    { 148, 143 }, // location of level 1 (CJ)
-    {  69, 122 }, // location of level 2 (CJ)
-    { 209, 102 }, // location of level 3 (CJ)
-    { 116,  89 }, // location of level 4 (CJ)
-    { 166,  55 }, // location of level 5 (CJ)
-    {  71,  56 }, // location of level 6 (CJ)
-    { 135,  29 }, // location of level 7 (CJ)
-    {  71,  24 }  // location of level 8 (CJ)
+    { 185, 164 }, // location of level 1
+    { 148, 143 }, // location of level 2
+    {  69, 122 }, // location of level 3
+    { 209, 102 }, // location of level 4
+    { 116,  89 }, // location of level 5
+    { 166,  55 }, // location of level 6
+    {  71,  56 }, // location of level 7
+    { 135,  29 }, // location of level 8
+    {  71,  24 }  // location of level 9
 };
 
 
