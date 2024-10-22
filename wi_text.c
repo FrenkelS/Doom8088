@@ -127,29 +127,6 @@ static void WI_slamBackground(void)
 }
 
 
-// ====================================================================
-// WI_drawNum
-// Purpose: Draws a number.  If digits > 0, then use that many digits
-//          minimum, otherwise only use as many as necessary
-// Args:    x, y   -- location
-//          n      -- the number to be drawn
-//          digits -- number of digits minimum or zero
-// Returns: new x position after drawing (note we are going to the left)
-
-static int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits)
-{
-	// draw the new number
-	while (digits--)
-	{
-		x -= 1;
-		V_DrawCharacter(x, y, 12, '0' + n % 10);
-		n /= 10;
-	}
-
-	return x;
-}
-
-
 static int16_t WI_calculateDigits(int16_t n)
 {
 	if (n == 0)
