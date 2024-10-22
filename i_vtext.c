@@ -481,24 +481,6 @@ void V_ClearString(int16_t y, size_t len)
 }
 
 
-void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
-{
-	UNUSED(x);
-	UNUSED(y);
-	UNUSED(patch);
-	// Do nothing
-}
-
-
-void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
-{
-	UNUSED(x);
-	UNUSED(y);
-	UNUSED(patch);
-	// Do nothing
-}
-
-
 void wipe_StartScreen(void)
 {
 	// Initialize the 3 screen pages again
