@@ -190,10 +190,10 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	videocard = I_DetectVideoCard();
 	if (videocard == vga)
 	{
-		// 8x8 font
+		// 200 scan lines to get the 8x8 font
 		union REGS regs;
-		regs.w.ax = 0x1102;
-		regs.h.bl = 0;
+		regs.w.ax = 0x1200;
+		regs.h.bl = 0x30;
 		int86(0x10, &regs, &regs);
 	}
 
