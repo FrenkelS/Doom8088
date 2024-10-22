@@ -99,30 +99,6 @@ static boolean snl_pointeron;
 //#define SP_TIMEY      (SCREENHEIGHT-32)
 
 
-typedef struct
-{
-  int16_t   x;       // x/y coordinate pair structure
-  int16_t   y;
-} point_t;
-
-#define NUMMAPS     9
-
-static const point_t lnodes[NUMMAPS] =
-{
-    { 185, 164 }, // location of level 0 (CJ)
-    { 148, 143 }, // location of level 1 (CJ)
-    {  69, 122 }, // location of level 2 (CJ)
-    { 209, 102 }, // location of level 3 (CJ)
-    { 116,  89 }, // location of level 4 (CJ)
-    { 166,  55 }, // location of level 5 (CJ)
-    {  71,  56 }, // location of level 6 (CJ)
-    { 135,  29 }, // location of level 7 (CJ)
-    {  71,  24 }  // location of level 8 (CJ)
-};
-
-
-
-
 //
 // GENERAL DATA
 //
@@ -139,12 +115,6 @@ static const point_t lnodes[NUMMAPS] =
 //
 //  GRAPHICS
 //
-
-// You Are Here graphic
-static const char* const yah = "WIURH0";
-
-// splat
-static const char* const splat = "WISPLAT";
 
 // "secret"
 static const char* const sp_secret = "WISCRT2";
@@ -360,18 +330,6 @@ static void WI_updateShowNextLoc(void)
     WI_initNoState();
   else
     snl_pointeron = (cnt & 31) < 20;
-}
-
-
-static void WI_drawSplat(int16_t i)
-{
-	V_DrawNamePatchScaled(lnodes[i].x, lnodes[i].y, splat);
-}
-
-
-static void WI_drawYouAreHere(int16_t i)
-{
-	V_DrawNamePatchScaled(lnodes[i].x, lnodes[i].y, yah);
 }
 
 

@@ -37,4 +37,7 @@ void WI_drawPercentSign(int16_t x, int16_t y);
 
 int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits);
 
+void WI_drawSplat(int16_t i);
+void WI_drawYouAreHere(int16_t i);
+
 #endif
