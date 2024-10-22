@@ -50,6 +50,17 @@
 // used to accelerate or skip a stage
 boolean   _g_acceleratestage;
 
+
+// States for the intermission
+
+typedef enum
+{
+  NoState = -1,
+  StatCount,
+  ShowNextLoc
+} stateenum_t;
+
+
  // specifies current state
 static stateenum_t  state;
 
