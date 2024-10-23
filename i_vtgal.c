@@ -369,10 +369,15 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	static int16_t fuzzpos = 0;
 
-	count <<= 1;
-
 	do
 	{
+		*dest = fuzzcolors[fuzzpos];
+		dest += SCREENWIDTH;
+
+		fuzzpos++;
+		if (fuzzpos >= FUZZTABLE)
+			fuzzpos = 0;
+
 		*dest = fuzzcolors[fuzzpos];
 		dest += SCREENWIDTH;
 
