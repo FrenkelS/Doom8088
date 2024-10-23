@@ -165,7 +165,7 @@ typedef struct
 } wadinfo_t;
 
 #if !defined WAD_FILE
-#define WAD_FILE "DOOM8088.WAD"
+#define WAD_FILE "DOOM1.WAD"
 #endif
 
 void W_Init(void)
