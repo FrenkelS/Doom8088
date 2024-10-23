@@ -414,18 +414,21 @@ void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
 }
 
 
-#define FUZZOFF (VIEWWINDOWWIDTH)
+#define FUZZCOLOR1 0x0000
+#define FUZZCOLOR2 0x0808
+#define FUZZCOLOR3 0x8080
+#define FUZZCOLOR4 0x8888
 #define FUZZTABLE 50
 
-static const int8_t fuzzoffset[FUZZTABLE] =
+static const int16_t fuzzcolors[FUZZTABLE] =
 {
-	FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
-	FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
-	FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
-	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
+	FUZZCOLOR1,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,
+	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR2,
+	FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR4,FUZZCOLOR2,
+	FUZZCOLOR1,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR4,
+	FUZZCOLOR3,FUZZCOLOR2,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR1,
+	FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR1,FUZZCOLOR3,
+	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,FUZZCOLOR1
 };
 
 //
@@ -438,36 +441,22 @@ static const int8_t fuzzoffset[FUZZTABLE] =
 //
 void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 {
-	int16_t dc_yl = dcvars->yl;
-	int16_t dc_yh = dcvars->yh;
-
-	// Adjust borders. Low...
-	if (dc_yl <= 0)
-		dc_yl = 1;
-
-	// .. and high.
-	if (dc_yh >= VIEWWINDOWHEIGHT - 1)
-		dc_yh = VIEWWINDOWHEIGHT - 2;
-
-	int16_t count = (dc_yh - dc_yl) + 1;
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
 		return;
 
-	if (nearcolormapoffset != D_FP_OFF(&fullcolormap[6 * 256]))
-	{
-		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
-		nearcolormapoffset = D_FP_OFF(&fullcolormap[6 * 256]);
-	}
-
-	uint8_t __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + (dcvars->x << 2);
+	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 
 	static int16_t fuzzpos = 0;
 
 	do
 	{
-		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], 0);
+		uint16_t __far* d = (uint16_t __far*) dest;
+		*d++ = fuzzcolors[fuzzpos];
+		*d   = fuzzcolors[fuzzpos];
+
 		dest += SCREENWIDTH;
 
 		fuzzpos++;
