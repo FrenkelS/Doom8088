@@ -386,18 +386,21 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 }
 
 
-#define FUZZOFF (VIEWWINDOWWIDTH)
+#define FUZZCOLOR1 0x00
+#define FUZZCOLOR2 0x08
+#define FUZZCOLOR3 0x80
+#define FUZZCOLOR4 0x88
 #define FUZZTABLE 50
 
-static const int8_t fuzzoffset[FUZZTABLE] =
+static const int8_t fuzzcolors[FUZZTABLE] =
 {
-	FUZZOFF,-FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,
-	FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,
-	FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,
-	FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,
-	FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF,FUZZOFF,-FUZZOFF,FUZZOFF
+	FUZZCOLOR1,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,
+	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR2,
+	FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR4,FUZZCOLOR2,
+	FUZZCOLOR1,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR4,
+	FUZZCOLOR3,FUZZCOLOR2,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR1,
+	FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR1,FUZZCOLOR3,
+	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,FUZZCOLOR1
 };
 
 //
@@ -410,30 +413,13 @@ static const int8_t fuzzoffset[FUZZTABLE] =
 //
 void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 {
-	int16_t dc_yl = dcvars->yl;
-	int16_t dc_yh = dcvars->yh;
-
-	// Adjust borders. Low...
-	if (dc_yl <= 0)
-		dc_yl = 1;
-
-	// .. and high.
-	if (dc_yh >= VIEWWINDOWHEIGHT - 1)
-		dc_yh = VIEWWINDOWHEIGHT - 2;
-
-	int16_t count = (dc_yh - dc_yl) + 1;
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
 		return;
 
-	if (nearcolormapoffset != D_FP_OFF(&fullcolormap[6 * 256]))
-	{
-		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
-		nearcolormapoffset = D_FP_OFF(&fullcolormap[6 * 256]);
-	}
-
-	uint8_t __far* dest = _s_screen + (dc_yl * SCREENWIDTH << 2) + (dcvars->x << 2);
+	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH << 2) + (dcvars->x << 2);
 
 	static int16_t fuzzpos = 0;
 
@@ -441,10 +427,9 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	do
 	{
-		uint8_t c = nearcolormap[dest[fuzzoffset[fuzzpos] * 4]];
-		*dest = c;
+		*dest = fuzzcolors[fuzzpos];
 		dest += 2;
-		*dest = c;
+		*dest = fuzzcolors[fuzzpos];
 		dest += SCREENWIDTH - 2;
 
 		fuzzpos++;
