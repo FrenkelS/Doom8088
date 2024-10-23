@@ -228,7 +228,7 @@ void I_ShutdownGraphicsHardwareSpecificCode(void)
 {
 	if (videocard == vga)
 	{
-		// 200 scan lines to get the 8x8 font
+		// 400 scan lines
 		union REGS regs;
 		regs.w.ax = 0x1202;
 		regs.h.bl = 0x30;
