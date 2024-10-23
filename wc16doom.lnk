@@ -19,6 +19,7 @@ file am_map.obj
 file d_items.obj
 file d_main.obj
 file f_finale.obj
+file f_lib.obj
 file g_game.obj
 file hu_stuff.obj
 file i_audio.obj
@@ -58,6 +59,7 @@ file st_stuff.obj
 file tables.obj
 file v_video.obj
 file w_wad.obj
+file wi_lib.obj
 file wi_stuff.obj
 file z_bmallo.obj
 file z_zone.obj

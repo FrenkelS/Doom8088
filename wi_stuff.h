@@ -36,19 +36,7 @@
 #ifndef __WI_STUFF__
 #define __WI_STUFF__
 
-//#include "v_video.h"
-
-#include "doomdef.h"
-
-// States for the intermission
-
-typedef enum
-{
-  NoState = -1,
-  StatCount,
-  ShowNextLoc
-
-} stateenum_t;
+#include "d_player.h"
 
 // Called by main loop, animate the intermission.
 void WI_Ticker (void);

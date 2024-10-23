@@ -39,6 +39,7 @@
 #include "w_wad.h"
 #include "g_game.h"
 #include "r_main.h"
+#include "wi_lib.h"
 #include "wi_stuff.h"
 #include "s_sound.h"
 #include "sounds.h"
@@ -48,6 +49,17 @@
 
 // used to accelerate or skip a stage
 boolean   _g_acceleratestage;
+
+
+// States for the intermission
+
+typedef enum
+{
+  NoState = -1,
+  StatCount,
+  ShowNextLoc
+} stateenum_t;
+
 
  // specifies current state
 static stateenum_t  state;
@@ -85,43 +97,6 @@ static boolean snl_pointeron;
 //
 
 
-// GLOBAL LOCATIONS
-#define WI_TITLEY      2
-
-// SINGLE-PLAYER STUFF
-#define SP_STATSX     50
-#define SP_STATSY     50
-
-#define SP_TIMEX      8
-// proff/nicolas 09/20/98 -- changed for hi-res
-#define SP_TIMEY      160
-//#define SP_TIMEY      (SCREENHEIGHT-32)
-
-
-typedef struct
-{
-  int16_t   x;       // x/y coordinate pair structure
-  int16_t   y;
-} point_t;
-
-#define NUMMAPS     9
-
-static const point_t lnodes[NUMMAPS] =
-{
-    { 185, 164 }, // location of level 0 (CJ)
-    { 148, 143 }, // location of level 1 (CJ)
-    {  69, 122 }, // location of level 2 (CJ)
-    { 209, 102 }, // location of level 3 (CJ)
-    { 116,  89 }, // location of level 4 (CJ)
-    { 166,  55 }, // location of level 5 (CJ)
-    {  71,  56 }, // location of level 6 (CJ)
-    { 135,  29 }, // location of level 7 (CJ)
-    {  71,  24 }  // location of level 8 (CJ)
-};
-
-
-
-
 //
 // GENERAL DATA
 //
@@ -135,76 +110,10 @@ static const point_t lnodes[NUMMAPS] =
 #define SHOWNEXTLOCDELAY  4
 //#define SHOWLASTLOCDELAY  SHOWNEXTLOCDELAY
 
-//
-//  GRAPHICS
-//
-
-// You Are Here graphic
-static const char* const yah = "WIURH0";
-
-// splat
-static const char* const splat = "WISPLAT";
-
-// %, : graphics
-static const char* const percent = "WIPCNT";
-static const char* const colon = "WICOLON";
-
-
-
-// minus sign
-static const char* const wiminus = "WIMINUS";
-
-// "Finished!" graphics
-static const char* const finished = "WIF";
-
-// "Entering" graphic
-static const char* const entering = "WIENTER";
-
-// "secret"
-static const char* const sp_secret = "WISCRT2";
-
-// "Kills", "Scrt", "Items", "Frags"
-static const char* const kills = "WIOSTK";
-static const char* const items = "WIOSTI";
-
-// Time sucks.
-static const char* const time1 = "WITIME";
-static const char* const par = "WIPAR";
-static const char* const sucks = "WISUCKS";
-
-// "Total", your face, your dead face
-static const char* const total = "WIMSTT";
-
 
 //
 // CODE
 //
-
-static int16_t V_NamePatchWidth(const char *name)
-{
-	return V_NumPatchWidth(W_GetNumForName(name));
-}
-
-static int16_t V_NamePatchHeight(const char *name)
-{
-	const patch_t __far* patch = W_GetLumpByName(name);
-	int16_t height = patch->height;
-	Z_ChangeTagToCache(patch);
-	return height;
-}
-
-
-/* ====================================================================
- * WI_levelNameLump
- * Purpore: Returns the name of the graphic lump containing the name of
- *          the given level.
- * Args:    Level, and buffer (must by 9 chars) to write to
- * Returns: void
- */
-static void WI_levelNameLump(int16_t map, char* buf)
-{
-  sprintf(buf, "WILV0%d", map);
-}
 
 // ====================================================================
 // WI_slamBackground
@@ -220,121 +129,27 @@ static void WI_slamBackground(void)
 }
 
 
-// ====================================================================
-// WI_drawLF
-// Purpose: Draw the "Finished" level name before showing stats
-// Args:    none
-// Returns: void
-//
-static void WI_drawLF(void)
+static int16_t WI_calculateDigits(int16_t n)
 {
-  int16_t y = WI_TITLEY;
-  char lname[9];
-
-  // draw <LevelName>
-  /* cph - get the graphic lump name and use it */
-  WI_levelNameLump(wbs->last, lname);
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
-
-  // draw "Finished!"
-  y += (5*V_NamePatchHeight(lname))/4;
-
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(finished))/2, y, finished);
-}
-
-
-// ====================================================================
-// WI_drawEL
-// Purpose: Draw introductory "Entering" and level name
-// Args:    none
-// Returns: void
-//
-static void WI_drawEL(void)
-{
-  int16_t y = WI_TITLEY;
-  char lname[9];
-
-  /* cph - get the graphic lump name */
-  WI_levelNameLump(wbs->next, lname);
-
-  // draw "Entering"
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(entering))/2, y, entering);
-
-  // draw level
-  y += (5*V_NamePatchHeight(lname))/4;
-
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled((SCREENWIDTH_VGA - V_NamePatchWidth(lname))/2, y, lname);
-}
-
-
-// ====================================================================
-// WI_drawNum
-// Purpose: Draws a number.  If digits > 0, then use that many digits
-//          minimum, otherwise only use as many as necessary
-// Args:    x, y   -- location
-//          n      -- the number to be drawn
-//          digits -- number of digits minimum or zero
-// Returns: new x position after drawing (note we are going to the left)
-// CPhipps - static
-
-//fontwidth = num[0]->width;
-#define fontwidth 11
-
-static int16_t WI_drawNum (int16_t x, int16_t y, int16_t n, int16_t digits)
-{
-	boolean   neg;
-	int16_t   temp;
-	char      name[9];  // limited to 8 characters
-
-	if (digits < 0)
+	if (n == 0)
 	{
-		if (!n)
-		{
-			// make variable-length zeros 1 digit long
-			digits = 1;
-		}
-		else
-		{
-			// figure out # of digits in #
-			digits = 0;
-			temp = n;
-
-			while (temp)
-			{
-				temp /= 10;
-				digits++;
-			}
-		}
+		// make variable-length zeros 1 digit long
+		return 1;
 	}
-
-	neg = n < 0;
-	if (neg)
-		n = -n;
-
-	// if non-number, do not draw it
-	if (n == 1994)
-		return 0;
-
-	// draw the new number
-	while (digits--)
+	else
 	{
-		x -= fontwidth;
-		// CPhipps - patch drawing updated
-		sprintf(name, "WINUM%d", n % 10);
-		V_DrawNamePatchScaled(x, y, name);
-		n /= 10;
+		// figure out # of digits in #
+		int16_t digits = 0;
+		int16_t temp = n;
+
+		while (temp)
+		{
+			temp /= 10;
+			digits++;
+		}
+
+		return digits;
 	}
-
-	// draw a minus sign if necessary
-	if (neg)
-		// CPhipps - patch drawing updated
-		V_DrawNamePatchScaled(x-=8, y, wiminus);
-
-	return x;
 }
 
 
@@ -346,14 +161,13 @@ static int16_t WI_drawNum (int16_t x, int16_t y, int16_t n, int16_t digits)
 //          p      -- the percentage value to be drawn, no negatives
 // Returns: void
 // CPhipps - static
-static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
+void WI_drawPercent(int16_t x, int16_t y, int16_t p)
 {
   if (p < 0)
     return;
 
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(x, y, percent);
-  WI_drawNum(x, y, p, -1);
+  WI_drawPercentSign(x, y);
+  WI_drawNum(x, y, p, WI_calculateDigits(p));
 }
 
 
@@ -368,27 +182,24 @@ static void WI_drawPercent(int16_t x, int16_t y, int16_t p)
 // CPhipps - static
 //         - largely rewritten to display hours and use slightly better algorithm
 
-static void WI_drawTime(int16_t x, int16_t y, int32_t t)
+void WI_drawTime(int16_t x, int16_t y, int32_t t)
 {
-  int16_t   n;
-
   if (t<0)
     return;
 
-  if (t < 100L*60*60)
+  if (t < 24L*60*60)
     for(;;) {
-      n = t % 60;
+      int16_t n = t % 60;
       t /= 60;
-      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - V_NamePatchWidth(colon);
+      x = WI_drawNum(x, y, n, (t || n>9) ? 2 : 1) - WI_getColonWidth();
 
       // draw
       if (t)
-  // CPhipps - patch drawing updated
-        V_DrawNamePatchScaled(x, y, colon);
+        WI_drawColon(x, y);
       else break;
     }
-  else // "sucks" (maybe should be "addicted", even I've never had a 100 hour game ;)
-    V_DrawNamePatchScaled(x - V_NamePatchWidth(sucks), y, sucks);
+  else // "sucks" (maybe should be "addicted", even I've never had a 24 hour game ;)
+    WI_drawSucks(x, y);
 }
 
 
@@ -422,30 +233,6 @@ static void WI_initNoState(void)
 
 
 // ====================================================================
-// WI_drawTimeStats
-// Purpose: Put the times on the screen
-// Args:    none
-// Returns: void
-//
-
-static void WI_drawTimeStats(void)
-{
-  V_DrawNamePatchScaled(SP_TIMEX, SP_TIMEY, time1);
-  WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, SP_TIMEY, cnt_time);
-
-  V_DrawNamePatchScaled(SP_TIMEX, (SP_TIMEY + SCREENHEIGHT_VGA) / 2, total);
-  WI_drawTime(SCREENWIDTH_VGA / 2 - SP_TIMEX, (SP_TIMEY + SCREENHEIGHT_VGA) / 2, cnt_total_time);
-
-  // Ty 04/11/98: redid logic: should skip only if with pwad but
-  // without deh patch
-  // killough 2/22/98: skip drawing par times on pwads
-  // Ty 03/17/98: unless pars changed with deh patch
-
-  V_DrawNamePatchScaled(SCREENWIDTH_VGA / 2 + SP_TIMEX, SP_TIMEY, par);
-  WI_drawTime(SCREENWIDTH_VGA - SP_TIMEX, SP_TIMEY, cnt_par);
-}
-
-// ====================================================================
 // WI_updateNoState
 // Purpose: Cycle until end of level activity is done
 // Args:    none
@@ -473,14 +260,6 @@ static void WI_initShowNextLoc(void)
   state = ShowNextLoc;
   _g_acceleratestage = false;
   
-  // e6y: That was pretty easy - only a HEX editor and luck
-  // There is no more desync on ddt-tas.zip\e4tux231.lmp
-  // --------- tasdoom.idb ---------
-  // .text:00031194 loc_31194:      ; CODE XREF: WI_updateStats+3A9j
-  // .text:00031194                 mov     ds:state, 1
-  // .text:0003119E                 mov     ds:acceleratestage, 0
-  // .text:000311A8                 mov     ds:cnt, 3Ch
-  // nowhere no hide
     cnt = SHOWNEXTLOCDELAY * TICRATE;
 }
 
@@ -514,18 +293,18 @@ static void WI_drawShowNextLoc(void)
 
     // draw a splat on taken cities.
     for (int16_t i=0 ; i<=last ; i++)
-        V_DrawNamePatchScaled(lnodes[i].x, lnodes[i].y, splat);
+        WI_drawSplat(i);
 
     // splat the secret level?
     if (wbs->didsecret)
-        V_DrawNamePatchScaled(lnodes[8].x, lnodes[8].y, splat);
+        WI_drawSplat(8);
 
     // draw flashing ptr
     if (snl_pointeron)
-        V_DrawNamePatchScaled(lnodes[wbs->next].x, lnodes[wbs->next].y, yah);
+        WI_drawYouAreHere(wbs->next);
 
     // draws which level you are entering..
-    WI_drawEL();
+    WI_drawEL(wbs->next);
 }
 
 // ====================================================================
@@ -681,39 +460,6 @@ static void WI_updateStats(void)
   }
 }
 
-// ====================================================================
-// WI_drawStats
-// Purpose: Put the solo stats on the screen
-// Args:    none
-// Returns: void
-//
-// proff/nicolas 09/20/98 -- changed for hi-res
-// CPhipps - patch drawing updated
-
-
-//lineHeight = (3 * num[0]->height) / 2;
-#define lineHeight 18
-
-static void WI_drawStats(void)
-{
-	WI_slamBackground();
-
-	WI_drawLF();
-
-	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY, kills);
-	if (cnt_kills)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY, cnt_kills);
-
-	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY + lineHeight, items);
-	if (cnt_items)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + lineHeight, cnt_items);
-
-	V_DrawNamePatchScaled(SP_STATSX, SP_STATSY + 2 * lineHeight, sp_secret);
-	if (cnt_secret)
-		WI_drawPercent(SCREENWIDTH_VGA - SP_STATSX, SP_STATSY + 2 * lineHeight, cnt_secret);
-
-	WI_drawTimeStats();
-}
 
 // ====================================================================
 // WI_checkForAccelerate
@@ -798,7 +544,9 @@ void WI_Drawer (void)
   switch (state)
   {
     case StatCount:
-           WI_drawStats();
+           WI_slamBackground();
+           WI_drawLF(wbs->last);
+           WI_drawStats(cnt_kills, cnt_items, cnt_secret, cnt_time, cnt_total_time, cnt_par);
          break;
 
     case ShowNextLoc:

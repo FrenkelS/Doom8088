@@ -42,7 +42,8 @@
 #include "w_wad.h"
 #include "s_sound.h"
 #include "sounds.h"
-#include "f_finale.h" // CPhipps - hmm...
+#include "f_finale.h"
+#include "f_lib.h"
 #include "d_englsh.h"
 
 #include "globdata.h"
@@ -50,8 +51,8 @@
 
 // Stage of animation:
 //  false = text, true = art screen
-static boolean finalestage; // cph -
-static int32_t finalecount; // made static
+static boolean finalestage;
+static int32_t finalecount;
 
 static boolean midstage;                 // whether we're in "mid-stage"
 
@@ -68,7 +69,7 @@ static boolean midstage;                 // whether we're in "mid-stage"
 // Ty 03/22/98 - ... the new s_WHATEVER extern variables are used
 // in the code below instead.
 
-void WI_checkForAccelerate(void);    // killough 3/28/98: used to
+void WI_checkForAccelerate(void);
 
 //
 // F_StartFinale
@@ -100,7 +101,7 @@ static int32_t Get_TextSpeed(void)
 {
     return midstage ? NEWTEXTSPEED : (midstage=_g_acceleratestage) ?
                               _g_acceleratestage=false, NEWTEXTSPEED : TEXTSPEED;
-    }
+}
 
 
 //
@@ -113,13 +114,11 @@ static int32_t Get_TextSpeed(void)
 // automatically responds to the user, and gives enough
 // time to read.
 //
-// killough 5/10/98: add back v1.9 demo compatibility
 //
 
-    void F_Ticker(void)
-    {
-
-    WI_checkForAccelerate();  // killough 3/28/98: check for acceleration
+void F_Ticker(void)
+{
+    WI_checkForAccelerate();
 
     // advance animation
     finalecount++;
@@ -143,67 +142,12 @@ static int32_t Get_TextSpeed(void)
 
 
 //
-// F_TextWrite
-//
-// This program displays the background and text at end-mission     // phares
-// text time. It draws both repeatedly so that other displays,      //   |
-// like the main menu, can be drawn over it dynamically and         //   V
-// erased dynamically. The TEXTSPEED constant is changed into
-// the Get_TextSpeed function so that the speed of writing the      //   ^
-// text can be increased, and there's still time to read what's     //   |
-// written.                                                         // phares
-// CPhipps - reformatted
-
-#include "hu_stuff.h"
-
-static void F_TextWrite (void)
-{
-	V_DrawBackground();
-
-	int16_t font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
-
-	// draw some of the text onto the screen
-	int16_t         cx = 10;
-	int16_t         cy = 10;
-	const char* ch = E1TEXT; // CPhipps - const
-	int32_t         count = (finalecount - 10)*100/Get_TextSpeed(); // phares
-
-	if (count < 0)
-		count = 0;
-
-	for ( ; count ; count-- )
-	{
-		char c = *ch++;
-
-		if (!c)
-			break;
-		if (c == '\n')
-		{
-			cx = 10;
-			cy += 11;
-			continue;
-		}
-
-		c = toupper(c);
-		if (HU_FONTSTART <= c && c <= HU_FONTEND) {
-			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
-			V_DrawPatchNotScaled(cx, cy, patch);
-			cx += patch->width;
-			Z_ChangeTagToCache(patch);
-		} else {
-			cx += HU_FONT_SPACE_WIDTH;
-		}
-	}
-}
-
-
-//
 // F_Drawer
 //
 void F_Drawer (void)
 {
 	if (!finalestage)
-		F_TextWrite ();
+		F_TextWrite(finalecount, Get_TextSpeed());
 	else
 	{
 		int16_t num = W_GetNumForName("HELP2");
