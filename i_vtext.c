@@ -224,6 +224,19 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	if (videocard == vga)
+	{
+		// 200 scan lines to get the 8x8 font
+		union REGS regs;
+		regs.w.ax = 0x1202;
+		regs.h.bl = 0x30;
+		int86(0x10, &regs, &regs);
+	}
+}
+
+
 static int8_t newpal;
 
 
