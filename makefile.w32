@@ -33,6 +33,7 @@ GLOBOBJS = &
  d_items.obj &
  d_main.obj &
  f_finale.obj &
+ f_lib.obj &
  g_game.obj &
  hu_stuff.obj &
  i_audio.obj &
@@ -72,6 +73,7 @@ GLOBOBJS = &
  tables.obj &
  v_video.obj &
  w_wad.obj &
+ wi_lib.obj &
  wi_stuff.obj &
  z_bmallo.obj &
  z_zone.obj
