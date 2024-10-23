@@ -202,7 +202,7 @@ uint8_t __far* dest;
 
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
-	int16_t l = count >> 4;
+	int16_t l = count >> 3;
 	while (l--)
 	{
 		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
@@ -226,7 +226,7 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
 	}
 
-	switch (count & 15)
+	switch ((count << 1) & 15)
 	{
 		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
 		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
@@ -249,7 +249,7 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
 {
-	int16_t count = ((dcvars->yh - dcvars->yl) + 1) << 1;
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
@@ -278,7 +278,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 
 void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 {
-	int16_t count = ((dcvars->yh - dcvars->yl) + 1) << 1;
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
@@ -286,7 +286,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH << 1) + (dcvars->x << 2);
 
-	uint16_t l = count >> 4;
+	uint16_t l = count >> 3;
 
 	while (l--)
 	{
@@ -311,7 +311,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 		*dest = color; dest += SCREENWIDTH;
 	}
 
-	switch (count & 15)
+	switch ((count << 1) & 15)
 	{
 		case 15: *dest = color; dest += SCREENWIDTH;
 		case 14: *dest = color; dest += SCREENWIDTH;
@@ -367,7 +367,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (dc_yh >= VIEWWINDOWHEIGHT - 1)
 		dc_yh = VIEWWINDOWHEIGHT - 2;
 
-	int16_t count = ((dc_yh - dc_yl) + 1) << 1;
+	int16_t count = (dc_yh - dc_yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
@@ -382,6 +382,8 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	uint8_t __far* dest = _s_screen + (dc_yl * SCREENWIDTH << 1) + (dcvars->x << 2);
 
 	static int16_t fuzzpos = 0;
+
+	count <<= 1;
 
 	do
 	{

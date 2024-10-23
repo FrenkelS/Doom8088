@@ -303,7 +303,7 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
 {
-	int16_t count = ((dcvars->yh - dcvars->yl) + 1);
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
@@ -332,7 +332,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 
 void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 {
-	int16_t count = ((dcvars->yh - dcvars->yl) + 1);
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
@@ -421,7 +421,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (dc_yh >= VIEWWINDOWHEIGHT - 1)
 		dc_yh = VIEWWINDOWHEIGHT - 2;
 
-	int16_t count = ((dc_yh - dc_yl) + 1);
+	int16_t count = (dc_yh - dc_yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
