@@ -330,7 +330,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 }
 
 
-void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
+void R_DrawColumnFlat(uint8_t color0, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -340,48 +340,12 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH << 2) + (dcvars->x << 2);
 
-	uint16_t l = count >> 2;
+	uint8_t color1 = (color0 << 4) | (color0 >> 4);
 
-	while (l--)
+	for (int16_t i = 0; i < count * 2; i++)
 	{
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		*dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-	}
-
-	switch ((count << 2) & 15)
-	{
-		case 15: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case 14: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case 13: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case 12: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case 11: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case 10: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  9: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  8: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  7: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  6: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  5: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  4: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  3: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  2: *dest = color; dest += 2; *dest = color; dest += SCREENWIDTH - 2;
-		case  1: *dest = color; dest += 2; *dest = color;
+		*dest = color0; dest += 2; *dest = color0; dest += SCREENWIDTH - 2;
+		*dest = color1; dest += 2; *dest = color1; dest += SCREENWIDTH - 2;
 	}
 }
 

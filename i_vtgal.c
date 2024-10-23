@@ -276,7 +276,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 }
 
 
-void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
+void R_DrawColumnFlat(uint8_t color0, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -286,48 +286,12 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH << 1) + (dcvars->x << 2);
 
-	uint16_t l = count >> 3;
+	uint8_t color1 = (color0 << 4) | (color0 >> 4);
 
-	while (l--)
+	for (int16_t i = 0; i < count; i++)
 	{
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-		*dest = color; dest += SCREENWIDTH;
-	}
-
-	switch ((count << 1) & 15)
-	{
-		case 15: *dest = color; dest += SCREENWIDTH;
-		case 14: *dest = color; dest += SCREENWIDTH;
-		case 13: *dest = color; dest += SCREENWIDTH;
-		case 12: *dest = color; dest += SCREENWIDTH;
-		case 11: *dest = color; dest += SCREENWIDTH;
-		case 10: *dest = color; dest += SCREENWIDTH;
-		case  9: *dest = color; dest += SCREENWIDTH;
-		case  8: *dest = color; dest += SCREENWIDTH;
-		case  7: *dest = color; dest += SCREENWIDTH;
-		case  6: *dest = color; dest += SCREENWIDTH;
-		case  5: *dest = color; dest += SCREENWIDTH;
-		case  4: *dest = color; dest += SCREENWIDTH;
-		case  3: *dest = color; dest += SCREENWIDTH;
-		case  2: *dest = color; dest += SCREENWIDTH;
-		case  1: *dest = color;
+		*dest = color0; dest += SCREENWIDTH;
+		*dest = color1; dest += SCREENWIDTH;
 	}
 }
 
