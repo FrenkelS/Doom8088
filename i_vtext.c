@@ -610,7 +610,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 {
 	boolean done = true;
 
-	uint8_t __far* backbuffer = _s_screen;
+	uint8_t __far* backbuffer = _s_screen - 1;
 
 	while (ticks--)
 	{
@@ -631,8 +631,8 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				if (wipe_y_lookup[i] + dy >= VIEWWINDOWHEIGHT)
 					dy = VIEWWINDOWHEIGHT - wipe_y_lookup[i];
 
-				uint8_t __far* s = &frontbuffer[i<<1] + ((VIEWWINDOWHEIGHT - 1 - dy) * PLANEWIDTH);
-				uint8_t __far* d = &frontbuffer[i<<1] + ((VIEWWINDOWHEIGHT - 1)      * PLANEWIDTH);
+				uint16_t __far* s = (uint16_t __far*)(&frontbuffer[i<<1] + ((VIEWWINDOWHEIGHT - 1 - dy) * PLANEWIDTH));
+				uint16_t __far* d = (uint16_t __far*)(&frontbuffer[i<<1] + ((VIEWWINDOWHEIGHT - 1)      * PLANEWIDTH));
 
 				// scroll down the column. Of course we need to copy from the bottom... up to
 				// VIEWWINDOWHEIGHT - yLookup - dy
@@ -640,19 +640,19 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				for (int16_t j = VIEWWINDOWHEIGHT - wipe_y_lookup[i] - dy; j; j--)
 				{
 					*d = *s;
-					d += -PLANEWIDTH;
-					s += -PLANEWIDTH;
+					d += -VIEWWINDOWWIDTH;
+					s += -VIEWWINDOWWIDTH;
 				}
 
 				// copy new screen. We need to copy only between y_lookup and + dy y_lookup
-				s = &backbuffer[i<<1]  + wipe_y_lookup[i] * PLANEWIDTH;
-				d = &frontbuffer[i<<1] + wipe_y_lookup[i] * PLANEWIDTH;
+				s = (uint16_t __far*)(&backbuffer[i<<1]  + wipe_y_lookup[i] * PLANEWIDTH);
+				d = (uint16_t __far*)(&frontbuffer[i<<1] + wipe_y_lookup[i] * PLANEWIDTH);
 
 				for (int16_t j = 0 ; j < dy; j++)
 				{
 					*d = *s;
-					d += PLANEWIDTH;
-					s += PLANEWIDTH;
+					d += VIEWWINDOWWIDTH;
+					s += VIEWWINDOWWIDTH;
 				}
 
 				wipe_y_lookup[i] += dy;
@@ -687,9 +687,9 @@ static void wipe_initMelt()
 
 void D_Wipe(void)
 {
-	frontbuffer = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, 1 + __djgpp_conventional_base);
+	frontbuffer = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, 0 + __djgpp_conventional_base);
 	if (D_FP_SEG(frontbuffer) == (PAGE0 - PAGE_SIZE))
-		frontbuffer = D_MK_FP(PAGE2, 1 + __djgpp_conventional_base);
+		frontbuffer = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
 
 	wipe_initMelt();
 
