@@ -563,6 +563,17 @@ void V_ClearString(int16_t y, size_t len)
 }
 
 
+void I_InitScreenPage(void)
+{
+	uint8_t __far* dst = _s_screen - 1 + VIEWWINDOWWIDTH * 2;
+	for (int16_t i = 0; i < VIEWWINDOWWIDTH * (VIEWWINDOWHEIGHT - 1 - 5); i++)
+	{
+		*dst++ = 0xb1;
+		dst++;
+	}
+}
+
+
 void wipe_StartScreen(void)
 {
 	// Initialize the 3 screen pages again

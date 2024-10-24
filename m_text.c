@@ -224,8 +224,7 @@ static const menu_t MainDef =
 
 static void M_DrawMainMenu(void)
 {
-	int16_t x = (VIEWWINDOWWIDTH - 4) / 2;
-	V_DrawString(x, 1, 14, "DOOM");
+	V_DrawString((VIEWWINDOWWIDTH - 4) / 2, 1, 14, "DOOM");
 }
 
 
@@ -268,13 +267,8 @@ static const menu_t NewDef =
 
 static void M_DrawNewGame(void)
 {
-	int16_t x;
-	
-	x = (VIEWWINDOWWIDTH - 8) / 2;
-	V_DrawString(x, 2, 12, "NEW GAME");
-
-	x = (VIEWWINDOWWIDTH - 19) / 2;
-	V_DrawString(x, 4, 12, "Choose Skill Level:");
+	V_DrawString((VIEWWINDOWWIDTH -  8) / 2, 2, 12, "NEW GAME");
+	V_DrawString((VIEWWINDOWWIDTH - 19) / 2, 4, 12, "Choose Skill Level:");
 }
 
 static void M_NewGame(int16_t choice)
@@ -357,18 +351,10 @@ static const menu_t LoadDef =
 
 static void M_DrawSaveLoad(const char* name)
 {
-	int8_t i;
+	V_DrawString((VIEWWINDOWWIDTH - strlen(name)) / 2, 2, 12, name);
 
-	int16_t x;
-
-	x = (VIEWWINDOWWIDTH - strlen(name)) / 2;
-	V_DrawString(x, 2, 12, name);
-
-	for (i = 0; i < load_end; i++)
-	{
-		x = LoadDef.x;
+	for (int16_t i = 0; i < load_end; i++)
 		M_WriteText(LoadDef.x, i + 4, _g_savegamestrings[i]);
-	}
 }
 
 static void M_DrawLoad(void)
@@ -559,10 +545,7 @@ static const char msgNames[2][4]  = {"Off","On"};
 
 static void M_DrawOptions(void)
 {
-	int16_t x;
-	
-	x = (VIEWWINDOWWIDTH - 7) / 2;
-	V_DrawString(x, 2, 12, "OPTIONS");
+	V_DrawString((VIEWWINDOWWIDTH - 7) / 2, 2, 12, "OPTIONS");
 
 	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * messages,  12, msgNames[showMessages]);
 
@@ -620,12 +603,11 @@ static const menu_t SoundDef =
 
 static void M_DrawSound(void)
 {
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(60, 38, "M_SVOL");
+	V_DrawNamePatchScaled(60, 38, "M_SVOL");
 
-  M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (sfx_vol   + 1), 16, snd_SfxVolume);
+	M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (sfx_vol   + 1), 16, snd_SfxVolume);
 
-  M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (music_vol + 1), 16, snd_MusicVolume);
+	M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (music_vol + 1), 16, snd_MusicVolume);
 }
 
 static void M_Sound(int16_t choice)
@@ -815,6 +797,7 @@ boolean M_Responder (event_t* ev)
         if (messageRoutine)
             messageRoutine(ch == 'y');
 
+        wipe_StartScreen();
         _g_menuactive = false;
         S_StartSound(NULL,sfx_swtchx);
         return true;
@@ -986,58 +969,59 @@ static char __far* Z_Strdup(const char* s)
 // Called after the view has been rendered,
 // but before it has been blitted.
 //
-// killough 9/29/98: Significantly reformatted source
-//
 
 void M_Drawer (void)
 {
-    // Horiz. & Vertically center string and print it.
-    // killough 9/29/98: simplified code, removed 40-character width limit
-    if (messageToPrint)
-    {
-        /* cph - strdup string to writable memory */
-        char __far* ms = Z_Strdup(messageString);
-        char __far* p = ms;
+	if (messageToPrint)
+	{
+		// Horiz. & Vertically center string and print it.
 
-        int16_t y = (VIEWWINDOWHEIGHT - M_StringHeight(messageString)) / 2;
-        while (*p)
-        {
-            char __far* string = p;
-            char c;
-            while ((c = *p) && *p != '\n')
-                p++;
-            *p = 0;
-            M_WriteText((VIEWWINDOWWIDTH - _fstrlen(string)) / 2, y, string);
-            y += 1;
-            if ((*p = c))
-                p++;
-        }
-        Z_Free(ms);
-    }
-    else
-        if (_g_menuactive)
-        {
-            int16_t x,y,max,i;
+		I_InitScreenPage();
 
-            if (currentMenu->routine)
-                currentMenu->routine();     // call Draw routine
+		/* cph - strdup string to writable memory */
+		char __far* ms = Z_Strdup(messageString);
+		char __far* p = ms;
 
-            // DRAW MENU
+		int16_t y = (VIEWWINDOWHEIGHT - M_StringHeight(messageString)) / 2;
+		while (*p)
+		{
+			char __far* string = p;
+			char c;
+			while ((c = *p) && *p != '\n')
+				p++;
+			*p = 0;
+			M_WriteText((VIEWWINDOWWIDTH - _fstrlen(string)) / 2, y, string);
+			y += 1;
+			if ((*p = c))
+				p++;
+		}
+		Z_Free(ms);
+	}
+	else if (_g_menuactive)
+	{
+		int16_t x,y,max,i;
 
-            x = currentMenu->x;
-            y = currentMenu->y;
-            max = currentMenu->numitems;
+		I_InitScreenPage();
 
-            for (i=0;i<max;i++)
-            {
-                if (currentMenu->menuitems[i].name[0])
-                    V_DrawString(x, y, 12, currentMenu->menuitems[i].name);
-                y += LINEHEIGHT;
-            }
+		if (currentMenu->routine)
+			currentMenu->routine();     // call Draw routine
 
-            // DRAW SKULL
-            V_DrawCharacter(x + SKULLXOFF, currentMenu->y + itemOn*LINEHEIGHT, 12, skullName[whichSkull]);
-        }
+		// DRAW MENU
+
+		x = currentMenu->x;
+		y = currentMenu->y;
+		max = currentMenu->numitems;
+
+		for (i=0;i<max;i++)
+		{
+			if (currentMenu->menuitems[i].name[0])
+				V_DrawString(x, y, 12, currentMenu->menuitems[i].name);
+			y += LINEHEIGHT;
+		}
+
+		// DRAW SKULL
+		V_DrawCharacter(x + SKULLXOFF, currentMenu->y + itemOn*LINEHEIGHT, 12, skullName[whichSkull]);
+	}
 }
 
 //
