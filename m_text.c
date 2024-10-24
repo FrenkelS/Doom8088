@@ -797,7 +797,7 @@ boolean M_Responder (event_t* ev)
         if (messageRoutine)
             messageRoutine(ch == 'y');
 
-        wipe_StartScreen();
+        I_InitScreenPages();
         _g_menuactive = false;
         S_StartSound(NULL,sfx_swtchx);
         return true;
@@ -1033,7 +1033,7 @@ static void M_ClearMenus (void)
 {
   _g_menuactive = false;
   itemOn = 0;
-  wipe_StartScreen();
+  I_InitScreenPages();
 }
 
 //

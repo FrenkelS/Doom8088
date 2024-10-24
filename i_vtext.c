@@ -574,10 +574,8 @@ void I_InitScreenPage(void)
 }
 
 
-void wipe_StartScreen(void)
+void I_InitScreenPages(void)
 {
-	// Initialize the 3 screen pages again
-
 	uint8_t __far* dst;
 	dst = D_MK_FP(PAGE0, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
@@ -599,6 +597,12 @@ void wipe_StartScreen(void)
 		*dst++ = 0xb1;
 		dst++;
 	}
+}
+
+
+void wipe_StartScreen(void)
+{
+	I_InitScreenPages();
 }
 
 
