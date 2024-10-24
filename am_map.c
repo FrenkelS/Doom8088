@@ -59,6 +59,20 @@
 enum automapmode_e automapmode; // Mode that the automap is in
 
 
+#if NR_OF_COLORS == 136
+static const uint8_t mapcolor_back = 0x00;
+static const uint8_t mapcolor_wall = 0x44;
+static const uint8_t mapcolor_fchg = 0x66;
+static const uint8_t mapcolor_cchg = 0x66;
+static const uint8_t mapcolor_clsd = 0xff;
+static const uint8_t mapcolor_rdor = 0xcc;
+static const uint8_t mapcolor_bdor = 0x11;
+static const uint8_t mapcolor_ydor = 0xee;
+static const uint8_t mapcolor_tele = 0x22;
+static const uint8_t mapcolor_secr = 0xdd;
+static const uint8_t mapcolor_unsn = 0x88;
+static const uint8_t mapcolor_sngl = 0xff;
+#else
 static const uint8_t mapcolor_back = 247;    // map background
 static const uint8_t mapcolor_wall = 23;    // normal 1s wall color
 static const uint8_t mapcolor_fchg = 55;    // line at floor height change color
@@ -71,9 +85,14 @@ static const uint8_t mapcolor_tele = 119;    // teleporter line color
 static const uint8_t mapcolor_secr = 252;    // secret sector boundary color
 static const uint8_t mapcolor_unsn = 104;    // computer map unseen line color
 static const uint8_t mapcolor_sngl = 208;    // single player arrow color
+#endif
 
-static const int16_t f_w = SCREENWIDTH;
-static const int16_t f_h = SCREENHEIGHT - ST_HEIGHT;// to allow runtime setting of width/height
+
+#if !defined MAPWIDTH
+#define MAPWIDTH SCREENWIDTH
+#endif
+static const int16_t f_w = MAPWIDTH;
+static const int16_t f_h = VIEWWINDOWHEIGHT;// to allow runtime setting of width/height
 
 
 typedef struct

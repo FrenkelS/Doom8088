@@ -270,12 +270,12 @@ static int16_t      st_randomnumber;
 #define ST_AMMO2WIDTH           ST_AMMO0WIDTH
 // proff 08/18/98: Changed for high-res
 #define ST_AMMO2X               (ST_X+220)
-#define ST_AMMO2Y               (ST_Y+23)
+#define ST_AMMO2Y               (ST_Y+17)
 
 #define ST_AMMO3WIDTH           ST_AMMO0WIDTH
 // proff 08/18/98: Changed for high-res
 #define ST_AMMO3X               (ST_X+220)
-#define ST_AMMO3Y               (ST_Y+17)
+#define ST_AMMO3Y               (ST_Y+23)
 
 
 // Indicate maximum ammunition.
@@ -293,12 +293,12 @@ static int16_t      st_randomnumber;
 #define ST_MAXAMMO2WIDTH        ST_MAXAMMO0WIDTH
 // proff 08/18/98: Changed for high-res
 #define ST_MAXAMMO2X            (ST_X+238)
-#define ST_MAXAMMO2Y            (ST_Y+23)
+#define ST_MAXAMMO2Y            (ST_Y+17)
 
 #define ST_MAXAMMO3WIDTH        ST_MAXAMMO0WIDTH
 // proff 08/18/98: Changed for high-res
 #define ST_MAXAMMO3X            (ST_X+238)
-#define ST_MAXAMMO3Y            (ST_Y+17)
+#define ST_MAXAMMO3Y            (ST_Y+23)
 
 
 // used to use appopriately pained face
@@ -624,7 +624,7 @@ static void ST_drawWidgets(void)
     STlib_drawNum(&w_ready);
 	
 	// Restore the ammo numbers for backpack stats I guess, etc ~Kippykip
-	for (int8_t i = 0; i < 4; i++)
+	for (int8_t i = 0; i < NUMAMMO; i++)
     {
 		STlib_drawNum(&w_ammo[i]);
 		STlib_drawNum(&w_maxammo[i]);
@@ -677,7 +677,7 @@ boolean ST_NeedUpdate(void)
         return true;
 	
 	// ammo
-    for(int8_t i=0; i<4; i++)
+    for(int8_t i=0; i<NUMAMMO; i++)
     {
         if(w_ammo[i].oldnum != *w_ammo[i].num)
             return true;
@@ -849,16 +849,16 @@ static void ST_createWidgets(void)
     STlib_initMultIcon(&w_keyboxes[2], ST_KEY2X, ST_KEY2Y, keys, &keyboxes[2]);			
 			
 	// ammo count (all four kinds)
-	STlib_initNum(&w_ammo[0], ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
-	STlib_initNum(&w_ammo[1], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
-	STlib_initNum(&w_ammo[2], ST_AMMO2X, ST_AMMO2Y, shortnum, &_g_player.ammo[2], ST_AMMO2WIDTH);
-	STlib_initNum(&w_ammo[3], ST_AMMO3X, ST_AMMO3Y, shortnum, &_g_player.ammo[3], ST_AMMO3WIDTH);
+	STlib_initNum(&w_ammo[am_clip],  ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[am_clip],  ST_AMMO0WIDTH);
+	STlib_initNum(&w_ammo[am_shell], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[am_shell], ST_AMMO1WIDTH);
+	STlib_initNum(&w_ammo[am_misl],  ST_AMMO2X, ST_AMMO2Y, shortnum, &_g_player.ammo[am_misl],  ST_AMMO2WIDTH);
+	STlib_initNum(&w_ammo[am_cell],  ST_AMMO3X, ST_AMMO3Y, shortnum, &_g_player.ammo[am_cell],  ST_AMMO3WIDTH);
 
 	// max ammo count (all four kinds)
-	STlib_initNum(&w_maxammo[0], ST_MAXAMMO0X, ST_MAXAMMO0Y, shortnum, &_g_player.maxammo[0], ST_MAXAMMO0WIDTH);
-	STlib_initNum(&w_maxammo[1], ST_MAXAMMO1X, ST_MAXAMMO1Y, shortnum, &_g_player.maxammo[1], ST_MAXAMMO1WIDTH);
-	STlib_initNum(&w_maxammo[2], ST_MAXAMMO2X, ST_MAXAMMO2Y, shortnum, &_g_player.maxammo[2], ST_MAXAMMO2WIDTH);
-	STlib_initNum(&w_maxammo[3], ST_MAXAMMO3X, ST_MAXAMMO3Y, shortnum, &_g_player.maxammo[3], ST_MAXAMMO3WIDTH);
+	STlib_initNum(&w_maxammo[am_clip],  ST_MAXAMMO0X, ST_MAXAMMO0Y, shortnum, &_g_player.maxammo[am_clip],  ST_MAXAMMO0WIDTH);
+	STlib_initNum(&w_maxammo[am_shell], ST_MAXAMMO1X, ST_MAXAMMO1Y, shortnum, &_g_player.maxammo[am_shell], ST_MAXAMMO1WIDTH);
+	STlib_initNum(&w_maxammo[am_misl],  ST_MAXAMMO2X, ST_MAXAMMO2Y, shortnum, &_g_player.maxammo[am_misl],  ST_MAXAMMO2WIDTH);
+	STlib_initNum(&w_maxammo[am_cell],  ST_MAXAMMO3X, ST_MAXAMMO3Y, shortnum, &_g_player.maxammo[am_cell],  ST_MAXAMMO3WIDTH);
 			
     // faces
     STlib_initMultIcon(&w_faces, ST_FACESX, ST_FACESY, faces, &st_faceindex);
