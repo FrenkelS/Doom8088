@@ -90,6 +90,9 @@ static int16_t cnt_secret;
 static boolean snl_pointeron;
 
 
+static int16_t wimap0num;
+
+
 //
 // Data needed to add patches to full screen intermission pics.
 // Patches are statistics messages, and animations.
@@ -123,9 +126,7 @@ static boolean snl_pointeron;
 //
 static void WI_slamBackground(void)
 {
-	// background
-	int16_t num = W_GetNumForName("WIMAP0");
-	V_DrawRawFullScreen(num);
+	V_DrawRawFullScreen(wimap0num);
 }
 
 
@@ -593,3 +594,10 @@ void WI_Start(wbstartstruct_t* wbstartstruct)
 	WI_initVariables(wbstartstruct);
 	WI_initStats();
 }
+
+
+void WI_Init(void)
+{
+	wimap0num = W_GetNumForName("WIMAP0");
+}
+
