@@ -471,28 +471,25 @@ static void WI_updateStats(void)
 //
 void WI_checkForAccelerate(void)
 {
-  player_t  *player = &_g_player;
+    player_t  *player = &_g_player;
 
-    if (_g_playeringame)
+    if (player->cmd.buttons & BT_ATTACK)
     {
-      if (player->cmd.buttons & BT_ATTACK)
-      {
         if (!player->attackdown)
-          _g_acceleratestage = true;
+            _g_acceleratestage = true;
         player->attackdown = true;
-      }
-      else
+    }
+    else
         player->attackdown = false;
 
-      if (player->cmd.buttons & BT_USE)
-      {
+    if (player->cmd.buttons & BT_USE)
+    {
         if (!player->usedown)
-          _g_acceleratestage = true;
+            _g_acceleratestage = true;
         player->usedown = true;
-      }
-      else
-        player->usedown = false;
     }
+    else
+        player->usedown = false;
 }
 
 // ====================================================================

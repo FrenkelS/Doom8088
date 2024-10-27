@@ -966,11 +966,6 @@ static void P_SpawnPlayer(int16_t playerx, int16_t playery, int8_t playerangle)
   player_t* p;
   mobj_t __far*   mobj;
 
-  // not playing?
-
-  if (!_g_playeringame)
-    return;
-
   p = &_g_player;
 
   if (p->playerstate == PST_REBORN)
