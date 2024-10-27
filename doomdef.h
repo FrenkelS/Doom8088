@@ -63,12 +63,18 @@
 #define HIBYTE(w)	(((uint8_t *)&w)[1])
 
 
+#if !defined VIEWWINDOWWIDTH
 #define VIEWWINDOWWIDTH  60
+#endif
+
+#if !defined VIEWWINDOWHEIGHT
 #define VIEWWINDOWHEIGHT 128
+#endif
+
 
 // SCREENWIDTH and SCREENHEIGHT define the visible size
 #define SCREENWIDTH  240u
-#define SCREENHEIGHT (VIEWWINDOWHEIGHT+ST_HEIGHT)
+#define SCREENHEIGHT 160 /*(VIEWWINDOWHEIGHT+ST_HEIGHT)*/
 
 #define SCREENWIDTH_VGA  320
 #define SCREENHEIGHT_VGA 200
@@ -140,8 +146,8 @@ typedef enum {
 typedef enum {
   am_clip,    // Pistol / chaingun ammo.
   am_shell,   // Shotgun / double barreled shotgun.
-  am_cell,    // Plasma rifle, BFG.
   am_misl,    // Missile launcher.
+  am_cell,    // Plasma rifle, BFG.
   NUMAMMO,
   am_noammo   // Unlimited for chainsaw / fist.
 } ammotype_t;

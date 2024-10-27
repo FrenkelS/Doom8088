@@ -74,8 +74,8 @@ static const int16_t soul_health       = 100;
 
 // a weapon is found with two clip loads,
 // a big item has five clip loads
-       const int16_t maxammo[NUMAMMO] = {200, 50, 300, 50};
-static const int8_t clipammo[NUMAMMO] = { 10,  4,  20,  1};
+       const int16_t maxammo[NUMAMMO] = {200, 50, 50, 300};
+static const int8_t clipammo[NUMAMMO] = { 10,  4,  1,  20};
 
 //
 // GET STUFF

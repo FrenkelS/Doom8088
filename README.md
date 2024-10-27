@@ -18,6 +18,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - Supports only Doom 1 Episode 1
  - Rotating overlaid automap
  - Only demo3 is supported
+ - 256 and 16 color modes
  - PC speaker sound effects
  - No music
  - No texture mapped floors and ceilings
@@ -32,6 +33,17 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - When there's not enough memory for a texture, one color is drawn
  - When there's not enough memory for the intermission screen, the last few frames of gameplay are shown instead
  - When there's not enough memory for a new palette, only the border changes color
+
+## Supported video modes
+
+### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13H
+![Doom8088 in 256 colors](readme_imgs/doom8088.png?raw=true)
+
+### Text mode 80x25 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomt80.png?raw=true)
+
+### Text mode 40x25 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomt40.png?raw=true)
 
 ## Controls:
 |Action                 |             |
@@ -54,8 +66,8 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |----------|-------------------------|
 |IDCHOPPERS|Chainsaw                 |
 |IDDQD     |God mode                 |
-|IDKFA     |Ammo & Keys              |
-|IDKA      |Ammo                     |
+|IDKFA     |Weapons & Keys           |
+|IDFA      |Weapons                  |
 |IDSPISPOPD|No Clipping              |
 |IDBEHOLDV |Invincibility            |
 |IDBEHOLDS |Berserk                  |
@@ -77,7 +89,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
 
-2) Run `compiamy.sh` to compile the Mode Y version and `compia13.sh` for the Mode 13h version.
+2) Run `compiamy.sh` to compile the Mode Y version, `compia13.sh` for the Mode 13h version, `compiat1.sh` for text mode 40x25 and `compiat3.sh` for text mode 80x25.
 
 3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
 
