@@ -632,7 +632,6 @@ static void G_DoCompleted (void)
     _g_wminfo.partime = TICRATE*pars[_g_gamemap];
 
 
-    _g_wminfo.plyr[0].in = true;
     _g_wminfo.plyr[0].skills = _g_player.killcount;
     _g_wminfo.plyr[0].sitems = _g_player.itemcount;
     _g_wminfo.plyr[0].ssecret = _g_player.secretcount;
