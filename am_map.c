@@ -91,8 +91,13 @@ static const uint8_t mapcolor_sngl = 208;    // single player arrow color
 #if !defined MAPWIDTH
 #define MAPWIDTH SCREENWIDTH
 #endif
+
+#if !defined MAPHEIGHT
+#define MAPHEIGHT VIEWWINDOWHEIGHT
+#endif
+
 static const int16_t f_w = MAPWIDTH;
-static const int16_t f_h = VIEWWINDOWHEIGHT;// to allow runtime setting of width/height
+static const int16_t f_h = MAPHEIGHT;
 
 
 typedef struct
