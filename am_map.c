@@ -87,8 +87,12 @@ static const uint8_t mapcolor_unsn = 104;    // computer map unseen line color
 static const uint8_t mapcolor_sngl = 208;    // single player arrow color
 #endif
 
-static const int16_t f_w = SCREENWIDTH;
-static const int16_t f_h = SCREENHEIGHT - ST_HEIGHT;// to allow runtime setting of width/height
+
+#if !defined MAPWIDTH
+#define MAPWIDTH SCREENWIDTH
+#endif
+static const int16_t f_w = MAPWIDTH;
+static const int16_t f_h = VIEWWINDOWHEIGHT;// to allow runtime setting of width/height
 
 
 typedef struct

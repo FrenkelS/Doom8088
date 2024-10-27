@@ -1,4 +1,6 @@
 ## Doom8088
+![Doom8088](readme_imgs/doom8088.png?raw=true)
+
 Doom was originally designed in 1993 for 32-bit DOS computers with 4 MB of RAM.
 It's mostly written in C code with very little assembly code.
 It has been ported to all kinds of systems.
@@ -6,7 +8,7 @@ Usually these systems are 32-bit or more and have a flat memory model.
 
 Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286, and with VGA or MCGA graphics.
 It uses 64 kB of EMS memory, if available.
-And 1510 kB of XMS memory, if available.
+And 1506 kB of XMS memory, if available.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom).
 Download Doom8088 [here](https://github.com/FrenkelS/Doom8088/releases).
 
@@ -34,8 +36,8 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 ## Supported video modes
 
-### VGA 256 color 320x200 Mode Y and MCGA 256 color 320x200 Mode 13H
-![Doom8088 in 256 colors](readme_imgs/doom256.png?raw=true)
+### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13H
+![Doom8088 in 256 colors](readme_imgs/doom8088.png?raw=true)
 
 ### Tandy 1000 16 color 640x200 mode
 ![Doom8088 in 16 colors](readme_imgs/doomth.png?raw=true)
@@ -45,6 +47,12 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 ### Tandy 1000 16 color 160x200 mode
 ![Doom8088 in 16 colors](readme_imgs/doomtl.png?raw=true)
+
+### Text mode 80x25 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomt80.png?raw=true)
+
+### Text mode 40x25 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomt40.png?raw=true)
 
 ## Controls:
 |Action                 |             |
@@ -67,8 +75,8 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |----------|-------------------------|
 |IDCHOPPERS|Chainsaw                 |
 |IDDQD     |God mode                 |
-|IDKFA     |Ammo & Keys              |
-|IDKA      |Ammo                     |
+|IDKFA     |Weapons & Keys           |
+|IDFA      |Weapons                  |
 |IDSPISPOPD|No Clipping              |
 |IDBEHOLDV |Invincibility            |
 |IDBEHOLDS |Berserk                  |
@@ -81,17 +89,16 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |IDRATE    |Toggle FPS counter       |
 
 ## Command line arguments:
-|Command line argument|Effect                    |
-|---------------------|--------------------------|
-|-hiddencard          |Disable video memory check|
-|-noems               |Disable EMS               |
-|-noxms               |Disable XMS               |
-|-timedemo demo3      |Run benchmark             |
+|Command line argument|Effect       |
+|---------------------|-------------|
+|-noems               |Disable EMS  |
+|-noxms               |Disable XMS  |
+|-timedemo demo3      |Run benchmark|
 
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
 
-2) Run `compiamy.sh` to compile the Mode Y version, `compia13.sh` for the Mode 13h version, `compiath.sh` for Tandy 1000 640x200, `compiatm.sh` for Tandy 1000 320x200 and `compiatl.sh` for Tandy 1000 160x200.
+2) Run `compiamy.sh` to compile the Mode Y version, `compia13.sh` for the Mode 13h version, `compiath.sh` for Tandy 1000 640x200, `compiatm.sh` for Tandy 1000 320x200, `compiatl.sh` for Tandy 1000 160x200, `compiat1.sh` for text mode 40x25 and `compiat3.sh` for text mode 80x25.
 
 3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
 

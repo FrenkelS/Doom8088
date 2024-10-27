@@ -90,6 +90,9 @@ static int16_t cnt_secret;
 static boolean snl_pointeron;
 
 
+static int16_t wimap0num;
+
+
 //
 // Data needed to add patches to full screen intermission pics.
 // Patches are statistics messages, and animations.
@@ -123,9 +126,7 @@ static boolean snl_pointeron;
 //
 static void WI_slamBackground(void)
 {
-	// background
-	int16_t num = W_GetNumForName("WIMAP0");
-	V_DrawRawFullScreen(num);
+	V_DrawRawFullScreen(wimap0num);
 }
 
 
@@ -471,28 +472,25 @@ static void WI_updateStats(void)
 //
 void WI_checkForAccelerate(void)
 {
-  player_t  *player = &_g_player;
+    player_t  *player = &_g_player;
 
-    if (_g_playeringame)
+    if (player->cmd.buttons & BT_ATTACK)
     {
-      if (player->cmd.buttons & BT_ATTACK)
-      {
         if (!player->attackdown)
-          _g_acceleratestage = true;
+            _g_acceleratestage = true;
         player->attackdown = true;
-      }
-      else
+    }
+    else
         player->attackdown = false;
 
-      if (player->cmd.buttons & BT_USE)
-      {
+    if (player->cmd.buttons & BT_USE)
+    {
         if (!player->usedown)
-          _g_acceleratestage = true;
+            _g_acceleratestage = true;
         player->usedown = true;
-      }
-      else
-        player->usedown = false;
     }
+    else
+        player->usedown = false;
 }
 
 // ====================================================================
@@ -596,3 +594,10 @@ void WI_Start(wbstartstruct_t* wbstartstruct)
 	WI_initVariables(wbstartstruct);
 	WI_initStats();
 }
+
+
+void WI_Init(void)
+{
+	wimap0num = W_GetNumForName("WIMAP0");
+}
+

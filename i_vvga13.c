@@ -165,6 +165,12 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 }
 
 
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// Do nothing
+}
+
+
 static int8_t newpal;
 
 

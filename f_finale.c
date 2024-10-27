@@ -57,6 +57,9 @@ static int32_t finalecount;
 static boolean midstage;                 // whether we're in "mid-stage"
 
 
+static int16_t help2num;
+
+
 // defines for the end mission display text                     // phares
 
 #define TEXTSPEED    300   // original value                    // phares
@@ -149,8 +152,11 @@ void F_Drawer (void)
 	if (!finalestage)
 		F_TextWrite(finalecount, Get_TextSpeed());
 	else
-	{
-		int16_t num = W_GetNumForName("HELP2");
-		V_DrawRawFullScreen(num);
-	}
+		V_DrawRawFullScreen(help2num);
+}
+
+
+void F_Init(void)
+{
+	help2num = W_GetNumForName("HELP2");
 }

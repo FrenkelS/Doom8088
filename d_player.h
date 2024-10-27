@@ -182,8 +182,6 @@ typedef struct player_s
 //
 typedef struct
 {
-  boolean     in;     // whether the player is in game
-
   // Player stats, kills, collected items etc.
   int32_t         skills;
   int32_t         sitems;

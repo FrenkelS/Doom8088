@@ -51,4 +51,6 @@ void WI_Start(wbstartstruct_t*   wbstartstruct);
 // Release intermission screen memory
 void WI_End(void);
 
+void WI_Init(void);
+
 #endif
