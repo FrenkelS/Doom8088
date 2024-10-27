@@ -80,13 +80,13 @@ void I_ReloadPalette(void)
 
 typedef enum
 {
-	mda,
-	cga,
-	pcjr,
-	tandy,
-	ega,
-	vga,
-	mcga
+	MDA,
+	CGA,
+	PCJR,
+	TANDY,
+	EGA,
+	VGA,
+	MCGA
 } videocardsenum_t;
 
 
@@ -107,33 +107,33 @@ static videocardsenum_t I_DetectVideoCard(void)
 		regs.w.ax = 0x1a00;
 		regs.h.bl = 0;
 		int86(0x10, &regs, &regs);
-		return (0x0a <= regs.h.bl && regs.h.bl <= 0x0c) ? mcga : vga;
+		return (0x0a <= regs.h.bl && regs.h.bl <= 0x0c) ? MCGA : VGA;
 	}
 
 	regs.h.ah = 0x12;
 	regs.h.bl = 0x10;
 	int86(0x10, &regs, &regs);
 	if (regs.h.bl & 3)
-		return ega;
+		return EGA;
 
 	regs.h.ah = 0x0f;
 	int86(0x10, &regs, &regs);
 	if (regs.h.al == 7)
-		return mda;
+		return MDA;
 
 	uint8_t __far* fp;
 	fp = D_MK_FP(0xffff, 0x000e);
 	if (*fp == 0xfd)
-		return pcjr;
+		return PCJR;
 
 	if (*fp == 0xff)
 	{
 		fp = D_MK_FP(0xfc00, 0);
 		if (*fp == 0x21)
-			return tandy;
+			return TANDY;
 	}
 
-	return cga;
+	return CGA;
 }
 
 
@@ -148,7 +148,7 @@ static const int8_t colors[14] =
 
 static void I_UploadNewPalette(int8_t pal)
 {
-	if (videocard == cga)
+	if (videocard == CGA)
 		outp(0x3d9, colors[pal]);
 	else
 	{
@@ -163,7 +163,7 @@ static void I_UploadNewPalette(int8_t pal)
 
 static void I_DisableBlinking(void)
 {
-	if (videocard == cga)
+	if (videocard == CGA)
 	{
 #if VIEWWINDOWWIDTH == 40
 		outp(0x3d8, 8);
@@ -188,7 +188,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	__djgpp_nearptr_enable();
 
 	videocard = I_DetectVideoCard();
-	if (videocard == vga)
+	if (videocard == VGA)
 	{
 		// 200 scan lines to get the 8x8 font
 		union REGS regs;
@@ -226,7 +226,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 void I_ShutdownGraphicsHardwareSpecificCode(void)
 {
-	if (videocard == vga)
+	if (videocard == VGA)
 	{
 		// 400 scan lines
 		union REGS regs;
