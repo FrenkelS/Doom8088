@@ -362,13 +362,13 @@ static void P_DoNewChaseDir(mobj_t __far* actor, fixed_t deltax, fixed_t deltay)
 // monsters to free themselves without making them tend to
 // hang over dropoffs.
 
-static boolean PIT_AvoidDropoff(const line_t __far* line)
+static boolean PIT_AvoidDropoff(line_t __far* line)
 {
-  if (LN_BACKSECTOR(line)                          && // Ignore one-sided linedefs
-      _g_tmbbox[BOXRIGHT]  > line->bbox[BOXLEFT]   &&
-      _g_tmbbox[BOXLEFT]   < line->bbox[BOXRIGHT]  &&
-      _g_tmbbox[BOXTOP]    > line->bbox[BOXBOTTOM] && // Linedef must be contacted
-      _g_tmbbox[BOXBOTTOM] < line->bbox[BOXTOP]    &&
+  if (LN_BACKSECTOR(line)                                               && // Ignore one-sided linedefs
+      _g_tmbbox[BOXRIGHT]  > (fixed_t)line->bbox[BOXLEFT]   << FRACBITS &&
+      _g_tmbbox[BOXLEFT]   < (fixed_t)line->bbox[BOXRIGHT]  << FRACBITS &&
+      _g_tmbbox[BOXTOP]    > (fixed_t)line->bbox[BOXBOTTOM] << FRACBITS && // Linedef must be contacted
+      _g_tmbbox[BOXBOTTOM] < (fixed_t)line->bbox[BOXTOP]    << FRACBITS &&
       P_BoxOnLineSide(_g_tmbbox, line) == -1)
     {
       fixed_t front = LN_FRONTSECTOR(line)->floorheight;
@@ -498,27 +498,22 @@ static boolean P_LookForPlayers(mobj_t __far* actor, boolean allaround)
 {
     player_t *player;
 
-    if(_g_playeringame)
-    {
-        player = &_g_player;
+    player = &_g_player;
 
-        if (player->health <= 0)
-            return false;               // dead
+    if (player->health <= 0)
+        return false;               // dead
 
-        if (!P_IsVisible(actor, player->mo, allaround))
-            return false;
+    if (!P_IsVisible(actor, player->mo, allaround))
+        return false;
 
-        actor->target = player->mo;
+    actor->target = player->mo;
 
-        /* killough 9/9/98: give monsters a threshold towards getting players
-       * (we don't want it to be too easy for a player with dogs :)
-       */
-        actor->threshold = 60;
+    /* killough 9/9/98: give monsters a threshold towards getting players
+     * (we don't want it to be too easy for a player with dogs :)
+     */
+    actor->threshold = 60;
 
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 //
@@ -920,7 +915,7 @@ void A_BossDeath(mobj_t __far* mo)
     if (mo->type != MT_BRUISER)
         return;
 
-    if (!(_g_playeringame && _g_player.health > 0))
+    if (_g_player.health <= 0)
         return;     // no one left alive, so do not end game
 
     // scan the remaining thinkers to see

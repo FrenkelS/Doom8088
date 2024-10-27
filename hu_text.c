@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -29,15 +29,17 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:  Heads-up displays
+ *               Text mode version
  *
  *-----------------------------------------------------------------------------
  */
 
 #include <stdint.h>
+
 #include "d_player.h"
+#include "i_vtext.h"
 #include "r_defs.h"
 #include "hu_stuff.h"
-#include "st_stuff.h" /* jff 2/16/98 need loc of status bar */
 #include "w_wad.h"
 #include "s_sound.h"
 #include "d_englsh.h"
@@ -55,10 +57,8 @@
  *  (parent of Scrolling Text and Input Text widgets) */
 typedef struct
 {
-  int16_t   y;
-
   char  lineoftext[HU_MAXLINELENGTH+1];
-  size_t   len;                            // current line length
+  size_t   len;
 } hu_textline_t;
 
 
@@ -77,12 +77,9 @@ boolean    _g_message_dontfuckwithme;
 // Locally used constants, shortcuts.
 //
 
-#define HU_TITLEY (VIEWWINDOWHEIGHT - 1 - HU_FONT_HEIGHT)
+#define HU_TITLEY (VIEWWINDOWHEIGHT - 1)
 
 #define HU_MSGY         0
-
-
-static int16_t font_lump_offset;
 
 
 //
@@ -94,10 +91,7 @@ static int16_t font_lump_offset;
 //
 void HU_Init(void)
 {
-	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
-
-	w_message.y = HU_MSGY;
-	w_title.y   = HU_TITLEY;
+	// Do nothing
 }
 
 
@@ -146,66 +140,44 @@ void HU_Start(void)
 
 
 //
-// HUlib_drawTextLine()
-//
-// Draws a hu_textline_t widget
-//
-// Passed the hu_textline_t and flag whether to draw a cursor
-// Returns nothing
-//
-static void HUlib_drawTextLine(hu_textline_t* textline)
-{
-	const int16_t y = textline->y;
-
-	// draw the new stuff
-	int16_t x = 0;
-	for (size_t i = 0; i < textline->len; i++)
-	{
-		char c = toupper(textline->lineoftext[i]); //jff insure were not getting a cheap toupper conv.
-
-		if (HU_FONTSTART <= c && c <= HU_FONTEND)
-		{
-			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
-			int16_t w = patch->width;
-			if (x + w > SCREENWIDTH)
-			{
-				Z_ChangeTagToCache(patch);
-				break;
-			}
-			V_DrawPatchNotScaled(x, y, patch);
-			Z_ChangeTagToCache(patch);
-			x += w;
-		}
-		else
-		{
-			x += HU_FONT_SPACE_WIDTH;
-			if (x >= SCREENWIDTH)
-				break;
-		}
-	}
-}
-
-
-//
 // HU_Drawer()
 //
 // Draw all the pieces of the heads-up display
 //
 // Passed nothing, returns nothing
 //
+
+static int16_t message_clearer = 0;
+
 void HU_Drawer(void)
 {
-    // draw the automap widgets if automap is displayed
-    if (automapmode & am_active)
-    {
-        // map title
-        HUlib_drawTextLine(&w_title);
-    }
+    // draw the automap widgets / map title if automap is displayed
+	static int16_t am_clearer = 0;
+
+	if (automapmode & am_active)
+	{
+        V_DrawString(0, HU_TITLEY, 12, w_title.lineoftext);
+		am_clearer = 3; // 3 screen pages
+	}
+	else
+	{
+		if (am_clearer)
+		{
+			am_clearer--;
+			V_ClearString(HU_TITLEY, w_title.len);
+		}
+	}
+
+
+	// message
+	if (message_clearer)
+	{
+		message_clearer--;
+		V_ClearString(HU_MSGY, HU_MAXLINELENGTH);
+	}
 
     if (message_on)
-    {
-        HUlib_drawTextLine(&w_message);
-    }
+		V_DrawString(0, HU_MSGY, 12, w_message.lineoftext);
 }
 
 
@@ -228,6 +200,7 @@ void HU_Ticker(void)
 	// tick down message counter if message is up
 	if (message_counter && !--message_counter)
 	{
+		message_clearer = 3; // 3 screen pages
 		message_on = false;
 	}
 
@@ -239,7 +212,10 @@ void HU_Ticker(void)
 		if (plr->message)
 		{
 			//post the message to the message widget
-			w_message.len = strlen(plr->message);
+			size_t newlen = strlen(plr->message);
+			if (newlen < w_message.len)
+				message_clearer = 3; // 3 screen pages
+			w_message.len = newlen;
 			strcpy(w_message.lineoftext, plr->message);
 
 			// clear the message to avoid posting multiple times

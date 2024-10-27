@@ -112,19 +112,19 @@ static boolean P_CrossSubsector(int16_t num)
     { // check lines
         int16_t linenum = seg->linenum;
 
-        const line_t __far* line = &_g_lines[linenum];
+        line_t __far* line = &_g_lines[linenum];
         divline_t divl;
 
         // allready checked other side?
-        if(_g_linedata[linenum].validcount == validcount)
+        if(line->validcount == validcount)
             continue;
 
-        _g_linedata[linenum].validcount = validcount;
+        line->validcount = validcount;
 
-        if (line->bbox[BOXLEFT]  > los.bbox[BOXRIGHT ] ||
-           line->bbox[BOXRIGHT]  < los.bbox[BOXLEFT  ] ||
-           line->bbox[BOXBOTTOM] > los.bbox[BOXTOP   ] ||
-           line->bbox[BOXTOP]    < los.bbox[BOXBOTTOM])
+        if ((fixed_t)line->bbox[BOXLEFT  ]<<FRACBITS > los.bbox[BOXRIGHT ] ||
+            (fixed_t)line->bbox[BOXRIGHT ]<<FRACBITS < los.bbox[BOXLEFT  ] ||
+            (fixed_t)line->bbox[BOXBOTTOM]<<FRACBITS > los.bbox[BOXTOP   ] ||
+            (fixed_t)line->bbox[BOXTOP   ]<<FRACBITS < los.bbox[BOXBOTTOM])
             continue;
 
         // cph - do what we can before forced to check intersection
@@ -152,17 +152,18 @@ static boolean P_CrossSubsector(int16_t num)
         }
 
         // Forget this line if it doesn't cross the line of sight
-        const vertex_t __far* v1;
-        const vertex_t __far* v2;
+        fixed_t v1x = (fixed_t)line->v1.x<<FRACBITS;
+        fixed_t v1y = (fixed_t)line->v1.y<<FRACBITS;
+        fixed_t v2x = (fixed_t)line->v2.x<<FRACBITS;
+        fixed_t v2y = (fixed_t)line->v2.y<<FRACBITS;
 
-        v1 = &line->v1;
-        v2 = &line->v2;
-
-        if (P_DivlineSide(v1->x, v1->y, &los.strace) == P_DivlineSide(v2->x, v2->y, &los.strace))
+        if (P_DivlineSide(v1x, v1y, &los.strace) == P_DivlineSide(v2x, v2y, &los.strace))
             continue;
 
-        divl.dx = v2->x - (divl.x = v1->x);
-        divl.dy = v2->y - (divl.y = v1->y);
+        divl.x = v1x;
+        divl.y = v1y;
+        divl.dx = v2x - v1x;
+        divl.dy = v2y - v1y;
 
         // line isn't crossed?
         if (P_DivlineSide(los.strace.x, los.strace.y, &divl) == P_DivlineSide(los.t2x, los.t2y, &divl))

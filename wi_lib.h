@@ -1,17 +1,7 @@
-/* Emacs style mode select   -*- C++ -*-
- *-----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
  *
  *
- *  PrBoom: a Doom port merged with LxDoom and LSDLDoom
- *  based on BOOM, a modified and improved DOOM engine
- *  Copyright (C) 1999 by
- *  id Software, Chi Hoang, Lee Killough, Jim Flynn, Rand Phares, Ty Halderman
- *  Copyright (C) 1999-2000 by
- *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
- *  Copyright 2005, 2006 by
- *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
- *  Frenkel Smeijers
+ *  Copyright (C) 2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -29,22 +19,29 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *   Related to f_finale.c, which is called when finishing a game
+ *  Intermission screens.
+ *  Text mode version
  *
  *-----------------------------------------------------------------------------*/
 
+#ifndef __WI_LIB__
+#define __WI_LIB__
 
-#ifndef __F_FINALE__
-#define __F_FINALE__
+void WI_drawLF(int16_t map);
+void WI_drawEL(int16_t map);
 
-/* Called by main loop. */
-void F_Ticker (void);
+int16_t WI_getColonWidth(void);
+void WI_drawColon(int16_t x, int16_t y);
+void WI_drawSucks(int16_t x, int16_t y);
+void WI_drawPercentSign(int16_t x, int16_t y);
 
-/* Called by main loop. */
-void F_Drawer (void);
+int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits);
+void WI_drawStats(int16_t cnt_kills, int16_t cnt_items, int16_t cnt_secret, int32_t cnt_time, int32_t cnt_total_time, int16_t cnt_par);
 
-void F_StartFinale (void);
+void WI_drawSplat(int16_t i);
+void WI_drawYouAreHere(int16_t i);
 
-void F_Init(void);
+void WI_drawPercent(int16_t x, int16_t y, int16_t p);
+void WI_drawTime(int16_t x, int16_t y, int32_t t);
 
 #endif

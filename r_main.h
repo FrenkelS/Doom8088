@@ -58,7 +58,10 @@ typedef struct {
 extern int16_t numnodes;
 extern const mapnode_t __far* nodes;
 
+#if !defined FLAT_SPAN
 extern fixed_t  viewx, viewy, viewz;
+extern fixed_t  viewcos, viewsin;
+#endif
 
 extern angle_t viewangle;
 
@@ -68,8 +71,6 @@ extern const uint8_t __far* fixedcolormap;
 extern int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
 
 extern int16_t       __far* texturetranslation;
-
-extern fixed_t  viewcos, viewsin;
 
 
 //
@@ -83,6 +84,9 @@ subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 void R_InitColormaps(void);
 const uint8_t __far* R_LoadColorMap(int16_t lightlevel);
 
+int16_t V_NumPatchWidth(int16_t num);
+
+
 //
 // REFRESH - the actual rendering functions.
 //
@@ -90,7 +94,7 @@ const uint8_t __far* R_LoadColorMap(int16_t lightlevel);
 void R_RenderPlayerView(player_t *player);   // Called by G_Drawer.
 
 void R_DrawColumn (const draw_column_vars_t *dcvars);
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars);
 
 void R_DrawPlanes (void);
 visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int16_t lightlevel);

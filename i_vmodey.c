@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for VGA Mode Y
+ *      Video code for VGA Mode Y 320x200 256 colors
  *
  *-----------------------------------------------------------------------------*/
  
@@ -65,6 +65,22 @@ extern const int16_t CENTERY;
 static uint8_t  __far* _s_screen;
 
 
+static int16_t palettelumpnum;
+
+
+void I_ReloadPalette(void)
+{
+	char lumpName[9] = "PLAYPAL0";
+
+	if (_g_gamma == 0)
+		lumpName[7] = 0;
+	else
+		lumpName[7] = '0' + _g_gamma;
+
+	palettelumpnum = W_GetNumForName(lumpName);
+}
+
+
 static const uint8_t colors[14][3] =
 {
 	// normal
@@ -93,14 +109,7 @@ static const uint8_t colors[14][3] =
 
 static void I_UploadNewPalette(int8_t pal)
 {
-	char lumpName[9] = "PLAYPAL0";
-
-	if(_g_gamma == 0)
-		lumpName[7] = 0;
-	else
-		lumpName[7] = '0' + _g_gamma;
-
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
+	const uint8_t __far* palette_lump = W_TryGetLumpByNum(palettelumpnum);
 	if (palette_lump != NULL)
 	{
 		const byte __far* palette = &palette_lump[pal * 256 * 3];
@@ -123,6 +132,7 @@ static void I_UploadNewPalette(int8_t pal)
 void I_InitGraphicsHardwareSpecificCode(void)
 {
 	I_SetScreenMode(0x13);
+	I_ReloadPalette();
 	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
@@ -147,6 +157,12 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	outp(CRTC_INDEX, CRTC_MODE);
 	outp(CRTC_INDEX + 1, inp(CRTC_INDEX + 1) | 0x40);
+}
+
+
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// Do nothing
 }
 
 
@@ -322,15 +338,13 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 }
 
 
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
 		return;
-
-	const uint8_t color = texture;
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 

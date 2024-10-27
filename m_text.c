@@ -1,17 +1,7 @@
-/* Emacs style mode select   -*- C++ -*-
- *-----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
  *
  *
- *  PrBoom: a Doom port merged with LxDoom and LSDLDoom
- *  based on BOOM, a modified and improved DOOM engine
- *  Copyright (C) 1999 by
- *  id Software, Chi Hoang, Lee Killough, Jim Flynn, Rand Phares, Ty Halderman
- *  Copyright (C) 1999-2000 by
- *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
- *  Copyright 2005, 2006 by
- *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
- *  Frenkel Smeijers
+ *  Copyright (C) 2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -34,6 +24,7 @@
  *  Setup Menus.
  *  Extended HELP screens.
  *  Dynamic HELP screen.
+ *  Text mode version
  *
  *-----------------------------------------------------------------------------*/
 
@@ -48,7 +39,6 @@
 #include "v_video.h"
 #include "w_wad.h"
 #include "r_main.h"
-#include "hu_stuff.h"
 #include "g_game.h"
 #include "s_sound.h"
 #include "sounds.h"
@@ -57,6 +47,8 @@
 #include "am_map.h"
 #include "i_system.h"
 #include "i_sound.h"
+#include "i_video.h"
+#include "i_vtext.h"
 
 #include "globdata.h"
 
@@ -72,7 +64,7 @@
 typedef struct
 {
   int16_t status; // 0 = no cursor here, 1 = ok, 2 = arrows ok
-  char  name[10];
+  char* name;
 
   // choice = menu item #.
   // if status = 2,
@@ -125,12 +117,12 @@ static void (*messageRoutine)(boolean affirmative);
 
 // we are going to be entering a savegame string
 
-#define SKULLXOFF  -32
-#define LINEHEIGHT  16
+#define SKULLXOFF  -2
+#define LINEHEIGHT  1
 
 // graphic name of skulls
 
-static const char skullName[2][9] = {"M_SKULL1","M_SKULL2"};
+static const char skullName[2] = {'\x02', '\x01'};
 
 
 // end of externs added for setup menus
@@ -168,7 +160,6 @@ static void M_DrawSave(void);
 static void M_SetupNextMenu(const menu_t *menudef);
 static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot);
 static void M_WriteText(int16_t x, int16_t y, const char __far* string);
-static int16_t M_StringWidth(const char __far* string);
 static int16_t M_StringHeight(const char *string);
 static void M_StartMessage(const char *string,void (*routine)(boolean));
 static void M_ClearMenus (void);
@@ -209,13 +200,13 @@ enum
 
 static const menuitem_t MainMenu[]=
 {
-  {1,"M_NGAME", M_NewGame},
-  {1,"M_OPTION",M_Options},
-  {1,"M_LOADG", M_LoadGame},
+  {1,"New Game",  M_NewGame},
+  {1,"Options",   M_Options},
+  {1,"Load game", M_LoadGame},
 #if !defined DISABLE_SAVE_GAME
-  {1,"M_SAVEG", M_SaveGame},
+  {1,"Save game", M_SaveGame},
 #endif
-  {1,"M_QUITG", M_QuitDOOM}
+  {1,"Quit Game", M_QuitDOOM}
 };
 
 static const menu_t MainDef =
@@ -223,7 +214,7 @@ static const menu_t MainDef =
   main_end,       // number of menu items
   MainMenu,       // table that defines menu items
   M_DrawMainMenu, // drawing routine
-  97,64,          // initial cursor position
+  (VIEWWINDOWWIDTH - 9) / 2,8,          // initial cursor position
   NULL,0,
 };
 
@@ -233,8 +224,7 @@ static const menu_t MainDef =
 
 static void M_DrawMainMenu(void)
 {
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(94, 2, "M_DOOM");
+	V_DrawString((VIEWWINDOWWIDTH - 4) / 2, 1, 14, "DOOM");
 }
 
 
@@ -254,11 +244,11 @@ enum
 
 static const menuitem_t NewGameMenu[]=
 {
-  {1,"M_JKILL", M_ChooseSkill},
-  {1,"M_ROUGH", M_ChooseSkill},
-  {1,"M_HURT",  M_ChooseSkill},
-  {1,"M_ULTRA", M_ChooseSkill},
-  {1,"M_NMARE", M_ChooseSkill}
+  {1,"I'm too young to die.", M_ChooseSkill},
+  {1,"Hey, not too rough.",   M_ChooseSkill},
+  {1,"Hurt me plenty.",       M_ChooseSkill},
+  {1,"Ultra-Violence.",       M_ChooseSkill},
+  {1,"NIGHTMARE!",            M_ChooseSkill}
 };
 
 static const menu_t NewDef =
@@ -266,7 +256,7 @@ static const menu_t NewDef =
   newg_end,       // # of menu items
   NewGameMenu,    // menuitem_t ->
   M_DrawNewGame,  // drawing routine ->
-  48,63,          // x,y
+  (VIEWWINDOWWIDTH - 21) / 2,8,          // x,y
   &MainDef,0,
 };
 
@@ -277,9 +267,8 @@ static const menu_t NewDef =
 
 static void M_DrawNewGame(void)
 {
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(96, 14, "M_NEWG");
-  V_DrawNamePatchScaled(54, 38, "M_SKILL");
+	V_DrawString((VIEWWINDOWWIDTH -  8) / 2, 2, 12, "NEW GAME");
+	V_DrawString((VIEWWINDOWWIDTH - 19) / 2, 4, 12, "Choose Skill Level:");
 }
 
 static void M_NewGame(int16_t choice)
@@ -350,7 +339,7 @@ static const menu_t LoadDef =
   load_end,
   LoadMenue,
   M_DrawLoad,
-  64,34, //jff 3/15/98 move menu up
+  (VIEWWINDOWWIDTH - 5) / 2,4,
   &MainDef,2,
 };
 
@@ -362,40 +351,15 @@ static const menu_t LoadDef =
 
 static void M_DrawSaveLoad(const char* name)
 {
-	int8_t i, j;
+	V_DrawString((VIEWWINDOWWIDTH - strlen(name)) / 2, 2, 12, name);
 
-	V_DrawNamePatchScaled(72 ,LOADGRAPHIC_Y, name);
-
-	const patch_t __far* lpatch = W_GetLumpByName("M_LSLEFT");
-	const patch_t __far* mpatch = W_GetLumpByName("M_LSCNTR");
-	const patch_t __far* rpatch = W_GetLumpByName("M_LSRGHT");
-
-	for (i = 0; i < load_end; i++)
-	{
-		//
-		// Draw border for the savegame description
-		//
-		int16_t x = LoadDef.x;
-		const int16_t y = 27 + 13 * i + 7;
-		V_DrawPatchNotScaled(x - 8, y, lpatch);
-		for (j = 0; j < 12; j++)
-		{
-			V_DrawPatchNotScaled(x, y, mpatch);
-			x += 8;
-		}
-		V_DrawPatchNotScaled(x, y, rpatch);
-
-		M_WriteText(LoadDef.x, y - 7, _g_savegamestrings[i]);
-	}
-
-	Z_ChangeTagToCache(lpatch);
-	Z_ChangeTagToCache(mpatch);
-	Z_ChangeTagToCache(rpatch);
+	for (int16_t i = 0; i < load_end; i++)
+		M_WriteText(LoadDef.x, i + 4, _g_savegamestrings[i]);
 }
 
 static void M_DrawLoad(void)
 {
-	M_DrawSaveLoad("M_LOADG");
+	M_DrawSaveLoad("Load game");
 }
 
 
@@ -452,7 +416,7 @@ static const menu_t SaveDef =
   load_end, // same number of slots as the Load Game screen
   SaveMenu,
   M_DrawSave,
-  80,34, //jff 3/15/98 move menu up
+  (VIEWWINDOWWIDTH - 5) / 2,5,
   &MainDef,3,
 };
 
@@ -470,7 +434,7 @@ static void M_ReadSaveStrings(void)
 //
 static void M_DrawSave(void)
 {
-	M_DrawSaveLoad("M_SAVEG");
+	M_DrawSaveLoad("Save game");
 }
 
 //
@@ -555,12 +519,12 @@ enum
 static const menuitem_t OptionsMenu[]=
 {
   // killough 4/6/98: move setup to be a sub-menu of OPTIONs
-  {1,"M_ENDGAM", M_EndGame},
-  {1,"M_MESSG",  M_ChangeMessages},
-  {1,"M_ARUN",   M_ChangeAlwaysRun},
-  {2,"M_GAMMA",  M_ChangeGamma},
+  {1,"End Game",     M_EndGame},
+  {1,"Messages:",    M_ChangeMessages},
+  {1,"Always Run:",  M_ChangeAlwaysRun},
+  {2,"Gamma Boost:", M_ChangeGamma},
 #if !defined DISABLE_SOUND_OPTIONS
-  {1,"M_SVOL",   M_Sound}
+  {1,"Sound Volume", M_Sound}
 #endif
 };
 
@@ -569,27 +533,25 @@ static const menu_t OptionsDef =
   opt_end,
   OptionsMenu,
   M_DrawOptions,
-  60,37,
+  (VIEWWINDOWWIDTH - 12) / 2,4,
   &MainDef,1,
 };
 
 //
 // M_Options
 //
-static const char msgNames[2][9]  = {"M_MSGOFF","M_MSGON"};
+static const char msgNames[2][4]  = {"Off","On"};
 
 
 static void M_DrawOptions(void)
 {
-  // CPhipps - patch drawing updated
-  // proff/nicolas 09/20/98 -- changed for hi-res
-  V_DrawNamePatchScaled(108, 15, "M_OPTTTL");
+	V_DrawString((VIEWWINDOWWIDTH - 7) / 2, 2, 12, "OPTIONS");
 
-  V_DrawNamePatchScaled(OptionsDef.x + 120, OptionsDef.y+LINEHEIGHT*messages, msgNames[showMessages]);
+	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * messages,  12, msgNames[showMessages]);
 
-  V_DrawNamePatchScaled(OptionsDef.x + 146, OptionsDef.y+LINEHEIGHT*alwaysrun, msgNames[_g_alwaysRun]);
+	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * alwaysrun, 12, msgNames[_g_alwaysRun]);
 
-  M_DrawThermo(OptionsDef.x + 158, OptionsDef.y+LINEHEIGHT*gamma+2,6,_g_gamma);
+	M_DrawThermo(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * gamma, 6, _g_gamma);
 }
 
 static void M_Options(int16_t choice)
@@ -620,9 +582,9 @@ enum
 
 static const menuitem_t SoundMenu[]=
 {
-  {2,"M_SFXVOL",M_SfxVol},
+  {2,"Sfx Volume",   M_SfxVol},
   {-1,"",0},
-  {2,"M_MUSVOL",M_MusicVol},
+  {2,"Music Volume", M_MusicVol},
   {-1,"",0}
 };
 
@@ -631,7 +593,7 @@ static const menu_t SoundDef =
   sound_end,
   SoundMenu,
   M_DrawSound,
-  80,64,
+  (VIEWWINDOWWIDTH - 12) / 2,8,
   &OptionsDef,4,
 };
 
@@ -641,12 +603,11 @@ static const menu_t SoundDef =
 
 static void M_DrawSound(void)
 {
-  // CPhipps - patch drawing updated
-  V_DrawNamePatchScaled(60, 38, "M_SVOL");
+	V_DrawNamePatchScaled(60, 38, "M_SVOL");
 
-  M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (sfx_vol   + 1), 16, snd_SfxVolume);
+	M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (sfx_vol   + 1), 16, snd_SfxVolume);
 
-  M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (music_vol + 1), 16, snd_MusicVolume);
+	M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (music_vol + 1), 16, snd_MusicVolume);
 }
 
 static void M_Sound(int16_t choice)
@@ -836,6 +797,7 @@ boolean M_Responder (event_t* ev)
         if (messageRoutine)
             messageRoutine(ch == 'y');
 
+        I_InitScreenPages();
         _g_menuactive = false;
         S_StartSound(NULL,sfx_swtchx);
         return true;
@@ -1007,60 +969,59 @@ static char __far* Z_Strdup(const char* s)
 // Called after the view has been rendered,
 // but before it has been blitted.
 //
-// killough 9/29/98: Significantly reformatted source
-//
 
 void M_Drawer (void)
 {
-    // Horiz. & Vertically center string and print it.
-    // killough 9/29/98: simplified code, removed 40-character width limit
-    if (messageToPrint)
-    {
-        /* cph - strdup string to writable memory */
-        char __far* ms = Z_Strdup(messageString);
-        char __far* p = ms;
+	if (messageToPrint)
+	{
+		// Horiz. & Vertically center string and print it.
 
-        int16_t y = 80 - M_StringHeight(messageString)/2;
-        while (*p)
-        {
-            char __far* string = p;
-            char c;
-            while ((c = *p) && *p != '\n')
-                p++;
-            *p = 0;
-            M_WriteText(120 - M_StringWidth(string)/2, y, string);
-            y += HU_FONT_HEIGHT;
-            if ((*p = c))
-                p++;
-        }
-        Z_Free(ms);
-    }
-    else
-        if (_g_menuactive)
-        {
-            int16_t x,y,max,i;
+		I_InitScreenPage();
 
-            if (currentMenu->routine)
-                currentMenu->routine();     // call Draw routine
+		/* cph - strdup string to writable memory */
+		char __far* ms = Z_Strdup(messageString);
+		char __far* p = ms;
 
-            // DRAW MENU
+		int16_t y = (VIEWWINDOWHEIGHT - M_StringHeight(messageString)) / 2;
+		while (*p)
+		{
+			char __far* string = p;
+			char c;
+			while ((c = *p) && *p != '\n')
+				p++;
+			*p = 0;
+			M_WriteText((VIEWWINDOWWIDTH - _fstrlen(string)) / 2, y, string);
+			y += 1;
+			if ((*p = c))
+				p++;
+		}
+		Z_Free(ms);
+	}
+	else if (_g_menuactive)
+	{
+		int16_t x,y,max,i;
 
-            x = currentMenu->x;
-            y = currentMenu->y;
-            max = currentMenu->numitems;
+		I_InitScreenPage();
 
-            for (i=0;i<max;i++)
-            {
-                if (currentMenu->menuitems[i].name[0])
-                    V_DrawNamePatchScaled(x,y,currentMenu->menuitems[i].name);
-                y += LINEHEIGHT;
-            }
+		if (currentMenu->routine)
+			currentMenu->routine();     // call Draw routine
 
-            // DRAW SKULL
+		// DRAW MENU
 
-            // CPhipps - patch drawing updated
-            V_DrawNamePatchScaled(x + SKULLXOFF, currentMenu->y - 5 + itemOn*LINEHEIGHT, skullName[whichSkull]);
-        }
+		x = currentMenu->x;
+		y = currentMenu->y;
+		max = currentMenu->numitems;
+
+		for (i=0;i<max;i++)
+		{
+			if (currentMenu->menuitems[i].name[0])
+				V_DrawString(x, y, 12, currentMenu->menuitems[i].name);
+			y += LINEHEIGHT;
+		}
+
+		// DRAW SKULL
+		V_DrawCharacter(x + SKULLXOFF, currentMenu->y + itemOn*LINEHEIGHT, 12, skullName[whichSkull]);
+	}
 }
 
 //
@@ -1072,6 +1033,7 @@ static void M_ClearMenus (void)
 {
   _g_menuactive = false;
   itemOn = 0;
+  I_InitScreenPages();
 }
 
 //
@@ -1121,41 +1083,13 @@ static void M_StartMessage (const char* string, void (*routine)(boolean))
 // M_DrawThermo draws the thermometer graphic for Mouse Sensitivity,
 // Sound Volume, etc.
 //
-// proff/nicolas 09/20/98 -- changed for hi-res
-// CPhipps - patch drawing updated
 //
 static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot )
 {
-    int16_t          xx;
-    int16_t           i;
-    /*
-   * Modification By Barry Mead to allow the Thermometer to have vastly
-   * larger ranges. (the thermWidth parameter can now have a value as
-   * large as 200.      Modified 1-9-2000  Originally I used it to make
-   * the sensitivity range for the mouse better. It could however also
-   * be used to improve the dynamic range of music and sound affect
-   * volume controls for example.
-   */
-    int16_t horizScaler; //Used to allow more thermo range for mouse sensitivity.
-    thermWidth = (thermWidth > 200) ? 200 : thermWidth; //Clamp to 200 max
-    horizScaler = (thermWidth > 23) ? (200 / thermWidth) : 8; //Dynamic range
-    xx = x;
+	for (int16_t w = 0; w < thermWidth; w++)
+		V_DrawCharacter(x + w, y, 8, '-');
 
-    int16_t thermm_lump = W_GetNumForName("M_THERMM");
-
-    V_DrawNamePatchScaled(xx, y, "M_THERML");
-
-    xx += 8;
-    for (i=0;i<thermWidth;i++)
-    {
-        V_DrawNumPatchScaled(xx, y, thermm_lump);
-        xx += horizScaler;
-    }
-
-    xx += (8 - horizScaler);  /* make the right end look even */
-
-    V_DrawNamePatchScaled(xx, y, "M_THERMR");
-    V_DrawNamePatchScaled((x+8)+thermDot*horizScaler,y, "M_THERMO");
+	V_DrawCharacter(x + thermDot, y, 9, '|');
 }
 
 /////////////////////////////
@@ -1163,42 +1097,16 @@ static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t therm
 // String-drawing Routines
 //
 
-static int16_t font_lump_offset;
-
-//
-// Find string width from hu_font chars
-//
-
-static int16_t M_StringWidth(const char __far* string)
-{
-	int16_t	w = 0;
-
-	for (size_t i = 0; i < _fstrlen(string); i++)
-	{
-		char c = string[i];
-		c = toupper(c);
-		if (HU_FONTSTART <= c && c <= HU_FONTEND)
-		{
-			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
-			w += patch->width;
-			Z_ChangeTagToCache(patch);
-		} else
-			w += HU_FONT_SPACE_WIDTH;
-	}
-
-	return w;
-}
-
 //
 //    Find string height from hu_font chars
 //
 
 static int16_t M_StringHeight(const char* string)
 {
-	int16_t i, h = HU_FONT_HEIGHT;
-	for (i = 0; string[i]; i++)            // killough 1/31/98
+	int16_t i, h = 1;
+	for (i = 0; string[i]; i++)
 		if (string[i] == '\n')
-			h += HU_FONT_HEIGHT;
+			h += 1;
 	return h;
 }
 
@@ -1218,20 +1126,12 @@ static void M_WriteText (int16_t x, int16_t y, const char __far* string)
 
 		if (c == '\n') {
 			cx = x;
-			cy += 12;
+			cy += 1;
 			continue;
 		}
 
-		c = toupper(c);
-		if (HU_FONTSTART <= c && c <= HU_FONTEND)
-		{
-			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
-			V_DrawPatchNotScaled(cx, cy, patch);
-			cx += patch->width;
-			Z_ChangeTagToCache(patch);
-		} else {
-			cx += HU_FONT_SPACE_WIDTH;
-		}
+		V_DrawCharacter(cx, cy, 12, c);
+		cx++;
 	}
 }
 
@@ -1253,8 +1153,6 @@ void M_Init(void)
 	messageToPrint        = false;
 	messageString         = NULL;
 	messageLastMenuActive = _g_menuactive;
-
-	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 
 	G_UpdateSaveGameStrings();
 }

@@ -66,6 +66,11 @@ typedef struct
   fixed_t x, y;
 } vertex_t;
 
+typedef struct
+{
+  int16_t x, y;
+} vertex16_t;
+
 // Each sector has a degenmobj_t in its center for sound origin purposes.
 typedef struct
 {
@@ -124,9 +129,9 @@ typedef struct
     int16_t textureoffset; // add this to the calculated texture column
     int16_t rowoffset;     // add this to the calculated texture top
 
-    int16_t toptexture:10;
-    int16_t bottomtexture:10;
-    int16_t midtexture:10;
+    int16_t toptexture;
+    int16_t bottomtexture;
+    int16_t midtexture;
 } side_t;
 
 //
@@ -148,38 +153,33 @@ typedef enum
     RF_MAPPED   =32      // Seen so show on automap.
 } r_flags;
 
-//Runtime mutable data for lines.
-typedef struct linedata_s
-{
-    uint16_t validcount;        // if == validcount, already checked
-    uint16_t r_validcount;      // cph: if == gametic, r_flags already done
-
-    int16_t special;
-    int16_t r_flags;
-} linedata_t;
 
 typedef struct line_s
 {
-    vertex_t v1;
-    vertex_t v2;     // Vertices, from v1 to v2.
-    uint16_t lineno;         //line number.
+    vertex16_t v1;
+    vertex16_t v2;     // Vertices, from v1 to v2.
 
     int16_t dx, dy;        // Precalculated v2 - v1 for side checking.
 
     uint16_t sidenum[2];        // Visual appearance: SideDefs.
-    fixed_t bbox[4];        //Line bounding box.
+    int16_t bbox[4];        //Line bounding box.
 
     int16_t tag;
     uint8_t flags;           // Animation related.
     int8_t slopetype; // To aid move clipping.
 
+    uint16_t validcount;        // if == validcount, already checked
+    uint16_t r_validcount;      // cph: if == gametic, r_flags already done
+
+    int16_t r_flags;
+    int16_t special;
 } line_t;
 
 
 #define LN_FRONTSECTOR(l) (_g_sides[(l)->sidenum[0]].sector)
 #define LN_BACKSECTOR(l) ((l)->sidenum[1] != NO_INDEX ? _g_sides[(l)->sidenum[1]].sector : NULL)
 
-#define LN_SPECIAL(l) (_g_linedata[(l)->lineno].special)
+#define LN_SPECIAL(l) ((l)->special)
 
 
 // phares 3/14/98
@@ -236,18 +236,20 @@ typedef struct
 //
 typedef struct
 {
-    vertex_t v1;
-    vertex_t v2;            // Vertices, from v1 to v2.
+    vertex16_t v1;
+    vertex16_t v2;            // Vertices, from v1 to v2.
 
-    fixed_t offset;
-    angle_t angle;
+    int16_t offset;
+    angle16_t angle;
 
     uint16_t sidenum;
     uint16_t linenum;
 
-    uint16_t frontsectornum;
-    uint16_t backsectornum;
+    uint8_t frontsectornum;
+    uint8_t backsectornum;
 } seg_t;
+
+typedef char assertSegSize[sizeof(seg_t) == 18 ? 1 : -1];
 
 
 //

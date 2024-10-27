@@ -56,11 +56,11 @@ button_t  _g_buttonlist[MAXBUTTONS];
 
 // switch animation structure type
 
-typedef PACKEDATTR_PRE struct
+typedef struct
 {
   char name1[9];
   char name2[9];
-} PACKEDATTR_POST switchlist_t; //jff 3/23/98 pack to read from memory
+} switchlist_t; //jff 3/23/98 pack to read from memory
 
 typedef char assertSwitchlistSize[sizeof(switchlist_t) == 18 ? 1 : -1];
 
@@ -172,7 +172,7 @@ static void P_StartButton(const line_t __far* line, bwhere_e w, int16_t texture,
 // 1 second, in ticks.
 #define BUTTONTIME  TICRATE
 
-void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
+void P_ChangeSwitchTexture(line_t __far* line, boolean useAgain)
 {
     /* Rearranged a bit to avoid too much code duplication */
     int16_t     i;
@@ -247,7 +247,7 @@ void P_ChangeSwitchTexture(const line_t __far* line, boolean useAgain)
 //
 // Passed the line activating the door and the thing activating it
 //
-static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
+static void EV_VerticalDoor(line_t __far* line, mobj_t __far* thing)
 {
   player_t* player;
   sector_t __far* sec;
@@ -262,7 +262,7 @@ static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
     case 32:
       if ( !player )
         return;
-      if (!player->cards[it_bluecard] && !player->cards[it_blueskull])
+      if (!player->cards[it_bluecard])
       {
           player->message = PD_BLUEK;         // Ty 03/27/98 - externalized
           S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
@@ -274,7 +274,7 @@ static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
     case 34:
       if ( !player )
           return;
-      if (!player->cards[it_yellowcard] && !player->cards[it_yellowskull])
+      if (!player->cards[it_yellowcard])
       {
           player->message = PD_YELLOWK;       // Ty 03/27/98 - externalized
           S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
@@ -286,7 +286,7 @@ static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
     case 33:
       if ( !player )
           return;
-      if (!player->cards[it_redcard] && !player->cards[it_redskull])
+      if (!player->cards[it_redcard])
       {
           player->message = PD_REDK;          // Ty 03/27/98 - externalized
           S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
@@ -415,7 +415,7 @@ static void EV_VerticalDoor(const line_t __far* line, mobj_t __far* thing)
 // Passed the thing using the line and the line being used
 // Returns true if a thinker was created
 //
-boolean P_UseSpecialLine(mobj_t __far* thing, const line_t __far* line)
+boolean P_UseSpecialLine(mobj_t __far* thing, line_t __far* line)
 {
   // Switches that other things can activate.
   if (!P_MobjIsPlayer(thing))

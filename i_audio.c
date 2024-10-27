@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -85,7 +85,7 @@ int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep)
 //	 || id == sfx_sawidl)
 //		return -1;
 
-	int16_t lumpnum = 999; // TODO should be W_GetNumForName("DPPISTOL") - 1;
+	int16_t lumpnum = 96 - 1; // TODO should be W_GetNumForName("DPPISTOL") - 1;
 	if (id < sfx_chgun)
 		lumpnum += id;
 	else if (id == sfx_chgun)

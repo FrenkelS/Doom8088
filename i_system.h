@@ -52,6 +52,7 @@ void I_SetScreenMode(uint16_t mode);
 
 void I_FinishUpdate(void);
 
+void I_ReloadPalette(void);
 void I_SetPalette(int8_t pal);
 
 /* I_StartTic

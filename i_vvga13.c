@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for VGA Mode 13h
+ *      Video code for VGA Mode 13h 320x200 256 colors
  *
  *-----------------------------------------------------------------------------*/
  
@@ -44,6 +44,22 @@ extern const int16_t CENTERY;
 // The screen is [SCREENWIDTH * SCREENHEIGHT];
 static uint8_t __far* _s_screen;
 static uint8_t __far* vgascreen;
+
+
+static int16_t palettelumpnum;
+
+
+void I_ReloadPalette(void)
+{
+	char lumpName[9] = "PLAYPAL0";
+
+	if (_g_gamma == 0)
+		lumpName[7] = 0;
+	else
+		lumpName[7] = '0' + _g_gamma;
+
+	palettelumpnum = W_GetNumForName(lumpName);
+}
 
 
 #define PEL_WRITE_ADR   0x3c8
@@ -81,14 +97,7 @@ static void I_UploadNewPalette(int8_t pal)
 	// This is used to replace the current 256 colour cmap with a new one
 	// Used by 256 colour PseudoColor modes
 
-	char lumpName[9] = "PLAYPAL0";
-
-	if(_g_gamma == 0)
-		lumpName[7] = 0;
-	else
-		lumpName[7] = '0' + _g_gamma;
-
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
+	const uint8_t __far* palette_lump = W_TryGetLumpByNum(palettelumpnum);
 	if (palette_lump != NULL)
 	{
 		const byte __far* palette = &palette_lump[pal * 256 * 3];
@@ -111,6 +120,7 @@ static void I_UploadNewPalette(int8_t pal)
 void I_InitGraphicsHardwareSpecificCode(void)
 {
 	I_SetScreenMode(0x13);
+	I_ReloadPalette();
 	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
@@ -146,6 +156,12 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 		}
 	}
 	drawStatusBar = true;
+}
+
+
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// Do nothing
 }
 
 
@@ -288,7 +304,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 }
 
 
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
+void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -296,7 +312,8 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	const uint16_t color = (texture << 8) | texture;
+	uint16_t color = col;
+	color = (color << 8) | col;
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 	uint16_t __far* d = (uint16_t __far*) dest;

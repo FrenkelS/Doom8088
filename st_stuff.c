@@ -31,7 +31,6 @@
  * DESCRIPTION:
  *      Status bar code.
  *      Does the face/direction indicator animation.
- *      Does palette indicators as well (red pain/berserk, bright pickup)
  *
  *-----------------------------------------------------------------------------*/
 
@@ -171,8 +170,6 @@ static int16_t      keyboxes[3];
 // a random number per tick
 static int16_t      st_randomnumber;
 
-static int8_t st_palette;
-
 
 // Size of statusbar.
 // Now sensitive for scaling.
@@ -273,12 +270,12 @@ static int8_t st_palette;
 #define ST_AMMO2WIDTH           ST_AMMO0WIDTH
 // proff 08/18/98: Changed for high-res
 #define ST_AMMO2X               (ST_X+220)
-#define ST_AMMO2Y               (ST_Y+23)
+#define ST_AMMO2Y               (ST_Y+17)
 
 #define ST_AMMO3WIDTH           ST_AMMO0WIDTH
 // proff 08/18/98: Changed for high-res
 #define ST_AMMO3X               (ST_X+220)
-#define ST_AMMO3Y               (ST_Y+17)
+#define ST_AMMO3Y               (ST_Y+23)
 
 
 // Indicate maximum ammunition.
@@ -296,12 +293,12 @@ static int8_t st_palette;
 #define ST_MAXAMMO2WIDTH        ST_MAXAMMO0WIDTH
 // proff 08/18/98: Changed for high-res
 #define ST_MAXAMMO2X            (ST_X+238)
-#define ST_MAXAMMO2Y            (ST_Y+23)
+#define ST_MAXAMMO2Y            (ST_Y+17)
 
 #define ST_MAXAMMO3WIDTH        ST_MAXAMMO0WIDTH
 // proff 08/18/98: Changed for high-res
 #define ST_MAXAMMO3X            (ST_X+238)
-#define ST_MAXAMMO3Y            (ST_Y+17)
+#define ST_MAXAMMO3Y            (ST_Y+23)
 
 
 // used to use appopriately pained face
@@ -530,12 +527,6 @@ static void ST_updateWidgets(void)
     for (i=0;i<3;i++)
     {
         keyboxes[i] = _g_player.cards[i] ? i : -1;
-
-        //jff 2/24/98 select double key
-        //killough 2/28/98: preserve traditional keys by config option
-
-        if (_g_player.cards[i+3])
-            keyboxes[i] = i+3;
     }
 
     // refresh everything if this is him coming back to life
@@ -547,60 +538,6 @@ void ST_Ticker(void)
   st_randomnumber = M_Random();
   ST_updateWidgets();
   st_oldhealth = _g_player.health;
-}
-
-
-// Palette indices.
-// For damage/bonus red-/gold-shifts
-#define STARTREDPALS            1
-#define STARTBONUSPALS          9
-#define NUMREDPALS              8
-#define NUMBONUSPALS            4
-// Radiation suit, green shift.
-#define RADIATIONPAL            13
-
-
-void ST_doPaletteStuff(void)
-{
-    int8_t  palette;
-    int16_t cnt = _g_player.damagecount;
-
-    if (_g_player.powers[pw_strength])
-    {
-        // slowly fade the berzerk out
-        int16_t bzc = 12 - (_g_player.powers[pw_strength] >> 6);
-        if (bzc > cnt)
-            cnt = bzc;
-    }
-
-    if (cnt)
-    {
-        palette = (cnt + 7) >> 3;
-        if (palette >= NUMREDPALS)
-            palette = NUMREDPALS - 1;
-
-        /* cph 2006/08/06 - if in the menu, reduce the red tint - navigating to
-       * load a game can be tricky if the screen is all red */
-        if (_g_menuactive)
-            palette >>= 1;
-
-        palette += STARTREDPALS;
-    }
-    else if (_g_player.bonuscount)
-    {
-        palette = (_g_player.bonuscount + 7) >> 3;
-        if (palette >= NUMBONUSPALS)
-            palette = NUMBONUSPALS - 1;
-        palette += STARTBONUSPALS;
-    }
-    else if (_g_player.powers[pw_ironfeet] > 4 * 32 || _g_player.powers[pw_ironfeet] & 8)
-        palette = RADIATIONPAL;
-    else
-        palette = 0;
-
-    if (palette != st_palette) {
-        I_SetPalette(st_palette = palette);
-    }
 }
 
 
@@ -687,7 +624,7 @@ static void ST_drawWidgets(void)
     STlib_drawNum(&w_ready);
 	
 	// Restore the ammo numbers for backpack stats I guess, etc ~Kippykip
-	for (int8_t i = 0; i < 4; i++)
+	for (int8_t i = 0; i < NUMAMMO; i++)
     {
 		STlib_drawNum(&w_ammo[i]);
 		STlib_drawNum(&w_maxammo[i]);
@@ -740,7 +677,7 @@ boolean ST_NeedUpdate(void)
         return true;
 	
 	// ammo
-    for(int8_t i=0; i<4; i++)
+    for(int8_t i=0; i<NUMAMMO; i++)
     {
         if(w_ammo[i].oldnum != *w_ammo[i].num)
             return true;
@@ -837,7 +774,7 @@ static void ST_initData(void)
     int8_t i;
 
     st_faceindex = 0;
-    st_palette = -1;
+    ST_initPalette();
 
     st_oldhealth = -1;
 
@@ -912,16 +849,16 @@ static void ST_createWidgets(void)
     STlib_initMultIcon(&w_keyboxes[2], ST_KEY2X, ST_KEY2Y, keys, &keyboxes[2]);			
 			
 	// ammo count (all four kinds)
-	STlib_initNum(&w_ammo[0], ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[0], ST_AMMO0WIDTH);
-	STlib_initNum(&w_ammo[1], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[1], ST_AMMO1WIDTH);
-	STlib_initNum(&w_ammo[2], ST_AMMO2X, ST_AMMO2Y, shortnum, &_g_player.ammo[2], ST_AMMO2WIDTH);
-	STlib_initNum(&w_ammo[3], ST_AMMO3X, ST_AMMO3Y, shortnum, &_g_player.ammo[3], ST_AMMO3WIDTH);
+	STlib_initNum(&w_ammo[am_clip],  ST_AMMO0X, ST_AMMO0Y, shortnum, &_g_player.ammo[am_clip],  ST_AMMO0WIDTH);
+	STlib_initNum(&w_ammo[am_shell], ST_AMMO1X, ST_AMMO1Y, shortnum, &_g_player.ammo[am_shell], ST_AMMO1WIDTH);
+	STlib_initNum(&w_ammo[am_misl],  ST_AMMO2X, ST_AMMO2Y, shortnum, &_g_player.ammo[am_misl],  ST_AMMO2WIDTH);
+	STlib_initNum(&w_ammo[am_cell],  ST_AMMO3X, ST_AMMO3Y, shortnum, &_g_player.ammo[am_cell],  ST_AMMO3WIDTH);
 
 	// max ammo count (all four kinds)
-	STlib_initNum(&w_maxammo[0], ST_MAXAMMO0X, ST_MAXAMMO0Y, shortnum, &_g_player.maxammo[0], ST_MAXAMMO0WIDTH);
-	STlib_initNum(&w_maxammo[1], ST_MAXAMMO1X, ST_MAXAMMO1Y, shortnum, &_g_player.maxammo[1], ST_MAXAMMO1WIDTH);
-	STlib_initNum(&w_maxammo[2], ST_MAXAMMO2X, ST_MAXAMMO2Y, shortnum, &_g_player.maxammo[2], ST_MAXAMMO2WIDTH);
-	STlib_initNum(&w_maxammo[3], ST_MAXAMMO3X, ST_MAXAMMO3Y, shortnum, &_g_player.maxammo[3], ST_MAXAMMO3WIDTH);
+	STlib_initNum(&w_maxammo[am_clip],  ST_MAXAMMO0X, ST_MAXAMMO0Y, shortnum, &_g_player.maxammo[am_clip],  ST_MAXAMMO0WIDTH);
+	STlib_initNum(&w_maxammo[am_shell], ST_MAXAMMO1X, ST_MAXAMMO1Y, shortnum, &_g_player.maxammo[am_shell], ST_MAXAMMO1WIDTH);
+	STlib_initNum(&w_maxammo[am_misl],  ST_MAXAMMO2X, ST_MAXAMMO2Y, shortnum, &_g_player.maxammo[am_misl],  ST_MAXAMMO2WIDTH);
+	STlib_initNum(&w_maxammo[am_cell],  ST_MAXAMMO3X, ST_MAXAMMO3Y, shortnum, &_g_player.maxammo[am_cell],  ST_MAXAMMO3WIDTH);
 			
     // faces
     STlib_initMultIcon(&w_faces, ST_FACESX, ST_FACESY, faces, &st_faceindex);

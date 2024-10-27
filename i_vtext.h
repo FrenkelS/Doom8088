@@ -1,17 +1,7 @@
-/* Emacs style mode select   -*- C++ -*-
- *-----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
  *
  *
- *  PrBoom: a Doom port merged with LxDoom and LSDLDoom
- *  based on BOOM, a modified and improved DOOM engine
- *  Copyright (C) 1999 by
- *  id Software, Chi Hoang, Lee Killough, Jim Flynn, Rand Phares, Ty Halderman
- *  Copyright (C) 1999-2000 by
- *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
- *  Copyright 2005, 2006 by
- *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
- *  Frenkel Smeijers
+ *  Copyright (C) 2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -29,22 +19,18 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *   Related to f_finale.c, which is called when finishing a game
+ *      Text mode specific code
  *
  *-----------------------------------------------------------------------------*/
 
+#ifndef __I_TEXT_MODE__
+#define __I_TEXT_MODE__
 
-#ifndef __F_FINALE__
-#define __F_FINALE__
-
-/* Called by main loop. */
-void F_Ticker (void);
-
-/* Called by main loop. */
-void F_Drawer (void);
-
-void F_StartFinale (void);
-
-void F_Init(void);
+void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c);
+void V_DrawCharacterForeground(int16_t x, int16_t y, uint8_t color, char c);
+void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
+void V_ClearString(int16_t y, size_t len);
+void I_InitScreenPage(void);
+void I_InitScreenPages(void);
 
 #endif

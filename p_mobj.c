@@ -44,8 +44,6 @@
 #include "p_map.h"
 #include "p_tick.h"
 #include "sounds.h"
-#include "st_stuff.h"
-#include "hu_stuff.h"
 #include "s_sound.h"
 #include "info.h"
 #include "g_game.h"
@@ -166,13 +164,13 @@ static void P_HitSlideLine(const line_t __far* ld)
     /* killough 10/98: only bounce if hit hard (prevents wobbling)
    * cph - DEMOSYNC - should only affect players in Boom demos? */
 
-    if (ld->slopetype == ST_HORIZONTAL)
+    if (ld->dy == 0)
     {
         tmymove = 0; // no more movement in the Y direction
         return;
     }
 
-    if (ld->slopetype == ST_VERTICAL)
+    if (ld->dx == 0)
     {                                                          // phares
         tmxmove = 0; // no more movement in the X direction
         return;
@@ -963,15 +961,10 @@ static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
 //  between levels.
 //
 
-static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
+static void P_SpawnPlayer(int16_t playerx, int16_t playery, int8_t playerangle)
 {
   player_t* p;
   mobj_t __far*   mobj;
-
-  // not playing?
-
-  if (!_g_playeringame)
-    return;
 
   p = &_g_player;
 
@@ -985,7 +978,7 @@ static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
 
   // set color translations for player sprites
 
-  mobj->angle      = ANG45 * (playerangle/45);
+  mobj->angle      = ANG45 * playerangle;
   mobj->health     = p->health;
 
   p->mo            = mobj;
@@ -1003,9 +996,6 @@ static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
   // setup gun psprite
 
   P_SetupPsprites (p);
-
-  ST_Start(); // wake up the status bar
-  HU_Start(); // wake up the heads up text
 }
 
 
@@ -1023,7 +1013,6 @@ static void P_SpawnPlayer(int16_t playerx, int16_t playery, int16_t playerangle)
 #define MTF_HARD                4
 // Deaf monsters/do not react to sound.
 #define MTF_AMBUSH              8
-#define MTF_NOTSINGLE          16
 
 void P_SpawnMapThing(const mapthing_t __far* mthing)
 {
@@ -1040,19 +1029,8 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
         P_SpawnPlayer(mthing->x, mthing->y, mthing->angle);
         return;
     }
-    else if (mthing->type == 2 || mthing->type == 3 || mthing->type == 4 || mthing->type == 11)
-    {
-        // ignore start spot for player 2, 3, 4 and Deathmatch
-        return;
-    }
 
     // check for apropriate skill level
-
-    /* jff "not single" thing flag */
-    if (mthing->options & MTF_NOTSINGLE)
-        return;
-
-    // killough 11/98: simplify
     if (_g_gameskill == sk_baby || _g_gameskill == sk_easy ?
             !(mthing->options & MTF_EASY) :
             _g_gameskill == sk_hard || _g_gameskill == sk_nightmare ?
@@ -1078,7 +1056,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     if (mobj->flags & MF_COUNTITEM)
         _g_totalitems++;
 
-    mobj->angle = ANG45 * (mthing->angle/45);
+    mobj->angle = ANG45 * mthing->angle;
     if (mthing->options & MTF_AMBUSH)
         mobj->flags |= MF_AMBUSH;
 }

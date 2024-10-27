@@ -62,7 +62,7 @@ typedef struct {
   union
   {
     mobj_t __far* thing;
-    const line_t __far* line;
+    line_t __far* line;
   } d;
 } intercept_t;
 
@@ -76,7 +76,7 @@ int16_t     P_BoxOnLineSide (const fixed_t *tmbox, const line_t __far* ld);
 void    P_LineOpening(const line_t __far* linedef);
 void    P_UnsetThingPosition(mobj_t __far* thing);
 void    P_SetThingPosition(mobj_t __far* thing);
-boolean P_BlockLinesIterator (int16_t x, int16_t y, boolean func(const line_t __far*));
+boolean P_BlockLinesIterator (int16_t x, int16_t y, boolean func(line_t __far*));
 boolean P_BlockThingsIterator(int16_t x, int16_t y, boolean func(mobj_t __far*));
 boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
                        int16_t flags, boolean trav(intercept_t *));

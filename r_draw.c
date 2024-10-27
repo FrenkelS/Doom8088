@@ -89,7 +89,17 @@ static int16_t openings[MAXOPENINGS];
 static int16_t* lastopening;
 
 
-static const int8_t viewangletoxTable[2027];
+#if VIEWWINDOWWIDTH == 80
+#define VIEWANGLETOXTABLESIZE (4096-1023-1040)
+#elif VIEWWINDOWWIDTH == 60
+#define VIEWANGLETOXTABLESIZE (4096-1023-1046)
+#elif VIEWWINDOWWIDTH == 40
+#define VIEWANGLETOXTABLESIZE (4096-1023-1057)
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
+static const int8_t viewangletoxTable[VIEWANGLETOXTABLESIZE];
+
 
 static int8_t viewangletox(int16_t va)
 {
@@ -100,12 +110,30 @@ static int8_t viewangletox(int16_t va)
 		I_Error("viewangletox: va >= 4096: %i", va);
 #endif
 
+#if VIEWWINDOWWIDTH == 80
+	if (va < 1040)			//    0 <= va < 1040
+		return VIEWWINDOWWIDTH;
+	else if (3073 <= va)	// 3073 <= va < 4096
+		return 0;
+	else					// 1040 <= va < 3073
+		return viewangletoxTable[va - 1040];
+#elif VIEWWINDOWWIDTH == 60
 	if (va < 1046)			//    0 <= va < 1046
 		return VIEWWINDOWWIDTH;
 	else if (3073 <= va)	// 3073 <= va < 4096
 		return 0;
 	else					// 1046 <= va < 3073
 		return viewangletoxTable[va - 1046];
+#elif VIEWWINDOWWIDTH == 40
+	if (va < 1057)			//    0 <= va < 1057
+		return VIEWWINDOWWIDTH;
+	else if (3073 <= va)	// 3073 <= va < 4096
+		return 0;
+	else					// 1057 <= va < 3073
+		return viewangletoxTable[va - 1057];
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 }
 
 
@@ -125,6 +153,31 @@ static int16_t ceilingclip[VIEWWINDOWWIDTH];
 
 static int16_t screenheightarray[VIEWWINDOWWIDTH] =
 {
+#if VIEWWINDOWWIDTH == 80
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT
+#elif VIEWWINDOWWIDTH == 60
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
@@ -136,10 +189,50 @@ static int16_t screenheightarray[VIEWWINDOWWIDTH] =
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
 	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT
+#elif VIEWWINDOWWIDTH == 40
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT,
+	VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT, VIEWWINDOWHEIGHT
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 };
 
 static int16_t negonearray[VIEWWINDOWWIDTH] =
 {
+#if VIEWWINDOWWIDTH == 80
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1
+#elif VIEWWINDOWWIDTH == 60
 	-1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1,
@@ -151,6 +244,21 @@ static int16_t negonearray[VIEWWINDOWWIDTH] =
 	-1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1
+#elif VIEWWINDOWWIDTH == 40
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1,
+	-1, -1, -1, -1
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 };
 
 
@@ -161,7 +269,13 @@ static int16_t negonearray[VIEWWINDOWWIDTH] =
 int16_t numnodes;
 const mapnode_t __far* nodes;
 
+#if defined FLAT_SPAN
+static fixed_t  viewx, viewy, viewz;
+static fixed_t  viewcos, viewsin;
+#else
 fixed_t  viewx, viewy, viewz;
+fixed_t  viewcos, viewsin;
+#endif
 
 angle_t  viewangle;
 static angle16_t viewangle16;
@@ -170,7 +284,7 @@ static byte solidcol[VIEWWINDOWWIDTH];
 
 static const seg_t     __far* curline;
 static side_t    __far* sidedef;
-static const line_t    __far* linedef;
+static line_t    __far* linedef;
 static sector_t  __far* frontsector;
 static sector_t  __far* backsector;
 static drawseg_t *ds_p;
@@ -231,7 +345,6 @@ int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - kill
 
 int16_t       __far* texturetranslation;
 
-fixed_t  viewcos, viewsin;
 
 static fixed_t  topfrac;
 static fixed_t  topstep;
@@ -617,13 +730,13 @@ static angle16_t R_PointToAngle16(int16_t x, int16_t y)
 #define SLOPEBITS    11
 #define DBITS      (FRACBITS-SLOPEBITS)
 
-static CONSTFUNC int16_t R_PointToDist(fixed_t x, fixed_t y)
+static CONSTFUNC int16_t R_PointToDist(int16_t x, int16_t y)
 {
-    if (viewx == x && viewy == y)
+    if (viewx == (fixed_t)x << FRACBITS && viewy == (fixed_t)y << FRACBITS)
         return 0;
 
-    fixed_t dx = D_abs(x - viewx);
-    fixed_t dy = D_abs(y - viewy);
+    fixed_t dx = D_abs(((fixed_t)x << FRACBITS) - viewx);
+    fixed_t dy = D_abs(((fixed_t)y << FRACBITS) - viewy);
 
     if (dy > dx)
     {
@@ -925,25 +1038,25 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 
 static PUREFUNC boolean R_PointOnSegSide(fixed_t x, fixed_t y, const seg_t __far* line)
 {
-    const fixed_t lx = line->v1.x;
-    const fixed_t ly = line->v1.y;
-    const fixed_t ldx = line->v2.x - lx;
-    const fixed_t ldy = line->v2.y - ly;
+    const int16_t lx = line->v1.x;
+    const int16_t ly = line->v1.y;
+    const int16_t ldx = line->v2.x - lx;
+    const int16_t ldy = line->v2.y - ly;
 
     if (!ldx)
-        return x <= lx ? ldy > 0 : ldy < 0;
+        return x <= (fixed_t)lx << FRACBITS ? ldy > 0 : ldy < 0;
 
     if (!ldy)
-        return y <= ly ? ldx < 0 : ldx > 0;
+        return y <= (fixed_t)ly << FRACBITS ? ldx < 0 : ldx > 0;
 
-    x -= lx;
-    y -= ly;
+    x -= (fixed_t)lx << FRACBITS;
+    y -= (fixed_t)ly << FRACBITS;
 
     // Try to quickly decide by looking at sign bits.
-    if ((ldy ^ ldx ^ x ^ y) < 0)
-        return (ldy ^ x) < 0;          // (left is negative)
+    if ((ldy ^ ldx ^ (x >> FRACBITS) ^ (y >> FRACBITS)) < 0)
+        return (ldy ^ (x >> FRACBITS)) < 0;          // (left is negative)
 
-    return FixedMul3216(y, ldx>>FRACBITS) >= FixedMul3216(x, ldy>>FRACBITS);
+    return FixedMul3216(y, ldx) >= FixedMul3216(x, ldy);
 }
 
 
@@ -1604,9 +1717,6 @@ static void R_DrawSegTextureColumn(const texture_t __far* tex, int16_t texture, 
 // CALLED: CORE LOOPING ROUTINE.
 //
 
-#define HEIGHTBITS 12
-#define HEIGHTUNIT (1<<HEIGHTBITS)
-
 static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor, boolean markceiling)
 {
     draw_column_vars_t dcvars;
@@ -1618,8 +1728,8 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
     {
         // mark floor / ceiling areas
 
-        int16_t yh = bottomfrac>>HEIGHTBITS;
-        int16_t yl = (topfrac+HEIGHTUNIT-1)>>HEIGHTBITS;
+        int16_t yh = bottomfrac>>FRACBITS;
+        int16_t yl = (topfrac+FRACUNIT-1)>>FRACBITS;
 
         int16_t cc_rwx = ceilingclip[rw_x];
         int16_t fc_rwx = floorclip[rw_x];
@@ -1729,7 +1839,7 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
             if (toptexture)
             {
                 // top wall
-                int16_t mid = pixhigh>>HEIGHTBITS;
+                int16_t mid = pixhigh>>FRACBITS;
                 pixhigh += pixhighstep;
 
                 if (mid >= fc_rwx)
@@ -1757,7 +1867,7 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 
             if (bottomtexture)          // bottom wall
             {
-                int16_t mid = (pixlow+HEIGHTUNIT-1)>>HEIGHTBITS;
+                int16_t mid = (pixlow+FRACUNIT-1)>>FRACBITS;
                 pixlow += pixlowstep;
 
                 // no space above wall?
@@ -1870,16 +1980,14 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     }
 
 
-    linedata_t __far* linedata = &_g_linedata[curline->linenum];
-
-    // mark the segment as visible for auto map
-    linedata->r_flags |= ML_MAPPED;
-
     sidedef = &_g_sides[curline->sidenum];
     linedef = &_g_lines[curline->linenum];
 
+    // mark the segment as visible for auto map
+    linedef->r_flags |= ML_MAPPED;
+
     // calculate rw_distance for scale calculation
-    rw_normalangle = (curline->angle >> FRACBITS) + ANG90_16;
+    rw_normalangle = curline->angle;
 
     angle16_t offsetangle = rw_normalangle - rw_angle1;
 
@@ -1956,7 +2064,7 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
         ds_p->sprtopclip = ds_p->sprbottomclip = NULL;
         ds_p->silhouette = SIL_NONE;
 
-        if(linedata->r_flags & RF_CLOSED)
+        if(linedef->r_flags & RF_CLOSED)
         { /* cph - closed 2S line e.g. door */
             // cph - killough's (outdated) comment follows - this deals with both
             // "automap fixes", his and mine
@@ -2054,8 +2162,8 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
     if (segtextured)
     {
         fixed_t rw_offset32 = hyp * -finesineapprox(offsetangle >> ANGLETOFINESHIFT_16);
-        rw_offset32 += (((fixed_t)sidedef->textureoffset) << FRACBITS) + curline->offset;
         rw_offset = rw_offset32 >> FRACBITS;
+        rw_offset += sidedef->textureoffset + curline->offset;
 
         rw_centerangle = ANG90_16 + viewangle16 - rw_normalangle;
 
@@ -2071,28 +2179,22 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
         markceiling = false;
 
     // calculate incremental stepping values for texture edges
-    worldtop    >>= 4;
-    worldbottom >>= 4;
-
     topstep = -FixedMul(worldtop, rw_scalestep);
-    topfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldtop, rw_scale);
+    topfrac = (CENTERY * FRACUNIT) - FixedMul(worldtop, rw_scale);
 
     bottomstep = -FixedMul(worldbottom, rw_scalestep);
-    bottomfrac = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldbottom, rw_scale);
+    bottomfrac = (CENTERY * FRACUNIT) - FixedMul(worldbottom, rw_scale);
 
     if (backsector)
     {
-        worldhigh >>= 4;
-        worldlow  >>= 4;
-
         if (worldhigh < worldtop)
         {
-            pixhigh = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldhigh, rw_scale);
+            pixhigh = (CENTERY * FRACUNIT) - FixedMul(worldhigh, rw_scale);
             pixhighstep = -FixedMul(worldhigh, rw_scalestep);
         }
         if (worldlow > worldbottom)
         {
-            pixlow = ((CENTERY * FRACUNIT) >> 4) - FixedMul(worldlow, rw_scale);
+            pixlow = (CENTERY * FRACUNIT) - FixedMul(worldlow, rw_scale);
             pixlowstep = -FixedMul(worldlow, rw_scalestep);
         }
     }
@@ -2190,11 +2292,9 @@ static void R_StoreWallRange(const int16_t start, const int16_t stop)
 
 static void R_RecalcLineFlags(void)
 {
-    linedata_t __far* linedata = &_g_linedata[linedef->lineno];
-
     const side_t __far* side = &_g_sides[curline->sidenum];
 
-    linedata->r_validcount = _g_gametic;
+    linedef->r_validcount = _g_gametic;
 
     /* First decide if the line is closed, normal, or invisible */
     if (!(linedef->flags & ML_TWOSIDED)
@@ -2216,7 +2316,7 @@ static void R_RecalcLineFlags(void)
                     frontsector->ceilingpic!= skyflatnum)
                 )
             )
-        linedata->r_flags = (RF_CLOSED | (linedata->r_flags & ML_MAPPED));
+        linedef->r_flags = (RF_CLOSED | (linedef->r_flags & ML_MAPPED));
     else
     {
         // Reject empty lines used for triggers
@@ -2232,9 +2332,9 @@ static void R_RecalcLineFlags(void)
                 || backsector->floorpic != frontsector->floorpic
                 || backsector->lightlevel != frontsector->lightlevel)
         {
-            linedata->r_flags = (linedata->r_flags & ML_MAPPED); return;
+            linedef->r_flags = (linedef->r_flags & ML_MAPPED);
         } else
-            linedata->r_flags = (RF_IGNORE | (linedata->r_flags & ML_MAPPED));
+            linedef->r_flags = (RF_IGNORE | (linedef->r_flags & ML_MAPPED));
     }
 }
 
@@ -2291,8 +2391,8 @@ static void R_AddLine(const seg_t __far* line)
 {
     curline = line;
 
-    angle16_t angle1 = R_PointToAngle(line->v1.x, line->v1.y);
-    angle16_t angle2 = R_PointToAngle(line->v2.x, line->v2.y);
+    angle16_t angle1 = R_PointToAngle16(line->v1.x, line->v1.y);
+    angle16_t angle2 = R_PointToAngle16(line->v2.x, line->v2.y);
 
     // Clip to view edges.
     angle16_t span = angle1 - angle2;
@@ -2340,18 +2440,17 @@ static void R_AddLine(const seg_t __far* line)
     if (x1 >= x2)       // killough 1/31/98 -- change == to >= for robustness
         return;
 
-    backsector = line->backsectornum != NO_INDEX ? &_g_sectors[line->backsectornum] : NULL;
+    backsector = line->backsectornum != NO_INDEX8 ? &_g_sectors[line->backsectornum] : NULL;
 
     /* cph - roll up linedef properties in flags */
     linedef = &_g_lines[curline->linenum];
-    linedata_t __far* linedata = &_g_linedata[linedef->lineno];
 
-    if (linedata->r_validcount != (uint16_t)_g_gametic)
+    if (linedef->r_validcount != (uint16_t)_g_gametic)
         R_RecalcLineFlags();
 
-    if (!(linedata->r_flags & RF_IGNORE))
+    if (!(linedef->r_flags & RF_IGNORE))
     {
-        R_ClipWallSegment (x1, x2, linedata->r_flags & RF_CLOSED);
+        R_ClipWallSegment (x1, x2, linedef->r_flags & RF_CLOSED);
     }
 }
 
@@ -2687,8 +2786,89 @@ void R_RenderPlayerView (player_t* player)
 }
 
 
-static const int8_t viewangletoxTable[2027] =
+static const int8_t viewangletoxTable[VIEWANGLETOXTABLESIZE] =
 {
+#if VIEWWINDOWWIDTH == 80
+    79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79,
+    78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78,
+    77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+    76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76,
+    75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75,
+    74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74,
+    73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73,
+    72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72,
+    71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71,
+    70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70,
+    69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69,
+    68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68,
+    67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+    66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66,
+    65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63,
+    62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+    61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61,
+    60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+    59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59,
+    58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58,
+    57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57,
+    56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
+    55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+    54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54,
+    53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53,
+    52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
+    51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51,
+    50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+    49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49,
+    48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
+    47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+    46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46,
+    45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
+    44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44,
+    43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
+    42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42,
+    41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+    40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40,
+    39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+    38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+    37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37,
+    36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
+    35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35,
+    34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34,
+    33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33,
+    32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+    31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31,
+    30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30,
+    29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+    28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+    27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+    26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
+    25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
+    24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
+    23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+    22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
+    21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
+    20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+    19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+    18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
+    17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+    15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+    14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+    13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+    12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+    11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+    10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+#elif VIEWWINDOWWIDTH == 60
     59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59,
     58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58,
     57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57,
@@ -2748,6 +2928,49 @@ static const int8_t viewangletoxTable[2027] =
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+#elif VIEWWINDOWWIDTH == 40
+    39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+    38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+    37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37,
+    36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
+    35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35,
+    34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34,
+    33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33,
+    32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+    31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31,
+    30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30,
+    29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+    28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+    27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+    26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
+    25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
+    24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
+    23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+    22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
+    21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
+    20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+    19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+    18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
+    17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+    15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+    14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+    13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+    12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+    11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+    10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 };
 
 
