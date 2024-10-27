@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -42,7 +42,6 @@
 #include <unistd.h>
 #endif
 
-#include <fcntl.h>
 #include <stdint.h>
 
 #include "compiler.h"
@@ -91,7 +90,7 @@ static void __far*__far* lumpcache;
 static void _ffread(void __far* ptr, uint16_t size, FILE* fp)
 {
 	uint8_t __far* dest = ptr;
-	uint8_t* buffer = alloca(BUFFERSIZE);
+	uint8_t buffer[BUFFERSIZE];
 
 	while (size >= BUFFERSIZE)
 	{
@@ -108,6 +107,55 @@ static void _ffread(void __far* ptr, uint16_t size, FILE* fp)
 	}
 }
 
+
+static boolean W_LoadWADIntoXMS(void)
+{
+	fseek(fileWAD, 0, SEEK_END);
+	int32_t size = ftell(fileWAD);
+	boolean xms = Z_InitXms(size);
+	if (!xms)
+	{
+		printf("Not enough XMS available\n");
+		return false;
+	}
+
+	printf("Loading WAD into XMS\n");
+	printf("Get Psyched!\n");
+
+	uint8_t buffer[BUFFERSIZE];
+
+	fseek(fileWAD, 0, SEEK_SET);
+	uint32_t dest = 0;
+
+	while (size >= BUFFERSIZE)
+	{
+		fread(buffer, BUFFERSIZE, 1, fileWAD);
+		Z_MoveConventionalMemoryToExtendedMemory(dest, buffer, BUFFERSIZE);
+		dest += BUFFERSIZE;
+		size -= BUFFERSIZE;
+	}
+
+	if (size > 0)
+	{
+		fread(buffer, size, 1, fileWAD);
+		Z_MoveConventionalMemoryToExtendedMemory(dest, buffer, size);
+	}
+
+	return true;
+}
+
+
+static void W_ReadDataFromFile(void __far* dest, uint32_t src, uint16_t length)
+{
+	fseek(fileWAD, src, SEEK_SET);
+	_ffread(dest, length, fileWAD);
+}
+
+
+typedef void (*W_ReadData_f)(void __far* dest, uint32_t src, uint16_t length);
+static W_ReadData_f readfunc;
+
+
 typedef struct
 {
   char identification[4]; // Should be "IWAD" or "PWAD".
@@ -116,27 +164,38 @@ typedef struct
   int32_t  infotableofs;
 } wadinfo_t;
 
+#if !defined WAD_FILE
+#define WAD_FILE "DOOM1.WAD"
+#endif
+
 void W_Init(void)
 {
-	printf("\tadding doom1.wad\n");
+	printf("\tadding " WAD_FILE "\n");
 	printf("\tshareware version.\n");
 
-	fileWAD = fopen("DOOM1.WAD", "rb");
+	fileWAD = fopen(WAD_FILE, "rb");
 	if (fileWAD == NULL)
-		I_Error("Can't open DOOM1.WAD.");
+		I_Error("Can't open " WAD_FILE ".");
+
+	boolean xms = W_LoadWADIntoXMS();
+	readfunc = xms ? Z_MoveExtendedMemoryToConventionalMemory : W_ReadDataFromFile;
 
 	wadinfo_t header;
-	fseek(fileWAD, 0, SEEK_SET);
-	fread(&header, sizeof(header), 1, fileWAD);
+	readfunc(&header, 0, sizeof(header));
 
 	fileinfo = Z_MallocStatic(header.numlumps * sizeof(filelump_t));
-	fseek(fileWAD, header.infotableofs, SEEK_SET);
-	_ffread(fileinfo, sizeof(filelump_t) * header.numlumps, fileWAD);
+	readfunc(fileinfo, header.infotableofs, sizeof(filelump_t) * header.numlumps);
 
 	lumpcache = Z_MallocStatic(header.numlumps * sizeof(*lumpcache));
 	_fmemset(lumpcache, 0, header.numlumps * sizeof(*lumpcache));
 
 	numlumps = header.numlumps;
+}
+
+
+void W_Shutdown(void)
+{
+	readfunc = W_ReadDataFromFile;
 }
 
 
@@ -185,8 +244,7 @@ int16_t PUREFUNC W_GetNumForName(const char *name)
 void W_ReadLumpByNum(int16_t num, void __far* ptr)
 {
 	const filelump_t __far* lump = &fileinfo[num];
-	fseek(fileWAD, lump->filepos, SEEK_SET);
-	_ffread(ptr, lump->size, fileWAD);
+	readfunc(ptr, lump->filepos, lump->size);
 }
 
 
@@ -196,8 +254,7 @@ const void __far* PUREFUNC W_GetLumpByNumAutoFree(int16_t num)
 
 	void __far* ptr = Z_MallocLevel(lump->size, NULL);
 
-	fseek(fileWAD, lump->filepos, SEEK_SET);
-	_ffread(ptr, lump->size, fileWAD);
+	readfunc(ptr, lump->filepos, lump->size);
 	return ptr;
 }
 
@@ -208,8 +265,7 @@ static void __far* PUREFUNC W_GetLumpByNumWithUser(int16_t num, void __far*__far
 
 	void __far* ptr = Z_MallocStaticWithUser(lump->size, user);
 
-	fseek(fileWAD, lump->filepos, SEEK_SET);
-	_ffread(ptr, lump->size, fileWAD);
+	readfunc(ptr, lump->filepos, lump->size);
 	return ptr;
 }
 
@@ -220,9 +276,8 @@ int16_t W_GetFirstInt16(int16_t num)
 
 	int16_t firstInt16;
 
-	fseek(fileWAD, lump->filepos, SEEK_SET);
-	fread(&firstInt16, sizeof(int16_t), 1, fileWAD);
-	return firstInt16;;
+	readfunc(&firstInt16, lump->filepos, sizeof(int16_t));
+	return firstInt16;
 }
 
 
@@ -245,7 +300,12 @@ boolean PUREFUNC W_IsLumpCached(int16_t num)
 
 const void __far* PUREFUNC W_TryGetLumpByNum(int16_t num)
 {
-	if (W_IsLumpCached(num) || Z_IsEnoughFreeMemory(W_LumpLength(num)))
+	if (lumpcache[num])
+	{
+		Z_ChangeTagToStatic(lumpcache[num]);
+		return lumpcache[num];
+	}
+	else if (Z_IsEnoughFreeMemory(W_LumpLength(num)))
 		return W_GetLumpByNum(num);
 	else
 		return NULL;

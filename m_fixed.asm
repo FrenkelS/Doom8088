@@ -31,7 +31,7 @@ bits 16
 
 global FixedReciprocal
 FixedReciprocal:
-	mov     bx, ax             ; bx = divisor-lo
+	xchg    bx, ax             ; bx = divisor-lo
 	mov     ax, 0ffffh         ; ax = FFFFh
 
 	test    dx, dx             ; divisor > 2^16-1 ?
@@ -61,9 +61,8 @@ shift_loop:
 	div     bx                 ; compute quotient FFFFh:FFFFh>>x / cx:bx>>x (stored in ax; remainder in dx not used)
 	mov     cx, ax             ; save quotient
 	mul     di                 ; quotient * divisor hi-word (low only)
-	mov     dx, 0ffffh         ; dividend high = FFFFh
-	sub     dx, ax             ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
-	mov     bx, dx             ; save dividend high
+	not     ax                 ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
+	mov     bx, ax             ; save dividend high
 	mov     ax, cx             ; ax=quotient
 	mul     si                 ; quotient * divisor lo-word
 	mov     ax, cx             ; get quotient
@@ -86,7 +85,7 @@ shift_loop:
 
 global FixedReciprocalSmall
 FixedReciprocalSmall:
-	mov     bx, ax             ; bx = divisor
+	xchg    bx, ax             ; bx = divisor
 	mov     ax, 0ffffh         ;
 	mov     cx, ax             ;
 	xor     dx, dx             ; ax = FFFFh, bx = divisor, cx = FFFFh, dx = 0
@@ -108,7 +107,7 @@ FixedReciprocalSmall:
 
 global FixedReciprocalBig
 FixedReciprocalBig:
-	mov     bx, ax             ; bx = divisor-lo
+	xchg    bx, ax             ; bx = divisor-lo
 	mov     cx, dx             ; cx = divisor-hi
 	mov     ax, 0ffffh         ; ax = FFFFh
 	mov     dx, ax             ; ax = FFFFh, bx = divisor-lo, cx = divisor-hi, dx = FFFFh
@@ -125,9 +124,8 @@ shift_loop_big:
 	div     bx                 ; compute quotient FFFFh:FFFFh>>x / cx:bx>>x (stored in ax; remainder in dx not used)
 	mov     cx, ax             ; save quotient
 	mul     di                 ; quotient * divisor hi-word (low only)
-	mov     dx, 0ffffh         ; dividend high = FFFFh
-	sub     dx, ax             ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
-	mov     bx, dx             ; save dividend high
+	not     ax                 ; dividend high - divisor high * quotient, no overflow (carry/borrow) possible here
+	mov     bx, ax             ; save dividend high
 	mov     ax, cx             ; ax=quotient
 	mul     si                 ; quotient * divisor lo-word
 	mov     ax, cx             ; get quotient

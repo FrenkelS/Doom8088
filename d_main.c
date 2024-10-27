@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -37,11 +37,6 @@
  *-----------------------------------------------------------------------------
  */
 
-
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <stdint.h>
 
 #include "doomdef.h"
@@ -98,6 +93,9 @@ boolean _g_fps_show;
 int16_t _g_fps_framerate;
 
 
+static int16_t titlepicnum;
+
+
 /*
  * D_PostEvent - Event handling
  *
@@ -123,13 +121,13 @@ void D_PostEvent(event_t *ev)
 static void D_BuildNewTiccmds(void)
 {
     static int32_t lastmadetic = 0;
-    int32_t newtics = I_GetTime() - lastmadetic;
+    int16_t newtics = I_GetTime() - lastmadetic;
     lastmadetic += newtics;
 
     while (newtics--)
     {
         I_StartTic();
-        if (maketic - _g_gametic > 3)
+        if ((int16_t)(maketic - _g_gametic) > 3)
             break;
 
         G_BuildTiccmd();
@@ -180,8 +178,6 @@ static void D_Display (void)
     else if (_g_gametic != _g_basetic)
     { // In a level
 
-        HU_Erase();
-
         // Work out if the player view is visible, and if there is a border
         boolean viewactive = (!(automapmode & am_active) || (automapmode & am_overlay));
 
@@ -192,6 +188,7 @@ static void D_Display (void)
         if (automapmode & am_active)
             AM_Drawer();
 
+        ST_doPaletteStuff();  // Do red-/gold-shifts from damage/items
         ST_Drawer();
 
         HU_Drawer();
@@ -204,19 +201,19 @@ static void D_Display (void)
 
     D_BuildNewTiccmds();
 
-    if (!wipe)
-        // normal update
-        I_FinishUpdate ();              // page flip or blit buffer
-    else
+    if (wipe)
         // wipe update
         D_Wipe();
+    else
+        // normal update
+        I_FinishUpdate ();              // page flip or blit buffer
 }
 
 
 //? how many ticks to run?
 static void TryRunTics (void)
 {
-    int32_t runtics;
+    int16_t runtics;
     int32_t entertime = I_GetTime();
 
     // Wait for tics to run
@@ -228,7 +225,7 @@ static void TryRunTics (void)
         runtics = maketic - _g_gametic;
         if (runtics <= 0)
         {
-            if (I_GetTime() - entertime > 10)
+            if ((int16_t)(I_GetTime() - entertime) > 10)
             {
                 M_Ticker();
                 return;
@@ -261,8 +258,7 @@ static void TryRunTics (void)
 //  calls all ?_Responder, ?_Ticker, and ?_Drawer,
 //  calls I_GetTime and I_StartTic
 //
-static void NORETURN_PRE D_DoomLoop(void) NORETURN_POST;
-static void D_DoomLoop(void)
+static void _Noreturn D_DoomLoop(void)
 {
     for (;;)
     {
@@ -348,8 +344,7 @@ void D_PageTicker(void)
 
 static void D_PageDrawer(void)
 {
-	int16_t num = W_GetNumForName("TITLEPIC");
-	V_DrawRaw(num, 0);
+	V_DrawRawFullScreen(titlepicnum);
 }
 
 //
@@ -361,14 +356,6 @@ void D_AdvanceDemo (void)
     advancedemo = true;
 }
 
-/* killough 11/98: functions to perform demo sequences
- * cphipps 10/99: constness fixes
- */
-
-static void D_SetPageName(const char *name)
-{
-	UNUSED(name);
-}
 
 static void D_DrawTitle1(const char *name)
 {
@@ -379,9 +366,6 @@ static void D_DrawTitle1(const char *name)
 }
 
 
-/* killough 11/98: tabulate demo sequences
- */
-
 static struct
 {
     void (*func)(const char *);
@@ -391,10 +375,6 @@ const demostates[] =
 {
     {D_DrawTitle1, NULL},
     {G_DeferedPlayDemo, "demo3"},
-    {D_SetPageName, NULL},
-    {G_DeferedPlayDemo, "demo1"},
-    {D_SetPageName, NULL},
-    {G_DeferedPlayDemo, "demo2"},
     {NULL, NULL},
 };
 
@@ -402,7 +382,6 @@ static int16_t  demosequence;
 
 /*
  * This cycles through the demo sequences.
- * killough 11/98: made table-driven
  */
 
 void D_DoAdvanceDemo(void)
@@ -411,7 +390,7 @@ void D_DoAdvanceDemo(void)
     advancedemo = _g_usergame = false;
     _g_gameaction = ga_nothing;
 
-    pagetic = TICRATE * 11;         /* killough 11/98: default behavior */
+    pagetic = TICRATE * 11;
     _g_gamestate = GS_DEMOSCREEN;
 
 
@@ -447,7 +426,7 @@ void D_StartTitle (void)
 static int myargc;
 static const char * const * myargv;
 
-static int16_t M_CheckParm(char *check)
+int16_t M_CheckParm(char *check)
 {
 	for (int16_t i = 1; i < myargc; i++)
 		if (!stricmp(check, myargv[i]))
@@ -457,9 +436,9 @@ static int16_t M_CheckParm(char *check)
 }
 
 
-static void D_InitNetGame (void)
+static void D_Init(void)
 {
-    _g_playeringame = true;
+	titlepicnum = W_GetNumForName("TITLEPIC");
 }
 
 
@@ -473,13 +452,17 @@ static void D_DoomMainSetup(void)
 {
     // init subsystems
 
-    G_ReloadDefaults();    // killough 3/4/98: set defaults just loaded.
+    printf("Z_Init: Init zone memory allocation daemon.\n");
+    Z_Init();
 
-    // CPhipps - move up netgame init
-    D_InitNetGame();
+    G_ReloadDefaults();    // killough 3/4/98: set defaults just loaded.
 
     printf("W_Init: Init WADfiles.\n");
     W_Init(); // CPhipps - handling of wadfiles init changed
+
+    D_Init();
+    F_Init();
+    WI_Init();
 
     printf("M_Init: Init miscellaneous info.\n");
     M_Init();
@@ -527,7 +510,7 @@ void D_DoomMain(int argc, const char * const * argv)
     myargc = argc;
     myargv = argv;
 
-    D_DoomMainSetup(); // CPhipps - setup out of main execution stack
+    D_DoomMainSetup();
 
     D_DoomLoop ();  // never returns
 }

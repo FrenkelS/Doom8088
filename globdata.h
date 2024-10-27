@@ -62,7 +62,6 @@ extern boolean         _g_respawnmonsters;
 
 extern boolean         _g_usergame;      // ok to save / end game
 extern boolean         _g_timingdemo;    // if true, exit with report on completion
-extern boolean         _g_playeringame;
 extern boolean         _g_demoplayback;
 extern boolean         _g_singledemo;           // quit after playing a demo from cmdline
 
@@ -109,12 +108,10 @@ extern const line_t    __far* _g_ceilingline;
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-extern const line_t __far* _g_spechit[4];
+extern line_t __far* _g_spechit[4];
 
 extern int16_t _g_numspechit;
 
-// Temporary holder for thing_sectorlist threads
-extern msecnode_t __far* _g_sector_list;
 
 extern mobj_t __far*   _g_linetarget; // who got hit (or NULL)
 
@@ -152,8 +149,7 @@ extern subsector_t __far* _g_subsectors;
 
 
 extern int16_t      _g_numlines;
-extern const line_t   __far* _g_lines;
-extern linedata_t __far* _g_linedata;
+extern line_t   __far* _g_lines;
 
 
 extern side_t   __far* _g_sides;

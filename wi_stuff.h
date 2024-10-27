@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -36,19 +36,7 @@
 #ifndef __WI_STUFF__
 #define __WI_STUFF__
 
-//#include "v_video.h"
-
-#include "doomdef.h"
-
-// States for the intermission
-
-typedef enum
-{
-  NoState = -1,
-  StatCount,
-  ShowNextLoc
-
-} stateenum_t;
+#include "d_player.h"
 
 // Called by main loop, animate the intermission.
 void WI_Ticker (void);
@@ -63,7 +51,6 @@ void WI_Start(wbstartstruct_t*   wbstartstruct);
 // Release intermission screen memory
 void WI_End(void);
 
-int16_t V_NumPatchWidth(int16_t num);
-int16_t V_NumPatchWidthDontCache(int16_t num);
+void WI_Init(void);
 
 #endif

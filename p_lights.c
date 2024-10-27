@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -49,42 +49,6 @@
 // Lighting action routines, called once per tick
 //
 //////////////////////////////////////////////////////////
-
-//
-// T_FireFlicker()
-//
-// Firelight flicker action routine, called once per tick
-//
-// Passed a fireflicker_t structure containing light levels and timing
-// Returns nothing
-//
-
-typedef struct
-{
-  thinker_t thinker;
-  sector_t __far* sector;
-  int16_t count;
-  int16_t maxlight;
-  int16_t minlight;
-
-} fireflicker_t;
-
-static void T_FireFlicker (fireflicker_t __far* flick)
-{
-  int16_t amount;
-
-  if (--flick->count)
-    return;
-
-  amount = (P_Random()&3)*16;
-
-  if (flick->sector->lightlevel - amount < flick->minlight)
-    flick->sector->lightlevel = flick->minlight;
-  else
-    flick->sector->lightlevel = flick->maxlight - amount;
-
-  flick->count = 4;
-}
 
 //
 // T_LightFlash()
@@ -248,33 +212,6 @@ static int16_t P_FindMinSurroundingLight(sector_t __far* sector, int16_t max)
 //////////////////////////////////////////////////////////
 
 //
-// P_SpawnFireFlicker()
-//
-// Spawns a fire flicker lighting thinker
-//
-// Passed the sector that spawned the thinker
-// Returns nothing
-//
-void P_SpawnFireFlicker(sector_t __far* sector)
-{
-  fireflicker_t __far*  flick;
-
-  // Note that we are resetting sector attributes.
-  // Nothing special about it during gameplay.
-  sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
-
-  flick = Z_CallocLevSpec( sizeof(*flick));
-
-  P_AddThinker (&flick->thinker);
-
-  flick->thinker.function = T_FireFlicker;
-  flick->sector = sector;
-  flick->maxlight = sector->lightlevel;
-  flick->minlight = P_FindMinSurroundingLight(sector,sector->lightlevel)+16;
-  flick->count = 4;
-}
-
-//
 // P_SpawnLightFlash()
 //
 // Spawns a broken light flash lighting thinker
@@ -287,7 +224,7 @@ void P_SpawnLightFlash (sector_t __far* sector)
   lightflash_t __far* flash;
 
   // nothing special about it during gameplay
-  sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
+  sector->special = 0;
 
   flash = Z_CallocLevSpec(sizeof(*flash));
 
@@ -332,7 +269,7 @@ void P_SpawnStrobeFlash(sector_t __far* sector, int16_t fastOrSlow, boolean inSy
     flash->minlight = 0;
 
   // nothing special about it during gameplay
-  sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
+  sector->special = 0;
 
   if (!inSync)
     flash->count = (P_Random()&7)+1;
@@ -362,7 +299,7 @@ void P_SpawnGlowingLight(sector_t __far* sector)
   g->thinker.function = T_Glow;
   g->direction = -1;
 
-  sector->special &= ~31; //jff 3/14/98 clear non-generalized sector type
+  sector->special = 0;
 }
 
 //////////////////////////////////////////////////////////
@@ -370,59 +307,6 @@ void P_SpawnGlowingLight(sector_t __far* sector)
 // Linedef lighting function handlers
 //
 //////////////////////////////////////////////////////////
-
-//
-// EV_StartLightStrobing()
-//
-// Start strobing lights (usually from a trigger)
-//
-// Passed the line that activated the strobing
-//
-void EV_StartLightStrobing(const line_t __far* line)
-{
-  int16_t   secnum;
-  sector_t __far* sec;
-
-  secnum = -1;
-  // start lights strobing in all sectors tagged same as line
-  while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
-  {
-    sec = &_g_sectors[secnum];
-    // if already doing a lighting function, don't start a second
-    if (P_SectorActive(lighting_special,sec)) //jff 2/22/98
-      continue;
-
-    P_SpawnStrobeFlash (sec,SLOWDARK, false);
-  }
-}
-
-//
-// EV_TurnTagLightsOff()
-//
-// Turn line's tagged sector's lights to min adjacent neighbor level
-//
-// Passed the line that activated the lights being turned off
-//
-void EV_TurnTagLightsOff(const line_t __far* line)
-{
-  int16_t j;
-
-  // search sectors for those with same tag as activating line
-
-  // killough 10/98: replaced inefficient search with fast search
-  for (j = -1; (j = P_FindSectorFromLineTag(line,j)) >= 0;)
-    {
-      sector_t __far* sector = _g_sectors + j;
-      sector_t __far* tsec;
-      int16_t i, min = sector->lightlevel;
-      // find min neighbor light level
-      for (i = 0;i < sector->linecount; i++)
-  if ((tsec = getNextSector(sector->lines[i], sector)) &&
-      tsec->lightlevel < min)
-    min = tsec->lightlevel;
-      sector->lightlevel = min;
-    }
-}
 
 //
 // EV_LightTurnOn()

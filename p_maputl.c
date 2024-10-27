@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -83,10 +83,10 @@ fixed_t CONSTFUNC P_AproxDistance(fixed_t dx, fixed_t dy)
 int16_t PUREFUNC P_PointOnLineSide(fixed_t x, fixed_t y, const line_t __far* line)
 {
   return
-    !line->dx ? x <= line->v1.x ? line->dy > 0 : line->dy < 0 :
-    !line->dy ? y <= line->v1.y ? line->dx < 0 : line->dx > 0 :
-    //FixedMul(y-line->v1.y, line->dx>>FRACBITS) >= FixedMul(line->dy>>FRACBITS, x-line->v1.x);
-    ((y - line->v1.y) >> 8) * line->dx >= line->dy * ((x - line->v1.x) >> 8);
+    !line->dx ? x <= (fixed_t)line->v1.x<<FRACBITS ? line->dy > 0 : line->dy < 0 :
+    !line->dy ? y <= (fixed_t)line->v1.y<<FRACBITS ? line->dx < 0 : line->dx > 0 :
+    //FixedMul(y-((fixed_t)line->v1.y<<FRACBITS), line->dx>>FRACBITS) >= FixedMul(line->dy>>FRACBITS, x-((fixed_t)line->v1.x<<FRACBITS));
+    ((y - ((fixed_t)line->v1.y<<FRACBITS) >> 8)) * line->dx >= line->dy * ((x - ((fixed_t)line->v1.x<<FRACBITS)) >> 8);
 }
 
 //
@@ -105,11 +105,11 @@ int16_t PUREFUNC P_BoxOnLineSide(const fixed_t *tmbox, const line_t __far* ld)
     default: // shut up compiler warnings -- killough
     case ST_HORIZONTAL:
         return
-                (tmbox[BOXBOTTOM] > ld->v1.y) == (p = tmbox[BOXTOP] > ld->v1.y) ?
+                (tmbox[BOXBOTTOM] > (fixed_t)ld->v1.y<<FRACBITS) == (p = tmbox[BOXTOP] > (fixed_t)ld->v1.y<<FRACBITS) ?
                     p ^ (ld->dx < 0) : -1;
     case ST_VERTICAL:
         return
-                (tmbox[BOXLEFT] < ld->v1.x) == (p = tmbox[BOXRIGHT] < ld->v1.x) ?
+                (tmbox[BOXLEFT] < (fixed_t)ld->v1.x<<FRACBITS) == (p = tmbox[BOXRIGHT] < (fixed_t)ld->v1.x<<FRACBITS) ?
                     p ^ (ld->dy < 0) : -1;
     case ST_POSITIVE:
         return
@@ -144,8 +144,8 @@ static int16_t PUREFUNC P_PointOnDivlineSide(fixed_t x, fixed_t y, const divline
 
 static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 {
-  dl->x = li->v1.x;
-  dl->y = li->v1.y;
+  dl->x = (fixed_t)li->v1.x<<FRACBITS;
+  dl->y = (fixed_t)li->v1.y<<FRACBITS;
   dl->dx = (fixed_t)li->dx<<FRACBITS;
   dl->dy = (fixed_t)li->dy<<FRACBITS;
 }
@@ -165,9 +165,6 @@ typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
 
 static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 {
-	if (a == 0 || b == 0)
-		return 0;
-
 	union int64_u r;
 	// r.ll = (int64_t)a << FRACBITS;
 	r.s.wl = 0;
@@ -185,13 +182,22 @@ static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 // and addlines traversers.
 //
 
-/* cph - this is killough's 4/19/98 version of P_InterceptVector and
- *  P_InterceptVector2 (which were interchangeable). We still use this
- *  in compatibility mode. */
-fixed_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
+static fixed_t PUREFUNC P_InterceptVector3(const divline_t *v2, const divline_t *v1)
 {
-	return FixedDiv(FixedMul(v1->dy, (v1->x - v2->x) >> 8) + FixedMul(v1->dx, (v2->y - v1->y) >> 8),
-	                FixedMul(v2->dx, v1->dy >> 8) - FixedMul(v2->dy, v1->dx >> 8));
+	fixed_t a = (v1->dy >> FRACBITS) * ((v1->x - v2->x) >> 8);
+	fixed_t b = (v1->dx >> FRACBITS) * ((v2->y - v1->y) >> 8);
+	fixed_t c = FixedMul(v2->dx, v1->dy >> 8);
+	fixed_t d = FixedMul(v2->dy, v1->dx >> 8);
+
+	fixed_t num = a + b;
+	fixed_t den = c - d;
+
+	if (num == 0 || den == 0)
+		return 0;
+	else if ((num ^ den) < 0)
+		return -1;
+	else
+		return FixedDiv(num, den);
 }
 
 //
@@ -277,7 +283,7 @@ void P_UnsetThingPosition(mobj_t __far* thing)
         // If this Thing is being removed entirely, then the calling
         // routine will clear out the nodes in sector_list.
 
-      _g_sector_list = thing->touching_sectorlist;
+      P_SetSeclist(thing->touching_sectorlist);
       thing->touching_sectorlist = NULL; //to be restored by P_SetThingPosition
     }
 
@@ -339,8 +345,6 @@ void P_SetThingPosition(mobj_t __far* thing)
       // added, new sector links are created.
 
       P_CreateSecNodeList(thing);
-      thing->touching_sectorlist = _g_sector_list; // Attach to Thing's mobj_t
-      _g_sector_list = NULL; // clear for next time
     }
 
   // link into blockmap
@@ -384,7 +388,7 @@ void P_SetThingPosition(mobj_t __far* thing)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(const line_t __far*))
+boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(line_t __far*))
 {
 
     if (!(0 <= x && x < _g_bmapwidth && 0 <= y && y <_g_bmapheight))
@@ -408,14 +412,12 @@ boolean P_BlockLinesIterator(int16_t x, int16_t y, boolean func(const line_t __f
     {
         const int16_t lineno = *list;
 
-        linedata_t __far* lt = &_g_linedata[lineno];
+        line_t __far* ld = &_g_lines[lineno];
 
-        if (lt->validcount == vcount)
+        if (ld->validcount == vcount)
             continue;       // line has already been checked
 
-        lt->validcount = vcount;
-
-        const line_t __far* ld = &_g_lines[lineno];
+        ld->validcount = vcount;
 
         if (!func(ld))
             return false;
@@ -461,7 +463,7 @@ static boolean check_intercept(void)
 //
 // killough 5/3/98: reformatted, cleaned up
 
-static boolean PIT_AddLineIntercepts(const line_t __far* ld)
+static boolean PIT_AddLineIntercepts(line_t __far* ld)
 {
   int16_t       s1;
   int16_t       s2;
@@ -472,8 +474,8 @@ static boolean PIT_AddLineIntercepts(const line_t __far* ld)
   if (_g_trace.dx >  FRACUNIT*16 || _g_trace.dy >  FRACUNIT*16 ||
       _g_trace.dx < -FRACUNIT*16 || _g_trace.dy < -FRACUNIT*16)
     {
-      s1 = P_PointOnDivlineSide (ld->v1.x, ld->v1.y, &_g_trace);
-      s2 = P_PointOnDivlineSide (ld->v2.x, ld->v2.y, &_g_trace);
+      s1 = P_PointOnDivlineSide ((fixed_t)ld->v1.x<<FRACBITS, (fixed_t)ld->v1.y<<FRACBITS, &_g_trace);
+      s2 = P_PointOnDivlineSide ((fixed_t)ld->v2.x<<FRACBITS, (fixed_t)ld->v2.y<<FRACBITS, &_g_trace);
     }
   else
     {
@@ -486,7 +488,7 @@ static boolean PIT_AddLineIntercepts(const line_t __far* ld)
 
   // hit the line
   P_MakeDivline(ld, &dl);
-  frac = P_InterceptVector2(&_g_trace, &dl);
+  frac = P_InterceptVector3(&_g_trace, &dl);
 
   if (frac < 0)
     return true;        // behind source
@@ -542,7 +544,7 @@ static boolean PIT_AddThingIntercepts(mobj_t __far* thing)
   dl.dx = x2-x1;
   dl.dy = y2-y1;
 
-  frac = P_InterceptVector2(&_g_trace, &dl);
+  frac = P_InterceptVector3(&_g_trace, &dl);
 
   if (frac < 0)
     return true;                // behind source
@@ -649,7 +651,7 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
         ystep = 256*FRACUNIT;
       }
 
-  yintercept = (y1>>MAPBTOFRAC) + FixedMul(partial, ystep);
+  yintercept = (y1>>MAPBTOFRAC) + FixedMul(ystep, partial);
 
   if (yt2 > yt1)
     {
@@ -671,7 +673,7 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
         xstep = 256*FRACUNIT;
       }
 
-  xintercept = (x1>>MAPBTOFRAC) + FixedMul (partial, xstep);
+  xintercept = (x1>>MAPBTOFRAC) + FixedMul(xstep, partial);
 
   // Step through map blocks.
   // Count is present to prevent a round off error

@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -33,8 +33,6 @@
  *-----------------------------------------------------------------------------
  */
 
-// killough 5/3/98: remove unnecessary headers
-
 #include <stdint.h>
 #include "d_player.h"
 #include "r_defs.h"
@@ -50,47 +48,27 @@
 #include "globdata.h"
 
 
-#define HU_MAXLINELENGTH  31
+#define HU_MAXLINELENGTH  34
 
 
 /* Text Line widget
  *  (parent of Scrolling Text and Input Text widgets) */
 typedef struct
 {
-  // left-justified position of scrolling text window
-  int16_t   x;
   int16_t   y;
 
-  int16_t   linelen;
-  char  l[HU_MAXLINELENGTH+1]; // line of text
-  int16_t   len;                            // current line length
-
-  // whether this line needs to be updated
-  int16_t   needsupdate;
-
+  char  lineoftext[HU_MAXLINELENGTH+1];
+  size_t   len;                            // current line length
 } hu_textline_t;
-
-
-// Scrolling Text window widget
-//  (child of Text Line widget)
-typedef struct
-{
-  hu_textline_t l; // text line to draw
-
-  // pointer to boolean stating whether to update window
-  boolean*    on;
-  boolean   laston;             // last value of *->on.
-
-} hu_stext_t;
 
 
 // widgets
 static hu_textline_t  w_title;
-static hu_stext_t     w_message;
+static hu_textline_t  w_message;
 
+// boolean stating whether to update window
 static boolean    message_on;
 boolean    _g_message_dontfuckwithme;
-static boolean    headsupactive;
 
 
 // global heads up display controls
@@ -98,39 +76,10 @@ static boolean    headsupactive;
 //
 // Locally used constants, shortcuts.
 //
-// Ty 03/28/98 -
-// These shortcuts modifed to reflect char ** of mapnames[]
-#define HU_TITLE  (mapnames[_g_gamemap-1])
-#define HU_TITLEX 0
-//jff 2/16/98 change 167 to ST_Y-1
-// CPhipps - changed to ST_TY
-// proff - changed to 200-ST_HEIGHT for stretching
-#define HU_TITLEY ((SCREENHEIGHT - ST_HEIGHT) - 1 - HU_FONT_HEIGHT)
 
+#define HU_TITLEY (VIEWWINDOWHEIGHT - 1 - HU_FONT_HEIGHT)
 
-#define HU_MSGX         0
 #define HU_MSGY         0
-
-
-//
-// Builtin map names.
-//
-// Ty 03/27/98 - externalized map name arrays - now in d_deh.c
-// and converted to arrays of pointers to char *
-// DOOM map names.
-// CPhipps - const**const
-static const char *const mapnames[] =
-{
-    HUSTR_E1M1,
-    HUSTR_E1M2,
-    HUSTR_E1M3,
-    HUSTR_E1M4,
-    HUSTR_E1M5,
-    HUSTR_E1M6,
-    HUSTR_E1M7,
-    HUSTR_E1M8,
-    HUSTR_E1M9,
-};
 
 
 static int16_t font_lump_offset;
@@ -146,91 +95,27 @@ static int16_t font_lump_offset;
 void HU_Init(void)
 {
 	font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
+
+	w_message.y = HU_MSGY;
+	w_title.y   = HU_TITLEY;
 }
 
+
 //
-// HU_Stop()
+// Builtin map names.
 //
-// Make the heads-up displays inactive
-//
-// Passed nothing, returns nothing
-//
-static void HU_Stop(void)
+static const char *const mapnames[] =
 {
-    headsupactive = false;
-}
-
-
-//
-// HUlib_clearTextLine()
-//
-// Blank the internal text line in a hu_textline_t widget
-//
-// Passed a hu_textline_t, returns nothing
-//
-static void HUlib_clearTextLine(hu_textline_t* t)
-{
-    t->linelen =         // killough 1/23 98: support multiple lines
-            t->len = 0;
-    t->l[0] = 0;
-    t->needsupdate = true;
-}
-
-
-//
-// HUlib_initTextLine()
-//
-// Initialize a hu_textline_t widget. Set the position.
-//
-// Passed a hu_textline_t, and the values used to initialize
-// Returns nothing
-//
-static void HUlib_initTextLine(hu_textline_t* t, int16_t x, int16_t y)
-//jff 2/16/98 add color range parameter
-{
-    t->x = x;
-    t->y = y;
-    HUlib_clearTextLine(t);
-}
-
-
-//
-// HUlib_initSText()
-//
-// Initialize a hu_stext_t widget. Set whether enabled.
-//
-// Passed a hu_stext_t, and the values used to initialize
-// Returns nothing
-//
-static void HUlib_initSText(hu_stext_t* s, boolean* on)
-{
-	s->on     = on;
-	s->laston = true;
-
-	HUlib_initTextLine(&s->l, HU_MSGX, HU_MSGY);
-}
-
-
-//
-// HUlib_addCharToTextLine()
-//
-// Adds a character at the end of the text line in a hu_textline_t widget
-//
-// Passed the hu_textline_t and the char to add
-//
-static void HUlib_addCharToTextLine(hu_textline_t* t,char ch)
-{
-	if (t->linelen != HU_MAXLINELENGTH)
-	{
-		t->linelen++;
-		if (ch == '\n')
-			t->linelen=0;
-
-		t->l[t->len++] = ch;
-		t->l[t->len] = 0;
-		t->needsupdate = 4;
-	}
-}
+    HUSTR_E1M1,
+    HUSTR_E1M2,
+    HUSTR_E1M3,
+    HUSTR_E1M4,
+    HUSTR_E1M5,
+    HUSTR_E1M6,
+    HUSTR_E1M7,
+    HUSTR_E1M8,
+    HUSTR_E1M9,
+};
 
 
 //
@@ -246,33 +131,17 @@ static void HUlib_addCharToTextLine(hu_textline_t* t,char ch)
 //
 void HU_Start(void)
 {
-    const char* s; /* cph - const */
+	message_on = false;
+	_g_message_dontfuckwithme = false;
 
-    if (headsupactive)                    // stop before starting
-        HU_Stop();
+	// create the message widget
+	// messages to player in upper-left of screen
+	w_message.len           = 0;
+	w_message.lineoftext[0] = 0;
 
-
-    message_on = false;
-    _g_message_dontfuckwithme = false;
-
-    // create the message widget
-    // messages to player in upper-left of screen
-    HUlib_initSText(&w_message, &message_on);
-
-    //jff 2/16/98 added some HUD widgets
-    // create the map title widget - map title display in lower left of automap
-    HUlib_initTextLine(&w_title, HU_TITLEX, HU_TITLEY);
-
-    // initialize the automap's level title widget
-    if (_g_gamestate == GS_LEVEL) /* cph - stop SEGV here when not in level */
-        s = HU_TITLE;
-    else s = "";
-    while (*s)
-        HUlib_addCharToTextLine(&w_title, *(s++));
-
-
-    // now allow the heads-up display to run
-    headsupactive = true;
+	// create the map title widget - map title display in lower left of automap
+	w_title.len       = strlen(mapnames[_g_gamemap - 1]);
+	strcpy(w_title.lineoftext, mapnames[_g_gamemap - 1]);
 }
 
 
@@ -284,21 +153,17 @@ void HU_Start(void)
 // Passed the hu_textline_t and flag whether to draw a cursor
 // Returns nothing
 //
-static void HUlib_drawTextLine(hu_textline_t* l)
+static void HUlib_drawTextLine(hu_textline_t* textline)
 {
-	int16_t y = l->y;           // killough 1/18/98 -- support multiple lines
+	const int16_t y = textline->y;
 
 	// draw the new stuff
-	int16_t x = l->x;
-	for (int16_t i = 0; i < l->len; i++)
+	int16_t x = 0;
+	for (size_t i = 0; i < textline->len; i++)
 	{
-		char c = toupper(l->l[i]); //jff insure were not getting a cheap toupper conv.
+		char c = toupper(textline->lineoftext[i]); //jff insure were not getting a cheap toupper conv.
 
-		if (c=='\n')         // killough 1/18/98 -- support multiple lines
-			x=0,y+=8;
-		else if (c=='\t')    // killough 1/23/98 -- support tab stops
-			x=x-x%80+80;
-		else if (HU_FONTSTART <= c && c <= HU_FONTEND)
+		if (HU_FONTSTART <= c && c <= HU_FONTEND)
 		{
 			const patch_t __far* patch = W_GetLumpByNum(c + font_lump_offset);
 			int16_t w = patch->width;
@@ -322,24 +187,6 @@ static void HUlib_drawTextLine(hu_textline_t* l)
 
 
 //
-// HUlib_drawSText()
-//
-// Displays a hu_stext_t widget
-//
-// Passed a hu_stext_t
-// Returns nothing
-//
-static void HUlib_drawSText(hu_stext_t* s)
-{
-	if (!*s->on)
-		return; // if not on, don't draw
-
-	// draw everything
-	HUlib_drawTextLine(&s->l); // no cursor, please
-}
-
-
-//
 // HU_Drawer()
 //
 // Draw all the pieces of the heads-up display
@@ -355,97 +202,10 @@ void HU_Drawer(void)
         HUlib_drawTextLine(&w_title);
     }
 
-    //jff 3/4/98 display last to give priority
-    HU_Erase(); // jff 4/24/98 Erase current lines before drawing current
-    // needed when screen not fullsize
-
-
-    HUlib_drawSText(&w_message);
-}
-
-
-//
-// HUlib_eraseTextLine()
-//
-// Erases a hu_textline_t widget when screen border is behind text
-// Sorta called by HU_Erase and just better darn get things straight
-//
-// Passed the hu_textline_t
-// Returns nothing
-//
-static void HUlib_eraseTextLine(hu_textline_t* l)
-{
-    if (l->needsupdate)
-        l->needsupdate--;
-}
-
-
-//
-// HUlib_eraseSText()
-//
-// Erases a hu_stext_t widget, when the screen is not fullsize
-//
-// Passed a hu_stext_t
-// Returns nothing
-//
-static void HUlib_eraseSText(hu_stext_t* s)
-{
-	if (s->laston && !*s->on)
-		s->l.needsupdate = 4;
-
-	HUlib_eraseTextLine(&s->l);
-
-	s->laston = *s->on;
-}
-
-
-//
-// HU_Erase()
-//
-// Erase hud display lines that can be trashed by small screen display
-//
-// Passed nothing, returns nothing
-//
-void HU_Erase(void)
-{
-    // erase the message display or the message review display
-    HUlib_eraseSText(&w_message);
-
-    // erase the automap title
-    HUlib_eraseTextLine(&w_title);
-}
-
-
-//
-// HUlib_addLineToSText()
-//
-// Adds a blank line to a hu_stext_t widget
-//
-// Passed a hu_stext_t
-// Returns nothing
-//
-static void HUlib_addLineToSText(hu_stext_t* s)
-{
-	HUlib_clearTextLine(&s->l);
-
-	s->l.needsupdate = 4;
-}
-
-
-//
-// HUlib_addMessageToSText()
-//
-// Adds a message line to a hu_stext_t widget
-//
-// Passed a hu_stext_t and a message string
-// Returns nothing
-//
-static void HUlib_addMessageToSText(hu_stext_t* s, const char* msg)
-{
-	HUlib_addLineToSText(s);
-
-	while (*msg)
-		HUlib_addCharToTextLine(&s->l, *(msg++));
+    if (message_on)
+    {
+        HUlib_drawTextLine(&w_message);
+    }
 }
 
 
@@ -461,36 +221,36 @@ static void HUlib_addMessageToSText(hu_stext_t* s, const char* msg)
 
 void HU_Ticker(void)
 {
-    static int16_t        message_counter = 0;
+	static int16_t        message_counter = 0;
 
-    player_t* plr = &_g_player;        // killough 3/7/98
+	player_t* plr = &_g_player;
 
-    // tick down message counter if message is up
-    if (message_counter && !--message_counter)
-    {
-        message_on = false;
-    }
+	// tick down message counter if message is up
+	if (message_counter && !--message_counter)
+	{
+		message_on = false;
+	}
 
+	// if messages on, or "Messages Off" is being displayed
+	// this allows the notification of turning messages off to be seen
+	if (showMessages || _g_message_dontfuckwithme)
+	{
+		// display message if necessary
+		if (plr->message)
+		{
+			//post the message to the message widget
+			w_message.len = strlen(plr->message);
+			strcpy(w_message.lineoftext, plr->message);
 
-    // if messages on, or "Messages Off" is being displayed
-    // this allows the notification of turning messages off to be seen
-    if (showMessages || _g_message_dontfuckwithme)
-    {
-        // display message if necessary
-        if (plr->message)
-        {
-            //post the message to the message widget
-            HUlib_addMessageToSText(&w_message, plr->message);
+			// clear the message to avoid posting multiple times
+			plr->message = NULL;
+			// note a message is displayed
+			message_on = true;
+			// start the message persistence counter
+			message_counter = HU_MSGTIMEOUT;
 
-            // clear the message to avoid posting multiple times
-            plr->message = 0;
-            // note a message is displayed
-            message_on = true;
-            // start the message persistence counter
-            message_counter = HU_MSGTIMEOUT;
-
-            // clear the flag that "Messages Off" is being posted
-            _g_message_dontfuckwithme = false;
-        }
-    }
+			// clear the flag that "Messages Off" is being posted
+			_g_message_dontfuckwithme = false;
+		}
+	}
 }

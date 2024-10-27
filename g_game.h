@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -70,7 +70,6 @@ extern const int16_t  key_menu_escape;
 extern const int16_t  key_menu_enter;
 extern const int16_t  key_fire;
 extern const int16_t  key_escape;
-extern const int16_t  key_enter;
 extern const int16_t  key_map_right;
 extern const int16_t  key_map_left;
 extern const int16_t  key_map_up;

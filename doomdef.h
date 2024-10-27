@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -63,12 +63,18 @@
 #define HIBYTE(w)	(((uint8_t *)&w)[1])
 
 
+#if !defined VIEWWINDOWWIDTH
 #define VIEWWINDOWWIDTH  60
+#endif
+
+#if !defined VIEWWINDOWHEIGHT
 #define VIEWWINDOWHEIGHT 128
+#endif
+
 
 // SCREENWIDTH and SCREENHEIGHT define the visible size
 #define SCREENWIDTH  240u
-#define SCREENHEIGHT 160
+#define SCREENHEIGHT 160 /*(VIEWWINDOWHEIGHT+ST_HEIGHT)*/
 
 #define SCREENWIDTH_VGA  320
 #define SCREENHEIGHT_VGA 200
@@ -77,16 +83,13 @@
 // The maximum number of players, multiplayer/networking.
 #define MAXPLAYERS       1
 
-// phares 5/14/98:
-// DOOM Editor Numbers (aka doomednum in mobj_t)
-
-#define DEN_PLAYER5 4001
-#define DEN_PLAYER6 4002
-#define DEN_PLAYER7 4003
-#define DEN_PLAYER8 4004
 
 // State updates, number of tics / second.
 #define TICRATE          35
+
+
+int16_t M_CheckParm(char *check);
+
 
 // The current state of the game: whether we are playing, gazing
 // at the intermission screen, the game final animation, or a demo.
@@ -119,9 +122,6 @@ typedef enum {
   it_bluecard,
   it_yellowcard,
   it_redcard,
-  it_blueskull,
-  it_yellowskull,
-  it_redskull,
   NUMCARDS
 } card_t;
 
@@ -146,8 +146,8 @@ typedef enum {
 typedef enum {
   am_clip,    // Pistol / chaingun ammo.
   am_shell,   // Shotgun / double barreled shotgun.
-  am_cell,    // Plasma rifle, BFG.
   am_misl,    // Missile launcher.
+  am_cell,    // Plasma rifle, BFG.
   NUMAMMO,
   am_noammo   // Unlimited for chainsaw / fist.
 } ammotype_t;
@@ -173,6 +173,7 @@ typedef enum {
 
 
 //GBA Keys
+#define KEYD_SPEED          0
 #define KEYD_A              1
 #define KEYD_B              2
 #define KEYD_L              3
@@ -187,6 +188,7 @@ typedef enum {
 #define KEYD_PLUS          12
 #define KEYD_BRACKET_LEFT  13
 #define KEYD_BRACKET_RIGHT 14
+#define KEYD_STRAFE        15
 
 #define NUMKEYS   16
 

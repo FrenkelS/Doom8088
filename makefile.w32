@@ -33,6 +33,7 @@ GLOBOBJS = &
  d_items.obj &
  d_main.obj &
  f_finale.obj &
+ f_lib.obj &
  g_game.obj &
  hu_stuff.obj &
  i_audio.obj &
@@ -43,11 +44,9 @@ GLOBOBJS = &
  m_cheat.obj &
  m_menu.obj &
  m_random.obj &
- p_ceilng.obj &
  p_doors.obj &
  p_enemy.obj &
  p_floor.obj &
- p_genlin.obj &
  p_inter.obj &
  p_lights.obj &
  p_map.obj &
@@ -69,10 +68,12 @@ GLOBOBJS = &
  r_things.obj &
  s_sound.obj &
  sounds.obj &
+ st_pal.obj &
  st_stuff.obj &
  tables.obj &
  v_video.obj &
  w_wad.obj &
+ wi_lib.obj &
  wi_stuff.obj &
  z_bmallo.obj &
  z_zone.obj

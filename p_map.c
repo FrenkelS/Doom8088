@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -75,12 +75,12 @@ static boolean         tmunstuck;     /* killough 8/1/98: whether to allow unsti
 // but don't process them until the move is proven valid
 
 // 1/11/98 killough: removed limit on special lines crossed
-const line_t __far* _g_spechit[4];
+line_t __far* _g_spechit[4];
 
 int16_t _g_numspechit;
 
 // Temporary holder for thing_sectorlist threads
-msecnode_t __far* _g_sector_list;
+static msecnode_t __far* _s_sector_list;
 
 
 mobj_t __far*   _g_linetarget; // who got hit (or NULL)
@@ -103,10 +103,6 @@ static int16_t bombdamage;
 
 static mobj_t __far*   usething;
 
-// If "floatok" true, move would be ok
-// if within "tmfloorz - tmceilingz".
-static boolean   floatok;
-
 
 static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 
@@ -118,12 +114,6 @@ static boolean telefrag;   /* killough 8/9/98: whether to telefrag at exit */
 boolean P_IsAttackRangeMeleeRange(void)
 {
 	return attackrange == MELEERANGE;
-}
-
-
-boolean P_IsFloatOk(void)
-{
-	return floatok;
 }
 
 
@@ -256,10 +246,10 @@ static boolean untouched(const line_t __far* ld)
 {
   fixed_t x, y, tmbbox[4];
   return
-    (tmbbox[BOXRIGHT] = (x=tmthing->x)+tmthing->radius) <= ld->bbox[BOXLEFT] ||
-    (tmbbox[BOXLEFT] = x-tmthing->radius) >= ld->bbox[BOXRIGHT] ||
-    (tmbbox[BOXTOP] = (y=tmthing->y)+tmthing->radius) <= ld->bbox[BOXBOTTOM] ||
-    (tmbbox[BOXBOTTOM] = y-tmthing->radius) >= ld->bbox[BOXTOP] ||
+    (tmbbox[BOXRIGHT] = (x=tmthing->x)+tmthing->radius) <= (fixed_t)ld->bbox[BOXLEFT]<<FRACBITS ||
+    (tmbbox[BOXLEFT] = x-tmthing->radius) >= (fixed_t)ld->bbox[BOXRIGHT]<<FRACBITS ||
+    (tmbbox[BOXTOP] = (y=tmthing->y)+tmthing->radius) <= (fixed_t)ld->bbox[BOXBOTTOM]<<FRACBITS ||
+    (tmbbox[BOXBOTTOM] = y-tmthing->radius) >= (fixed_t)ld->bbox[BOXTOP]<<FRACBITS ||
     P_BoxOnLineSide(tmbbox, ld) != -1;
 }
 
@@ -268,12 +258,12 @@ static boolean untouched(const line_t __far* ld)
 // Adjusts tmfloorz and tmceilingz as lines are contacted
 //
 
-static boolean PIT_CheckLine (const line_t __far* ld)
+static boolean PIT_CheckLine (line_t __far* ld)
 {
-  if (_g_tmbbox[BOXRIGHT] <= ld->bbox[BOXLEFT]
-   || _g_tmbbox[BOXLEFT] >= ld->bbox[BOXRIGHT]
-   || _g_tmbbox[BOXTOP] <= ld->bbox[BOXBOTTOM]
-   || _g_tmbbox[BOXBOTTOM] >= ld->bbox[BOXTOP] )
+  if (_g_tmbbox[BOXRIGHT]  <= (fixed_t)ld->bbox[BOXLEFT]   << FRACBITS
+   || _g_tmbbox[BOXLEFT]   >= (fixed_t)ld->bbox[BOXRIGHT]  << FRACBITS
+   || _g_tmbbox[BOXTOP]    <= (fixed_t)ld->bbox[BOXBOTTOM] << FRACBITS
+   || _g_tmbbox[BOXBOTTOM] >= (fixed_t)ld->bbox[BOXTOP]    << FRACBITS)
     return true; // didn't hit it
 
   if (P_BoxOnLineSide(_g_tmbbox, ld) != -1)
@@ -373,25 +363,6 @@ static boolean PIT_CheckThing(mobj_t __far* thing)
 
   if (thing == tmthing)
     return true;
-
-  // check for skulls slamming into things
-
-  if (tmthing->flags & MF_SKULLFLY)
-    {
-      // A flying skull is smacking something.
-      // Determine damage amount, and the skull comes to a dead stop.
-
-      int16_t damage = ((P_Random()%8)+1)*mobjinfo[tmthing->type].damage;
-
-      P_DamageMobj (thing, tmthing, tmthing, damage);
-
-      tmthing->flags &= ~MF_SKULLFLY;
-      tmthing->momx = tmthing->momy = tmthing->momz = 0;
-
-      P_SetMobjState (tmthing, mobjinfo[tmthing->type].spawnstate);
-
-      return false;   // stop moving
-    }
 
   // missiles can hit other things
   // killough 8/10/98: bouncing non-solid things can hit other things too
@@ -561,155 +532,6 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   }
 
 
-// killough 4/16/98: Same thing, only for linedefs
-
-static int16_t P_FindLineFromLineTag(const line_t __far* line, int16_t start)
-{
-
-    int16_t	i;
-
-    for (i=start+1; i<_g_numlines; i++)
-    {
-        if (_g_lines[i].tag == line->tag)
-            return i;
-    }
-
-    return -1;
-}
-
-
-//
-// Silent linedef-based TELEPORTATION, by Lee Killough
-// Primarily for rooms-over-rooms etc.
-// This is the complete player-preserving kind of teleporter.
-// It has advantages over the teleporter with thing exits.
-//
-
-// maximum fixed_t units to move object to avoid hiccups
-#define FUDGEFACTOR 10
-
-static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mobj_t __far* thing, boolean reverse)
-{
-  int16_t i;
-  const line_t __far* l;
-
-  if (side || thing->flags & MF_MISSILE)
-    return false;
-
-  for (i = -1; (i = P_FindLineFromLineTag(line, i)) >= 0;)
-    if ((l=_g_lines+i) != line && LN_BACKSECTOR(l))
-      {
-        // Get the thing's position along the source linedef
-        fixed_t pos = abs(line->dx) > abs(line->dy) ?
-          FixedApproxDiv(thing->x - line->v1.x, (fixed_t)line->dx<<FRACBITS) :
-          FixedApproxDiv(thing->y - line->v1.y, (fixed_t)line->dy<<FRACBITS) ;
-
-        // Get the angle between the two linedefs, for rotating
-        // orientation and momentum. Rotate 180 degrees, and flip
-        // the position across the exit linedef, if reversed.
-        angle_t angle = (reverse ? pos = FRACUNIT-pos, 0 : ANG180) +
-          R_PointToAngle2(0, 0, (fixed_t)l->dx<<FRACBITS, (fixed_t)l->dy<<FRACBITS) -
-          R_PointToAngle2(0, 0, (fixed_t)line->dx<<FRACBITS, (fixed_t)line->dy<<FRACBITS);
-
-        // Interpolate position across the exit linedef
-        fixed_t x = l->v2.x - FixedMul(pos, (fixed_t)l->dx<<FRACBITS);
-        fixed_t y = l->v2.y - FixedMul(pos, (fixed_t)l->dy<<FRACBITS);
-
-        // Sine, cosine of angle adjustment
-        fixed_t s = finesine(  angle>>ANGLETOFINESHIFT);
-        fixed_t c = finecosine(angle>>ANGLETOFINESHIFT);
-
-        // Maximum distance thing can be moved away from interpolated
-        // exit, to ensure that it is on the correct side of exit linedef
-        int16_t fudge = FUDGEFACTOR;
-
-        // Whether this is a player, and if so, a pointer to its player_t.
-        // Voodoo dolls are excluded by making sure thing->player->mo==thing.
-        player_t *player = P_MobjIsPlayer(thing) && P_MobjIsPlayer(thing)->mo == thing ?
-          P_MobjIsPlayer(thing) : NULL;
-
-        // Whether walking towards first side of exit linedef steps down
-        int16_t stepdown =
-          LN_FRONTSECTOR(l)->floorheight < LN_BACKSECTOR(l)->floorheight;
-
-        // Height of thing above ground
-        fixed_t z = thing->z - thing->floorz;
-
-        // Side to exit the linedef on positionally.
-        //
-        // Notes:
-        //
-        // This flag concerns exit position, not momentum. Due to
-        // roundoff error, the thing can land on either the left or
-        // the right side of the exit linedef, and steps must be
-        // taken to make sure it does not end up on the wrong side.
-        //
-        // Exit momentum is always towards side 1 in a reversed
-        // teleporter, and always towards side 0 otherwise.
-        //
-        // Exiting positionally on side 1 is always safe, as far
-        // as avoiding oscillations and stuck-in-wall problems,
-        // but may not be optimum for non-reversed teleporters.
-        //
-        // Exiting on side 0 can cause oscillations if momentum
-        // is towards side 1, as it is with reversed teleporters.
-        //
-        // Exiting on side 1 slightly improves player viewing
-        // when going down a step on a non-reversed teleporter.
-
-        int16_t side = reverse || (player && stepdown);
-
-        // Make sure we are on correct side of exit linedef.
-        while (P_PointOnLineSide(x, y, l) != side && --fudge>=0)
-          if (abs(l->dx) > abs(l->dy))
-            y -= (l->dx < 0) != side ? -1 : 1;
-          else
-            x += (l->dy < 0) != side ? -1 : 1;
-
-        // Attempt to teleport, aborting if blocked
-        if (!P_TeleportMove(thing, x, y, false)) /* killough 8/9/98 */
-          return false;
-
-
-
-        // Adjust z position to be same height above ground as before.
-        // Ground level at the exit is measured as the higher of the
-        // two floor heights at the exit linedef.
-        thing->z = z + _g_sides[l->sidenum[stepdown]].sector->floorheight;
-
-        // Rotate thing's orientation according to difference in linedef angles
-        thing->angle += angle;
-
-        // Momentum of thing crossing teleporter linedef
-        x = thing->momx;
-        y = thing->momy;
-
-        // Rotate thing's momentum to come out of exit just like it entered
-        thing->momx = FixedMul(x, c) - FixedMul(y, s);
-        thing->momy = FixedMul(y, c) + FixedMul(x, s);
-
-        // Adjust a player's view, in case there has been a height change
-        if (player)
-          {
-            // Save the current deltaviewheight, used in stepping
-            fixed_t deltaviewheight = player->deltaviewheight;
-
-            // Clear deltaviewheight, since we don't want any changes now
-            player->deltaviewheight = 0;
-
-            // Set player's view according to the newly set parameters
-            P_CalcHeight(player);
-
-            // Reset the delta to have the same dynamics as before
-            player->deltaviewheight = deltaviewheight;
-          }
-
-        return true;
-      }
-  return false;
-}
-
-
 //
 // P_CrossSpecialLine - Walkover Trigger Dispatcher
 //
@@ -722,7 +544,7 @@ static boolean EV_SilentLineTeleport(const line_t __far* line, int16_t side, mob
 //  crossed. Change is qualified by demo_compatibility.
 //
 // CPhipps - take a line_t pointer instead of a line number, as in MBF
-static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __far* thing)
+static void P_CrossSpecialLine(line_t __far* line, int16_t side, mobj_t __far* thing)
 {
   boolean         ok;
 
@@ -742,118 +564,13 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
   }
 
 
-    // pointer to line function is NULL by default, set non-null if
-    // line special is walkover generalized linedef type
-    boolean (*linefunc)(const line_t __far* line)=NULL;
-
-    // check each range of generalized linedefs
-    if ((uint16_t)LN_SPECIAL(line) >= GenEnd)
-    {
-      // Out of range for GenFloors
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenFloorBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if ((LN_SPECIAL(line) & FloorChange) || !(LN_SPECIAL(line) & FloorModel))
-          return;     // FloorModel is "Allow Monsters" if FloorChange is 0
-      if (!line->tag) //jff 2/27/98 all walk generalized types require tag
-        return;
-      linefunc = EV_DoGenFloor;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenCeilingBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if ((LN_SPECIAL(line) & CeilingChange) || !(LN_SPECIAL(line) & CeilingModel))
-          return;     // CeilingModel is "Allow Monsters" if CeilingChange is 0
-      if (!line->tag) //jff 2/27/98 all walk generalized types require tag
-        return;
-      linefunc = EV_DoGenCeiling;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenDoorBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-      {
-        if (!(LN_SPECIAL(line) & DoorMonster))
-          return;                    // monsters disallowed from this door
-        if (line->flags & ML_SECRET) // they can't open secret doors either
-          return;
-      }
-      if (!line->tag) //3/2/98 move outside the monster check
-        return;
-      linefunc = EV_DoGenDoor;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenLockedBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        return;                     // monsters disallowed from unlocking doors
-      if (((LN_SPECIAL(line)&TriggerType)==WalkOnce) || ((LN_SPECIAL(line)&TriggerType)==WalkMany))
-      { //jff 4/1/98 check for being a walk type before reporting door type
-        if (!P_CanUnlockGenDoor(line,P_MobjIsPlayer(thing)))
-          return;
-      }
-      else
-        return;
-      linefunc = EV_DoGenLockedDoor;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenLiftBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if (!(LN_SPECIAL(line) & LiftMonster))
-          return; // monsters disallowed
-      if (!line->tag) //jff 2/27/98 all walk generalized types require tag
-        return;
-      linefunc = EV_DoGenLift;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenStairsBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if (!(LN_SPECIAL(line) & StairMonster))
-          return; // monsters disallowed
-      if (!line->tag) //jff 2/27/98 all walk generalized types require tag
-        return;
-      linefunc = EV_DoGenStairs;
-    }
-
-    if (linefunc) // if it was a valid generalized type
-      switch((LN_SPECIAL(line) & TriggerType) >> TriggerTypeShift)
-      {
-        case WalkOnce:
-          if (linefunc(line))
-            LN_SPECIAL(line) = 0;    // clear special if a walk once type
-          return;
-        case WalkMany:
-          linefunc(line);
-          return;
-        default:                  // if not a walk type, do nothing here
-          return;
-      }
-
-
   if (!P_MobjIsPlayer(thing))
   {
     ok = false;
     switch(LN_SPECIAL(line))
     {
-      case 39:      // teleport trigger
       case 97:      // teleport retrigger
-      case 125:     // teleport monsteronly trigger
-      case 126:     // teleport monsteronly retrigger
-      case 4:       // raise door
-      case 10:      // plat down-wait-up-stay trigger
       case 88:      // plat down-wait-up-stay retrigger
-        //jff 3/5/98 add ability of monsters etc. to use teleporters
-      case 208:     //silent thing teleporters
-      case 207:
-      case 243:     //silent line-line teleporter
-      case 244:     //jff 3/6/98 make fit within DCK's 256 linedef types
-      case 262:     //jff 4/14/98 add monster only
-      case 263:     //jff 4/14/98 silent thing,line,line rev types
-      case 264:     //jff 4/14/98 plus player/monster silent line
-      case 265:     //            reversed types
-      case 266:
-      case 267:
-      case 268:
-      case 269:
         ok = true;
         break;
     }
@@ -877,52 +594,16 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         LN_SPECIAL(line) = 0;
       break;
 
-    case 3:
-      // Close Door
-      if (EV_DoDoor(line,dclose))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 4:
-      // Raise Door
-      if (EV_DoDoor(line,normal))
-        LN_SPECIAL(line) = 0;
-      break;
-
     case 5:
       // Raise Floor
       if (EV_DoFloor(line,raiseFloor))
         LN_SPECIAL(line) = 0;
       break;
 
-    case 6:
-      // Fast Ceiling Crush & Raise
-      if (EV_DoCeiling(line,fastCrushAndRaise))
-        LN_SPECIAL(line) = 0;
-      break;
-
     case 8:
       // Build Stairs
-      if (EV_BuildStairs(line,build8))
+      if (EV_BuildStairs(line))
         LN_SPECIAL(line) = 0;
-      break;
-
-    case 10:
-      // PlatDownWaitUp
-      if (EV_DoPlat(line,downWaitUpStay,0))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 12:
-      // Light Turn On - brightest near
-      EV_LightTurnOn(line,0);
-      LN_SPECIAL(line) = 0;
-      break;
-
-    case 13:
-      // Light Turn On 255
-      EV_LightTurnOn(line,255);
-      LN_SPECIAL(line) = 0;
       break;
 
     case 16:
@@ -931,34 +612,9 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         LN_SPECIAL(line) = 0;
       break;
 
-    case 17:
-      // Start Light Strobing
-      EV_StartLightStrobing(line);
-      LN_SPECIAL(line) = 0;
-      break;
-
-    case 19:
-      // Lower Floor
-      if (EV_DoFloor(line,lowerFloor))
-        LN_SPECIAL(line) = 0;
-      break;
-
     case 22:
       // Raise floor to nearest height and change texture
-      if (EV_DoPlat(line,raiseToNearestAndChange,0))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 25:
-      // Ceiling Crush and Raise
-      if (EV_DoCeiling(line,crushAndRaise))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 30:
-      // Raise floor to shortest texture height
-      //  on either side of lines.
-      if (EV_DoFloor(line,raiseToTexture))
+      if (EV_DoPlat(line,raiseToNearestAndChange))
         LN_SPECIAL(line) = 0;
       break;
 
@@ -974,193 +630,11 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
         LN_SPECIAL(line) = 0;
       break;
 
-    case 37:
-      // LowerAndChange
-      if (EV_DoFloor(line,lowerAndChange))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 38:
-      // Lower Floor To Lowest
-      if (EV_DoFloor(line, lowerFloorToLowest))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 39:
-      // TELEPORT! //jff 02/09/98 fix using up with wrong side crossing
-      if (EV_Teleport(line, side, thing))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 40:
-      // RaiseCeilingLowerFloor
-        if (EV_DoCeiling(line, raiseToHighest))
-          LN_SPECIAL(line) = 0;
-      break;
-
-    case 44:
-      // Ceiling Crush
-      if (EV_DoCeiling(line, lowerAndCrush))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 52:
-      // EXIT!
-      // killough 10/98: prevent zombies from exiting levels
-      if (!(P_MobjIsPlayer(thing) && P_MobjIsPlayer(thing)->health <= 0))
-  G_ExitLevel ();
-      break;
-
-    case 53:
-      // Perpetual Platform Raise
-      if (EV_DoPlat(line,perpetualRaise,0))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 54:
-      // Platform Stop
-      EV_StopPlat(line);
-      LN_SPECIAL(line) = 0;
-      break;
-
-    case 56:
-      // Raise Floor Crush
-      if (EV_DoFloor(line,raiseFloorCrush))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 57:
-      // Ceiling Crush Stop
-      if (EV_CeilingCrushStop(line))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 58:
-      // Raise Floor 24
-      if (EV_DoFloor(line,raiseFloor24))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 59:
-      // Raise Floor 24 And Change
-      if (EV_DoFloor(line,raiseFloor24AndChange))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 100:
-      // Build Stairs Turbo 16
-      if (EV_BuildStairs(line,turbo16))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 104:
-      // Turn lights off in sector(tag)
-      EV_TurnTagLightsOff(line);
-      LN_SPECIAL(line) = 0;
-      break;
-
-    case 108:
-      // Blazing Door Raise (faster than TURBO!)
-      if (EV_DoDoor(line,blazeRaise))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 109:
-      // Blazing Door Open (faster than TURBO!)
-      if (EV_DoDoor (line,blazeOpen))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 110:
-      // Blazing Door Close (faster than TURBO!)
-      if (EV_DoDoor (line,blazeClose))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 119:
-      // Raise floor to nearest surr. floor
-      if (EV_DoFloor(line,raiseFloorToNearest))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 121:
-      // Blazing PlatDownWaitUpStay
-      if (EV_DoPlat(line,blazeDWUS,0))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 124:
-      // Secret EXIT
-      // killough 10/98: prevent zombies from exiting levels
-      // CPhipps - change for lxdoom's compatibility handling
-      if (!(P_MobjIsPlayer(thing) && P_MobjIsPlayer(thing)->health <= 0))
-  G_SecretExitLevel ();
-      break;
-
-    case 125:
-      // TELEPORT MonsterONLY
-      if (!P_MobjIsPlayer(thing) &&
-          (EV_Teleport(line, side, thing)))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 130:
-      // Raise Floor Turbo
-      if (EV_DoFloor(line,raiseFloorTurbo))
-        LN_SPECIAL(line) = 0;
-      break;
-
-    case 141:
-      // Silent Ceiling Crush & Raise
-      if (EV_DoCeiling(line,silentCrushAndRaise))
-        LN_SPECIAL(line) = 0;
-      break;
-
       // Regular walk many retriggerable
-
-    case 72:
-      // Ceiling Crush
-      EV_DoCeiling( line, lowerAndCrush );
-      break;
-
-    case 73:
-      // Ceiling Crush and Raise
-      EV_DoCeiling(line,crushAndRaise);
-      break;
-
-    case 74:
-      // Ceiling Crush Stop
-      EV_CeilingCrushStop(line);
-      break;
-
-    case 75:
-      // Close Door
-      EV_DoDoor(line,dclose);
-      break;
 
     case 76:
       // Close Door 30
       EV_DoDoor(line,close30ThenOpen);
-      break;
-
-    case 77:
-      // Fast Ceiling Crush & Raise
-      EV_DoCeiling(line,fastCrushAndRaise);
-      break;
-
-    case 79:
-      // Lights Very Dark
-      EV_LightTurnOn(line,35);
-      break;
-
-    case 80:
-      // Light Turn On - brightest near
-      EV_LightTurnOn(line,0);
-      break;
-
-    case 81:
-      // Light Turn On 255
-      EV_LightTurnOn(line,255);
       break;
 
     case 82:
@@ -1168,34 +642,14 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
       EV_DoFloor( line, lowerFloorToLowest );
       break;
 
-    case 83:
-      // Lower Floor
-      EV_DoFloor(line,lowerFloor);
-      break;
-
-    case 84:
-      // LowerAndChange
-      EV_DoFloor(line,lowerAndChange);
-      break;
-
     case 86:
       // Open Door
       EV_DoDoor(line,dopen);
       break;
 
-    case 87:
-      // Perpetual Platform Raise
-      EV_DoPlat(line,perpetualRaise,0);
-      break;
-
     case 88:
       // PlatDownWaitUp
-      EV_DoPlat(line,downWaitUpStay,0);
-      break;
-
-    case 89:
-      // Platform Stop
-      EV_StopPlat(line);
+      EV_DoPlat(line,downWaitUpStay);
       break;
 
     case 90:
@@ -1208,33 +662,6 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
       EV_DoFloor(line,raiseFloor);
       break;
 
-    case 92:
-      // Raise Floor 24
-      EV_DoFloor(line,raiseFloor24);
-      break;
-
-    case 93:
-      // Raise Floor 24 And Change
-      EV_DoFloor(line,raiseFloor24AndChange);
-      break;
-
-    case 94:
-      // Raise Floor Crush
-      EV_DoFloor(line,raiseFloorCrush);
-      break;
-
-    case 95:
-      // Raise floor to nearest height
-      // and change texture.
-      EV_DoPlat(line,raiseToNearestAndChange,0);
-      break;
-
-    case 96:
-      // Raise floor to shortest texture height
-      // on either side of lines.
-      EV_DoFloor(line,raiseToTexture);
-      break;
-
     case 97:
       // TELEPORT!
       EV_Teleport( line, side, thing );
@@ -1244,349 +671,6 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
       // Lower Floor (TURBO)
       EV_DoFloor(line,turboLower);
       break;
-
-    case 105:
-      // Blazing Door Raise (faster than TURBO!)
-      EV_DoDoor (line,blazeRaise);
-      break;
-
-    case 106:
-      // Blazing Door Open (faster than TURBO!)
-      EV_DoDoor (line,blazeOpen);
-      break;
-
-    case 107:
-      // Blazing Door Close (faster than TURBO!)
-      EV_DoDoor (line,blazeClose);
-      break;
-
-    case 120:
-      // Blazing PlatDownWaitUpStay.
-      EV_DoPlat(line,blazeDWUS,0);
-      break;
-
-    case 126:
-      // TELEPORT MonsterONLY.
-      if (!P_MobjIsPlayer(thing))
-        EV_Teleport( line, side, thing );
-      break;
-
-    case 128:
-      // Raise To Nearest Floor
-      EV_DoFloor(line,raiseFloorToNearest);
-      break;
-
-    case 129:
-      // Raise Floor Turbo
-      EV_DoFloor(line,raiseFloorTurbo);
-      break;
-
-      // Extended walk triggers
-
-      // jff 1/29/98 added new linedef types to fill all functions out so that
-      // all have varieties SR, S1, WR, W1
-
-      // killough 1/31/98: "factor out" compatibility test, by
-      // adding inner switch qualified by compatibility flag.
-      // relax test to demo_compatibility
-
-      // killough 2/16/98: Fix problems with W1 types being cleared too early
-
-    default:
-        switch (LN_SPECIAL(line))
-        {
-          // Extended walk once triggers
-
-          case 142:
-            // Raise Floor 512
-            // 142 W1  EV_DoFloor(raiseFloor512)
-            if (EV_DoFloor(line,raiseFloor512))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 143:
-            // Raise Floor 24 and change
-            // 143 W1  EV_DoPlat(raiseAndChange,24)
-            if (EV_DoPlat(line,raiseAndChange,24))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 144:
-            // Raise Floor 32 and change
-            // 144 W1  EV_DoPlat(raiseAndChange,32)
-            if (EV_DoPlat(line,raiseAndChange,32))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 145:
-            // Lower Ceiling to Floor
-            // 145 W1  EV_DoCeiling(lowerToFloor)
-            if (EV_DoCeiling( line, lowerToFloor ))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 146:
-            // Lower Pillar, Raise Donut
-            // 146 W1  EV_DoDonut()
-            if (EV_DoDonut(line))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 199:
-            // Lower ceiling to lowest surrounding ceiling
-            // 199 W1 EV_DoCeiling(lowerToLowest)
-            if (EV_DoCeiling(line,lowerToLowest))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 200:
-            // Lower ceiling to highest surrounding floor
-            // 200 W1 EV_DoCeiling(lowerToMaxFloor)
-            if (EV_DoCeiling(line,lowerToMaxFloor))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 207:
-            // killough 2/16/98: W1 silent teleporter (normal kind)
-            if (EV_SilentTeleport(line, side, thing))
-              LN_SPECIAL(line) = 0;
-            break;
-
-            //jff 3/16/98 renumber 215->153
-          case 153: //jff 3/15/98 create texture change no motion type
-            // Texture/Type Change Only (Trig)
-            // 153 W1 Change Texture/Type Only
-            if (EV_DoChange(line,trigChangeOnly))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 239: //jff 3/15/98 create texture change no motion type
-            // Texture/Type Change Only (Numeric)
-            // 239 W1 Change Texture/Type Only
-            if (EV_DoChange(line,numChangeOnly))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 219:
-            // Lower floor to next lower neighbor
-            // 219 W1 Lower Floor Next Lower Neighbor
-            if (EV_DoFloor(line,lowerFloorToNearest))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 227:
-            // Raise elevator next floor
-            // 227 W1 Raise Elevator next floor
-            if (EV_DoElevator(line,elevateUp))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 231:
-            // Lower elevator next floor
-            // 231 W1 Lower Elevator next floor
-            if (EV_DoElevator(line,elevateDown))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 235:
-            // Elevator to current floor
-            // 235 W1 Elevator to current floor
-            if (EV_DoElevator(line,elevateCurrent))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 243: //jff 3/6/98 make fit within DCK's 256 linedef types
-            // killough 2/16/98: W1 silent teleporter (linedef-linedef kind)
-            if (EV_SilentLineTeleport(line, side, thing, false))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 262: //jff 4/14/98 add silent line-line reversed
-            if (EV_SilentLineTeleport(line, side, thing, true))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 264: //jff 4/14/98 add monster-only silent line-line reversed
-            if (!P_MobjIsPlayer(thing) &&
-                EV_SilentLineTeleport(line, side, thing, true))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 266: //jff 4/14/98 add monster-only silent line-line
-            if (!P_MobjIsPlayer(thing) &&
-                EV_SilentLineTeleport(line, side, thing, false))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          case 268: //jff 4/14/98 add monster-only silent
-            if (!P_MobjIsPlayer(thing) && EV_SilentTeleport(line, side, thing))
-              LN_SPECIAL(line) = 0;
-            break;
-
-          //jff 1/29/98 end of added W1 linedef types
-
-          // Extended walk many retriggerable
-
-          //jff 1/29/98 added new linedef types to fill all functions
-          //out so that all have varieties SR, S1, WR, W1
-
-          case 147:
-            // Raise Floor 512
-            // 147 WR  EV_DoFloor(raiseFloor512)
-            EV_DoFloor(line,raiseFloor512);
-            break;
-
-          case 148:
-            // Raise Floor 24 and Change
-            // 148 WR  EV_DoPlat(raiseAndChange,24)
-            EV_DoPlat(line,raiseAndChange,24);
-            break;
-
-          case 149:
-            // Raise Floor 32 and Change
-            // 149 WR  EV_DoPlat(raiseAndChange,32)
-            EV_DoPlat(line,raiseAndChange,32);
-            break;
-
-          case 150:
-            // Start slow silent crusher
-            // 150 WR  EV_DoCeiling(silentCrushAndRaise)
-            EV_DoCeiling(line,silentCrushAndRaise);
-            break;
-
-          case 151:
-            // RaiseCeilingLowerFloor
-            // 151 WR  EV_DoCeiling(raiseToHighest),
-            //         EV_DoFloor(lowerFloortoLowest)
-            EV_DoCeiling( line, raiseToHighest );
-            EV_DoFloor( line, lowerFloorToLowest );
-            break;
-
-          case 152:
-            // Lower Ceiling to Floor
-            // 152 WR  EV_DoCeiling(lowerToFloor)
-            EV_DoCeiling( line, lowerToFloor );
-            break;
-
-            //jff 3/16/98 renumber 153->256
-          case 256:
-            // Build stairs, step 8
-            // 256 WR EV_BuildStairs(build8)
-            EV_BuildStairs(line,build8);
-            break;
-
-            //jff 3/16/98 renumber 154->257
-          case 257:
-            // Build stairs, step 16
-            // 257 WR EV_BuildStairs(turbo16)
-            EV_BuildStairs(line,turbo16);
-            break;
-
-          case 155:
-            // Lower Pillar, Raise Donut
-            // 155 WR  EV_DoDonut()
-            EV_DoDonut(line);
-            break;
-
-          case 156:
-            // Start lights strobing
-            // 156 WR Lights EV_StartLightStrobing()
-            EV_StartLightStrobing(line);
-            break;
-
-          case 157:
-            // Lights to dimmest near
-            // 157 WR Lights EV_TurnTagLightsOff()
-            EV_TurnTagLightsOff(line);
-            break;
-
-          case 201:
-            // Lower ceiling to lowest surrounding ceiling
-            // 201 WR EV_DoCeiling(lowerToLowest)
-            EV_DoCeiling(line,lowerToLowest);
-            break;
-
-          case 202:
-            // Lower ceiling to highest surrounding floor
-            // 202 WR EV_DoCeiling(lowerToMaxFloor)
-            EV_DoCeiling(line,lowerToMaxFloor);
-            break;
-
-          case 208:
-            // killough 2/16/98: WR silent teleporter (normal kind)
-            EV_SilentTeleport(line, side, thing);
-            break;
-
-          case 212: //jff 3/14/98 create instant toggle floor type
-            // Toggle floor between C and F instantly
-            // 212 WR Instant Toggle Floor
-            EV_DoPlat(line,toggleUpDn,0);
-            break;
-
-          //jff 3/16/98 renumber 216->154
-          case 154: //jff 3/15/98 create texture change no motion type
-            // Texture/Type Change Only (Trigger)
-            // 154 WR Change Texture/Type Only
-            EV_DoChange(line,trigChangeOnly);
-            break;
-
-          case 240: //jff 3/15/98 create texture change no motion type
-            // Texture/Type Change Only (Numeric)
-            // 240 WR Change Texture/Type Only
-            EV_DoChange(line,numChangeOnly);
-            break;
-
-          case 220:
-            // Lower floor to next lower neighbor
-            // 220 WR Lower Floor Next Lower Neighbor
-            EV_DoFloor(line,lowerFloorToNearest);
-            break;
-
-          case 228:
-            // Raise elevator next floor
-            // 228 WR Raise Elevator next floor
-            EV_DoElevator(line,elevateUp);
-            break;
-
-          case 232:
-            // Lower elevator next floor
-            // 232 WR Lower Elevator next floor
-            EV_DoElevator(line,elevateDown);
-            break;
-
-          case 236:
-            // Elevator to current floor
-            // 236 WR Elevator to current floor
-            EV_DoElevator(line,elevateCurrent);
-            break;
-
-          case 244: //jff 3/6/98 make fit within DCK's 256 linedef types
-            // killough 2/16/98: WR silent teleporter (linedef-linedef kind)
-            EV_SilentLineTeleport(line, side, thing, false);
-            break;
-
-          case 263: //jff 4/14/98 add silent line-line reversed
-            EV_SilentLineTeleport(line, side, thing, true);
-            break;
-
-          case 265: //jff 4/14/98 add monster-only silent line-line reversed
-            if (!P_MobjIsPlayer(thing))
-              EV_SilentLineTeleport(line, side, thing, true);
-            break;
-
-          case 267: //jff 4/14/98 add monster-only silent line-line
-            if (!P_MobjIsPlayer(thing))
-              EV_SilentLineTeleport(line, side, thing, false);
-            break;
-
-          case 269: //jff 4/14/98 add monster-only silent
-            if (!P_MobjIsPlayer(thing))
-              EV_SilentTeleport(line, side, thing);
-            break;
-
-            //jff 1/29/98 end of added WR linedef types
-        }
-      break;
   }
 }
 
@@ -1594,14 +678,12 @@ static void P_CrossSpecialLine(const line_t __far* line, int16_t side, mobj_t __
 //
 // P_TryMove
 // Attempt to move to a new position,
-// crossing special lines unless MF_TELEPORT is set.
+// crossing special lines.
 //
 boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
 {
     fixed_t oldx;
     fixed_t oldy;
-
-    floatok = false;
 
     if (!P_CheckPosition (thing, x, y))
         return false;   // solid wall or thing
@@ -1611,17 +693,13 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
         if (_g_tmceilingz - _g_tmfloorz < thing->height)
             return false;	// doesn't fit
 
-        floatok = true;
-
-        if ( !(thing->flags & MF_TELEPORT)
-             && _g_tmceilingz - thing->z < thing->height)
+        if (_g_tmceilingz - thing->z < thing->height)
             return false;	// mobj must lower itself to fit
 
-        if ( !(thing->flags & MF_TELEPORT)
-             && _g_tmfloorz - thing->z > 24*FRACUNIT )
+        if (_g_tmfloorz - thing->z > 24*FRACUNIT )
             return false;	// too big a step up
 
-        if ( !(thing->flags & (MF_DROPOFF|MF_FLOAT))
+        if ( !(thing->flags & MF_DROPOFF)
              && _g_tmfloorz - _g_tmdropoffz > 24*FRACUNIT )
             return false;	// don't stand over a dropoff
     }
@@ -1643,7 +721,7 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
 
     // if any special lines were hit, do the effect
 
-    if (! (thing->flags&(MF_TELEPORT|MF_NOCLIP)) )
+    if (!(thing->flags & MF_NOCLIP))
         while (_g_numspechit--)
             if (LN_SPECIAL(_g_spechit[_g_numspechit]))  // see if the line was crossed
             {
@@ -1767,106 +845,8 @@ static boolean PTR_AimTraverse (intercept_t* in)
 // of the line, should the sector already be in motion when the line is
 // impacted. Change is qualified by demo_compatibility.
 //
-static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
+static void P_ShootSpecialLine(mobj_t __far* thing, line_t __far* line)
 {
-    // pointer to line function is NULL by default, set non-null if
-    // line special is gun triggered generalized linedef type
-    boolean (*linefunc)(const line_t __far* line)=NULL;
-
-    // check each range of generalized linedefs
-    if ((uint16_t)LN_SPECIAL(line) >= GenEnd)
-    {
-      // Out of range for GenFloors
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenFloorBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if ((LN_SPECIAL(line) & FloorChange) || !(LN_SPECIAL(line) & FloorModel))
-          return;   // FloorModel is "Allow Monsters" if FloorChange is 0
-      if (!line->tag) //jff 2/27/98 all gun generalized types require tag
-        return;
-
-      linefunc = EV_DoGenFloor;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenCeilingBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if ((LN_SPECIAL(line) & CeilingChange) || !(LN_SPECIAL(line) & CeilingModel))
-          return;   // CeilingModel is "Allow Monsters" if CeilingChange is 0
-      if (!line->tag) //jff 2/27/98 all gun generalized types require tag
-        return;
-      linefunc = EV_DoGenCeiling;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenDoorBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-      {
-        if (!(LN_SPECIAL(line) & DoorMonster))
-          return;   // monsters disallowed from this door
-        if (line->flags & ML_SECRET) // they can't open secret doors either
-          return;
-      }
-      if (!line->tag) //jff 3/2/98 all gun generalized types require tag
-        return;
-      linefunc = EV_DoGenDoor;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenLockedBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        return;   // monsters disallowed from unlocking doors
-      if (((LN_SPECIAL(line)&TriggerType)==GunOnce) || ((LN_SPECIAL(line)&TriggerType)==GunMany))
-      { //jff 4/1/98 check for being a gun type before reporting door type
-        if (!P_CanUnlockGenDoor(line,P_MobjIsPlayer(thing)))
-          return;
-      }
-      else
-        return;
-      if (!line->tag) //jff 2/27/98 all gun generalized types require tag
-        return;
-
-      linefunc = EV_DoGenLockedDoor;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenLiftBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if (!(LN_SPECIAL(line) & LiftMonster))
-          return; // monsters disallowed
-      linefunc = EV_DoGenLift;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenStairsBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if (!(LN_SPECIAL(line) & StairMonster))
-          return; // monsters disallowed
-      if (!line->tag) //jff 2/27/98 all gun generalized types require tag
-        return;
-      linefunc = EV_DoGenStairs;
-    }
-    else if ((uint16_t)LN_SPECIAL(line) >= GenCrusherBase)
-    {
-      if (!P_MobjIsPlayer(thing))
-        if (!(LN_SPECIAL(line) & StairMonster))
-          return; // monsters disallowed
-      if (!line->tag) //jff 2/27/98 all gun generalized types require tag
-        return;
-      linefunc = EV_DoGenCrusher;
-    }
-
-    if (linefunc)
-      switch((LN_SPECIAL(line) & TriggerType) >> TriggerTypeShift)
-      {
-        case GunOnce:
-          if (linefunc(line))
-            P_ChangeSwitchTexture(line,false);
-          return;
-        case GunMany:
-          if (linefunc(line))
-            P_ChangeSwitchTexture(line,true);
-          return;
-        default:  // if not a gun type, do nothing here
-          return;
-      }
-
   // Impacts that other things can activate.
   if (!P_MobjIsPlayer(thing))
   {
@@ -1887,51 +867,22 @@ static void P_ShootSpecialLine(mobj_t __far* thing, const line_t __far* line)
 
   switch(LN_SPECIAL(line))
   {
-    case 24:
-      // 24 G1 raise floor to highest adjacent
-      if (EV_DoFloor(line,raiseFloor))
-        P_ChangeSwitchTexture(line,false);
-      break;
-
     case 46:
       // 46 GR open door, stay open
       EV_DoDoor(line,dopen);
       P_ChangeSwitchTexture(line,true);
       break;
-
-    case 47:
-      // 47 G1 raise floor to nearest and change texture and type
-      if (EV_DoPlat(line,raiseToNearestAndChange,0))
-        P_ChangeSwitchTexture(line,false);
-      break;
-
-    //jff 1/30/98 added new gun linedefs here
-    // killough 1/31/98: added demo_compatibility check, added inner switch
-
-    default:
-        switch (LN_SPECIAL(line))
-        {
-          case 197:
-            // Exit to next level
-            // killough 10/98: prevent zombies from exiting levels
-            if(P_MobjIsPlayer(thing) && P_MobjIsPlayer(thing)->health<=0)
-              break;
-            P_ChangeSwitchTexture(line,false);
-            G_ExitLevel();
-            break;
-
-          case 198:
-            // Exit to secret level
-            // killough 10/98: prevent zombies from exiting levels
-            if(P_MobjIsPlayer(thing) && P_MobjIsPlayer(thing)->health<=0)
-              break;
-            P_ChangeSwitchTexture(line,false);
-            G_SecretExitLevel();
-            break;
-            //jff end addition of new gun linedefs
-        }
-      break;
   }
+}
+
+
+static fixed_t FixedMul3(fixed_t a, fixed_t b, fixed_t c)
+{
+	if (a == 0)
+		return 0;
+
+	fixed_t bc = FixedMul(c, b);
+	return FixedMul(bc, a);
 }
 
 
@@ -1953,7 +904,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   if (in->isaline)
   {
-    const line_t __far* li = in->d.line;
+    line_t __far* li = in->d.line;
 
     if (LN_SPECIAL(li))
       P_ShootSpecialLine (shootthing, li);
@@ -1961,7 +912,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     if (li->flags & ML_TWOSIDED)
     {  // crosses a two sided (really 2s) line
       P_LineOpening (li);
-      fixed_t t = FixedMul(aimslope, FixedMul(attackrange, in->frac)) + shootz;
+      fixed_t t = FixedMul3(aimslope, in->frac, attackrange) + shootz;
 
       if ((LN_FRONTSECTOR(li)->floorheight   == LN_BACKSECTOR(li)->floorheight   || _g_openbottom <= t) &&
           (LN_FRONTSECTOR(li)->ceilingheight == LN_BACKSECTOR(li)->ceilingheight || _g_opentop    >= t))
@@ -1974,7 +925,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
     frac = in->frac - 4 * FixedReciprocal(attackrange);
     x = _g_trace.x + FixedMul(_g_trace.dx, frac);
     y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-    z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
+    z = shootz + FixedMul3(aimslope, frac, attackrange);
 
     if (LN_FRONTSECTOR(li)->ceilingpic == skyflatnum)
     {
@@ -2032,7 +983,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 
   x = _g_trace.x + FixedMul(_g_trace.dx, frac);
   y = _g_trace.y + FixedMul(_g_trace.dy, frac);
-  z = shootz  + FixedMul(aimslope, FixedMul(frac, attackrange));
+  z = shootz  + FixedMul3(aimslope, frac, attackrange);
 
   // Spawn bullet puffs or blod spots,
   // depending on target type.
@@ -2309,7 +1260,7 @@ static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   {
   msecnode_t __far* node;
 
-  node = _g_sector_list;
+  node = _s_sector_list;
   while (node)
     {
     if (node->m_sector == s)   // Already have a node for this sector?
@@ -2331,9 +1282,9 @@ static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   node->m_sector = s;       // sector
   node->m_thing  = thing;     // mobj
   node->m_tprev  = NULL;    // prev node on Thing thread
-  node->m_tnext  = _g_sector_list;  // next node on Thing thread
-  if (_g_sector_list)
-    _g_sector_list->m_tprev = node; // set back link on Thing
+  node->m_tnext  = _s_sector_list;  // next node on Thing thread
+  if (_s_sector_list)
+    _s_sector_list->m_tprev = node; // set back link on Thing
 
   // Add new node at head of sector thread starting at s->touching_thinglist
 
@@ -2342,7 +1293,7 @@ static void P_AddSecnode(sector_t __far* s, mobj_t __far* thing)
   if (s->touching_thinglist)
     node->m_snext->m_sprev = node;
   s->touching_thinglist = node;
-  _g_sector_list = node;
+  _s_sector_list = node;
   }
 
 
@@ -2394,14 +1345,17 @@ static msecnode_t __far* P_DelSecnode(msecnode_t __far* node)
 
 void P_DelSeclist(void)
 {
-	if (_g_sector_list)
-	{
-		msecnode_t __far* node = _g_sector_list;
-		while (node)
-			node = P_DelSecnode(node);
+	msecnode_t __far* node = _s_sector_list;
+	while (node)
+		node = P_DelSecnode(node);
 
-		_g_sector_list = NULL;
-	}
+	_s_sector_list = NULL;
+}
+
+
+void P_SetSeclist(msecnode_t __far* sectorList)
+{
+	_s_sector_list = sectorList;
 }
 
 
@@ -2413,12 +1367,12 @@ void P_DelSeclist(void)
 // at this location, so don't bother with checking impassable or
 // blocking lines.
 
-static boolean PIT_GetSectors(const line_t __far* ld)
+static boolean PIT_GetSectors(line_t __far* ld)
   {
-  if (_g_tmbbox[BOXRIGHT]  <= ld->bbox[BOXLEFT]   ||
-      _g_tmbbox[BOXLEFT]   >= ld->bbox[BOXRIGHT]  ||
-      _g_tmbbox[BOXTOP]    <= ld->bbox[BOXBOTTOM] ||
-      _g_tmbbox[BOXBOTTOM] >= ld->bbox[BOXTOP])
+  if (_g_tmbbox[BOXRIGHT]  <= (fixed_t)ld->bbox[BOXLEFT]   << FRACBITS ||
+      _g_tmbbox[BOXLEFT]   >= (fixed_t)ld->bbox[BOXRIGHT]  << FRACBITS ||
+      _g_tmbbox[BOXTOP]    <= (fixed_t)ld->bbox[BOXBOTTOM] << FRACBITS ||
+      _g_tmbbox[BOXBOTTOM] >= (fixed_t)ld->bbox[BOXTOP]    << FRACBITS)
     return true;
 
   if (P_BoxOnLineSide(_g_tmbbox, ld) != -1)
@@ -2463,7 +1417,7 @@ void P_CreateSecNodeList(mobj_t __far* thing)
   // finished, delete all nodes where m_thing is still NULL. These
   // represent the sectors the Thing has vacated.
 
-  msecnode_t __far* node = _g_sector_list;
+  msecnode_t __far* node = _s_sector_list;
   while (node)
     {
     node->m_thing = NULL;
@@ -2498,13 +1452,13 @@ void P_CreateSecNodeList(mobj_t __far* thing)
   // Now delete any nodes that won't be used. These are the ones where
   // m_thing is still NULL.
 
-  node = _g_sector_list;
+  node = _s_sector_list;
   while (node)
     {
     if (node->m_thing == NULL)
       {
-      if (node == _g_sector_list)
-        _g_sector_list = node->m_tnext;
+      if (node == _s_sector_list)
+        _s_sector_list = node->m_tnext;
       node = P_DelSecnode(node);
       }
     else
@@ -2520,13 +1474,9 @@ void P_CreateSecNodeList(mobj_t __far* thing)
    *  Fun. We restore its previous value unless we're in a Boom/MBF demo.
    */
   tmthing = saved_tmthing;
-}
 
-/* cphipps 2004/08/30 - 
- * Must clear tmthing at tic end, as it might contain a pointer to a removed thinker, or the level might have ended/been ended and we clear the objects it was pointing too. Hopefully we don't need to carry this between tics for sync. */
-void P_MapStart(void)
-{
-    if (tmthing) I_Error("P_MapStart: tmthing set!");
+  thing->touching_sectorlist = _s_sector_list; // Attach to Thing's mobj_t
+  _s_sector_list = NULL; // clear for next time
 }
 
 void P_MapEnd(void)

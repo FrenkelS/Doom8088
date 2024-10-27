@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -79,11 +79,8 @@ typedef enum
   CF_NOCLIP           = 1,
   // No damage, no health loss.
   CF_GODMODE          = 2,
-  // Not really a cheat, just a debug aid.
-  CF_NOMOMENTUM       = 4,
-
   //You played goldeneye right?
-  CF_ENEMY_ROCKETS    = 8
+  CF_ENEMY_ROCKETS    = 4
 
 } cheat_t;
 
@@ -143,7 +140,7 @@ typedef struct player_s
 
   // Bit flags, for cheats and debug.
   // See cheat_t, above.
-  int32_t                 cheats;
+  int16_t                 cheats;
 
   // Refired shots are less accurate.
   int16_t                 refire;
@@ -170,10 +167,6 @@ typedef struct player_s
   //  can be set to REDCOLORMAP for pain, etc.
   int16_t                 fixedcolormap;
 
-  // Player skin colorshift,
-  //  0-3 for which color to draw player.
-  int16_t                 colormap;
-
   // Overlay view sprites (gun, etc).
   pspdef_t            psprites[NUMPSPRITES];
 
@@ -189,8 +182,6 @@ typedef struct player_s
 //
 typedef struct
 {
-  boolean     in;     // whether the player is in game
-
   // Player stats, kills, collected items etc.
   int32_t         skills;
   int32_t         sitems;
@@ -213,9 +204,6 @@ typedef struct
 
   // the par time
   int16_t         partime;
-
-  // index of this player in game
-  int32_t         pnum;
 
   wbplayerstruct_t    plyr[MAXPLAYERS];
 

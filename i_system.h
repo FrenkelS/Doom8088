@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -41,14 +41,18 @@
 void I_InitTimer(void);
 int32_t I_GetTime(void);
 
-void NORETURN_PRE I_Error(const char *error, ...) NORETURN_POST;
+void _Noreturn I_Quit(void);
+void _Noreturn I_Error(const char *error, ...);
 
-void I_InitScreen();
+void I_InitScreen(void);
 
-void I_InitGraphics();
+void I_InitGraphics(void);
+
+void I_SetScreenMode(uint16_t mode);
 
 void I_FinishUpdate(void);
 
+void I_ReloadPalette(void);
 void I_SetPalette(int8_t pal);
 
 /* I_StartTic
@@ -57,6 +61,6 @@ void I_SetPalette(int8_t pal);
  * Quick syncronous operations are performed here.
  * Can call D_PostEvent.
  */
-void I_StartTic();
+void I_StartTic(void);
 
 #endif

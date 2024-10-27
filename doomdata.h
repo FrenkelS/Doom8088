@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -50,6 +50,7 @@
 
 
 #define NO_INDEX ((uint16_t)-1)
+#define NO_INDEX8 (0xff)
 
 //
 // LineDef attributes.
@@ -99,13 +100,15 @@
 
 // Thing definition, position, orientation and type,
 // plus skill/visibility flags and attributes.
-typedef PACKEDATTR_PRE struct {
+typedef struct {
   int16_t x;
   int16_t y;
-  int16_t angle;
   int16_t type;
-  int16_t options;
-} PACKEDATTR_POST mapthing_t;
+  int8_t angle;
+  int8_t options;
+} mapthing_t;
+
+typedef char assertMapthingSize[sizeof(mapthing_t) == 8 ? 1 : -1];
 
 
 /* Bounding box coordinate storage. */
@@ -131,6 +134,8 @@ typedef struct {
   // If NF_SUBSECTOR its a subsector, else it's a node of another subtree.
   uint16_t children[2];
 } mapnode_t;
+
+typedef char assertMapnodeSize[sizeof(mapnode_t) == 28 ? 1 : -1];
 
 
 

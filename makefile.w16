@@ -44,6 +44,7 @@ GLOBOBJS = &
  d_items.obj &
  d_main.obj &
  f_finale.obj &
+ f_lib.obj &
  g_game.obj &
  hu_stuff.obj &
  i_audio.obj &
@@ -54,11 +55,9 @@ GLOBOBJS = &
  m_cheat.obj &
  m_menu.obj &
  m_random.obj &
- p_ceilng.obj &
  p_doors.obj &
  p_enemy.obj &
  p_floor.obj &
- p_genlin.obj &
  p_inter.obj &
  p_lights.obj &
  p_map.obj &
@@ -80,10 +79,12 @@ GLOBOBJS = &
  r_things.obj &
  s_sound.obj &
  sounds.obj &
+ st_pal.obj &
  st_stuff.obj &
  tables.obj &
  v_video.obj &
  w_wad.obj &
+ wi_lib.obj &
  wi_stuff.obj &
  z_bmallo.obj &
  z_zone.obj
@@ -102,8 +103,26 @@ WC16\DOOM16WC.EXE : $(GLOBOBJS)
 i_vmodey.obj : i_vmodey.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
+p_map.obj : p_map.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
+p_maputl.obj : p_maputl.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
+p_sight.obj : p_sight.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
 r_draw.obj : r_draw.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
+r_plane.obj : r_plane.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
 tables.obj : tables.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
+w_wad.obj : w_wad.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
+z_zone.obj : z_zone.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&

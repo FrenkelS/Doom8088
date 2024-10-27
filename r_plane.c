@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023 Frenkel Smeijers
+ *  Copyright (C) 2023-2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -28,17 +28,18 @@
 #include "compiler.h"
 #include "r_defs.h"
 #include "r_main.h"
+#include "i_video.h"
 
 #include "globdata.h"
 
 
+#if defined FLAT_SPAN
+static int16_t nukage;
+#else
 static int16_t firstflat;
 static int16_t  animated_flat_basepic;
 static int16_t __far* flattranslation;             // for global animation
 
-#if defined FLAT_SPAN
-static int16_t animated_flat_basepic_color[3];
-#else
 static fixed_t planeheight;
 static fixed_t basexscale, baseyscale;
 
@@ -66,18 +67,15 @@ static visplane_t __far*__far* freehead;
 #if defined FLAT_SPAN
 byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
 {
-	const lighttable_t __far* colormap = R_LoadColorMap(lightlevel);
-	return colormap[flattranslation[picnum]];
+	const uint8_t __far* colormap = R_LoadColorMap(lightlevel);
+
+	if (picnum == -3)
+		picnum = nukage;
+
+	return colormap[picnum];
 }
 
 #else
-
-typedef struct {
-  uint32_t            position;
-  uint32_t            step;
-  const byte         __far* source; // start of a 64*64 tile image
-  const lighttable_t __far* colormap;
-} draw_span_vars_t;
 
 
 static const fixed_t yslopeTable[VIEWWINDOWHEIGHT / 2] =
@@ -121,11 +119,11 @@ static void R_MapPlane(uint16_t y, uint16_t x1, uint16_t x2, draw_span_vars_t *d
     dsvars->step = ((FixedMul(distance,basexscale) << 10) & 0xffff0000) | ((FixedMul(distance,baseyscale) >> 6) & 0x0000ffff);
 
     fixed_t length = FixedMul (distance, distscale(x1));
-    angle_t angle = (viewangle + xtoviewangle(x1))>>ANGLETOFINESHIFT;
+    int16_t angle = (viewangle + (((angle_t)xtoviewangleTable[x1]) << FRACBITS)) >> ANGLETOFINESHIFT;
 
     // killough 2/28/98: Add offsets
-    uint32_t xfrac =  viewx + FixedMul(finecosine(angle), length);
-    uint32_t yfrac = -viewy - FixedMul(finesine(  angle), length);
+    uint32_t xfrac =  viewx + FixedMulAngle(length, finecosineapprox(angle));
+    uint32_t yfrac = -viewy - FixedMulAngle(length, finesineapprox(  angle));
 
     dsvars->position = ((xfrac << 10) & 0xffff0000) | ((yfrac >> 6)  & 0x0000ffff);
 
@@ -361,7 +359,8 @@ visplane_t __far* R_CheckPlane(visplane_t __far* pl, int16_t start, int16_t stop
 
 void R_InitFlats(void)
 {
-	firstflat        = W_GetNumForName("F_START") + 1;
+#if !defined FLAT_SPAN
+	       firstflat = W_GetNumForName("F_START") + 1;
 
 	int16_t lastflat = W_GetNumForName("F_END")   - 1;
 	int16_t numflats = lastflat - firstflat + 1;
@@ -372,21 +371,6 @@ void R_InitFlats(void)
 
 	animated_flat_basepic = R_FlatNumForName("NUKAGE1");
 
-#if defined FLAT_SPAN
-	byte __far* source = Z_MallocStatic(64 * 64);
-
-	for (int16_t i = 0; i < numflats; i++)
-	{
-		W_ReadLumpByNum(firstflat + i, source);
-		flattranslation[i] = source[(64 / 2) * 64 + (64 / 2)];
-	}
-
-	Z_Free(source);
-
-	animated_flat_basepic_color[0] = flattranslation[animated_flat_basepic + 0];
-	animated_flat_basepic_color[1] = flattranslation[animated_flat_basepic + 1];
-	animated_flat_basepic_color[2] = flattranslation[animated_flat_basepic + 2];
-#else
 	for (int16_t i = 0; i < numflats; i++)
 		flattranslation[i] = i;
 #endif
@@ -398,23 +382,28 @@ void R_InitFlats(void)
 // Retrieval, get a flat number for a flat name.
 //
 //
-
+#if !defined FLAT_SPAN
 int16_t R_FlatNumForName(const char *name)
 {
 	int16_t i = W_GetNumForName(name);
 	return i - firstflat;
 }
+#endif
 
+
+#if !defined FLAT_NUKAGE1_COLOR
+#define FLAT_NUKAGE1_COLOR 122
+#endif
 
 void P_UpdateAnimatedFlat(void)
 {
 #if defined FLAT_SPAN
-	int16_t pic = animated_flat_basepic_color[(_g_leveltime >> 3) % 3];
+	nukage = FLAT_NUKAGE1_COLOR + (((int16_t)_g_leveltime >> 3) % 3) * 2;
 #else
-	int16_t pic = animated_flat_basepic + ((_g_leveltime >> 3) % 3);
-#endif
+	int16_t pic = animated_flat_basepic + (((int16_t)_g_leveltime >> 3) % 3);
 
 	flattranslation[animated_flat_basepic + 0] = pic;
 	flattranslation[animated_flat_basepic + 1] = pic;
 	flattranslation[animated_flat_basepic + 2] = pic;
+#endif
 }

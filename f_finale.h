@@ -10,6 +10,8 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
+ *  Copyright 2023, 2024 by
+ *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -27,20 +29,13 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *   Related to f_finale.c, which is called at the end of a level
+ *   Related to f_finale.c, which is called when finishing a game
  *
  *-----------------------------------------------------------------------------*/
 
 
 #ifndef __F_FINALE__
 #define __F_FINALE__
-
-#include "doomtype.h"
-#include "d_event.h"
-
-/*
- * FINALE
- */
 
 /* Called by main loop. */
 void F_Ticker (void);
@@ -49,5 +44,7 @@ void F_Ticker (void);
 void F_Drawer (void);
 
 void F_StartFinale (void);
+
+void F_Init(void);
 
 #endif

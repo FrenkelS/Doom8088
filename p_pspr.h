@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -68,8 +68,8 @@ typedef enum
 typedef struct
 {
   const state_t *state;       /* a NULL state means not active */
-  int32_t     tics;
-  fixed_t sx;
+  int16_t     tics;
+  int16_t sx;
   fixed_t sy;
 } pspdef_t;
 

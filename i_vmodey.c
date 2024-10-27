@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023 Frenkel Smeijers
+ *  Copyright (C) 2023-2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for VGA Mode Y
+ *      Video code for VGA Mode Y 320x200 256 colors
  *
  *-----------------------------------------------------------------------------*/
  
@@ -54,280 +54,62 @@
 #define GC_READMAP              4
 #define GC_MODE                 5
 #define GC_MISCELLANEOUS        6
- 
- 
-void I_SetScreenMode(uint16_t mode);
-
-extern const int16_t CENTERY;
-
-static uint8_t  __far* _s_screen;
-
-
-void V_DrawBackground(void)
-{
-	const byte __far* src = W_GetLumpByName("FLOOR4_8");
-
-	for (int16_t plane = 0; plane < 4; plane++)
-	{
-		outp(SC_INDEX + 1, 1 << plane);
-		for (int16_t y = 0; y < SCREENHEIGHT; y++)
-		{
-			uint8_t __far* dest = _s_screen + y * PLANEWIDTH;
-			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
-			{
-				*dest++ = src[(y & 63) * 64 + (((x * 4) + plane) & 63)];
-			}
-		}
-	}
-	outp(SC_INDEX + 1, 15);
-
-	Z_ChangeTagToCache(src);
-}
-
-
-static int16_t cachedLumpNum;
-static int16_t cachedLumpHeight;
-
-void V_DrawRaw(int16_t num, uint16_t offset)
-{
-	if (cachedLumpNum != num)
-	{
-		const uint8_t __far* lump = W_TryGetLumpByNum(num);
-
-		if (lump != NULL)
-		{
-			uint16_t lumpLength = W_LumpLength(num);
-			cachedLumpHeight = lumpLength / SCREENWIDTH;
-			for (int16_t plane = 0; plane < 4; plane++)
-			{
-				outp(SC_INDEX + 1, 1 << plane);
-				for (int16_t y = 0; y < cachedLumpHeight; y++)
-				{
-					uint8_t __far* dest = D_MK_FP(0xa800, y * PLANEWIDTH + __djgpp_conventional_base);
-					for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
-					{
-						*dest++ = lump[y * SCREENWIDTH + (x * 4) + plane];
-					}
-				}
-			}
-			outp(SC_INDEX + 1, 15);
-			Z_ChangeTagToCache(lump);
-
-			cachedLumpNum = num;
-		}
-	}
-
-	if (cachedLumpNum == num)
-	{
-		// set write mode 1
-		outp(GC_INDEX, GC_MODE);
-		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
-
-		uint8_t __far *src  = D_MK_FP(0xa800, 0 + __djgpp_conventional_base);
-		uint8_t __far *dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
-		for (int16_t y = 0; y < cachedLumpHeight; y++)
-		{
-			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
-			{
-				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
-				dest[y * PLANEWIDTH + x] = 0;
-			}
-		}
-
-		// set write mode 0
-		outp(GC_INDEX, GC_MODE);
-		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
-	}
-}
-
-
-void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
-{
-	static const int32_t DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
-	static const int16_t DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH) >> 8;
-	static const int32_t DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
-	static const int16_t DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
-
-	y -= patch->topoffset;
-	x -= patch->leftoffset;
-
-	const int16_t left   = ( x * DX ) >> FRACBITS;
-	const int16_t right  = ((x + patch->width)  * DX) >> FRACBITS;
-	const int16_t bottom = ((y + patch->height) * DY) >> FRACBITS;
-
-	uint16_t col = 0;
-
-	for (int16_t dc_x = left; dc_x < right; dc_x++, col += DXI)
-	{
-		if (dc_x < 0)
-			continue;
-		else if (dc_x >= SCREENWIDTH)
-			break;
-
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col >> 8]);
-
-		// step through the posts in a column
-		while (column->topdelta != 0xff)
-		{
-			int16_t dc_yl = (((y + column->topdelta) * DY) >> FRACBITS);
-
-			if ((dc_yl >= SCREENHEIGHT) || (dc_yl > bottom))
-				break;
-
-			int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
-
-			outp(SC_INDEX + 1, 1 << (dc_x & 3));
-			byte __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dc_x / 4;
-
-			int16_t frac = 0;
-
-			const byte __far* source = (const byte __far*)column + 3;
-
-			int16_t count = dc_yh - dc_yl;
-			while (count--)
-			{
-				*dest = source[frac >> 8];
-				dest += PLANEWIDTH;
-				frac += DYI;
-			}
-
-			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
-		}
-	}
-
-	outp(SC_INDEX + 1, 15);
-}
-
-
-void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
-{
-	y -= patch->topoffset;
-	x -= patch->leftoffset;
-
-	int16_t plane = x & 3;
-	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + x / 4;
-
-	int16_t width = patch->width;
-
-	for (int16_t col = 0; col < width; col++)
-	{
-		outp(SC_INDEX + 1, 1 << plane);
-
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + patch->columnofs[col]);
-
-		// step through the posts in a column
-		while (column->topdelta != 0xff)
-		{
-			const byte __far* source = (const byte __far*)column + 3;
-			byte __far* dest = desttop + (column->topdelta * PLANEWIDTH);
-
-			uint16_t count = column->length;
-
-			uint16_t l = count >> 2;
-			while (l--)
-			{
-				*dest = *source++; dest += PLANEWIDTH;
-				*dest = *source++; dest += PLANEWIDTH;
-				*dest = *source++; dest += PLANEWIDTH;
-				*dest = *source++; dest += PLANEWIDTH;
-			}
-
-			switch (count & 3)
-			{
-				case 3: *dest = *source++; dest += PLANEWIDTH;
-				case 2: *dest = *source++; dest += PLANEWIDTH;
-				case 1: *dest = *source++;
-			}
-
-			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
-		}
-
-		if (++plane == 4)
-		{
-			plane = 0;
-			desttop++;
-		}
-	}
-
-	outp(SC_INDEX + 1, 15);
-}
-
-
-void V_FillRect(byte colour)
-{
-	for (int16_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
-		_fmemset(_s_screen + y * PLANEWIDTH, colour, SCREENWIDTH / 4);
-}
-
-
-
-static void V_PlotPixel(int16_t x, int16_t y, uint8_t color)
-{
-	outp(SC_INDEX + 1, 1 << (x & 3));
-	_s_screen[y * PLANEWIDTH + x / 4] = color;
-}
-
-
-void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
-{
-	int16_t dx = abs(x1 - x0);
-	int16_t sx = x0<x1 ? 1 : -1;
-
-	int16_t dy = -abs(y1 - y0);
-	int16_t sy = y0<y1 ? 1 : -1;
-
-	int16_t err = dx + dy;
-
-	while(true)
-	{
-		V_PlotPixel(x0, y0, color);
-
-		if (x0==x1 && y0==y1)
-			break;
-
-		int16_t e2 = 2 * err;
-
-		if (e2 >= dy)
-		{
-			err += dy;
-			x0 += sx;
-		}
-
-		if (e2 <= dx)
-		{
-			err += dx;
-			y0 += sy;
-		}
-	}
-
-	outp(SC_INDEX + 1, 15);
-}
-
-
-static boolean isGraphicsModeSet = false;
-
-static int8_t newpal;
-
-
-boolean I_IsGraphicsModeSet(void)
-{
-	return isGraphicsModeSet;
-}
-
 
 #define PEL_WRITE_ADR   0x3c8
 #define PEL_DATA        0x3c9
 
-static void I_UploadNewPalette(int8_t pal)
+
+extern const int16_t CENTERY;
+
+
+static uint8_t  __far* _s_screen;
+
+
+static int16_t palettelumpnum;
+
+
+void I_ReloadPalette(void)
 {
 	char lumpName[9] = "PLAYPAL0";
 
-	if(_g_gamma == 0)
+	if (_g_gamma == 0)
 		lumpName[7] = 0;
 	else
 		lumpName[7] = '0' + _g_gamma;
 
-	const uint8_t __far* palette_lump = W_TryGetLumpByNum(W_GetNumForName(lumpName));
+	palettelumpnum = W_GetNumForName(lumpName);
+}
+
+
+static const uint8_t colors[14][3] =
+{
+	// normal
+	{0, 0, 0},
+
+	// red
+	{0x07, 0, 0},
+	{0x0e, 0, 0},
+	{0x15, 0, 0},
+	{0x1c, 0, 0},
+	{0x23, 0, 0},
+	{0x2a, 0, 0},
+	{0x31, 0, 0},
+	{0x3b, 0, 0},
+
+	// yellow
+	{0x06, 0x05, 0x02},
+	{0x0d, 0x0b, 0x04},
+	{0x14, 0x11, 0x06},
+	{0x1a, 0x17, 0x08},
+
+	// green
+	{0, 0x08, 0}
+};
+
+
+static void I_UploadNewPalette(int8_t pal)
+{
+	const uint8_t __far* palette_lump = W_TryGetLumpByNum(palettelumpnum);
 	if (palette_lump != NULL)
 	{
 		const byte __far* palette = &palette_lump[pal * 256 * 3];
@@ -337,42 +119,21 @@ static void I_UploadNewPalette(int8_t pal)
 
 		Z_ChangeTagToCache(palette_lump);
 	}
-}
-
-
-#define NO_PALETTE_CHANGE 100
-
-void I_FinishUpdate(void)
-{
-	if (newpal != NO_PALETTE_CHANGE)
+	else
 	{
-		I_UploadNewPalette(newpal);
-		newpal = NO_PALETTE_CHANGE;
+		outp(PEL_WRITE_ADR, 0);
+		outp(PEL_DATA, colors[pal][0]);
+		outp(PEL_DATA, colors[pal][1]);
+		outp(PEL_DATA, colors[pal][2]);
 	}
-
-	// page flip
-	outp(CRTC_INDEX, CRTC_STARTHIGH);
-#if defined _M_I86
-	outp(CRTC_INDEX + 1, D_FP_SEG(_s_screen) >> 4);
-	_s_screen = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff); // flip between segments A000 and A400
-#else
-	outp(CRTC_INDEX + 1, (D_FP_SEG(_s_screen) >> 4) & 0xf0);
-	_s_screen = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
-#endif
 }
 
 
-void I_SetPalette(int8_t pal)
+void I_InitGraphicsHardwareSpecificCode(void)
 {
-	newpal = pal;
-}
-
-
-void I_InitGraphics(void)
-{	
 	I_SetScreenMode(0x13);
+	I_ReloadPalette();
 	I_UploadNewPalette(0);
-	isGraphicsModeSet = true;
 
 	__djgpp_nearptr_enable();
 	_s_screen = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
@@ -399,82 +160,156 @@ void I_InitGraphics(void)
 }
 
 
+void I_ShutdownGraphicsHardwareSpecificCode(void)
+{
+	// Do nothing
+}
+
+
+static int8_t newpal;
+
+
+void I_SetPalette(int8_t pal)
+{
+	newpal = pal;
+}
+
+
+#define NO_PALETTE_CHANGE 100
+
+static uint16_t st_needrefresh = 0;
+
+void I_FinishUpdate(void)
+{
+	// palette
+	if (newpal != NO_PALETTE_CHANGE)
+	{
+		I_UploadNewPalette(newpal);
+		newpal = NO_PALETTE_CHANGE;
+	}
+
+	// status bar
+	if (st_needrefresh)
+	{
+		st_needrefresh--;
+
+		if (st_needrefresh != 2)
+		{
+			// set write mode 1
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+#if defined _M_I86
+			uint8_t __far* src = (uint8_t __far*)(((uint32_t)_s_screen) - 0x04000000);
+			if ((((uint32_t)src) & 0x9c000000) == 0x9c000000)
+				src = (uint8_t __far*)(((uint32_t)src) + 0x0c000000);
+#else
+			uint8_t __far* src = _s_screen - 0x04000;
+			if ((((uint32_t)src) & 0x9c000) == 0x9c000)
+				src += 0x0c000;
+#endif
+			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			for (int16_t y = 0; y < ST_HEIGHT; y++)
+			{
+				for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+				{
+					volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+					dest[y * PLANEWIDTH + x] = 0;
+				}
+			}
+
+			// set write mode 0
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+		}
+	}
+
+	// page flip between segments A000, A400 and A800
+	outp(CRTC_INDEX, CRTC_STARTHIGH);
+#if defined _M_I86
+	outp(CRTC_INDEX + 1, D_FP_SEG(_s_screen) >> 4);
+	_s_screen = (uint8_t __far*)(((uint32_t)_s_screen) + 0x04000000);
+	if ((((uint32_t)_s_screen) & 0xac000000) == 0xac000000)
+		_s_screen = (uint8_t __far*)(((uint32_t)_s_screen) - 0x0c000000);
+#else
+	outp(CRTC_INDEX + 1, (D_FP_SEG(_s_screen) >> 4) & 0xf0);
+	_s_screen += 0x04000;
+	if ((((uint32_t)_s_screen) & 0xac000) == 0xac000)
+		_s_screen -= 0x0c000;
+#endif
+}
+
+
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, const byte __far* colormap, uint16_t frac)
+uint8_t nearcolormap[256];
+
+#if defined _M_I86
+#define L_FP_OFF D_FP_OFF
+static uint16_t nearcolormapoffset = 0xffff;
+#else
+#define L_FP_OFF(p) ((uint32_t)(p))
+static uint32_t nearcolormapoffset = 0xffffffff;
+#endif
+
+const uint8_t __far* source;
+uint8_t __far* dest;
+
+
+#if defined C_ONLY
+static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
-	*dest = colormap[source[frac>>COLBITS]];
+	int16_t l = count >> 4;
+	while (l--)
+	{
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+	}
+
+	switch (count & 15)
+	{
+		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
+	}
 }
+#else
+void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
+#endif
 
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
-{
-    int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-    // Zero length, column does not exceed a pixel.
-    if (count <= 0)
-        return;
-
-    const byte __far* source   = dcvars->source;
-    const byte __far* colormap = dcvars->colormap;
-
-    uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
-
-    const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
-    uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
-
-    // Inner loop that does the actual texture mapping,
-    //  e.g. a DDA-lile scaling.
-    // This is as fast as it gets.
-
-    uint16_t l = count >> 4;
-
-    while (l--)
-    {
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-    }
-
-    switch (count & 15)
-    {
-        case 15:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 14:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 13:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 12:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 11:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case 10:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  9:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  8:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  7:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  6:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  5:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  4:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  3:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  2:    R_DrawColumnPixel(dest, source, colormap, frac); dest+=PLANEWIDTH; frac+=fracstep;
-        case  1:    R_DrawColumnPixel(dest, source, colormap, frac);
-    }
-}
-
-
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -482,7 +317,34 @@ void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	const uint8_t color = texture;
+	source = dcvars->source;
+
+	if (nearcolormapoffset != L_FP_OFF(dcvars->colormap))
+	{
+		_fmemcpy(nearcolormap, dcvars->colormap, 256);
+		nearcolormapoffset = L_FP_OFF(dcvars->colormap);
+	}
+
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
+
+	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
+	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
+
+	// Inner loop that does the actual texture mapping,
+	//  e.g. a DDA-lile scaling.
+	// This is as fast as it gets.
+
+	R_DrawColumn2(fracstep, frac, count);
+}
+
+
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
+{
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
@@ -528,7 +390,11 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	const byte __far* colormap = &fullcolormap[6 * 256];
+	if (nearcolormapoffset != L_FP_OFF(&fullcolormap[6 * 256]))
+	{
+		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
+		nearcolormapoffset = L_FP_OFF(&fullcolormap[6 * 256]);
+	}
 
 	uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
 
@@ -536,7 +402,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	do
 	{
-		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos]], colormap, 0);
+		*dest = nearcolormap[dest[fuzzoffset[fuzzpos]]];
 		dest += PLANEWIDTH;
 
 		fuzzpos++;
@@ -544,6 +410,252 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 			fuzzpos = 0;
 
 	} while (--count);
+}
+
+
+void V_FillRect(byte colour)
+{
+	for (int16_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
+		_fmemset(_s_screen + y * PLANEWIDTH, colour, SCREENWIDTH / 4);
+}
+
+
+void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
+{
+	int16_t dx = abs(x1 - x0);
+	int16_t sx = x0 < x1 ? 1 : -1;
+
+	int16_t dy = -abs(y1 - y0);
+	int16_t sy = y0 < y1 ? 1 : -1;
+
+	int16_t err = dx + dy;
+
+	outp(SC_INDEX + 1, 1 << (x0 & 3));
+
+	while (true)
+	{
+		_s_screen[y0 * PLANEWIDTH + x0 / 4] = color;
+
+		if (x0 == x1 && y0 == y1)
+			break;
+
+		int16_t e2 = 2 * err;
+
+		if (e2 >= dy)
+		{
+			err += dy;
+			x0  += sx;
+			outp(SC_INDEX + 1, 1 << (x0 & 3));
+		}
+
+		if (e2 <= dx)
+		{
+			err += dx;
+			y0  += sy;
+		}
+	}
+
+	outp(SC_INDEX + 1, 15);
+}
+
+
+void V_DrawBackground(void)
+{
+	const byte __far* src = W_GetLumpByName("FLOOR4_8");
+
+	for (int16_t plane = 0; plane < 4; plane++)
+	{
+		outp(SC_INDEX + 1, 1 << plane);
+		for (int16_t y = 0; y < SCREENHEIGHT; y++)
+		{
+			uint8_t __far* dest = _s_screen + y * PLANEWIDTH;
+			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+			{
+				*dest++ = src[(y & 63) * 64 + (((x * 4) + plane) & 63)];
+			}
+		}
+	}
+	outp(SC_INDEX + 1, 15);
+
+	Z_ChangeTagToCache(src);
+}
+
+
+void V_DrawRaw(int16_t num, uint16_t offset)
+{
+	static int16_t cachedLumpNum;
+	static int16_t cachedLumpHeight;
+
+	if (cachedLumpNum != num)
+	{
+		const uint8_t __far* lump = W_TryGetLumpByNum(num);
+
+		if (lump != NULL)
+		{
+			uint16_t lumpLength = W_LumpLength(num);
+			cachedLumpHeight = lumpLength / SCREENWIDTH;
+			for (int16_t plane = 0; plane < 4; plane++)
+			{
+				outp(SC_INDEX + 1, 1 << plane);
+				for (int16_t y = 0; y < cachedLumpHeight; y++)
+				{
+					uint8_t __far* dest = D_MK_FP(0xac00, y * PLANEWIDTH + __djgpp_conventional_base);
+					for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+					{
+						*dest++ = lump[y * SCREENWIDTH + (x * 4) + plane];
+					}
+				}
+			}
+			outp(SC_INDEX + 1, 15);
+			Z_ChangeTagToCache(lump);
+
+			cachedLumpNum = num;
+		}
+	}
+
+	if (cachedLumpNum == num)
+	{
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+		uint8_t __far* src  = D_MK_FP(0xac00, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
+		for (int16_t y = 0; y < cachedLumpHeight; y++)
+		{
+			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+			{
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
+			}
+		}
+
+		// set write mode 0
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+	}
+}
+
+
+void ST_Drawer(void)
+{
+	if (ST_NeedUpdate())
+	{
+		ST_doRefresh();
+		st_needrefresh = 3; //3 screen pages
+	}
+}
+
+
+void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
+{
+	y -= patch->topoffset;
+	x -= patch->leftoffset;
+
+	int16_t plane = x & 3;
+	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + x / 4;
+
+	int16_t width = patch->width;
+
+	for (int16_t col = 0; col < width; col++)
+	{
+		outp(SC_INDEX + 1, 1 << plane);
+
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			const byte __far* source = (const byte __far*)column + 3;
+			byte __far* dest = desttop + (column->topdelta * PLANEWIDTH);
+
+			uint16_t count = column->length;
+
+			uint16_t l = count >> 2;
+			while (l--)
+			{
+				*dest = *source++; dest += PLANEWIDTH;
+				*dest = *source++; dest += PLANEWIDTH;
+				*dest = *source++; dest += PLANEWIDTH;
+				*dest = *source++; dest += PLANEWIDTH;
+			}
+
+			switch (count & 3)
+			{
+				case 3: *dest = *source++; dest += PLANEWIDTH;
+				case 2: *dest = *source++; dest += PLANEWIDTH;
+				case 1: *dest = *source++;
+			}
+
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+
+		if (++plane == 4)
+		{
+			plane = 0;
+			desttop++;
+		}
+	}
+
+	outp(SC_INDEX + 1, 15);
+}
+
+
+void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
+{
+	static const int32_t DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
+	static const int16_t DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH) >> 8;
+	static const int32_t DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
+	static const int16_t DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
+
+	y -= patch->topoffset;
+	x -= patch->leftoffset;
+
+	const int16_t left   = ( x * DX ) >> FRACBITS;
+	const int16_t right  = ((x + patch->width)  * DX) >> FRACBITS;
+	const int16_t bottom = ((y + patch->height) * DY) >> FRACBITS;
+
+	uint16_t col = 0;
+
+	for (int16_t dc_x = left; dc_x < right; dc_x++, col += DXI)
+	{
+		if (dc_x < 0)
+			continue;
+		else if (dc_x >= SCREENWIDTH)
+			break;
+
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			int16_t dc_yl = (((y + column->topdelta) * DY) >> FRACBITS);
+
+			if ((dc_yl >= SCREENHEIGHT) || (dc_yl > bottom))
+				break;
+
+			int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
+
+			outp(SC_INDEX + 1, 1 << (dc_x & 3));
+			byte __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dc_x / 4;
+
+			int16_t frac = 0;
+
+			const byte __far* source = (const byte __far*)column + 3;
+
+			int16_t count = dc_yh - dc_yl;
+			while (count--)
+			{
+				*dest = source[frac >> 8];
+				dest += PLANEWIDTH;
+				frac += DYI;
+			}
+
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+	}
+
+	outp(SC_INDEX + 1, 15);
 }
 
 
@@ -639,9 +751,13 @@ static void wipe_initMelt()
 void D_Wipe(void)
 {
 #if defined _M_I86
-	frontbuffer = (uint8_t __far*) (((uint32_t) _s_screen + 0x04000000) & 0xa400ffff);
+	frontbuffer = (uint8_t __far*)(((uint32_t)_s_screen) - 0x04000000);
+	if ((((uint32_t)frontbuffer) & 0x9c000000) == 0x9c000000)
+		frontbuffer = (uint8_t __far*)(((uint32_t)frontbuffer) + 0x0c000000);
 #else
-	frontbuffer = (uint8_t __far*) (((uint32_t) _s_screen + 0x4000) & 0xfffa4fff);
+	frontbuffer	= _s_screen - 0x04000;
+	if ((((uint32_t)frontbuffer) & 0x9c000) == 0x9c000)
+		frontbuffer += 0x0c000;
 #endif
 
 	// set write mode 1

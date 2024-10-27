@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023 Frenkel Smeijers
+ *  Copyright (C) 2023-2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -37,8 +37,11 @@
 #include "globdata.h"
 
 
-boolean I_IsGraphicsModeSet(void);
-static void NORETURN_PRE I_Quit(void) NORETURN_POST;
+void I_InitGraphicsHardwareSpecificCode(void);
+void I_ShutdownGraphicsHardwareSpecificCode(void);
+
+
+static boolean isGraphicsModeSet = false;
 
 
 //**************************************************************************************
@@ -51,6 +54,20 @@ void I_SetScreenMode(uint16_t mode)
 	union REGS regs;
 	regs.w.ax = mode;
 	int86(0x10, &regs, &regs);
+}
+
+
+void I_InitGraphics(void)
+{
+	I_InitGraphicsHardwareSpecificCode();
+	isGraphicsModeSet = true;
+}
+
+
+static void I_ShutdownGraphics(void)
+{
+	I_ShutdownGraphicsHardwareSpecificCode();
+	I_SetScreenMode(3);
 }
 
 
@@ -78,6 +95,11 @@ static void __interrupt I_KeyboardISR(void)
 	// Get the scan code
 	keyboardqueue[kbdhead & (KBDQUESIZE - 1)] = inp(0x60);
 	kbdhead++;
+
+	// Tell the XT keyboard controller to clear the key
+	byte temp;
+	outp(0x61, (temp = inp(0x61)) | 0x80);
+	outp(0x61, temp);
 
 	// acknowledge the interrupt
 	outp(0x20, 0x20);
@@ -144,6 +166,7 @@ void I_InitScreen(void)
 #define SC_RSHIFT			0x36
 #define SC_COMMA			0x33
 #define SC_PERIOD			0x34
+#define SC_ALT				0x38
 #define SC_SPACE			0x39
 #define SC_F10				0x44
 #define SC_UPARROW			0x48
@@ -209,8 +232,10 @@ void I_StartTic(void)
 				break;
 			case SC_ENTER:
 			case SC_SPACE:
-			case SC_RSHIFT:
 				ev.data1 = KEYD_A;
+				break;
+			case SC_RSHIFT:
+				ev.data1 = KEYD_SPEED;
 				break;
 			case SC_UPARROW:
 				ev.data1 = KEYD_UP;
@@ -229,6 +254,9 @@ void I_StartTic(void)
 				break;
 			case SC_CTRL:
 				ev.data1 = KEYD_B;
+				break;
+			case SC_ALT:
+				ev.data1 = KEYD_STRAFE;
 				break;
 			case SC_COMMA:
 				ev.data1 = KEYD_L;
@@ -322,8 +350,8 @@ static void I_ShutdownTimer(void)
 
 static void I_Shutdown(void)
 {
-	if (I_IsGraphicsModeSet())
-		I_SetScreenMode(3);
+	if (isGraphicsModeSet)
+		I_ShutdownGraphics();
 
 	I_ShutdownSound();
 
@@ -338,11 +366,12 @@ static void I_Shutdown(void)
 	if (mousepresent)
 		I_ResetMouse();
 
+	W_Shutdown();
 	Z_Shutdown();
 }
 
 
-static void I_Quit(void)
+void I_Quit(void)
 {
 	I_Shutdown();
 

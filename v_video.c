@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -39,11 +39,16 @@
 
 #include "doomdef.h"
 #include "compiler.h"
-#include "r_main.h"
-#include "w_wad.h"   /* needed for color translation lump lookup */
+#include "w_wad.h"
 #include "v_video.h"
 
 #include "globdata.h"
+
+
+void V_DrawRawFullScreen(int16_t num)
+{
+	V_DrawRaw(num, 0);
+}
 
 
 void V_DrawNumPatchScaled(int16_t x, int16_t y, int16_t num)

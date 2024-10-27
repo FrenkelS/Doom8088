@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -115,7 +115,6 @@ boolean         _g_respawnmonsters;
 
 boolean         _g_usergame;      // ok to save / end game
 boolean         _g_timingdemo;    // if true, exit with report on completion
-boolean         _g_playeringame;
 boolean         _g_demoplayback;
 boolean         _g_singledemo;           // quit after playing a demo from cmdline
 
@@ -137,9 +136,10 @@ static const int16_t key_down        = KEYD_DOWN;
 static const int16_t key_strafeleft  = KEYD_L;
 static const int16_t key_straferight = KEYD_R;
        const int16_t key_fire        = KEYD_B; 
+static const int16_t key_speed       = KEYD_SPEED;
+static const int16_t key_strafe      = KEYD_STRAFE;
 static const int16_t key_use         = KEYD_A;
        const int16_t key_escape      = KEYD_START;
-       const int16_t key_enter       = KEYD_A;
        const int16_t key_map_right   = KEYD_RIGHT;
        const int16_t key_map_left    = KEYD_LEFT;
        const int16_t key_map_up      = KEYD_UP;
@@ -218,6 +218,7 @@ void G_BuildTiccmd(void)
 {
     static int16_t     turnheld = 0;       // for accelerative turning
 
+    boolean strafe;
     int16_t speed;
     int16_t tspeed;
     int16_t forward;
@@ -226,8 +227,10 @@ void G_BuildTiccmd(void)
     /* cphipps - remove needless I_BaseTiccmd call, just set the ticcmd to zero */
     memset(&netcmd,0,sizeof(ticcmd_t));
 
+    strafe = gamekeydown[key_strafe];
+
     //Use button negates the always run setting.
-    speed = (gamekeydown[key_use] ^ _g_alwaysRun);
+    speed = (gamekeydown[key_speed] ^ _g_alwaysRun);
 
     forward = side = 0;
 
@@ -245,10 +248,20 @@ void G_BuildTiccmd(void)
 
     // let movement keys cancel each other out
 
-    if (gamekeydown[key_right])
-        netcmd.angleturn -= angleturn[tspeed];
-    if (gamekeydown[key_left])
-        netcmd.angleturn += angleturn[tspeed];
+    if (strafe)
+    {
+        if (gamekeydown[key_right])
+            side += sidemove[speed];
+        if (gamekeydown[key_left])
+            side -= sidemove[speed];
+    }
+    else
+    {
+        if (gamekeydown[key_right])
+            netcmd.angleturn -= angleturn[tspeed];
+        if (gamekeydown[key_left])
+            netcmd.angleturn += angleturn[tspeed];
+    }
 
     netcmd.angleturn -= mousex;
     if (mousexframe-- == 0)
@@ -317,7 +330,7 @@ static void G_DoLoadLevel (void)
     _g_gamestate = GS_LEVEL;
 
 
-    if (_g_playeringame && _g_player.playerstate == PST_DEAD)
+    if (_g_player.playerstate == PST_DEAD)
         _g_player.playerstate = PST_REBORN;
 
 
@@ -337,9 +350,8 @@ static void G_DoLoadLevel (void)
     // clear cmd building stuff
     memset(gamekeydown, 0, sizeof(gamekeydown));
 
-    // killough 5/13/98: in case netdemo has consoleplayer other than green
-    ST_Start();
-    HU_Start();
+    ST_Start(); // wake up the status bar
+    HU_Start(); // wake up the heads up text
 }
 
 
@@ -435,9 +447,7 @@ void G_Ticker (void)
 {
     static gamestate_t prevgamestate = 0;
 
-    P_MapStart();
-
-    if(_g_playeringame && _g_player.playerstate == PST_REBORN)
+    if(_g_player.playerstate == PST_REBORN)
         G_DoReborn ();
 
     P_MapEnd();
@@ -481,13 +491,10 @@ void G_Ticker (void)
         _g_basetic++;  // For revenant tracers and RNG -- we must maintain sync
     else
     {
-        if (_g_playeringame)
-        {
-            memcpy(&_g_player.cmd, &netcmd, sizeof(ticcmd_t));
+        memcpy(&_g_player.cmd, &netcmd, sizeof(ticcmd_t));
 
-            if (_g_demoplayback)
-                G_ReadDemoTiccmd ();
-        }
+        if (_g_demoplayback)
+            G_ReadDemoTiccmd ();
     }
 
     // cph - if the gamestate changed, we may need to clean up the old gamestate
@@ -578,7 +585,7 @@ void G_PlayerReborn (void)
 
     p = &_g_player;
 
-    int32_t cheats = p->cheats;
+    int16_t cheats = p->cheats;
     memset (p, 0, sizeof(*p));
     p->cheats = cheats;
 
@@ -638,8 +645,7 @@ static void G_DoCompleted (void)
 {
     _g_gameaction = ga_nothing;
 
-    if (_g_playeringame)
-        G_PlayerFinishLevel();        // take away cards and stuff
+    G_PlayerFinishLevel();        // take away cards and stuff
 
     if (automapmode & am_active)
         AM_Stop();
@@ -668,10 +674,7 @@ static void G_DoCompleted (void)
 
     _g_wminfo.partime = TICRATE*pars[_g_gamemap];
 
-    _g_wminfo.pnum = 0;
 
-
-    _g_wminfo.plyr[0].in = _g_playeringame;
     _g_wminfo.plyr[0].skills = _g_player.killcount;
     _g_wminfo.plyr[0].sitems = _g_player.itemcount;
     _g_wminfo.plyr[0].ssecret = _g_player.secretcount;
@@ -682,7 +685,7 @@ static void G_DoCompleted (void)
    *  the times in seconds shown for each level. Also means our total time
    *  will agree with Compet-n.
    */
-    _g_wminfo.totaltimes = (totalleveltimes += (_g_leveltime - _g_leveltime%35));
+    _g_wminfo.totaltimes = (totalleveltimes += (_g_leveltime - (int16_t)_g_leveltime % TICRATE));
 
     _g_gamestate = GS_INTERMISSION;
     automapmode &= ~am_active;
@@ -1053,7 +1056,7 @@ static const byte __far* G_ReadDemoHeader(const byte __far* demo_p)
     //e6y: check for overrun
     CheckForOverrun(header_p, demo_p, MAXPLAYERS);
 
-    _g_playeringame = *demo_p++;
+    demo_p++;
     demo_p += MIN_MAXPLAYERS - MAXPLAYERS;
 
 

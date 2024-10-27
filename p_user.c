@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -76,8 +76,8 @@ static boolean onground; // whether player is on ground or in air
 
 static void P_BobAndThrust(player_t *player, int16_t angle, int8_t move)
 {
-	fixed_t x = FixedMul(move * ORIG_FRICTION_FACTOR,finecosine(angle));
-	fixed_t y = FixedMul(move * ORIG_FRICTION_FACTOR,finesine(  angle));
+	fixed_t x = FixedMulAngle(move * ORIG_FRICTION_FACTOR,finecosine(angle));
+	fixed_t y = FixedMulAngle(move * ORIG_FRICTION_FACTOR,finesine(  angle));
 	player->mo->momx += x;
 	player->mo->momy += y;
 	player->momx     += x;
@@ -85,11 +85,25 @@ static void P_BobAndThrust(player_t *player, int16_t angle, int8_t move)
 }
 
 //
+// FixedSquare
+// return FixedMul(a, a);
+//
+static fixed_t FixedSquare(fixed_t a)
+{
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * alw;
+	return (a + alw) * ahw + (ll >> FRACBITS);
+}
+
+
+//
 // P_CalcHeight
 // Calculate the walking / running height adjustment
 //
 
-void P_CalcHeight (player_t* player)
+static void P_CalcHeight (player_t* player)
   {
   int16_t     angle;
   fixed_t bob;
@@ -108,13 +122,12 @@ void P_CalcHeight (player_t* player)
    * it causes bobbing jerkiness when the player moves from ice to non-ice,
    * and vice-versa.
    */
-  player->bob = (FixedMul(player->momx,player->momx) +
-        FixedMul(player->momy,player->momy))>>2;
+  player->bob = (FixedSquare(player->momx) + FixedSquare(player->momy)) >> 2;
 
   if (player->bob > MAXBOB)
     player->bob = MAXBOB;
 
-  if (!onground || player->cheats & CF_NOMOMENTUM)
+  if (!onground)
     {
     player->viewz = player->mo->z + VIEWHEIGHT;
 
@@ -130,7 +143,7 @@ void P_CalcHeight (player_t* player)
     }
 
   angle = (FINEANGLES/20*_g_leveltime)&FINEMASK;
-  bob = FixedMul(player->bob/2,finesine(angle));
+  bob = FixedMulAngle(player->bob/2,finesine(angle));
 
   // move viewheight
 
@@ -288,33 +301,28 @@ static void P_PlayerInSpecialSector (player_t* player)
     return;
 
   // Has hit ground.
-  //jff add if to handle old vs generalized types
-  if (sector->special<32) // regular sector specials
-  {
     switch (sector->special)
       {
       case 5:
         // 5/10 unit damage per 31 ticks
         if (!player->powers[pw_ironfeet])
-          if (!(_g_leveltime&0x1f))
+          if (!((int16_t)_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 10);
         break;
 
       case 7:
         // 2/5 unit damage per 31 ticks
         if (!player->powers[pw_ironfeet])
-          if (!(_g_leveltime&0x1f))
+          if (!((int16_t)_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 5);
         break;
 
       case 16:
         // 10/20 unit damage per 31 ticks
-      case 4:
-        // 10/20 unit damage plus blinking light (light already spawned)
         if (!player->powers[pw_ironfeet]
             || (P_Random()<5) ) // even with suit, take damage
         {
-          if (!(_g_leveltime&0x1f))
+          if (!((int16_t)_g_leveltime&0x1f))
             P_DamageMobj (player->mo, NULL, NULL, 20);
         }
         break;
@@ -328,7 +336,7 @@ static void P_PlayerInSpecialSector (player_t* player)
       case 11:
         _g_player.cheats &= ~CF_GODMODE;
 
-        if (!(_g_leveltime&0x1f))
+        if (!((int16_t)_g_leveltime&0x1f))
           P_DamageMobj (player->mo, NULL, NULL, 20);
 
         if (player->health <= 10)
@@ -339,47 +347,6 @@ static void P_PlayerInSpecialSector (player_t* player)
         //jff 1/24/98 Don't exit as DOOM2 did, just ignore
         break;
       }
-  }
-  else //jff 3/14/98 handle extended sector types for secrets and damage
-  {
-    switch ((sector->special&DAMAGE_MASK)>>DAMAGE_SHIFT)
-    {
-      case 0: // no damage
-        break;
-      case 1: // 2/5 damage per 31 ticks
-        if (!player->powers[pw_ironfeet])
-          if (!(_g_leveltime&0x1f))
-            P_DamageMobj (player->mo, NULL, NULL, 5);
-        break;
-      case 2: // 5/10 damage per 31 ticks
-        if (!player->powers[pw_ironfeet])
-          if (!(_g_leveltime&0x1f))
-            P_DamageMobj (player->mo, NULL, NULL, 10);
-        break;
-      case 3: // 10/20 damage per 31 ticks
-        if (!player->powers[pw_ironfeet]
-            || (P_Random()<5))  // take damage even with suit
-        {
-          if (!(_g_leveltime&0x1f))
-            P_DamageMobj (player->mo, NULL, NULL, 20);
-        }
-        break;
-    }
-    if (sector->special&SECRET_MASK)
-    {
-      player->secretcount++;
-      sector->special &= ~SECRET_MASK;
-      if (sector->special<32) // if all extended bits clear,
-        sector->special=0;    // sector is not special anymore
-    }
-
-    // phares 3/19/98:
-    //
-    // If FRICTION_MASK or PUSH_MASK is set, we don't care at this
-    // point, since the code to deal with those situations is
-    // handled by Thinkers.
-
-  }
 }
 
 

@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -47,7 +47,6 @@
 #include "globdata.h"
 
 
-static boolean crushchange;
 static boolean nofit;
 
 
@@ -119,8 +118,6 @@ static boolean P_ThingHeightClip(mobj_t __far* thing)
 
 static void PIT_ChangeSector(mobj_t __far* thing)
   {
-  mobj_t __far* mo;
-
   if (P_ThingHeightClip (thing))
     return;
 
@@ -152,22 +149,6 @@ static void PIT_ChangeSector(mobj_t __far* thing)
     }
 
   nofit = true;
-
-  if (crushchange && !(_g_leveltime&3)) {
-    int16_t t;
-    P_DamageMobj(thing,NULL,NULL,10);
-
-    // spray blood in a random direction
-    mo = P_SpawnMobj (thing->x,
-                      thing->y,
-                      thing->z + thing->height/2, MT_BLOOD);
-
-    /* killough 8/10/98: remove dependence on order of evaluation */
-    t = P_Random();
-    mo->momx = (t - P_Random ())<<12;
-    t = P_Random();
-    mo->momy = (t - P_Random ())<<12;
-  }
   }
 
 
@@ -178,12 +159,11 @@ static void PIT_ChangeSector(mobj_t __far* thing)
 // sector. Both more accurate and faster.
 //
 
-static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
+static boolean P_CheckSector(sector_t __far* sector)
   {
   msecnode_t __far* n;
 
   nofit = false;
-  crushchange = crunch;
 
   // killough 4/4/98: scan list front-to-back until empty or exhausted,
   // restarting from beginning after each thing is processed. Avoids
@@ -235,17 +215,13 @@ static boolean P_CheckSector(sector_t __far* sector, boolean crunch)
 //  pastdest - plane moved normally and is now at destination height
 //  crushed - plane encountered an obstacle, is holding until removed
 //
-result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolean crush, int16_t floorOrCeiling, int16_t direction)
+result_e T_MovePlaneFloor(sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction)
 {
   boolean       flag;
   fixed_t       lastpos;
   fixed_t       destheight; //jff 02/04/98 used to keep floors/ceilings
                             // from moving thru each other
 
-  switch(floorOrCeiling)
-  {
-    case 0:
-      // Moving a floor
       switch(direction)
       {
         case -1:
@@ -254,11 +230,11 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->floorheight;
             sector->floorheight = dest;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
             if (flag == true)
             {
               sector->floorheight =lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
             }
             return pastdest;
           }
@@ -266,7 +242,7 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->floorheight;
             sector->floorheight -= speed;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
       /* cph - make more compatible with original Doom, by
        *  reintroducing this code. This means floors can't lower
        *  if objects are stuck in the ceiling */
@@ -283,11 +259,11 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->floorheight;
             sector->floorheight = destheight;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
             if (flag == true)
             {
               sector->floorheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
             }
             return pastdest;
           }
@@ -296,21 +272,29 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
             // crushing is possible
             lastpos = sector->floorheight;
             sector->floorheight += speed;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
             if (flag == true)
             {
 
               sector->floorheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
               return crushed;
             }
           }
           break;
       }
-      break;
 
-    case 1:
-      // moving a ceiling
+  return ok;
+}
+
+
+result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction)
+{
+  boolean       flag;
+  fixed_t       lastpos;
+  fixed_t       destheight; //jff 02/04/98 used to keep floors/ceilings
+                            // from moving thru each other
+
       switch(direction)
       {
         case -1:
@@ -323,12 +307,12 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->ceilingheight;
             sector->ceilingheight = destheight;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
 
             if (flag == true)
             {
               sector->ceilingheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
             }
             return pastdest;
           }
@@ -337,14 +321,12 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
             // crushing is possible
             lastpos = sector->ceilingheight;
             sector->ceilingheight -= speed;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
 
             if (flag == true)
             {
-              if (crush == true)
-                return crushed;
               sector->ceilingheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
               return crushed;
             }
           }
@@ -356,11 +338,11 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->ceilingheight;
             sector->ceilingheight = dest;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
             if (flag == true)
             {
               sector->ceilingheight = lastpos;
-              P_CheckSector(sector,crush);      //jff 3/19/98 use faster chk
+              P_CheckSector(sector);
             }
             return pastdest;
           }
@@ -368,14 +350,14 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
           {
             lastpos = sector->ceilingheight;
             sector->ceilingheight += speed;
-            flag = P_CheckSector(sector,crush); //jff 3/19/98 use faster chk
+            flag = P_CheckSector(sector);
           }
           break;
       }
-      break;
-  }
+
   return ok;
 }
+
 
 //
 // T_MoveFloor()
@@ -384,27 +366,32 @@ result_e T_MovePlane(sector_t __far* sector, fixed_t speed, fixed_t dest, boolea
 // Called once per tick for each moving floor.
 //
 // Passed a floormove_t structure that contains all pertinent info about the
-// move. See P_SPEC.H for fields.
+// move.
 // No return.
 //
 // jff 02/08/98 all cases with labels beginning with gen added to support
 // generalized line type behaviors.
 
-void T_MoveFloor(floormove_t __far* floor)
+typedef struct
+{
+  thinker_t thinker;
+  floor_e type;
+  sector_t __far* sector;
+  int16_t direction;
+  int16_t texture;
+  fixed_t floordestheight;
+  fixed_t speed;
+
+} floormove_t;
+
+static void T_MoveFloor(floormove_t __far* floor)
 {
   result_e      res;
 
-  res = T_MovePlane       // move the floor
-  (
-    floor->sector,
-    floor->speed,
-    floor->floordestheight,
-    floor->crush,
-    0,
-    floor->direction
-  );
+  // move the floor
+  res = T_MovePlaneFloor(floor->sector, floor->speed, floor->floordestheight, floor->direction);
 
-  if (!(_g_leveltime&7))     // make the floormove sound
+  if (!((int16_t)_g_leveltime&7))     // make the floormove sound
     S_StartSound2(&floor->sector->soundorg, sfx_stnmov);
 
   if (res == pastdest)    // if destination height is reached
@@ -414,39 +401,7 @@ void T_MoveFloor(floormove_t __far* floor)
       switch(floor->type) // handle texture/type changes
       {
         case donutRaise:
-          floor->sector->special = floor->newspecial;
-          floor->sector->floorpic = floor->texture;
-          break;
-        case genFloorChgT:
-        case genFloorChg0:
-          floor->sector->special = floor->newspecial;
-          //jff add to fix bug in special transfers from changes
-          floor->sector->oldspecial = floor->oldspecial;
-          //fall thru
-        case genFloorChg:
-          floor->sector->floorpic = floor->texture;
-          break;
-        default:
-          break;
-      }
-    }
-    else if (floor->direction == -1) // going down
-    {
-      switch(floor->type) // handle texture/type changes
-      {
-        case lowerAndChange:
-          floor->sector->special = floor->newspecial;
-          //jff add to fix bug in special transfers from changes
-          floor->sector->oldspecial = floor->oldspecial;
-          floor->sector->floorpic = floor->texture;
-          break;
-        case genFloorChgT:
-        case genFloorChg0:
-          floor->sector->special = floor->newspecial;
-          //jff add to fix bug in special transfers from changes
-          floor->sector->oldspecial = floor->oldspecial;
-          //fall thru
-        case genFloorChg:
+          floor->sector->special  = 0;
           floor->sector->floorpic = floor->texture;
           break;
         default:
@@ -459,94 +414,6 @@ void T_MoveFloor(floormove_t __far* floor)
 
     // make floor stop sound
     S_StartSound2(&floor->sector->soundorg, sfx_pstop);
-  }
-}
-
-//
-// T_MoveElevator()
-//
-// Move an elevator to it's destination (up or down)
-// Called once per tick for each moving floor.
-//
-// Passed an elevator_t structure that contains all pertinent info about the
-// move. See P_SPEC.H for fields.
-// No return.
-//
-// jff 02/22/98 added to support parallel floor/ceiling motion
-//
-
-typedef struct
-{
-  thinker_t thinker;
-  elevator_e type;
-  sector_t __far* sector;
-  int16_t direction;
-  fixed_t floordestheight;
-  fixed_t ceilingdestheight;
-  fixed_t speed;
-} elevator_t;
-
-static void T_MoveElevator(elevator_t __far* elevator)
-{
-  result_e      res;
-
-  if (elevator->direction<0)      // moving down
-  {
-    res = T_MovePlane             //jff 4/7/98 reverse order of ceiling/floor
-    (
-      elevator->sector,
-      elevator->speed,
-      elevator->ceilingdestheight,
-      0,
-      1,                          // move floor
-      elevator->direction
-    );
-    if (res==ok || res==pastdest) // jff 4/7/98 don't move ceil if blocked
-      T_MovePlane
-      (
-        elevator->sector,
-        elevator->speed,
-        elevator->floordestheight,
-        0,
-        0,                        // move ceiling
-        elevator->direction
-      );
-  }
-  else // up
-  {
-    res = T_MovePlane             //jff 4/7/98 reverse order of ceiling/floor
-    (
-      elevator->sector,
-      elevator->speed,
-      elevator->floordestheight,
-      0,
-      0,                          // move ceiling
-      elevator->direction
-    );
-    if (res==ok || res==pastdest) // jff 4/7/98 don't move floor if blocked
-      T_MovePlane
-      (
-        elevator->sector,
-        elevator->speed,
-        elevator->ceilingdestheight,
-        0,
-        1,                        // move floor
-        elevator->direction
-      );
-  }
-
-  // make floor move sound
-  if (!(_g_leveltime&7))
-    S_StartSound2(&elevator->sector->soundorg, sfx_stnmov);
-
-  if (res == pastdest)            // if destination height acheived
-  {
-    elevator->sector->floordata = NULL;     //jff 2/22/98
-    elevator->sector->ceilingdata = NULL;   //jff 2/22/98
-    P_RemoveThinker(&elevator->thinker);    // remove elevator from actives
-
-    // make floor stop sound
-    S_StartSound2(&elevator->sector->soundorg, sfx_pstop);
   }
 }
 
@@ -605,7 +472,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
 {
   int16_t           secnum;
   boolean           rtn;
-  int16_t           i;
   sector_t __far*     sec;
   floormove_t __far*  floor;
 
@@ -617,7 +483,7 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
     sec = &_g_sectors[secnum];
 
     // Don't start a second thinker on the same floor
-    if (P_SectorActive(floor_special,sec)) //jff 2/23/98
+    if (sec->floordata != NULL)
       continue;
 
     // new floor thinker
@@ -627,7 +493,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
     sec->floordata = floor; //jff 2/22/98
     floor->thinker.function = T_MoveFloor;
     floor->type = floortype;
-    floor->crush = false;
 
     // setup the thinker according to the linedef type
     switch(floortype)
@@ -646,15 +511,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->floordestheight = P_FindLowestFloorSurrounding(sec);
         break;
 
-        //jff 02/03/30 support lowering floor to next lowest floor
-      case lowerFloorToNearest:
-        floor->direction = -1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight =
-          P_FindNextLowestFloor(sec,floor->sector->floorheight);
-        break;
-
       case turboLower:
         floor->direction = -1;
         floor->sector = sec;
@@ -664,8 +520,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
           floor->floordestheight += 8*FRACUNIT;
         break;
 
-      case raiseFloorCrush:
-        floor->crush = true;
       case raiseFloor:
         floor->direction = 1;
         floor->sector = sec;
@@ -673,14 +527,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->floordestheight = P_FindLowestCeilingSurrounding(sec);
         if (floor->floordestheight > sec->ceilingheight)
           floor->floordestheight = sec->ceilingheight;
-        floor->floordestheight -= (8*FRACUNIT)*(floortype == raiseFloorCrush);
-        break;
-
-      case raiseFloorTurbo:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED*4;
-        floor->floordestheight = P_FindNextHighestFloor(sec);
         break;
 
       case raiseFloorToNearest:
@@ -690,89 +536,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
         floor->floordestheight = P_FindNextHighestFloor(sec);
         break;
 
-      case raiseFloor24:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = floor->sector->floorheight + 24 * FRACUNIT;
-        break;
-
-      case raiseFloor512:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = floor->sector->floorheight + 512 * FRACUNIT;
-        break;
-
-      case raiseFloor24AndChange:
-        floor->direction = 1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = floor->sector->floorheight + 24 * FRACUNIT;
-        sec->floorpic = LN_FRONTSECTOR(line)->floorpic;
-        sec->special = LN_FRONTSECTOR(line)->special;
-        //jff 3/14/98 transfer both old and new special
-        sec->oldspecial = LN_FRONTSECTOR(line)->oldspecial;
-        break;
-
-      case raiseToTexture:
-        {
-          int16_t minsize = 32000; /* jff 3/13/98 no ovf */
-          side_t __far*     side;
-
-          floor->direction = 1;
-          floor->sector = sec;
-          floor->speed = FLOORSPEED;
-          for (i = 0; i < sec->linecount; i++)
-          {
-            if (twoSided (secnum, i) )
-            {
-              side = getSide(secnum,i,0);
-              // jff 8/14/98 don't scan texture 0, its not real
-              if (side->bottomtexture > 0)
-                if (textureheight[side->bottomtexture] < minsize)
-                  minsize = textureheight[side->bottomtexture];
-              side = getSide(secnum,i,1);
-              // jff 8/14/98 don't scan texture 0, its not real
-              if (side->bottomtexture > 0)
-                if (textureheight[side->bottomtexture] < minsize)
-                  minsize = textureheight[side->bottomtexture];
-            }
-          }
-          {
-            floor->floordestheight =
-              (floor->sector->floorheight>>FRACBITS) + minsize;
-            if (floor->floordestheight>32000)
-              floor->floordestheight = 32000;        //jff 3/13/98 do not
-            floor->floordestheight<<=FRACBITS;       // allow height overflow
-          }
-        }
-      break;
-
-      case lowerAndChange:
-        floor->direction = -1;
-        floor->sector = sec;
-        floor->speed = FLOORSPEED;
-        floor->floordestheight = P_FindLowestFloorSurrounding(sec);
-        floor->texture = sec->floorpic;
-
-        // jff 1/24/98 make sure floor->newspecial gets initialized
-        // in case no surrounding sector is at floordestheight
-        // --> should not affect compatibility <--
-        floor->newspecial = sec->special;
-        //jff 3/14/98 transfer both old and new special
-        floor->oldspecial = sec->oldspecial;
-
-        //jff 5/23/98 use model subroutine to unify fixes and handling
-        sec = P_FindModelFloorSector(floor->floordestheight,sec-_g_sectors);
-        if (sec)
-        {
-          floor->texture = sec->floorpic;
-          floor->newspecial = sec->special;
-          //jff 3/14/98 transfer both old and new special
-          floor->oldspecial = sec->oldspecial;
-        }
-        break;
       default:
         break;
     }
@@ -780,56 +543,6 @@ boolean EV_DoFloor(const line_t __far* line, floor_e floortype)
   return rtn;
 }
 
-//
-// EV_DoChange()
-//
-// Handle pure change types. These change floor texture and sector type
-// by trigger or numeric model without moving the floor.
-//
-// The linedef causing the change and the type of change is passed
-// Returns true if any sector changes
-//
-// jff 3/15/98 added to better support generalized sector types
-//
-boolean EV_DoChange(const line_t __far* line, change_e changetype)
-{
-  int16_t                   secnum;
-  boolean                   rtn;
-  sector_t __far*             sec;
-  sector_t __far*             secm;
-
-  secnum = -1;
-  rtn = false;
-  // change all sectors with the same tag as the linedef
-  while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
-  {
-    sec = &_g_sectors[secnum];
-
-    rtn = true;
-
-    // handle trigger or numeric change type
-    switch(changetype)
-    {
-      case trigChangeOnly:
-        sec->floorpic = LN_FRONTSECTOR(line)->floorpic;
-        sec->special = LN_FRONTSECTOR(line)->special;
-        sec->oldspecial = LN_FRONTSECTOR(line)->oldspecial;
-        break;
-      case numChangeOnly:
-        secm = P_FindModelFloorSector(sec->floorheight,secnum);
-        if (secm) // if no model, no change
-        {
-          sec->floorpic = secm->floorpic;
-          sec->special = secm->special;
-          sec->oldspecial = secm->oldspecial;
-        }
-        break;
-      default:
-        break;
-    }
-  }
-  return rtn;
-}
 
 /*
  * EV_BuildStairs()
@@ -864,7 +577,7 @@ static inline int16_t P_FindSectorFromLineTagWithLowerBound(const line_t __far* 
   return start;
 }
 
-boolean EV_BuildStairs(const line_t __far* line, stair_e type)
+boolean EV_BuildStairs(const line_t __far* line)
 {
   /* cph 2001/09/22 - cleaned up this function to save my sanity. A separate
    * outer loop index makes the logic much cleared, and local variables moved
@@ -880,7 +593,7 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
    sector_t __far*     sec = &_g_sectors[secnum];
 
     // don't start a stair if the first step's floor is already moving
-   if (!P_SectorActive(floor_special,sec)) { //jff 2/22/98
+   if (sec->floordata == NULL) {
     floormove_t __far*  floor;
     int16_t       texture;
     fixed_t       height;
@@ -898,21 +611,9 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
     floor->sector = sec;
     floor->type = buildStair;   //jff 3/31/98 do not leave uninited
 
-    // set up the speed and stepsize according to the stairs type
-    switch(type)
-    {
-      default: // killough -- prevent compiler warning
-      case build8:
-        speed = FLOORSPEED/4;
-        stairsize = 8*FRACUNIT;
-          floor->crush = false; //jff 2/27/98 fix uninitialized crush field
-        break;
-      case turbo16:
-        speed = FLOORSPEED*4;
-        stairsize = 16*FRACUNIT;
-          floor->crush = true;  //jff 2/27/98 fix uninitialized crush field
-        break;
-    }
+    // set up the speed and stepsize
+    speed = FLOORSPEED/4;
+    stairsize = 8*FRACUNIT;
     floor->speed = speed;
     height = sec->floorheight + stairsize;
     floor->floordestheight = height;
@@ -949,7 +650,7 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
           continue;
 
         // if sector's floor already moving, look for another
-        if (P_SectorActive(floor_special,tsec)) //jff 2/22/98
+        if (tsec->floordata != NULL)
           continue;
 
         height += stairsize;
@@ -968,8 +669,6 @@ boolean EV_BuildStairs(const line_t __far* line, stair_e type)
         floor->speed = speed;
         floor->floordestheight = height;
         floor->type = buildStair; //jff 3/31/98 do not leave uninited
-        //jff 2/27/98 fix uninitialized crush field
-          floor->crush = type==build8? false : true;
         ok = true;
         break;
       }
@@ -1007,7 +706,7 @@ boolean EV_DoDonut(const line_t __far* line)
     s1 = &_g_sectors[secnum];                // s1 is pillar's sector
 
     // do not start the donut if the pillar is already moving
-    if (P_SectorActive(floor_special,s1)) //jff 2/22/98
+    if (s1->floordata != NULL)
       continue;
 
     s2 = getNextSector(s1->lines[0],s1);  // s2 is pool's sector
@@ -1016,7 +715,7 @@ boolean EV_DoDonut(const line_t __far* line)
 
     /* do not start the donut if the pool is already moving
      * cph - DEMOSYNC - was !compatibility */
-    if (P_SectorActive(floor_special,s2))
+    if (s2->floordata != NULL)
       continue;                           //jff 5/7/98
 
     // find a two sided line around the pool whose other side isn't the pillar
@@ -1037,12 +736,10 @@ boolean EV_DoDonut(const line_t __far* line)
       s2->floordata = floor; //jff 2/22/98
       floor->thinker.function = T_MoveFloor;
       floor->type = donutRaise;
-      floor->crush = false;
       floor->direction = 1;
       floor->sector = s2;
       floor->speed = FLOORSPEED / 2;
       floor->texture = s3->floorpic;
-      floor->newspecial = 0;
       floor->floordestheight = s3->floorheight;
 
       //  Spawn lowering donut-hole pillar
@@ -1051,90 +748,11 @@ boolean EV_DoDonut(const line_t __far* line)
       s1->floordata = floor; //jff 2/22/98
       floor->thinker.function = T_MoveFloor;
       floor->type = lowerFloor;
-      floor->crush = false;
       floor->direction = -1;
       floor->sector = s1;
       floor->speed = FLOORSPEED / 2;
       floor->floordestheight = s3->floorheight;
       break;
-    }
-  }
-  return rtn;
-}
-
-//
-// EV_DoElevator
-//
-// Handle elevator linedef types
-//
-// Passed the linedef that triggered the elevator and the elevator action
-//
-// jff 2/22/98 new type to move floor and ceiling in parallel
-//
-boolean EV_DoElevator(const line_t __far* line, elevator_e elevtype)
-{
-  int16_t                   secnum;
-  boolean                   rtn;
-  sector_t __far*             sec;
-  elevator_t __far*           elevator;
-
-  secnum = -1;
-  rtn = false;
-  // act on all sectors with the same tag as the triggering linedef
-  while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
-  {
-    sec = &_g_sectors[secnum];
-
-    // If either floor or ceiling is already activated, skip it
-    if (sec->floordata || sec->ceilingdata) //jff 2/22/98
-      continue;
-
-    // create and initialize new elevator thinker
-    rtn = true;
-    elevator = Z_CallocLevSpec(sizeof(*elevator));
-    P_AddThinker (&elevator->thinker);
-    sec->floordata = elevator; //jff 2/22/98
-    sec->ceilingdata = elevator; //jff 2/22/98
-    elevator->thinker.function = T_MoveElevator;
-    elevator->type = elevtype;
-
-    // set up the fields according to the type of elevator action
-    switch(elevtype)
-    {
-        // elevator down to next floor
-      case elevateDown:
-        elevator->direction = -1;
-        elevator->sector = sec;
-        elevator->speed = ELEVATORSPEED;
-        elevator->floordestheight =
-          P_FindNextLowestFloor(sec,sec->floorheight);
-        elevator->ceilingdestheight =
-          elevator->floordestheight + sec->ceilingheight - sec->floorheight;
-        break;
-
-        // elevator up to next floor
-      case elevateUp:
-        elevator->direction = 1;
-        elevator->sector = sec;
-        elevator->speed = ELEVATORSPEED;
-        elevator->floordestheight   = P_FindNextHighestFloor(sec);
-        elevator->ceilingdestheight =
-          elevator->floordestheight + sec->ceilingheight - sec->floorheight;
-        break;
-
-        // elevator to floor height of activating switch's front sector
-      case elevateCurrent:
-        elevator->sector = sec;
-        elevator->speed = ELEVATORSPEED;
-        elevator->floordestheight = LN_FRONTSECTOR(line)->floorheight;
-        elevator->ceilingdestheight =
-          elevator->floordestheight + sec->ceilingheight - sec->floorheight;
-        elevator->direction =
-          elevator->floordestheight>sec->floorheight?  1 : -1;
-        break;
-
-      default:
-        break;
     }
   }
   return rtn;

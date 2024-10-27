@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -409,8 +409,59 @@ fixed_t finecosine(int16_t x)
 }
 
 
-static const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
+fixed_t finesineapprox(int16_t x)
 {
+	if (x < 2048) {			//    0 <= x < 2048
+		return finesineTable_part_1[x];
+	} else if (x < 4096) {	// 2048 <= x < 4096
+		return finesineTable_part_1[4095 - x];
+	} else if (x < 6144) {	// 4096 <= x < 6144
+		return 0xffff0000 | -finesineTable_part_1[x - 4096];
+	} else {				// 6144 <= x < 8192
+		return 0xffff0000 | -finesineTable_part_1[8191 - x];
+	}
+}
+
+
+fixed_t finecosineapprox(int16_t x)
+{
+	if (x < 2048) {			//    0 <= x < 2048
+		return finesineTable_part_1[4095 - (x + (FINEANGLES / 4))];
+	} else if (x < 4096) {	// 2048 <= x < 4096
+		return 0xffff0000 | -finesineTable_part_1[(x + (FINEANGLES / 4)) - 4096];
+	} else if (x < 6144) {	// 4096 <= x < 6144
+		return 0xffff0000 | -finesineTable_part_1[8191 - (x + (FINEANGLES / 4))];
+	} else {				// 6144 <= x < 8192
+		return finesineTable_part_1[x - 6144];
+	}
+}
+
+
+const angle16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
+{
+#if VIEWWINDOWWIDTH == 80
+	0x2008, 0x1F80, 0x1EF8, 0x1E70,
+	0x1DE0, 0x1D50, 0x1CB8, 0x1C20,
+	0x1B80, 0x1AE0, 0x1A38, 0x1990,
+	0x18E8, 0x1838, 0x1780, 0x16C8,
+	0x1608, 0x1548, 0x1480, 0x13B8,
+	0x12E8, 0x1218, 0x1140, 0x1060,
+	0x0F80, 0x0EA0, 0x0DB8, 0x0CD0,
+	0x0BE0, 0x0AF0, 0x0A00, 0x0908,
+	0x0810, 0x0710, 0x0610, 0x0510,
+	0x0410, 0x0310, 0x0208, 0x0108,
+	0x0000, 0xFEF8, 0xFDF8, 0xFCF0,
+	0xFBF0, 0xFAF0, 0xF9F0, 0xF8F0,
+	0xF7F0, 0xF6F8, 0xF600, 0xF510,
+	0xF420, 0xF330, 0xF248, 0xF160,
+	0xF080, 0xEFA0, 0xEEC0, 0xEDE8,
+	0xED18, 0xEC48, 0xEB80, 0xEAB8,
+	0xE9F8, 0xE938, 0xE880, 0xE7C8,
+	0xE718, 0xE670, 0xE5C8, 0xE520,
+	0xE480, 0xE3E0, 0xE348, 0xE2B0,
+	0xE220, 0xE190, 0xE108, 0xE080,
+	0xDFF8
+#elif VIEWWINDOWWIDTH == 60
 	0x2008, 0x1F50, 0x1EA0, 0x1DE0,
 	0x1D20, 0x1C50, 0x1B80, 0x1AA8,
 	0x19C8, 0x18E8, 0x17F8, 0x1708,
@@ -427,9 +478,29 @@ static const uint16_t xtoviewangleTable[VIEWWINDOWWIDTH + 1] =
 	0xE638, 0xE558, 0xE480, 0xE3B0,
 	0xE2E0, 0xE220, 0xE160, 0xE0B0,
 	0xDFF8
+#elif VIEWWINDOWWIDTH == 40
+	0x2008,         0x1EF8,
+	0x1DE0,         0x1CB8,
+	0x1B80,         0x1A38,
+	0x18E8,         0x1780,
+	0x1608,         0x1480,
+	0x12E8,         0x1140,
+	0x0F80,         0x0DB8,
+	0x0BE0,         0x0A00,
+	0x0810,         0x0610,
+	0x0410,         0x0208,
+	0x0000,         0xFDF8,
+	0xFBF0,         0xF9F0,
+	0xF7F0,         0xF600,
+	0xF420,         0xF248,
+	0xF080,         0xEEC0,
+	0xED18,         0xEB80,
+	0xE9F8,         0xE880,
+	0xE718,         0xE5C8,
+	0xE480,         0xE348,
+	0xE220,         0xE108,
+	0xDFF8
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 };
-
-angle_t xtoviewangle(int16_t x)
-{
-	return ((uint32_t)xtoviewangleTable[x]) << FRACBITS;
-}

@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -59,6 +59,20 @@
 enum automapmode_e automapmode; // Mode that the automap is in
 
 
+#if NR_OF_COLORS == 136
+static const uint8_t mapcolor_back = 0x00;
+static const uint8_t mapcolor_wall = 0x44;
+static const uint8_t mapcolor_fchg = 0x66;
+static const uint8_t mapcolor_cchg = 0x66;
+static const uint8_t mapcolor_clsd = 0xff;
+static const uint8_t mapcolor_rdor = 0xcc;
+static const uint8_t mapcolor_bdor = 0x11;
+static const uint8_t mapcolor_ydor = 0xee;
+static const uint8_t mapcolor_tele = 0x22;
+static const uint8_t mapcolor_secr = 0xdd;
+static const uint8_t mapcolor_unsn = 0x88;
+static const uint8_t mapcolor_sngl = 0xff;
+#else
 static const uint8_t mapcolor_back = 247;    // map background
 static const uint8_t mapcolor_wall = 23;    // normal 1s wall color
 static const uint8_t mapcolor_fchg = 55;    // line at floor height change color
@@ -70,11 +84,15 @@ static const uint8_t mapcolor_ydor = 231;    // yellow door color
 static const uint8_t mapcolor_tele = 119;    // teleporter line color
 static const uint8_t mapcolor_secr = 252;    // secret sector boundary color
 static const uint8_t mapcolor_unsn = 104;    // computer map unseen line color
-static const uint8_t mapcolor_flat = 88;    // line with no floor/ceiling changes
 static const uint8_t mapcolor_sngl = 208;    // single player arrow color
+#endif
 
-static const int16_t f_w = SCREENWIDTH;
-static const int16_t f_h = SCREENHEIGHT - ST_HEIGHT;// to allow runtime setting of width/height
+
+#if !defined MAPWIDTH
+#define MAPWIDTH SCREENWIDTH
+#endif
+static const int16_t f_w = MAPWIDTH;
+static const int16_t f_h = VIEWWINDOWHEIGHT;// to allow runtime setting of width/height
 
 
 typedef struct
@@ -153,7 +171,7 @@ static fixed_t ftom_zoommul = FRACUNIT; // how far the window zooms each tic (fb
 #define PLAYERRADIUS    (16L*(1<<MAPBITS)) // e6y
 
 // translates between frame-buffer and map distances
-#define FTOM(x) FixedMul((((int32_t)x)<<16),scale_ftom)
+#define FTOM(x) ((x)*scale_ftom)
 #define MTOF(x) (FixedMul((x),scale_mtof)>>16)
 // translates between frame-buffer and map coordinates
 #define CXMTOF(x)  (MTOF((x)- m_x))
@@ -213,35 +231,41 @@ static void AM_findMinMaxBoundaries(void)
     int16_t i;
     fixed_t a;
     fixed_t b;
+    int16_t min16_x, min16_y, max16_x, max16_y;
 
-    min_x = min_y =  INT32_MAX;
-    max_x = max_y = -INT32_MAX;
+    min16_x = min16_y =  INT16_MAX;
+    max16_x = max16_y = -INT16_MAX;
 
     for (i=0;i<_g_numlines;i++)
     {
-        if (_g_lines[i].v1.x < min_x)
-            min_x = _g_lines[i].v1.x;
-        else if (_g_lines[i].v1.x > max_x)
-            max_x = _g_lines[i].v1.x;
+        if (_g_lines[i].v1.x < min16_x)
+            min16_x = _g_lines[i].v1.x;
+        else if (_g_lines[i].v1.x > max16_x)
+            max16_x = _g_lines[i].v1.x;
 
-        if (_g_lines[i].v2.x < min_x)
-            min_x = _g_lines[i].v2.x;
-        else if (_g_lines[i].v2.x > max_x)
-            max_x = _g_lines[i].v2.x;
+        if (_g_lines[i].v2.x < min16_x)
+            min16_x = _g_lines[i].v2.x;
+        else if (_g_lines[i].v2.x > max16_x)
+            max16_x = _g_lines[i].v2.x;
 
-        if (_g_lines[i].v1.y < min_y)
-            min_y = _g_lines[i].v1.y;
-        else if (_g_lines[i].v1.y > max_y)
-            max_y = _g_lines[i].v1.y;
+        if (_g_lines[i].v1.y < min16_y)
+            min16_y = _g_lines[i].v1.y;
+        else if (_g_lines[i].v1.y > max16_y)
+            max16_y = _g_lines[i].v1.y;
 
-        if (_g_lines[i].v2.y < min_y)
-            min_y = _g_lines[i].v2.y;
-        else if (_g_lines[i].v2.y > max_y)
-            max_y = _g_lines[i].v2.y;
+        if (_g_lines[i].v2.y < min16_y)
+            min16_y = _g_lines[i].v2.y;
+        else if (_g_lines[i].v2.y > max16_y)
+            max16_y = _g_lines[i].v2.y;
     }
 
-    max_w = (max_x >>= FRACTOMAPBITS) - (min_x >>= FRACTOMAPBITS);//e6y
-    max_h = (max_y >>= FRACTOMAPBITS) - (min_y >>= FRACTOMAPBITS);//e6y
+    min_x = (fixed_t)min16_x << MAPBITS;
+    min_y = (fixed_t)min16_y << MAPBITS;
+    max_x = (fixed_t)max16_x << MAPBITS;
+    max_y = (fixed_t)max16_y << MAPBITS;
+
+    max_w = max_x - min_x;
+    max_h = max_y - min_y;
 
     a = FixedApproxDiv((int32_t)f_w<<FRACBITS, max_w);
     b = FixedApproxDiv((int32_t)f_h<<FRACBITS, max_h);
@@ -525,12 +549,12 @@ static void AM_rotate(fixed_t* x,  fixed_t* y, angle_t a, fixed_t xorig, fixed_t
     yorig>>=FRACTOMAPBITS;
 
     tmpx =
-            FixedMul(*x - xorig,finecosine(a>>ANGLETOFINESHIFT)) -
-            FixedMul(*y - yorig,finesine(  a>>ANGLETOFINESHIFT));
+            FixedMulAngle(*x - xorig,finecosineapprox(a>>ANGLETOFINESHIFT)) -
+            FixedMulAngle(*y - yorig,finesineapprox(  a>>ANGLETOFINESHIFT));
 
     *y   = yorig +
-            FixedMul(*x - xorig,finesine(  a>>ANGLETOFINESHIFT)) +
-            FixedMul(*y - yorig,finecosine(a>>ANGLETOFINESHIFT));
+            FixedMulAngle(*x - xorig,finesineapprox(  a>>ANGLETOFINESHIFT)) +
+            FixedMulAngle(*y - yorig,finecosineapprox(a>>ANGLETOFINESHIFT));
 
     *x = tmpx + xorig;
 }
@@ -770,29 +794,17 @@ static void AM_drawMline(mline_t* ml, uint8_t color)
 //    0 if a red key required
 //    1 if a blue key required
 //    2 if a yellow key required
-//    3 if a multiple keys required
-//
-// jff 4/3/98 add routine to get color of generalized keyed door
-//
 static int16_t AM_DoorColor(int16_t type)
 {
-    if (GenLockedBase <= type && type< GenDoorBase)
-    {
-        type -= GenLockedBase;
-        type = (type & LockedKey) >> LockedKeyShift;
-        if (!type || type==7)
-            return 3;  //any or all keys
-        else return (type-1)%3;
-    }
     switch (type)  // closed keyed door
     {
-    case 26: case 32: case 99: case 133:
+    case 26: case 32:
         /*bluekey*/
         return 1;
-    case 27: case 34: case 136: case 137:
+    case 27: case 34:
         /*yellowkey*/
         return 2;
-    case 28: case 33: case 134: case 135:
+    case 28: case 33:
         /*redkey*/
         return 0;
     default:
@@ -812,7 +824,7 @@ static int16_t AM_DoorColor(int16_t type)
 //
 static boolean PUREFUNC P_WasSecret(const sector_t __far* sec)
 {
-  return (sec->oldspecial==9 || (sec->oldspecial&SECRET_MASK));
+  return sec->oldspecial == 9;
 }
 
 
@@ -840,10 +852,10 @@ static void AM_drawWalls(void)
     // draw the unclipped visible portions of all lines
     for (i=0;i<_g_numlines;i++)
     {
-        l.a.x = _g_lines[i].v1.x >> FRACTOMAPBITS;//e6y
-        l.a.y = _g_lines[i].v1.y >> FRACTOMAPBITS;//e6y
-        l.b.x = _g_lines[i].v2.x >> FRACTOMAPBITS;//e6y
-        l.b.y = _g_lines[i].v2.y >> FRACTOMAPBITS;//e6y
+        l.a.x = (fixed_t)_g_lines[i].v1.x << MAPBITS;
+        l.a.y = (fixed_t)_g_lines[i].v1.y << MAPBITS;
+        l.b.x = (fixed_t)_g_lines[i].v2.x << MAPBITS;
+        l.b.y = (fixed_t)_g_lines[i].v2.y << MAPBITS;
 
 
         const sector_t __far* backsector = LN_BACKSECTOR(&_g_lines[i]);
@@ -858,7 +870,7 @@ static void AM_drawWalls(void)
         }
 
         // if line has been seen or IDDT has been used
-        if (_g_linedata[i].r_flags & ML_MAPPED)
+        if (_g_lines[i].r_flags & ML_MAPPED)
         {
             if (_g_lines[i].flags & ML_DONTDRAW)
                 continue;
@@ -882,10 +894,6 @@ static void AM_drawWalls(void)
                             /*redkey*/
                             AM_drawMline(&l,mapcolor_rdor);
                             continue;
-                        case 3:
-                            /*any or all*/
-                            AM_drawMline(&l, mapcolor_clsd);
-                            continue;
                         }
                     }
                 }
@@ -894,7 +902,7 @@ static void AM_drawWalls(void)
             if(!backsector)
             {
                 // jff 1/10/98 add new color for 1S secret sector boundary
-                if (mapcolor_secr && P_WasSecret(frontsector))
+                if (P_WasSecret(frontsector))
                     AM_drawMline(&l, mapcolor_secr); // line bounding secret sector
                 else                               //jff 2/16/98 fixed bug
                     AM_drawMline(&l, mapcolor_wall); // special was cleared
@@ -902,12 +910,7 @@ static void AM_drawWalls(void)
             else /* now for 2S lines */
             {
                 // jff 1/10/98 add color change for all teleporter types
-                if
-                        (
-                         mapcolor_tele && !(_g_lines[i].flags & ML_SECRET) &&
-                         (line_special == 39 || line_special == 97 ||
-                          line_special == 125 || line_special == 126)
-                         )
+                if (!(_g_lines[i].flags & ML_SECRET) && (line_special == 97))
                 { // teleporters
                     AM_drawMline(&l, mapcolor_tele);
                 }
@@ -917,7 +920,6 @@ static void AM_drawWalls(void)
                 }
                 else if
                         (
-                         mapcolor_clsd &&
                          !(_g_lines[i].flags & ML_SECRET) &&    // non-secret closed door
                          ((backsector->floorheight==backsector->ceilingheight) ||
                           (frontsector->floorheight==frontsector->ceilingheight))
@@ -925,7 +927,7 @@ static void AM_drawWalls(void)
                 {
                     AM_drawMline(&l, mapcolor_clsd);      // non-secret closed door
                 } //jff 1/6/98 show secret sector 2S lines
-                else if (mapcolor_secr && (P_WasSecret(frontsector) || P_WasSecret(backsector)))
+                else if (P_WasSecret(frontsector) || P_WasSecret(backsector))
                 {
                     AM_drawMline(&l, mapcolor_secr); // line bounding secret sector
                 } //jff 1/6/98 end secret sector line change
@@ -945,19 +947,7 @@ static void AM_drawWalls(void)
         {
             if (!(_g_lines[i].flags & ML_DONTDRAW)) // invisible flag lines do not show
             {
-                if
-                        (
-                         mapcolor_flat
-                         ||
-                         !backsector
-                         ||
-                         backsector->floorheight
-                         != frontsector->floorheight
-                         ||
-                         backsector->ceilingheight
-                         != frontsector->ceilingheight
-                         )
-                    AM_drawMline(&l, mapcolor_unsn);
+                AM_drawMline(&l, mapcolor_unsn);
             }
         }
     }

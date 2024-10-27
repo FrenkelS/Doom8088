@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -190,27 +190,6 @@ static boolean P_IsOnLift(const mobj_t __far* actor)
   return false;
 }
 
-/*
- * P_IsUnderDamage
- *
- * killough 9/9/98:
- *
- * Returns nonzero if the object is under damage based on
- * their current position. Returns 1 if the damage is moderate,
- * -1 if it is serious. Used for AI.
- */
-
-static int16_t P_IsUnderDamage(mobj_t __far* actor)
-{
-  const struct msecnode_s __far* seclist;
-  const ceiling_t __far* cl;             // Crushing ceiling
-  int16_t dir = 0;
-  for (seclist=actor->touching_sectorlist; seclist; seclist=seclist->m_tnext)
-    if ((cl = seclist->m_sector->ceilingdata) &&
-  cl->thinker.function == T_MoveCeiling)
-      dir |= cl->direction;
-  return dir;
-}
 
 //
 // P_Move
@@ -231,7 +210,7 @@ static boolean P_Move(mobj_t __far* actor)
     return false;
 
 #ifdef RANGECHECK
-  if ((uint16_t)actor->movedir >= 8)
+  if (actor->movedir >= 8)
     I_Error ("P_Move: Weird actor->movedir!");
 #endif
 
@@ -244,18 +223,6 @@ static boolean P_Move(mobj_t __far* actor)
 
   if (!try_ok)
     {      // open any specials
-      if (actor->flags & MF_FLOAT && P_IsFloatOk())
-        {
-          if (actor->z < _g_tmfloorz)          // must adjust height
-            actor->z += FLOATSPEED;
-          else
-            actor->z -= FLOATSPEED;
-
-          actor->flags |= MF_INFLOAT;
-
-    return true;
-        }
-
       if (!_g_numspechit)
         return false;
 
@@ -290,12 +257,9 @@ static boolean P_Move(mobj_t __far* actor)
        */
       return good;
     }
-  else
-    actor->flags &= ~MF_INFLOAT;
 
   /* fall more slowly, under gravity */
-  if (!(actor->flags & MF_FLOAT))
-    actor->z = actor->floorz;
+  actor->z = actor->floorz;
 
   return true;
 }
@@ -333,8 +297,8 @@ static boolean P_TryWalk(mobj_t __far* actor)
 static void P_DoNewChaseDir(mobj_t __far* actor, fixed_t deltax, fixed_t deltay)
 {
   int16_t xdir, ydir, tdir;
-  int16_t olddir = actor->movedir;
-  int16_t turnaround = olddir;
+  uint8_t olddir = actor->movedir;
+  uint8_t turnaround = olddir;
 
   if (turnaround != DI_NODIR)         // find reverse direction
     turnaround ^= 4;
@@ -398,13 +362,13 @@ static void P_DoNewChaseDir(mobj_t __far* actor, fixed_t deltax, fixed_t deltay)
 // monsters to free themselves without making them tend to
 // hang over dropoffs.
 
-static boolean PIT_AvoidDropoff(const line_t __far* line)
+static boolean PIT_AvoidDropoff(line_t __far* line)
 {
-  if (LN_BACKSECTOR(line)                          && // Ignore one-sided linedefs
-      _g_tmbbox[BOXRIGHT]  > line->bbox[BOXLEFT]   &&
-      _g_tmbbox[BOXLEFT]   < line->bbox[BOXRIGHT]  &&
-      _g_tmbbox[BOXTOP]    > line->bbox[BOXBOTTOM] && // Linedef must be contacted
-      _g_tmbbox[BOXBOTTOM] < line->bbox[BOXTOP]    &&
+  if (LN_BACKSECTOR(line)                                               && // Ignore one-sided linedefs
+      _g_tmbbox[BOXRIGHT]  > (fixed_t)line->bbox[BOXLEFT]   << FRACBITS &&
+      _g_tmbbox[BOXLEFT]   < (fixed_t)line->bbox[BOXRIGHT]  << FRACBITS &&
+      _g_tmbbox[BOXTOP]    > (fixed_t)line->bbox[BOXBOTTOM] << FRACBITS && // Linedef must be contacted
+      _g_tmbbox[BOXBOTTOM] < (fixed_t)line->bbox[BOXTOP]    << FRACBITS &&
       P_BoxOnLineSide(_g_tmbbox, line) == -1)
     {
       fixed_t front = LN_FRONTSECTOR(line)->floorheight;
@@ -476,7 +440,7 @@ static void P_NewChaseDir(mobj_t __far* actor)
 
     if (actor->floorz - actor->dropoffz > FRACUNIT*24 &&
             actor->z <= actor->floorz &&
-            !(actor->flags & (MF_DROPOFF|MF_FLOAT)) &&
+            !(actor->flags & MF_DROPOFF) &&
             P_AvoidDropoff(actor)) /* Move away from dropoff */
     {
         P_DoNewChaseDir(actor, dropoff_deltax, dropoff_deltay);
@@ -496,7 +460,7 @@ static void P_NewChaseDir(mobj_t __far* actor)
 
         if (actor->flags & target->flags & MF_FRIEND &&
                 distfriend > dist &&
-                !P_IsOnLift(target) && !P_IsUnderDamage(actor))
+                !P_IsOnLift(target))
         {
             deltax = -deltax, deltay = -deltay;
         }
@@ -518,7 +482,7 @@ static boolean P_IsVisible(mobj_t __far* actor, mobj_t __far* mo, boolean allaro
     {
         angle_t an = R_PointToAngle2(actor->x, actor->y, mo->x, mo->y) - actor->angle;
 
-        if (an > ANG90 && an < ANG270 && P_AproxDistance(mo->x-actor->x, mo->y-actor->y) > MELEERANGE)
+        if (ANG90 < an && an < ANG270 && P_AproxDistance(mo->x-actor->x, mo->y-actor->y) > MELEERANGE)
             return false;
     }
     return P_CheckSight(actor, mo);
@@ -534,27 +498,22 @@ static boolean P_LookForPlayers(mobj_t __far* actor, boolean allaround)
 {
     player_t *player;
 
-    if(_g_playeringame)
-    {
-        player = &_g_player;
+    player = &_g_player;
 
-        if (player->health <= 0)
-            return false;               // dead
+    if (player->health <= 0)
+        return false;               // dead
 
-        if (!P_IsVisible(actor, player->mo, allaround))
-            return false;
+    if (!P_IsVisible(actor, player->mo, allaround))
+        return false;
 
-        actor->target = player->mo;
+    actor->target = player->mo;
 
-        /* killough 9/9/98: give monsters a threshold towards getting players
-       * (we don't want it to be too easy for a player with dogs :)
-       */
-        actor->threshold = 60;
+    /* killough 9/9/98: give monsters a threshold towards getting players
+     * (we don't want it to be too easy for a player with dogs :)
+     */
+    actor->threshold = 60;
 
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 //
@@ -956,7 +915,7 @@ void A_BossDeath(mobj_t __far* mo)
     if (mo->type != MT_BRUISER)
         return;
 
-    if (!(_g_playeringame && _g_player.health > 0))
+    if (_g_player.health <= 0)
         return;     // no one left alive, so do not end game
 
     // scan the remaining thinkers to see

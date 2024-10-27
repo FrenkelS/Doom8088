@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -41,15 +41,15 @@
 
 
 typedef struct {
-  int16_t                 x;
-  int16_t                 yl;
-  int16_t                 yh;
-  fixed_t             iscale;
-  fixed_t             texturemid;
+  int16_t              x;
+  int16_t              yl;
+  int16_t              yh;
+  fixed_t              iscale;
+  fixed_t              texturemid;
 
-  const byte          __far* source; // first pixel in a column
+  const byte    __far* source; // first pixel in a column
 
-  const lighttable_t  __far* colormap;
+  const uint8_t __far* colormap;
 } draw_column_vars_t;
 
 
@@ -58,18 +58,19 @@ typedef struct {
 extern int16_t numnodes;
 extern const mapnode_t __far* nodes;
 
+#if !defined FLAT_SPAN
 extern fixed_t  viewx, viewy, viewz;
+extern fixed_t  viewcos, viewsin;
+#endif
 
 extern angle_t viewangle;
 
-extern const lighttable_t __far* fullcolormap;
-extern const lighttable_t __far* fixedcolormap;
+extern const uint8_t __far* fullcolormap;
+extern const uint8_t __far* fixedcolormap;
 
 extern int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
 
 extern int16_t       __far* texturetranslation;
-
-extern fixed_t  viewcos, viewsin;
 
 
 //
@@ -81,7 +82,10 @@ angle_t R_PointToAngle3(fixed_t x, fixed_t y);
 subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 
 void R_InitColormaps(void);
-const lighttable_t __far* R_LoadColorMap(int16_t lightlevel);
+const uint8_t __far* R_LoadColorMap(int16_t lightlevel);
+
+int16_t V_NumPatchWidth(int16_t num);
+
 
 //
 // REFRESH - the actual rendering functions.
@@ -90,7 +94,7 @@ const lighttable_t __far* R_LoadColorMap(int16_t lightlevel);
 void R_RenderPlayerView(player_t *player);   // Called by G_Drawer.
 
 void R_DrawColumn (const draw_column_vars_t *dcvars);
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars);
 
 void R_DrawPlanes (void);
 visplane_t __far* R_FindPlane(fixed_t height, int16_t picnum, int16_t lightlevel);

@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023 Frenkel Smeijers
+ *  Copyright (C) 2023-2024 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -29,24 +29,41 @@
 #include "r_defs.h"
 #include "r_main.h"
 
-void V_DrawBackground(void);
-void V_DrawRaw(int16_t num, uint16_t offset);
-void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch);
-void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch);
-void V_FillRect(byte colour);
-void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color);
-boolean I_IsGraphicsModeSet(void);
-void I_FinishUpdate(void);
+void I_InitGraphicsHardwareSpecificCode(void);
+void I_ShutdownGraphicsHardwareSpecificCode(void);
+void I_ReloadPalette(void);
 void I_SetPalette(int8_t pal);
-void I_InitGraphics(void);
+void I_FinishUpdate(void);
+
+
 void R_DrawColumn (const draw_column_vars_t *dcvars);
-void R_DrawColumnFlat(int16_t texture, const draw_column_vars_t *dcvars);
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars);
 void R_DrawFuzzColumn (const draw_column_vars_t *dcvars);
-void wipe_StartScreen(void);
-void D_Wipe(void);
 
 #if !defined FLAT_SPAN
+typedef struct {
+  uint32_t             position;
+  uint32_t             step;
+  const byte    __far* source; // start of a 64*64 tile image
+  const uint8_t __far* colormap;
+} draw_span_vars_t;
+
 void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *dsvars);
 #endif
+
+
+void V_FillRect(byte colour);
+void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color);
+void V_DrawBackground(void);
+void V_DrawRaw(int16_t num, uint16_t offset);
+
+void ST_Drawer(void);
+
+void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch);
+void V_DrawPatchScaled(   int16_t x, int16_t y, const patch_t __far* patch);
+
+
+void wipe_StartScreen(void);
+void D_Wipe(void);
 
 #endif

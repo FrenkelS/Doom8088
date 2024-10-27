@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -37,7 +37,6 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -60,6 +59,10 @@
 #include "i_sound.h"
 
 #include "globdata.h"
+
+
+#define DISABLE_SAVE_GAME
+#define DISABLE_SOUND_OPTIONS
 
 
 //
@@ -141,6 +144,7 @@ static void M_LoadGame(int16_t choice);
 static void M_SaveGame(int16_t choice);
 static void M_Options(int16_t choice);
 static void M_EndGame(int16_t choice);
+static void M_QuitDOOM(int16_t choice);
 
 
 static void M_ChangeMessages(int16_t choice);
@@ -153,8 +157,6 @@ static void M_Sound(int16_t choice);
 static void M_LoadSelect(int16_t choice);
 static void M_SaveSelect(int16_t choice);
 static void M_ReadSaveStrings(void);
-void M_QuickSave(void);
-void M_QuickLoad(void);
 
 static void M_DrawMainMenu(void);
 static void M_DrawNewGame(void);
@@ -189,9 +191,12 @@ static void M_ClearMenus (void);
 enum
 {
   newgame = 0,
-  loadgame,
-  savegame,
   options,
+  loadgame,
+#if !defined DISABLE_SAVE_GAME
+  savegame,
+#endif
+  quitdoom,
   main_end
 };
 
@@ -199,8 +204,7 @@ enum
 // MainMenu is the definition of what the main menu Screen should look
 // like. Each entry shows that the cursor can land on each item (1), the
 // built-in graphic lump (i.e. "M_NGAME") that should be displayed,
-// the program which takes over when an item is selected, and the hotkey
-// associated with the item.
+// and the program which takes over when an item is selected.
 //
 
 static const menuitem_t MainMenu[]=
@@ -208,7 +212,10 @@ static const menuitem_t MainMenu[]=
   {1,"M_NGAME", M_NewGame},
   {1,"M_OPTION",M_Options},
   {1,"M_LOADG", M_LoadGame},
+#if !defined DISABLE_SAVE_GAME
   {1,"M_SAVEG", M_SaveGame},
+#endif
+  {1,"M_QUITG", M_QuitDOOM}
 };
 
 static const menu_t MainDef =
@@ -504,6 +511,26 @@ static void M_SaveGame (int16_t choice)
 	M_ReadSaveStrings();
 }
 
+
+/////////////////////////////
+//
+// QUIT DOOM
+//
+
+static void M_QuitResponse(boolean affirmative)
+{
+	if (affirmative)
+		I_Quit();
+}
+
+
+static void M_QuitDOOM(int16_t choice)
+{
+	UNUSED(choice);
+	M_StartMessage(QUITMSG, M_QuitResponse);
+}
+
+
 /////////////////////////////
 //
 // OPTIONS MENU
@@ -517,7 +544,9 @@ enum
   messages,
   alwaysrun,
   gamma,
+#if !defined DISABLE_SOUND_OPTIONS
   soundvol,
+#endif
   opt_end
 };
 
@@ -530,7 +559,9 @@ static const menuitem_t OptionsMenu[]=
   {1,"M_MESSG",  M_ChangeMessages},
   {1,"M_ARUN",   M_ChangeAlwaysRun},
   {2,"M_GAMMA",  M_ChangeGamma},
+#if !defined DISABLE_SOUND_OPTIONS
   {1,"M_SVOL",   M_Sound}
+#endif
 };
 
 static const menu_t OptionsDef =
@@ -734,6 +765,7 @@ static void M_ChangeGamma(int16_t choice)
 			_g_gamma++;
 		  break;
     }
+	I_ReloadPalette();
 	I_SetPalette(0);
 
     G_SaveSettings();
@@ -796,13 +828,13 @@ boolean M_Responder (event_t* ev)
     if (messageToPrint)
     {
         if (messageNeedsInput == true &&
-                !(ch == 'n' || ch == 'y' || ch == key_escape || ch == key_fire || ch == key_enter))
+                !(ch == 'n' || ch == 'y' || ch == key_escape))
             return false;
 
         _g_menuactive  = messageLastMenuActive;
         messageToPrint = false;
         if (messageRoutine)
-            messageRoutine(ch == 'y' || ch == key_fire || ch == key_enter);
+            messageRoutine(ch == 'y');
 
         _g_menuactive = false;
         S_StartSound(NULL,sfx_swtchx);

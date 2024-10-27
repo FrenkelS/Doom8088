@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -44,8 +44,6 @@
 #include "p_map.h"
 #include "p_tick.h"
 #include "sounds.h"
-#include "st_stuff.h"
-#include "hu_stuff.h"
 #include "s_sound.h"
 #include "info.h"
 #include "g_game.h"
@@ -53,10 +51,6 @@
 #include "i_system.h"
 
 #include "globdata.h"
-
-
-// Maintain player starting spot.
-static mapthing_t playerstart;
 
 
 void A_CyberAttack(mobj_t __far* actor);
@@ -170,13 +164,13 @@ static void P_HitSlideLine(const line_t __far* ld)
     /* killough 10/98: only bounce if hit hard (prevents wobbling)
    * cph - DEMOSYNC - should only affect players in Boom demos? */
 
-    if (ld->slopetype == ST_HORIZONTAL)
+    if (ld->dy == 0)
     {
         tmymove = 0; // no more movement in the Y direction
         return;
     }
 
-    if (ld->slopetype == ST_VERTICAL)
+    if (ld->dx == 0)
     {                                                          // phares
         tmxmove = 0; // no more movement in the X direction
         return;
@@ -210,9 +204,9 @@ static void P_HitSlideLine(const line_t __far* ld)
 
     lineangle >>= ANGLETOFINESHIFT;
     deltaangle >>= ANGLETOFINESHIFT;
-    newlen = FixedMul (movelen, finecosine(deltaangle));
-    tmxmove = FixedMul (newlen, finecosine(lineangle));
-    tmymove = FixedMul (newlen, finesine(  lineangle));
+    newlen  = FixedMulAngle(movelen, finecosine(deltaangle));
+    tmxmove = FixedMulAngle(newlen,  finecosine(lineangle));
+    tmymove = FixedMulAngle(newlen,  finesine(  lineangle));
     // phares
 }
 
@@ -383,6 +377,17 @@ static void P_SlideMove(mobj_t __far* mo)
 }
 
 
+static fixed_t FixedMul32OrigFriction(fixed_t a)
+{
+	uint16_t alw = a;
+	 int16_t ahw = a >> FRACBITS;
+
+	uint32_t ll = (uint32_t) alw * ORIG_FRICTION;
+	 int32_t hl = ( int32_t) ahw * ORIG_FRICTION;
+	return (ll >> FRACBITS) + hl;
+}
+
+
 //
 // P_XYMovement
 //
@@ -399,16 +404,6 @@ static void P_XYMovement(mobj_t __far* mo)
 
     if (!(mo->momx | mo->momy)) // Any momentum?
     {
-        if (mo->flags & MF_SKULLFLY)
-        {
-
-            // the skull slammed into something
-
-            mo->flags &= ~MF_SKULLFLY;
-            mo->momz = 0;
-
-            P_SetMobjState (mo, mobjinfo[mo->type].spawnstate);
-        }
         return;
     }
 
@@ -493,7 +488,7 @@ static void P_XYMovement(mobj_t __far* mo)
     // slow down
 
     /* no friction for missiles or skulls ever, no friction when airborne */
-    if (mo->flags & (MF_MISSILE | MF_SKULLFLY) || mo->z > mo->floorz)
+    if (mo->flags & MF_MISSILE || mo->z > mo->floorz)
         return;
 
     /* killough 8/11/98: add bouncers
@@ -551,8 +546,8 @@ static void P_XYMovement(mobj_t __far* mo)
        * cph - DEMOSYNC - need old code for Boom demos?
        */
 
-        mo->momx = FixedMul3216(mo->momx, ORIG_FRICTION);
-        mo->momy = FixedMul3216(mo->momy, ORIG_FRICTION);
+        mo->momx = FixedMul32OrigFriction(mo->momx);
+        mo->momy = FixedMul32OrigFriction(mo->momy);
 
         /* killough 10/98: Always decrease player bobbing by ORIG_FRICTION.
        * This prevents problems with bobbing on ice, where it was not being
@@ -562,8 +557,8 @@ static void P_XYMovement(mobj_t __far* mo)
 
         if (player && player->mo == mo)     /* Not voodoo dolls */
         {
-            player->momx = FixedMul3216(player->momx, ORIG_FRICTION);
-            player->momy = FixedMul3216(player->momy, ORIG_FRICTION);
+            player->momx = FixedMul32OrigFriction(player->momx);
+            player->momy = FixedMul32OrigFriction(player->momy);
         }
     }
 }
@@ -593,47 +588,11 @@ static void P_ZMovement(mobj_t __far* mo)
 
   mo->z += mo->momz;
 
-  if ((mo->flags & MF_FLOAT) && mo->target)
-
-    // float down towards target if too close
-
-    if (!((mo->flags ^ MF_FLOAT) & (MF_FLOAT | MF_SKULLFLY | MF_INFLOAT)) &&
-  mo->target)     /* killough 11/98: simplify */
-      {
-  fixed_t delta;
-  if (P_AproxDistance(mo->x - mo->target->x, mo->y - mo->target->y) <
-      D_abs(delta = mo->target->z + (mo->height>>1) - mo->z)*3)
-    mo->z += delta < 0 ? -FLOATSPEED : FLOATSPEED;
-      }
-
   // clip movement
 
   if (mo->z <= mo->floorz)
     {
     // hit the floor
-
-    /* Note (id):
-     *  somebody left this after the setting momz to 0,
-     *  kinda useless there.
-     * cph - This was the a bug in the linuxdoom-1.10 source which
-     *  caused it not to sync Doom 2 v1.9 demos. Someone
-     *  added the above comment and moved up the following code. So
-     *  demos would desync in close lost soul fights.
-     * cph - revised 2001/04/15 -
-     * This was a bug in the Doom/Doom 2 source; the following code
-     *  is meant to make charging lost souls bounce off of floors, but it 
-     *  was incorrectly placed after momz was set to 0.
-     *  However, this bug was fixed in Doom95 and 
-     *  the v1.10 source release (which is one reason why it failed to sync 
-     *  some Doom2 v1.9 demos)
-     * I've added a comp_soul compatibility option to make this behavior 
-     *  selectable for PrBoom v2.3+. For older demos, we do this here only 
-     *  if we're in a compatibility level above Doom 2 v1.9 (in which case we
-     *  mimic the bug and do it further down instead)
-     */
-
-    if (mo->flags & MF_SKULLFLY)
-      mo->momz = -mo->momz; // the skull slammed into something
 
     if (mo->momz < 0)
       {
@@ -669,13 +628,6 @@ static void P_ZMovement(mobj_t __far* mo)
 
   if (mo->z + mo->height > mo->ceilingz)
     {
-    /* cph 2001/04/15 - 
-     * Lost souls were meant to bounce off of ceilings;
-     *  new comp_soul compatibility option added
-     */
-    if (mo->flags & MF_SKULLFLY)
-      mo->momz = -mo->momz; // the skull slammed into something
-
     // hit the ceiling
 
     if (mo->momz > 0)
@@ -770,12 +722,8 @@ static void P_NightmareRespawn(mobj_t __far* mobj)
 
 void P_MobjThinker (mobj_t __far* mobj)
 {
-    // killough 11/98:
-    // removed old code which looked at target references
-    // (we use pointer reference counting now)
-
     // momentum movement
-    if (mobj->momx | mobj->momy || mobj->flags & MF_SKULLFLY)
+    if (mobj->momx | mobj->momy)
     {
         P_XYMovement(mobj);
         if (mobj->thinker.function != P_MobjThinker) // cph - Must've been removed
@@ -991,7 +939,6 @@ void P_RemoveMobj(mobj_t __far* mobj)
  *
  * Finds a mobj type with a matching doomednum
  *
- * killough 8/24/98: rewrote to use hashing
  */
 
 static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
@@ -1003,7 +950,7 @@ static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
             return i;
     }
 
-    return NUMMOBJTYPES;
+    I_Error("P_FindDoomedNum: unknown thing %i", type);
 }
 
 
@@ -1014,38 +961,24 @@ static PUREFUNC int16_t P_FindDoomedNum(int16_t type)
 //  between levels.
 //
 
-static void P_SpawnPlayer (const mapthing_t* mthing)
-  {
+static void P_SpawnPlayer(int16_t playerx, int16_t playery, int8_t playerangle)
+{
   player_t* p;
-  fixed_t   x;
-  fixed_t   y;
-  fixed_t   z;
   mobj_t __far*   mobj;
-
-  // not playing?
-
-  if (!_g_playeringame)
-    return;
 
   p = &_g_player;
 
   if (p->playerstate == PST_REBORN)
     G_PlayerReborn ();
 
-  /* cph 2001/08/14 - use the options field of memorised player starts to
-   * indicate whether the start really exists in the level.
-   */
-  if (!mthing->options)
-    I_Error("P_SpawnPlayer: attempt to spawn player at unavailable start point");
-  
-  x    = ((int32_t)mthing->x) << FRACBITS;
-  y    = ((int32_t)mthing->y) << FRACBITS;
-  z    = ONFLOORZ;
+  fixed_t x = ((int32_t)playerx) << FRACBITS;
+  fixed_t y = ((int32_t)playery) << FRACBITS;
+  fixed_t z = ONFLOORZ;
   mobj = P_SpawnMobj (x,y,z, MT_PLAYER);
 
   // set color translations for player sprites
 
-  mobj->angle      = ANG45 * (mthing->angle/45);
+  mobj->angle      = ANG45 * playerangle;
   mobj->health     = p->health;
 
   p->mo            = mobj;
@@ -1063,14 +996,7 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
   // setup gun psprite
 
   P_SetupPsprites (p);
-
-
-  if (mthing->type-1 == 0)
-    {
-    ST_Start(); // wake up the status bar
-    HU_Start(); // wake up the heads up text
-    }
-  }
+}
 
 
 //
@@ -1087,9 +1013,6 @@ static void P_SpawnPlayer (const mapthing_t* mthing)
 #define MTF_HARD                4
 // Deaf monsters/do not react to sound.
 #define MTF_AMBUSH              8
-#define MTF_NOTSINGLE          16
-#define MTF_FRIEND            128
-#define MTF_RESERVED          256
 
 void P_SpawnMapThing(const mapthing_t __far* mthing)
 {
@@ -1097,70 +1020,26 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     mobj_t __far* mobj;
     fixed_t x;
     fixed_t y;
-    int16_t options = mthing->options; /* cph 2001/07/07 - make writable copy */
-
-    // killough 2/26/98: Ignore type-0 things as NOPs
-    // phares 5/14/98: Ignore Player 5-8 starts (for now)
-
-    switch(mthing->type)
-    {
-        case 0:
-        case DEN_PLAYER5:
-        case DEN_PLAYER6:
-        case DEN_PLAYER7:
-        case DEN_PLAYER8:
-            return;
-    }
-
-    // killough 11/98: clear flags unused by Doom
-    //
-    // We clear the flags unused in Doom if we see flag mask 256 set, since
-    // it is reserved to be 0 under the new scheme. A 1 in this reserved bit
-    // indicates it's a Doom wad made by a Doom editor which puts 1's in
-    // bits that weren't used in Doom (such as HellMaker wads). So we should
-    // then simply ignore all upper bits.
-
-    if (options & MTF_RESERVED)
-    {
-        printf("P_SpawnMapThing: correcting bad flags (%u) (thing type %d)\n", options, mthing->type);
-        options &= MTF_EASY|MTF_NORMAL|MTF_HARD|MTF_AMBUSH|MTF_NOTSINGLE;
-    }
 
     // check for players specially
 
     //Only care about start spot for player 1.
-    if(mthing->type == 1)
+    if (mthing->type == 1)
     {
-        playerstart = *mthing;
-        playerstart.options = 1;
-        P_SpawnPlayer (&playerstart);
+        P_SpawnPlayer(mthing->x, mthing->y, mthing->angle);
         return;
     }
 
     // check for apropriate skill level
-
-    /* jff "not single" thing flag */
-    if (options & MTF_NOTSINGLE)
-        return;
-
-    // killough 11/98: simplify
     if (_g_gameskill == sk_baby || _g_gameskill == sk_easy ?
-            !(options & MTF_EASY) :
+            !(mthing->options & MTF_EASY) :
             _g_gameskill == sk_hard || _g_gameskill == sk_nightmare ?
-            !(options & MTF_HARD) : !(options & MTF_NORMAL))
+            !(mthing->options & MTF_HARD) : !(mthing->options & MTF_NORMAL))
         return;
 
     // find which type to spawn
 
-    // killough 8/23/98: use table for faster lookup
     i = P_FindDoomedNum(mthing->type);
-
-    // phares 5/16/98:
-    // Do not abort because of an unknown thing. Ignore it, but post a
-    // warning message for the player.
-
-    if (i == NUMMOBJTYPES)
-        return;
 
     x = ((int32_t)mthing->x) << FRACBITS;
     y = ((int32_t)mthing->y) << FRACBITS;
@@ -1170,11 +1049,6 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     if (mobj->tics > 0)
         mobj->tics = 1 + (P_Random () % mobj->tics);
 
-    if (!(mobj->flags & MF_FRIEND) && options & MTF_FRIEND)
-    {
-        mobj->flags |= MF_FRIEND;
-    }
-
     /* killough 7/20/98: exclude friends */
     if (!((mobj->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
         _g_totalkills++;
@@ -1182,8 +1056,8 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     if (mobj->flags & MF_COUNTITEM)
         _g_totalitems++;
 
-    mobj->angle = ANG45 * (mthing->angle/45);
-    if (options & MTF_AMBUSH)
+    mobj->angle = ANG45 * mthing->angle;
+    if (mthing->options & MTF_AMBUSH)
         mobj->flags |= MF_AMBUSH;
 }
 
@@ -1295,8 +1169,8 @@ mobj_t __far* P_SpawnMissile(mobj_t __far* source, mobj_t __far* dest, mobjtype_
 
   th->angle = an;
   an >>= ANGLETOFINESHIFT;
-  th->momx = FixedMul (mobjinfo[th->type].speed, finecosine(an));
-  th->momy = FixedMul (mobjinfo[th->type].speed, finesine(  an));
+  th->momx = FixedMulAngle(mobjinfo[th->type].speed, finecosine(an));
+  th->momy = FixedMulAngle(mobjinfo[th->type].speed, finesine(  an));
 
   dist = P_AproxDistance (dest->x - source->x, dest->y - source->y);
   dist = dist / mobjinfo[th->type].speed;
@@ -1354,8 +1228,8 @@ void P_SpawnPlayerMissile(mobj_t __far* source)
 
 	th->target = source;
 	th->angle  = an;
-	th->momx   = FixedMul(mobjinfo[th->type].speed,finecosine(an >> ANGLETOFINESHIFT));
-	th->momy   = FixedMul(mobjinfo[th->type].speed,finesine(  an >> ANGLETOFINESHIFT));
+	th->momx   = FixedMulAngle(mobjinfo[th->type].speed,finecosine(an >> ANGLETOFINESHIFT));
+	th->momy   = FixedMulAngle(mobjinfo[th->type].speed,finesine(  an >> ANGLETOFINESHIFT));
 	th->momz   = FixedMul(mobjinfo[th->type].speed,slope);
 
 	P_CheckMissileSpawn(th);

@@ -4,7 +4,7 @@
 // $Id:$
 //
 // Copyright (C) 1993-1996 by id Software, Inc.
-// Copyright (C) 2023 by Frenkel Smeijers
+// Copyright (C) 2023-2024 by Frenkel Smeijers
 //
 // This source is available for distribution and/or modification
 // only under the terms of the DOOM Source Code License as
@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 
 #include <dos.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include "compiler.h"
 #include "z_zone.h"
@@ -63,8 +63,13 @@
 
 typedef struct
 {
+#if SIZE_OF_SEGMENT_T == 2
+    uint32_t  size;			// including the header and possibly tiny fragments
+    uint16_t  tag;			// purgelevel
+#else
     uint32_t  size:24;		// including the header and possibly tiny fragments
     uint32_t  tag:4;		// purgelevel
+#endif
     void __far*__far*    user;	// NULL if a free block
     segment_t next;
     segment_t prev;
@@ -90,10 +95,7 @@ static segment_t pointerToSegment(const memblock_t __far* ptr)
 		I_Error("pointerToSegment: pointer is not aligned: 0x%lx", ptr);
 #endif
 
-	uint32_t seg = D_FP_SEG(ptr);
-	uint16_t off = D_FP_OFF(ptr);
-	uint32_t linear = seg * PARAGRAPH_SIZE + off;
-	return linear / PARAGRAPH_SIZE;
+	return D_FP_SEG(ptr);
 }
 
 static memblock_t __far* segmentToPointer(segment_t seg)
@@ -116,6 +118,9 @@ static uint16_t emsHandle;
 
 static segment_t Z_InitExpandedMemory(void)
 {
+	if (M_CheckParm("-noems"))
+		return 0;
+
 #if defined _M_I86
 	segment_t __far* emsInterruptVectorSegment = D_MK_FP(0, EMS_INT * 4 + 2);
 	uint64_t __far* actualEmsDeviceName = D_MK_FP(*emsInterruptVectorSegment, 0x000a);
@@ -185,6 +190,122 @@ static segment_t Z_InitExpandedMemory(void)
 }
 
 
+#define	XMS_INT					0x2f
+
+#define	XMS_INSTALLATION_CHECK	0x4300
+#define	XMS_GET_DRIVER_ADDRESS	0x4310
+
+typedef struct
+{
+	uint32_t Length;		// 32-bit number of bytes to transfer
+	uint16_t SourceHandle;	// Handle of source block
+	uint32_t SourceOffset;	// 32-bit offset into source
+	uint16_t DestHandle;	// Handle of destination block
+	uint32_t DestOffset;	// 32-bit offset into destination block
+} ExtMemMoveStruct_t;
+
+
+void __far* XMSControl;
+
+
+static uint16_t xmsHandle;
+static ExtMemMoveStruct_t ExtMemMoveStruct;
+
+
+#if defined _M_I86
+#if !defined C_ONLY
+uint16_t Z_AllocateExtendedMemoryBlock(uint16_t size);
+void Z_FreeExtendedMemoryBlock(uint16_t handle);
+void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s);
+#else
+static void Z_FreeExtendedMemoryBlock(uint16_t handle)
+{
+	UNUSED(handle);
+}
+
+static void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
+{
+	UNUSED(s);
+}
+#endif
+#elif defined __DJGPP__ || defined _M_I386
+static uint8_t *fakeXMSHandle;
+
+static void Z_FreeExtendedMemoryBlock(uint16_t handle)
+{
+	UNUSED(handle);
+}
+
+static void Z_MoveExtendedMemoryBlock(const ExtMemMoveStruct_t __far* s)
+{
+	if (s->SourceHandle == 0)
+		memcpy(fakeXMSHandle + s->DestOffset, (uint8_t*)s->SourceOffset, s->Length);
+	else
+		memcpy((uint8_t*)s->DestOffset, fakeXMSHandle + s->SourceOffset, s->Length);
+}
+#endif
+
+
+boolean Z_InitXms(uint32_t size)
+{
+	if (M_CheckParm("-noxms"))
+		return false;
+
+#if defined _M_I86
+#if !defined C_ONLY
+	union REGS regs;
+	struct SREGS sregs;
+
+	// Is an XMS driver installed?
+	regs.w.ax = XMS_INSTALLATION_CHECK;
+	int86(XMS_INT, &regs, &regs);
+	if (regs.h.al != 0x80)
+		return false;
+
+	// Get the address of the driver's control function
+	regs.w.ax = XMS_GET_DRIVER_ADDRESS;
+	int86x(XMS_INT, &regs, &regs, &sregs);
+	XMSControl = D_MK_FP(sregs.es, regs.w.bx);
+
+	// Allocate Extended Memory Block
+	uint16_t xmsSize = (size + (1024 - 1)) / 1024;
+	xmsHandle = Z_AllocateExtendedMemoryBlock(xmsSize);
+
+	return xmsHandle != 0;
+#else
+	UNUSED(size);
+	return false;
+#endif
+#else
+	xmsHandle = 1;
+	fakeXMSHandle = malloc(size);
+	return fakeXMSHandle != NULL;
+#endif
+}
+
+
+void Z_MoveConventionalMemoryToExtendedMemory(uint32_t dest, const void __far* src, uint16_t length)
+{
+	ExtMemMoveStruct.Length       = (length + 1) & ~1;
+	ExtMemMoveStruct.SourceHandle = 0;
+	ExtMemMoveStruct.SourceOffset = (uint32_t)src;
+	ExtMemMoveStruct.DestHandle   = xmsHandle;
+	ExtMemMoveStruct.DestOffset   = dest;
+	Z_MoveExtendedMemoryBlock(&ExtMemMoveStruct);
+}
+
+
+void Z_MoveExtendedMemoryToConventionalMemory(void __far* dest, uint32_t src, uint16_t length)
+{
+	ExtMemMoveStruct.Length       = (length + 1) & ~1;
+	ExtMemMoveStruct.SourceHandle = xmsHandle;
+	ExtMemMoveStruct.SourceOffset = src;
+	ExtMemMoveStruct.DestHandle   = 0;
+	ExtMemMoveStruct.DestOffset   = (uint32_t)dest;
+	Z_MoveExtendedMemoryBlock(&ExtMemMoveStruct);
+}
+
+
 void Z_Shutdown(void)
 {
 	if (emsHandle)
@@ -193,6 +314,11 @@ void Z_Shutdown(void)
 		regs.h.ah = EMS_FREEPAGES;
 		regs.w.dx = emsHandle;
 		int86(EMS_INT, &regs, &regs);
+	}
+
+	if (xmsHandle)
+	{
+		Z_FreeExtendedMemoryBlock(xmsHandle);
 	}
 }
 
@@ -250,6 +376,11 @@ void Z_Init (void)
 		b = (uint32_t) &mainzone_sentinal_buffer[i++];
 	mainzone_sentinal = (memblock_t __far*)b;
 
+#if defined __WATCOMC__ && defined _M_I86
+	// normalize pointer
+	mainzone_sentinal = D_MK_FP(D_FP_SEG(mainzone_sentinal) + D_FP_OFF(mainzone_sentinal) / PARAGRAPH_SIZE, 0);
+#endif
+
 	// set the entire zone to one free block
 	memblock_t __far* block = (memblock_t __far*)mainzone;
 	mainzone_rover_segment = pointerToSegment(block);
@@ -304,25 +435,36 @@ void Z_Init (void)
 }
 
 
-void Z_ChangeTagToStatic(const void __far* ptr)
+static void Z_ChangeTag(const void __far* ptr, uint_fast8_t tag)
 {
-	memblock_t __far* block = segmentToPointer(pointerToSegment(ptr) - 1);
+#if defined RANGECHECK
+	if ((((uint32_t) ptr) & (PARAGRAPH_SIZE - 1)) != 0)
+		I_Error("Z_ChangeTag: pointer is not aligned: 0x%lx %s %i", ptr, f, l);
+#endif
+
+#if defined _M_I86
+	memblock_t __far* block = (memblock_t __far*)(((uint32_t)ptr) - 0x00010000);
+#else
+	memblock_t __far* block = (memblock_t __far*)(((uint32_t)ptr) - 0x00010);
+#endif
+
 #if defined ZONEIDCHECK
 	if (block->id != ZONEID)
-		I_Error("Z_ChangeTagToStatic: block has id %x instead of ZONEID", block->id);
+		I_Error("Z_ChangeTag: block has id %x instead of ZONEID", block->id);
 #endif
-	block->tag = PU_STATIC;
+	block->tag = tag;
+}
+
+
+void Z_ChangeTagToStatic(const void __far* ptr)
+{
+	Z_ChangeTag(ptr, PU_STATIC);
 }
 
 
 void Z_ChangeTagToCache(const void __far* ptr)
 {
-	memblock_t __far* block = segmentToPointer(pointerToSegment(ptr) - 1);
-#if defined ZONEIDCHECK
-	if (block->id != ZONEID)
-		I_Error("Z_ChangeTagToCache: block has id %x instead of ZONEID", block->id);
-#endif
-	block->tag = PU_CACHE;
+	Z_ChangeTag(ptr, PU_CACHE);
 }
 
 
@@ -386,7 +528,18 @@ static void Z_FreeBlock(memblock_t __far* block)
 //
 void Z_Free (const void __far* ptr)
 {
-	Z_FreeBlock(segmentToPointer(pointerToSegment(ptr) - 1));
+#if defined RANGECHECK
+	if ((((uint32_t) ptr) & (PARAGRAPH_SIZE - 1)) != 0)
+		I_Error("Z_Free: pointer is not aligned: 0x%lx", ptr);
+#endif
+
+#if defined _M_I86
+	memblock_t __far* block = (memblock_t __far*)(((uint32_t)ptr) - 0x00010000);
+#else
+	memblock_t __far* block = (memblock_t __far*)(((uint32_t)ptr) - 0x00010);
+#endif
+
+	Z_FreeBlock(block);
 }
 
 
@@ -520,7 +673,13 @@ static void __far* Z_TryMalloc(uint16_t size, int8_t tag, void __far*__far* user
     printf("Alloc: %ld (%ld)\n", base->size, running_count);
 #endif
 
-    return segmentToPointer(pointerToSegment(base) + 1);
+#if defined _M_I86
+    memblock_t __far* block = (memblock_t __far*)(((uint32_t)base) + 0x00010000);
+#else
+    memblock_t __far* block = (memblock_t __far*)(((uint32_t)base) + 0x00010);
+#endif
+
+    return block;
 }
 
 

@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -64,7 +64,6 @@ typedef enum
   SPR_BAL1,
   SPR_MISL,
   SPR_TFOG,
-  SPR_IFOG,
   SPR_PLAY,
   SPR_POSS,
   SPR_SPOS,
@@ -198,13 +197,6 @@ typedef enum
   S_TFOG8,
   S_TFOG9,
   S_TFOG10,
-  S_IFOG,
-  S_IFOG01,
-  S_IFOG02,
-  S_IFOG2,
-  S_IFOG3,
-  S_IFOG4,
-  S_IFOG5,
   S_PLAY,
   S_PLAY_RUN1,
   S_PLAY_RUN2,
@@ -426,8 +418,6 @@ typedef enum
   S_LAUN,
   S_SHOT,
   S_COLU,
-  S_DEADTORSO,
-  S_DEADBOTTOM,
   S_GIBS,
   S_CANDLESTIK,
   S_CANDELABRA,
@@ -477,7 +467,6 @@ typedef enum {
   MT_PUFF,
   MT_BLOOD,
   MT_TFOG,
-  MT_IFOG,
   MT_TELEPORTMAN,
   MT_MISC0,
   MT_MISC1,
@@ -510,10 +499,6 @@ typedef enum {
   MT_MISC49,
   MT_MISC50,
   MT_MISC62,
-  MT_MISC63,
-  MT_MISC64,
-  MT_MISC66,
-  MT_MISC67,
   MT_MISC68,
   MT_MISC69,
   MT_MISC71,

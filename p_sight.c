@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -59,16 +59,40 @@ static los_t los;
 // Returns side 0 (front), 1 (back), or 2 (on).
 //
 
-static int16_t P_DivlineSide(fixed_t x, fixed_t y, const divline_t *node)
+static int8_t P_DivlineSide(fixed_t x, fixed_t y, const divline_t *node)
 {
   fixed_t left, right;
   return
     !node->dx ? x == node->x ? 2 : x <= node->x ? node->dy > 0 : node->dy < 0 :
-    !node->dy ? (y) == node->y ? 2 : y <= node->y ? node->dx < 0 : node->dx > 0 :
+    !node->dy ? y == node->y ? 2 : y <= node->y ? node->dx < 0 : node->dx > 0 :
     (right = ((y - node->y) >> FRACBITS) * (node->dx >> FRACBITS)) <
     (left  = ((x - node->x) >> FRACBITS) * (node->dy >> FRACBITS)) ? 0 :
     right == left ? 2 : 1;
 }
+
+
+static uint16_t PUREFUNC P_InterceptVector2(const divline_t *v2, const divline_t *v1)
+{
+	fixed_t a = (v1->dy >> FRACBITS) * ((v1->x - v2->x) >> 8);
+	fixed_t b = (v1->dx >> FRACBITS) * ((v2->y - v1->y) >> 8);
+
+	fixed_t num = a + b;
+
+	if (num == 0)
+		return 0;
+
+	fixed_t c = FixedMul(v2->dx, v1->dy >> 8);
+	fixed_t d = FixedMul(v2->dy, v1->dx >> 8);
+
+	fixed_t den = c - d;
+
+	if (den == 0 || (den >> 12) == 0)
+		return 0;
+
+	fixed_t r = (num << 4) / (den >> 12);
+	return (uint32_t)r <= 0xffffu ? r : 0xffffu;
+}
+
 
 //
 // P_CrossSubsector
@@ -88,19 +112,19 @@ static boolean P_CrossSubsector(int16_t num)
     { // check lines
         int16_t linenum = seg->linenum;
 
-        const line_t __far* line = &_g_lines[linenum];
+        line_t __far* line = &_g_lines[linenum];
         divline_t divl;
 
         // allready checked other side?
-        if(_g_linedata[linenum].validcount == validcount)
+        if(line->validcount == validcount)
             continue;
 
-        _g_linedata[linenum].validcount = validcount;
+        line->validcount = validcount;
 
-        if (line->bbox[BOXLEFT]  > los.bbox[BOXRIGHT ] ||
-           line->bbox[BOXRIGHT]  < los.bbox[BOXLEFT  ] ||
-           line->bbox[BOXBOTTOM] > los.bbox[BOXTOP   ] ||
-           line->bbox[BOXTOP]    < los.bbox[BOXBOTTOM])
+        if ((fixed_t)line->bbox[BOXLEFT  ]<<FRACBITS > los.bbox[BOXRIGHT ] ||
+            (fixed_t)line->bbox[BOXRIGHT ]<<FRACBITS < los.bbox[BOXLEFT  ] ||
+            (fixed_t)line->bbox[BOXBOTTOM]<<FRACBITS > los.bbox[BOXTOP   ] ||
+            (fixed_t)line->bbox[BOXTOP   ]<<FRACBITS < los.bbox[BOXBOTTOM])
             continue;
 
         // cph - do what we can before forced to check intersection
@@ -108,7 +132,9 @@ static boolean P_CrossSubsector(int16_t num)
         {
 
             // no wall to block sight with?
-            if ((front = SG_FRONTSECTOR(seg))->floorheight == (back = SG_BACKSECTOR(seg))->floorheight && front->ceilingheight == back->ceilingheight)
+            front = &_g_sectors[seg->frontsectornum];
+            back  = &_g_sectors[seg->backsectornum];
+            if (front->floorheight == back->floorheight && front->ceilingheight == back->ceilingheight)
                 continue;
 
             // possible occluder
@@ -126,17 +152,18 @@ static boolean P_CrossSubsector(int16_t num)
         }
 
         // Forget this line if it doesn't cross the line of sight
-        const vertex_t __far* v1;
-        const vertex_t __far* v2;
+        fixed_t v1x = (fixed_t)line->v1.x<<FRACBITS;
+        fixed_t v1y = (fixed_t)line->v1.y<<FRACBITS;
+        fixed_t v2x = (fixed_t)line->v2.x<<FRACBITS;
+        fixed_t v2y = (fixed_t)line->v2.y<<FRACBITS;
 
-        v1 = &line->v1;
-        v2 = &line->v2;
-
-        if (P_DivlineSide(v1->x, v1->y, &los.strace) == P_DivlineSide(v2->x, v2->y, &los.strace))
+        if (P_DivlineSide(v1x, v1y, &los.strace) == P_DivlineSide(v2x, v2y, &los.strace))
             continue;
 
-        divl.dx = v2->x - (divl.x = v1->x);
-        divl.dy = v2->y - (divl.y = v1->y);
+        divl.x = v1x;
+        divl.y = v1y;
+        divl.dx = v2x - v1x;
+        divl.dy = v2y - v1y;
 
         // line isn't crossed?
         if (P_DivlineSide(los.strace.x, los.strace.y, &divl) == P_DivlineSide(los.t2x, los.t2y, &divl))
@@ -150,20 +177,18 @@ static boolean P_CrossSubsector(int16_t num)
             return false;
 
         // crosses a two sided line
-        /* cph 2006/07/15 - oops, we missed this in 2.4.0 & .1;
-       *  use P_InterceptVector2 for those compat levels only. */
-        fixed_t frac = P_InterceptVector2(&los.strace, &divl);
+        uint16_t frac = P_InterceptVector2(&los.strace, &divl);
 
         if (front->floorheight != back->floorheight)
         {
-            fixed_t slope = frac != 0 ? FixedApproxDiv(openbottom - los.sightzstart, frac) : INT32_MAX;
+            fixed_t slope = frac != 0 ? ((openbottom - los.sightzstart) >> FRACBITS) * FixedReciprocalSmall(frac) : INT32_MAX;
             if (slope > los.bottomslope)
                 los.bottomslope = slope;
         }
 
         if (front->ceilingheight != back->ceilingheight)
         {
-            fixed_t slope = frac != 0 ? FixedApproxDiv(opentop - los.sightzstart, frac) : INT32_MAX;
+            fixed_t slope = frac != 0 ? ((opentop - los.sightzstart) >> FRACBITS) * FixedReciprocalSmall(frac) : INT32_MAX;
             if (slope < los.topslope)
                 los.topslope = slope;
         }
@@ -189,7 +214,7 @@ static boolean P_CrossBSPNode(int16_t bspnum)
         dl.dx = ((fixed_t)bsp->dx << FRACBITS);
         dl.dy = ((fixed_t)bsp->dy << FRACBITS);
 
-        int16_t side,side2;
+        int8_t side,side2;
         side = P_DivlineSide(los.strace.x,los.strace.y,&dl)&1;
         side2= P_DivlineSide(los.t2x, los.t2y, &dl);
 

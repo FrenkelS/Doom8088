@@ -14,6 +14,7 @@ static void cheat_noclip(void);
 static void cheat_invincibility(void);
 static void cheat_berserk(void);
 static void cheat_invisibility(void);
+static void cheat_rad(void);
 static void cheat_map(void);
 static void cheat_goggles(void);
 static void cheat_exit(void);
@@ -39,6 +40,7 @@ static cheatseq_t cheat_def[] =
 	{cheat_invincibility, "idbeholdv",  NULL},
 	{cheat_berserk,       "idbeholds",  NULL},
 	{cheat_invisibility,  "idbeholdi",  NULL},
+	{cheat_rad,           "idbeholdr",  NULL},
 	{cheat_map,           "idbeholda",  NULL},
 	{cheat_goggles,       "idbeholdl",  NULL},
 	{cheat_exit,          "idclev",     NULL},
@@ -203,6 +205,11 @@ static void cheat_berserk()
 static void cheat_invisibility()
 {
     P_GivePower(&_g_player, pw_invisibility);
+}
+
+static void cheat_rad()
+{
+    P_GivePower(&_g_player, pw_ironfeet);
 }
 
 static void cheat_map()

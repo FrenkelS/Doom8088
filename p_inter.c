@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -74,8 +74,8 @@ static const int16_t soul_health       = 100;
 
 // a weapon is found with two clip loads,
 // a big item has five clip loads
-       const int16_t maxammo[NUMAMMO] = {200, 50, 300, 50};
-static const int8_t clipammo[NUMAMMO] = { 10,  4,  20,  1};
+       const int16_t maxammo[NUMAMMO] = {200, 50, 50, 300};
+static const int8_t clipammo[NUMAMMO] = { 10,  4,  1,  20};
 
 //
 // GET STUFF
@@ -514,7 +514,7 @@ static void P_KillMobj(mobj_t __far* source, mobj_t __far* target)
   mobjtype_t item;
   mobj_t     __far* mo;
 
-  target->flags &= ~(MF_SHOOTABLE|MF_FLOAT|MF_SKULLFLY);
+  target->flags &= ~MF_SHOOTABLE;
   target->flags &= ~MF_NOGRAVITY;
   target->flags |= MF_CORPSE|MF_DROPOFF;
   target->height >>= 2;
@@ -611,9 +611,6 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
   if (target->health <= 0)
     return;
 
-  if (target->flags & MF_SKULLFLY)
-    target->momx = target->momy = target->momz = 0;
-
   player = P_MobjIsPlayer(target);
   if (player && _g_gameskill == sk_baby)
     damage >>= 1;   // take half damage in trainer mode
@@ -641,8 +638,8 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
         }
 
       ang >>= ANGLETOFINESHIFT;
-      target->momx += FixedMul (thrust, finecosine(ang));
-      target->momy += FixedMul (thrust, finesine(  ang));
+      target->momx += FixedMulAngle(thrust, finecosine(ang));
+      target->momy += FixedMulAngle(thrust, finesine(  ang));
     }
 
   // player specific
@@ -698,9 +695,8 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
       if (player)
         target->target = source;
 
-  if (P_Random () < mobjinfo[target->type].painchance &&
-      !(target->flags & MF_SKULLFLY))
-  { //killough 11/98: see below
+  if (P_Random () < mobjinfo[target->type].painchance)
+  {
       justhit = true;
 
     P_SetMobjState(target, mobjinfo[target->type].painstate);
