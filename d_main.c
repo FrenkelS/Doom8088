@@ -93,6 +93,9 @@ boolean _g_fps_show;
 int16_t _g_fps_framerate;
 
 
+static int16_t titlepicnum;
+
+
 /*
  * D_PostEvent - Event handling
  *
@@ -341,8 +344,7 @@ void D_PageTicker(void)
 
 static void D_PageDrawer(void)
 {
-	int16_t num = W_GetNumForName("TITLEPIC");
-	V_DrawRawFullScreen(num);
+	V_DrawRawFullScreen(titlepicnum);
 }
 
 //
@@ -434,9 +436,9 @@ int16_t M_CheckParm(char *check)
 }
 
 
-static void D_InitNetGame (void)
+static void D_Init(void)
 {
-    _g_playeringame = true;
+	titlepicnum = W_GetNumForName("TITLEPIC");
 }
 
 
@@ -455,11 +457,12 @@ static void D_DoomMainSetup(void)
 
     G_ReloadDefaults();    // killough 3/4/98: set defaults just loaded.
 
-    // CPhipps - move up netgame init
-    D_InitNetGame();
-
     printf("W_Init: Init WADfiles.\n");
     W_Init(); // CPhipps - handling of wadfiles init changed
+
+    D_Init();
+    F_Init();
+    WI_Init();
 
     printf("M_Init: Init miscellaneous info.\n");
     M_Init();
