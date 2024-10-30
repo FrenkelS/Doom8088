@@ -8,7 +8,7 @@ export RENDER_OPTIONS="-DFLAT_SPAN -DFLAT_NUKAGE1_COLOR=32 -DWAD_FILE=\"DOOM136.
 #export CPU=i8088
 export CPU=i286
 
-nasm i_vtexta.asm -f elf -DPLANEWIDTH=80
+nasm i_vtexta.asm -f elf -DPLANEWIDTH=80 -DVIEWWINDOWHEIGHT=25
 nasm m_fixed.asm  -f elf
 nasm z_xms.asm    -f elf
 

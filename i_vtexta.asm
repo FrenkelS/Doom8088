@@ -15,6 +15,16 @@
 ; along with this program. If not, see <https://www.gnu.org/licenses/>.
 ;
 
+%ifidn VIEWWINDOWHEIGHT, 25
+; OK
+%elifidn VIEWWINDOWHEIGHT, 43
+; OK
+%elifidn VIEWWINDOWHEIGHT, 50
+; OK
+%else
+%error unsupported viewwindowheight VIEWWINDOWHEIGHT
+%endif
+
 bits 16
 
 extern source
@@ -47,13 +57,45 @@ last_pixel_jump_table:
 	dw last_pixel22,
 	dw last_pixel23,
 	dw last_pixel24,
-	dw last_pixel25
+	dw last_pixel25,
+
+%ifidn VIEWWINDOWHEIGHT, 25
+%else
+	dw last_pixel26,
+	dw last_pixel27,
+	dw last_pixel28,
+	dw last_pixel29,
+	dw last_pixel30,
+	dw last_pixel31,
+	dw last_pixel32,
+	dw last_pixel33,
+	dw last_pixel34,
+	dw last_pixel35,
+	dw last_pixel36,
+	dw last_pixel37,
+	dw last_pixel38,
+	dw last_pixel39,
+	dw last_pixel40,
+	dw last_pixel41,
+	dw last_pixel42,
+	dw last_pixel43,
+
+%ifidn VIEWWINDOWHEIGHT, 50
+	dw last_pixel44,
+	dw last_pixel45,
+	dw last_pixel46,
+	dw last_pixel47,
+	dw last_pixel48,
+	dw last_pixel49,
+	dw last_pixel50,
+%endif
+%endif
 
 ;
 ; input:
 ;   ax = fracstep
 ;   dx = frac
-;   cx = count		1 <= count <= 25	=>	ch = 0
+;   cx = count		1 <= count <= 43	=>	ch = 0
 ;
 
 global R_DrawColumn2
@@ -74,6 +116,483 @@ R_DrawColumn2:
 
 	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
+
+
+%ifidn VIEWWINDOWHEIGHT, 50
+last_pixel50:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel49:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel48:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel47:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel46:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel45:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel44:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel43:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel42:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel41:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel40:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel39:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel38:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel37:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel36:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel35:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel34:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel33:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel32:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel31:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel30:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel29:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel28:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel27:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel26:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+%elifidn VIEWWINDOWHEIGHT, 43
+last_pixel43:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel42:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel41:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel40:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel39:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel38:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel37:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel36:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel35:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel34:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel33:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel32:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel31:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel30:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel29:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel28:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel27:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+
+last_pixel26:
+	mov al, dh
+	shr al, 1
+	mov bx, si
+	xlat
+	mov bx, cx
+	ss xlat
+	stosb
+	add di, PLANEWIDTH-1
+	add dx, bp
+%endif
 
 last_pixel25:
 	mov al, dh
