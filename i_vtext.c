@@ -211,13 +211,10 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	I_SetScreenMode(SCREEN_MODE);
 
 #if VIEWWINDOWHEIGHT == 43 || VIEWWINDOWHEIGHT == 50
-	if (videocard == VGA)
-	{
-		union REGS regs;
-		regs.w.ax = 0x1112;
-		regs.h.bl = 0;
-		int86(0x10, &regs, &regs);
-	}
+	union REGS regs;
+	regs.w.ax = 0x1112;
+	regs.h.bl = 0;
+	int86(0x10, &regs, &regs);
 #endif
 
 	I_DisableBlinking();
