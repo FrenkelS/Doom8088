@@ -89,7 +89,8 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
 
-2) To build Doom8088, run one of the following build scripts:
+2) Run one of the build scripts:
+
 |Build script |Version                  |
 |-------------|-------------------------|
 |`bmodey.sh`  |Mode Y                   |
