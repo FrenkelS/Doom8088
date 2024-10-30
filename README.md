@@ -20,6 +20,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - Only demo3 is supported
  - 256 and 16 color modes
  - PC speaker sound effects
+ - Mouse support
  - No music
  - No texture mapped floors and ceilings
  - No light diminishing
@@ -27,7 +28,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - No multiplayer
  - No PWADs
  - No screen resizing
- - No mouse and joystick support
+ - No joystick support
 
 **Known bugs:**
  - When there's not enough memory for a texture, one color is drawn
@@ -46,20 +47,20 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ![Doom8088 in 16 colors](readme_imgs/doomt40.png?raw=true)
 
 ## Controls:
-|Action                 |             |
-|-----------------------|-------------|
-|Fire                   |Ctrl         |
-|Use                    |Enter & Space|
-|Sprint                 |Shift        |
-|Walk                   |Arrow keys   |
-|Strafe                 |Alt          |
-|Strafe left and right  |< & >        |
-|Automap                |Tab          |
-|Automap zoom in and out|+ & -        |
-|Automap follow mode    |F            |
-|Weapon up and down     |[ & ]        |
-|Menu                   |Esc          |
-|Quit to DOS            |F10          |
+|Action                 |                       |
+|-----------------------|-----------------------|
+|Fire                   |Ctrl & any mouse button|
+|Use                    |Enter & Space & E      |
+|Sprint                 |Shift                  |
+|Walk                   |Arrow keys, W & S      |
+|Strafe                 |Alt                    |
+|Strafe left and right  |< & >, A & D           |
+|Automap                |Tab                    |
+|Automap zoom in and out|+ & -                  |
+|Automap follow mode    |F                      |
+|Weapon up and down     |[ & ]                  |
+|Menu                   |Esc                    |
+|Quit to DOS            |F10                    |
 
 ## Cheats:
 |Code      |Effects                  |

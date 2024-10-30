@@ -99,6 +99,11 @@ static int32_t             totalleveltimes;      // CPhipps - total time for all
 
 static boolean gamekeydown[NUMKEYS];
 
+static const int16_t mouseSensitivity = 35;
+static boolean mousebutton;
+static int16_t mousex;
+static int16_t mousexframe;
+
 static skill_t d_skill;
 
 static byte  savegameslot;         // Slot to load if gameaction == ga_loadgame
@@ -258,6 +263,10 @@ void G_BuildTiccmd(void)
             netcmd.angleturn += angleturn[tspeed];
     }
 
+    netcmd.angleturn -= mousex;
+    if (mousexframe-- == 0)
+        mousex = 0;
+
     if (gamekeydown[key_up])
         forward += forwardmove[speed];
     if (gamekeydown[key_down])
@@ -269,8 +278,11 @@ void G_BuildTiccmd(void)
     if (gamekeydown[key_strafeleft])
         side -= sidemove[speed];
 
-    if (gamekeydown[key_fire])
+    if (gamekeydown[key_fire] || mousebutton)
+    {
         netcmd.buttons |= BT_ATTACK;
+        mousebutton = false;
+    }
 
     if (gamekeydown[key_use])
     {
@@ -383,12 +395,43 @@ void G_Responder (event_t* ev)
         case ev_keydown:
             if (ev->data1 < NUMKEYS)
                 gamekeydown[ev->data1] = true;
+            else if(ev->data1 == 'w')
+                gamekeydown[key_up] = true;
+            else if(ev->data1 == 's')
+                gamekeydown[key_down] = true;
+            else if(ev->data1 == 'a')
+                gamekeydown[key_strafeleft] = true;
+            else if(ev->data1 == 'd')
+                gamekeydown[key_straferight] = true;
+            else if(ev->data1 == 'e')
+                gamekeydown[key_use] = true;
+
             return;    // eat key down events
 
         case ev_keyup:
             if (ev->data1 < NUMKEYS)
                 gamekeydown[ev->data1] = false;
+            else if(ev->data1 == 'w')
+                gamekeydown[key_up] = false;
+            else if(ev->data1 == 's')
+                gamekeydown[key_down] = false;
+            else if(ev->data1 == 'a')
+                gamekeydown[key_strafeleft] = false;
+            else if(ev->data1 == 'd')
+                gamekeydown[key_straferight] = false;
+            else if(ev->data1 == 'e')
+                gamekeydown[key_use] = false;
+
             return;   // always let key up events filter down
+
+        case ev_mouse_click:
+            mousebutton = true;
+            return;
+
+        case ev_mouse_move:
+            mousex = (ev->data1 * (mouseSensitivity + 5) / 10) * 8;
+            mousexframe = 3;
+            return;
 
         default:
             break;
