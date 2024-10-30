@@ -89,14 +89,21 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
 
-2) Run `compiamy.sh` to compile the Mode Y version, `compia13.sh` for the Mode 13h version, `compiat1.sh` for text mode 40x25 and `compiat3.sh` for text mode 80x25.
+2) To build Doom8088, run one of the following build scripts:
+|Build script |Version                  |
+|-------------|-------------------------|
+|`bmodey.sh`  |Mode Y                   |
+|`bmode13h.sh`|Mode 13h                 |
+|`bt80x25.sh` |Text mode 80x25 16 colors|
+|`bt40x25.sh` |Text mode 40x25 16 colors|
+
+It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2).
+First run `setenvdj.bat` once and then `bdj32.bat` for DJGPP, and `setenvwc.bat` followed by `bwc32.bat` for Watcom.
+For debugging purposes, the Zone memory can be increased significantly this way.
+
+It's also possible to build a 16-bit version with Watcom: Run `setenvwc.bat` followed by `bwc16.bat`.
+
 
 3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
 
 4) Doom8088 needs an IWAD file that has been preprocessed by [jWadUtil](https://github.com/FrenkelS/jWadUtil).
-
-It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2).
-First run `setenvdj.bat` once and then `compdj.bat` for DJGPP, and `setenvwc.bat` followed by `compwc32.bat` for Watcom.
-For debugging purposes, the Zone memory can be increased significantly this way.
-
-It's also possible to build a 16-bit version with Watcom: Run `setenvwc.bat` followed by `compwc16.bat`.
