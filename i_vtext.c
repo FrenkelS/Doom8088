@@ -168,32 +168,36 @@ static const int8_t colors[14] =
 
 static void I_UploadNewPalette(int8_t pal)
 {
+#if VIEWWINDOWHEIGHT == 25
 	if (videocard == CGA)
-		outp(0x3d9, colors[pal]);
-	else
 	{
-		union REGS regs;
-		regs.w.ax = 0x1000;
-		regs.h.bl = 0x00;
-		regs.h.bh = colors[pal];
-		int86(0x10, &regs, &regs);
+		outp(0x3d9, colors[pal]);
+		return;
 	}
+#endif
+
+	union REGS regs;
+	regs.w.ax = 0x1000;
+	regs.h.bl = 0x00;
+	regs.h.bh = colors[pal];
+	int86(0x10, &regs, &regs);
 }
 
 
 static void I_DisableBlinking(void)
 {
+#if VIEWWINDOWHEIGHT == 25
 	if (videocard == CGA)
 	{
 		outp(0x3d8, 8 | CGA_HIGH_RESOLUTION);
+		return;
 	}
-	else
-	{
-		union REGS regs;
-		regs.w.ax = 0x1003;
-		regs.w.bx = 0x0000;
-		int86(0x10, &regs, &regs);
-	}
+#endif
+
+	union REGS regs;
+	regs.w.ax = 0x1003;
+	regs.w.bx = 0x0000;
+	int86(0x10, &regs, &regs);
 }
 
 
