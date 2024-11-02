@@ -115,6 +115,16 @@ static videocardsenum_t videocard;
 
 static videocardsenum_t I_DetectVideoCard(void)
 {
+#if VIEWWINDOWHEIGHT == 50
+	return VGA;
+#elif VIEWWINDOWHEIGHT == 43
+	union REGS regs;
+	regs.w.ax = 0x1200;
+	regs.h.bl = 0x32;
+	int86(0x10, &regs, &regs);
+
+	return regs.h.al == 0x12 ? VGA : EGA;
+#else
 	// This code is based on Jason M. Knight's Paku Paku code
 
 	union REGS regs;
@@ -154,6 +164,7 @@ static videocardsenum_t I_DetectVideoCard(void)
 	}
 
 	return CGA;
+#endif
 }
 
 
