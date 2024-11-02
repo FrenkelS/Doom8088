@@ -74,6 +74,9 @@
 #define PAGE3		(PAGE2+PAGE_SIZE)
 
 
+#define DITHER_CHARACTER 0xb1
+
+
 extern const int16_t CENTERY;
 
 static uint8_t __far* _s_screen;
@@ -224,19 +227,19 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	uint16_t __far* dst;
 	dst = D_MK_FP(PAGE0, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dst++ = 0x00b1;
+		*dst++ = 0x0000 | DITHER_CHARACTER;
 
 	dst = D_MK_FP(PAGE1, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dst++ = 0x00b1;
+		*dst++ = 0x0000 | DITHER_CHARACTER;
 
 	dst = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dst++ = 0x00b1;
+		*dst++ = 0x0000 | DITHER_CHARACTER;
 
 	dst = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dst++ = 0x00b1;
+		*dst++ = 0x0000 | DITHER_CHARACTER;
 
 	outp(0x3d4, 0xc);
 }
@@ -582,7 +585,7 @@ void V_ClearString(int16_t y, size_t len)
 	uint8_t __far* dst = _s_screen + y * PLANEWIDTH - 1;
 	for (int16_t x = 0; x < len; x++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 }
@@ -594,7 +597,7 @@ void I_InitScreenPage(void)
 	// Skip the first row and the last 5 rows
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * (VIEWWINDOWHEIGHT - 1 - 5); i++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 }
@@ -606,21 +609,21 @@ void I_InitScreenPages(void)
 	dst = D_MK_FP(PAGE0, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 
 	dst = D_MK_FP(PAGE1, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 
 	dst = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 }
