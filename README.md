@@ -42,9 +42,6 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ### Text mode 80x43 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomt80x43.png?raw=true)
 
-### Text mode 40x43 16 color mode
-![Doom8088 in 16 colors](readme_imgs/doomt40x43.png?raw=true)
-
 ### Text mode 80x25 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomt80x25.png?raw=true)
 
@@ -102,7 +99,6 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |`bmodey.sh`  |Mode Y                   |
 |`bmode13h.sh`|Mode 13h                 |
 |`bt80x43.sh` |Text mode 80x43 16 colors|
-|`bt40x43.sh` |Text mode 40x43 16 colors|
 |`bt80x25.sh` |Text mode 80x25 16 colors|
 |`bt40x25.sh` |Text mode 40x25 16 colors|
 
