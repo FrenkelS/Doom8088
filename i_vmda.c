@@ -263,14 +263,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void V_FillRect(byte colour)
 {
-	uint8_t __far* dest = _s_screen;
-	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
-	{
-		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
-		{
-			*dest++ = colour;
-		}
-	}
+	_fmemset(_s_screen, colour, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
 }
 
 
