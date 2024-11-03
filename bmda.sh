@@ -8,6 +8,7 @@ export RENDER_OPTIONS="-DFLAT_SPAN -DFLAT_NUKAGE1_COLOR=205 -DWAD_FILE=\"DOOM2T.
 #export CPU=i8088
 export CPU=i286
 
+nasm i_vtexta.asm -f elf -DPLANEWIDTH=80 -DVIEWWINDOWHEIGHT=25
 nasm m_fixed.asm  -f elf
 nasm z_xms.asm    -f elf
 
@@ -39,6 +40,7 @@ export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
 #export GLOBOBJS+=" i_vmda.c"
 export GLOBOBJS+=" i_vmda.o"
+export GLOBOBJS+=" i_vtexta.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_fixed.o"
@@ -89,6 +91,7 @@ export GLOBOBJS+=" z_zone.o"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
+rm i_vtexta.o
 rm m_fixed.o
 rm z_xms.o
 

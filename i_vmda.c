@@ -118,6 +118,7 @@ const uint8_t __far* source;
 uint8_t __far* dest;
 
 
+#if defined C_ONLY
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	switch (count)
@@ -149,6 +150,9 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
 	}
 }
+#else
+void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
+#endif
 
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
