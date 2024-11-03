@@ -43,7 +43,7 @@ extern const int16_t CENTERY;
 
 // The screen is [SCREENWIDTH * SCREENHEIGHT];
 static uint8_t __far* _s_screen;
-static uint8_t __far* vgascreen;
+static uint8_t __far* videomemory;
 
 
 void I_ReloadPalette(void)
@@ -57,7 +57,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	I_SetScreenMode(7);
 
 	__djgpp_nearptr_enable();
-	vgascreen = D_MK_FP(0xb000, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) + __djgpp_conventional_base);
+	videomemory = D_MK_FP(0xb000, 0 + __djgpp_conventional_base);
 
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
@@ -69,26 +69,23 @@ static boolean drawStatusBar = true;
 
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
-	uint8_t __far* src = buffer;
-	uint8_t __far* dst = vgascreen;
+	static const int16_t DXI = SCREENWIDTH / 80;
+	static const fixed_t DYI = ((fixed_t)(SCREENHEIGHT - ST_HEIGHT) << FRACBITS) / 25;
 
-	for (uint_fast8_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
-	{
-		_fmemcpy(dst, src, SCREENWIDTH);
-		dst += SCREENWIDTH_VGA;
-		src += SCREENWIDTH;
-	}
+	uint8_t __far* dst = videomemory;
 
-	if (drawStatusBar)
+	fixed_t y = 0;
+	for (int16_t h = 0; h < 25; h++)
 	{
-		for (uint_fast8_t y = 0; y < ST_HEIGHT; y++)
+		int16_t x = 0;
+		for (int16_t w = 0; w < 80; w++)
 		{
-			_fmemcpy(dst, src, SCREENWIDTH);
-			dst += SCREENWIDTH_VGA;
-			src += SCREENWIDTH;
+			*dst = buffer[(y >> FRACBITS) * SCREENWIDTH + x];
+			x += 3;
+			dst += 2;
 		}
+		y += DYI;
 	}
-	drawStatusBar = true;
 }
 
 
@@ -517,10 +514,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 void ST_Drawer(void)
 {
-	if (ST_NeedUpdate())
-		ST_doRefresh();
-	else
-		drawStatusBar = false;
+	// Do nothing
 }
 
 
