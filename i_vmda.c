@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for MDA 80x25 monochrome
+ *      Video code for MDA 80x25 monochrome text mode
  *
  *-----------------------------------------------------------------------------*/
  
@@ -333,22 +333,11 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 	if (lump != NULL)
 	{
-		static const int16_t DXI = SCREENWIDTH / VIEWWINDOWWIDTH;
-		static const fixed_t DYI = ((fixed_t)SCREENHEIGHT << FRACBITS) / VIEWWINDOWHEIGHT;
-		fixed_t y = 0;
-		uint8_t __far* dst = _s_screen;
-		for (int16_t h = 0; h < VIEWWINDOWHEIGHT; h++)
-		{
-			int16_t x = 0;
-			for (int16_t w = 0; w < VIEWWINDOWWIDTH; w++)
-			{
-				*dst++ = lump[(y >> FRACBITS) * SCREENWIDTH + x];
-				x += DXI;
-			}
-			y += DYI;
-		}
+		_fmemcpy(_s_screen, lump, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
 		Z_ChangeTagToCache(lump);
 	}
+	else
+		W_ReadLumpByNum(num, _s_screen);
 }
 
 
