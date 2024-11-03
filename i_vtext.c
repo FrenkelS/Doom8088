@@ -19,7 +19,10 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for Text modes 80x25 and 40x25 16 color
+ *      Video code for 16 color Text modes
+ *      80x25, 40x25
+ *      80x43, 40x43
+ *      80x50, 40x50
  *
  *-----------------------------------------------------------------------------*/
  
@@ -42,20 +45,37 @@
 
 #if VIEWWINDOWWIDTH == 40
 #define SCREEN_MODE	1
-#define PAGE_SIZE	0x0080
+#define CGA_HIGH_RESOLUTION 0
 #elif VIEWWINDOWWIDTH == 80
 #define SCREEN_MODE 3
-#define PAGE_SIZE	0x0100
+#define CGA_HIGH_RESOLUTION 1
 #else
 #error unsupported VIEWWINDOWWIDTH value
 #endif
+
+#if VIEWWINDOWHEIGHT == 25
+#define VGA_SCANLINES 0
+#elif VIEWWINDOWHEIGHT == 43
+#define VGA_SCANLINES 1
+#elif VIEWWINDOWHEIGHT == 50
+#define VGA_SCANLINES 2
+#else
+#error unsupported VIEWWINDOWHEIGHT value
+#endif
+
+
+#define PLANEWIDTH (VIEWWINDOWWIDTH*2)
+
+#define PAGE_SIZE (((PLANEWIDTH * VIEWWINDOWHEIGHT + 511) & ~511) >> 4)
 
 #define PAGE0		0xb800
 #define PAGE1		(PAGE0+PAGE_SIZE)
 #define PAGE2		(PAGE1+PAGE_SIZE)
 #define PAGE3		(PAGE2+PAGE_SIZE)
 
-#define PLANEWIDTH (VIEWWINDOWWIDTH*2)
+
+#define DITHER_CHARACTER 0xb1
+
 
 extern const int16_t CENTERY;
 
@@ -95,6 +115,16 @@ static videocardsenum_t videocard;
 
 static videocardsenum_t I_DetectVideoCard(void)
 {
+#if VIEWWINDOWHEIGHT == 50
+	return VGA;
+#elif VIEWWINDOWHEIGHT == 43
+	union REGS regs;
+	regs.w.ax = 0x1200;
+	regs.h.bl = 0x32;
+	int86(0x10, &regs, &regs);
+
+	return regs.h.al == 0x12 ? VGA : EGA;
+#else
 	// This code is based on Jason M. Knight's Paku Paku code
 
 	union REGS regs;
@@ -134,6 +164,7 @@ static videocardsenum_t I_DetectVideoCard(void)
 	}
 
 	return CGA;
+#endif
 }
 
 
@@ -148,38 +179,36 @@ static const int8_t colors[14] =
 
 static void I_UploadNewPalette(int8_t pal)
 {
+#if VIEWWINDOWHEIGHT == 25
 	if (videocard == CGA)
-		outp(0x3d9, colors[pal]);
-	else
 	{
-		union REGS regs;
-		regs.w.ax = 0x1000;
-		regs.h.bl = 0x00;
-		regs.h.bh = colors[pal];
-		int86(0x10, &regs, &regs);
+		outp(0x3d9, colors[pal]);
+		return;
 	}
+#endif
+
+	union REGS regs;
+	regs.w.ax = 0x1000;
+	regs.h.bl = 0x00;
+	regs.h.bh = colors[pal];
+	int86(0x10, &regs, &regs);
 }
 
 
 static void I_DisableBlinking(void)
 {
+#if VIEWWINDOWHEIGHT == 25
 	if (videocard == CGA)
 	{
-#if VIEWWINDOWWIDTH == 40
-		outp(0x3d8, 8);
-#elif VIEWWINDOWWIDTH == 80
-		outp(0x3d8, 9);
-#else
-#error unsupported VIEWWINDOWWIDTH value
+		outp(0x3d8, 8 | CGA_HIGH_RESOLUTION);
+		return;
+	}
 #endif
-	}
-	else
-	{
-		union REGS regs;
-		regs.w.ax = 0x1003;
-		regs.w.bx = 0x0000;
-		int86(0x10, &regs, &regs);
-	}
+
+	union REGS regs;
+	regs.w.ax = 0x1003;
+	regs.w.bx = 0x0000;
+	int86(0x10, &regs, &regs);
 }
 
 
@@ -190,14 +219,21 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	videocard = I_DetectVideoCard();
 	if (videocard == VGA)
 	{
-		// 200 scan lines to get the 8x8 font
+		// change scan lines to get the 8x8 font
 		union REGS regs;
-		regs.w.ax = 0x1200;
+		regs.w.ax = 0x1200 | VGA_SCANLINES;
 		regs.h.bl = 0x30;
 		int86(0x10, &regs, &regs);
 	}
 
 	I_SetScreenMode(SCREEN_MODE);
+
+#if VIEWWINDOWHEIGHT == 43 || VIEWWINDOWHEIGHT == 50
+	union REGS regs;
+	regs.w.ax = 0x1112;
+	regs.h.bl = 0;
+	int86(0x10, &regs, &regs);
+#endif
 
 	I_DisableBlinking();
 
@@ -206,19 +242,19 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	uint16_t __far* dst;
 	dst = D_MK_FP(PAGE0, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dst++ = 0x00b1;
+		*dst++ = 0x0000 | DITHER_CHARACTER;
 
 	dst = D_MK_FP(PAGE1, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dst++ = 0x00b1;
+		*dst++ = 0x0000 | DITHER_CHARACTER;
 
 	dst = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dst++ = 0x00b1;
+		*dst++ = 0x0000 | DITHER_CHARACTER;
 
 	dst = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dst++ = 0x00b1;
+		*dst++ = 0x0000 | DITHER_CHARACTER;
 
 	outp(0x3d4, 0xc);
 }
@@ -260,7 +296,11 @@ void I_FinishUpdate(void)
 	// page flip between segments
 	// B800, B880, B900 for 40x25
 	// B800, B900, BA00 for 80x25
-	outp(0x3d5, (D_FP_SEG(_s_screen) >> 5) & 0x1c);
+	// B800, B8E0, B9C0 for 40x43
+	// B800, B9C0, BB80 for 80x43
+	// B800, B900, BA00 for 40x50
+	// B800, BA00, BC00 for 80x50
+	outp(0x3d5, (D_FP_SEG(_s_screen) >> 5) & 0x3f);
 	_s_screen = D_MK_FP(D_FP_SEG(_s_screen) + PAGE_SIZE, 1 + __djgpp_conventional_base);
 	if (D_FP_SEG(_s_screen) == PAGE3)
 		_s_screen = D_MK_FP(PAGE0, 1 + __djgpp_conventional_base);
@@ -498,17 +538,20 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 		if (lump != NULL)
 		{
-			uint8_t __far* src = (uint8_t __far*)lump;
+			static const int16_t DXI = SCREENWIDTH / VIEWWINDOWWIDTH;
+			static const fixed_t DYI = ((fixed_t)SCREENHEIGHT << FRACBITS) / VIEWWINDOWHEIGHT;
+			fixed_t y = 0;
 			uint8_t __far* dst = D_MK_FP(PAGE3, 1 + __djgpp_conventional_base);
-			for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
+			for (int16_t h = 0; h < VIEWWINDOWHEIGHT; h++)
 			{
-				for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+				int16_t x = 0;
+				for (int16_t w = 0; w < VIEWWINDOWWIDTH; w++)
 				{
-					*dst++ = *src;
-					src += (SCREENWIDTH / VIEWWINDOWWIDTH);
-					dst++;
+					*dst = lump[(y >> FRACBITS) * SCREENWIDTH + x];
+					x += DXI;
+					dst += 2;
 				}
-				src += ((SCREENHEIGHT / VIEWWINDOWHEIGHT) - 1) * SCREENWIDTH;
+				y += DYI;
 			}
 			Z_ChangeTagToCache(lump);
 
@@ -557,7 +600,7 @@ void V_ClearString(int16_t y, size_t len)
 	uint8_t __far* dst = _s_screen + y * PLANEWIDTH - 1;
 	for (int16_t x = 0; x < len; x++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 }
@@ -569,7 +612,7 @@ void I_InitScreenPage(void)
 	// Skip the first row and the last 5 rows
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * (VIEWWINDOWHEIGHT - 1 - 5); i++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 }
@@ -581,21 +624,21 @@ void I_InitScreenPages(void)
 	dst = D_MK_FP(PAGE0, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 
 	dst = D_MK_FP(PAGE1, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 
 	dst = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
 	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
 	{
-		*dst++ = 0xb1;
+		*dst++ = DITHER_CHARACTER;
 		dst++;
 	}
 }
@@ -631,7 +674,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 			// scroll down columns, which are still visible
 			if (wipe_y_lookup[i] < VIEWWINDOWHEIGHT)
 			{
-				int16_t dy = 1;
+				int16_t dy = ((VIEWWINDOWHEIGHT - 1) / 25) + 1; // 1 or 2
 				// At most dy shall be so that the column is shifted by VIEWWINDOWHEIGHT (i.e. just invisible)
 				if (wipe_y_lookup[i] + dy >= VIEWWINDOWHEIGHT)
 					dy = VIEWWINDOWHEIGHT - wipe_y_lookup[i];

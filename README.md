@@ -39,20 +39,23 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13H
 ![Doom8088 in 256 colors](readme_imgs/doom8088.png?raw=true)
 
-### Tandy 1000 16 color 640x200 mode
+### Tandy 1000 640x200 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomth.png?raw=true)
 
-### Tandy 1000 16 color 320x200 mode
+### Tandy 1000 320x200 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomtm.png?raw=true)
 
-### Tandy 1000 16 color 160x200 mode
+### Tandy 1000 160x200 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomtl.png?raw=true)
 
+### Text mode 80x43 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomt80x43.png?raw=true)
+
 ### Text mode 80x25 16 color mode
-![Doom8088 in 16 colors](readme_imgs/doomt80.png?raw=true)
+![Doom8088 in 16 colors](readme_imgs/doomt80x25.png?raw=true)
 
 ### Text mode 40x25 16 color mode
-![Doom8088 in 16 colors](readme_imgs/doomt40.png?raw=true)
+![Doom8088 in 16 colors](readme_imgs/doomt40x25.png?raw=true)
 
 ## Controls:
 |Action                 |             |
@@ -89,11 +92,12 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |IDRATE    |Toggle FPS counter       |
 
 ## Command line arguments:
-|Command line argument|Effect       |
-|---------------------|-------------|
-|-noems               |Disable EMS  |
-|-noxms               |Disable XMS  |
-|-timedemo demo3      |Run benchmark|
+|Command line argument|Effect                    |
+|---------------------|--------------------------|
+|-hiddencard          |Disable video memory check|
+|-noems               |Disable EMS               |
+|-noxms               |Disable XMS               |
+|-timedemo demo3      |Run benchmark             |
 
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
@@ -107,6 +111,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |`btandyh.sh` |Tandy 1000 640x200 16 colors|
 |`btandym.sh` |Tandy 1000 320x200 16 colors|
 |`btandyl.sh` |Tandy 1000 160x200 16 colors|
+|`bt80x43.sh` |Text mode 80x43 16 colors   |
 |`bt80x25.sh` |Text mode 80x25 16 colors   |
 |`bt40x25.sh` |Text mode 40x25 16 colors   |
 
