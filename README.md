@@ -18,7 +18,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - Supports only Doom 1 Episode 1
  - Rotating overlaid automap
  - Only demo3 is supported
- - 256 and 16 color modes
+ - 256, 16 and 2 color modes
  - PC speaker sound effects
  - No music
  - No texture mapped floors and ceilings
