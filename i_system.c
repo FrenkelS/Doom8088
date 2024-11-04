@@ -71,12 +71,6 @@ static void I_ShutdownGraphics(void)
 }
 
 
-void I_InitScreen(void)
-{
-	I_SetScreenMode(3);
-}
-
-
 //**************************************************************************************
 //
 // Keyboard code

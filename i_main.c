@@ -88,14 +88,9 @@ static void tprintf(void)
 
 int main(int argc, const char * const * argv)
 {
-	I_InitScreen();
-	I_InitKeyboard();
+	I_SetScreenMode(3);
 
 	tprintf();
-
-	I_InitTimer();
-
-	I_InitSound();
 
 	D_DoomMain(argc, argv);
 	return 0;

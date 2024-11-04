@@ -451,6 +451,11 @@ static void D_Init(void)
 static void D_DoomMainSetup(void)
 {
     // init subsystems
+    I_InitKeyboard();
+
+    I_InitTimer();
+
+    I_InitSound();
 
     printf("Z_Init: Init zone memory allocation daemon.\n");
     Z_Init();
