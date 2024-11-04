@@ -46,6 +46,9 @@ static uint8_t __far* _s_screen;
 static uint8_t __far* videomemory;
 
 
+static boolean isMDA;
+
+
 void I_ReloadPalette(void)
 {
 	char* lumpName;
@@ -64,10 +67,10 @@ void I_ReloadPalette(void)
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
-	I_SetScreenMode(7);
+	I_SetScreenMode(isMDA ? 7 : 3);
 
 	__djgpp_nearptr_enable();
-	videomemory = D_MK_FP(0xb000, 0 + __djgpp_conventional_base);
+	videomemory = D_MK_FP(isMDA ? 0xb000 : 0xb800, 0 + __djgpp_conventional_base);
 
 	_s_screen = Z_MallocStatic(VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
 	_fmemset(_s_screen, 0, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
@@ -91,7 +94,7 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 
 void I_ShutdownGraphics(void)
 {
-	I_SetScreenMode(7);
+	I_SetScreenMode(isMDA ? 7 : 3);
 }
 
 
@@ -391,11 +394,22 @@ void D_Wipe(void)
 }
 
 
+static boolean I_IsMDA(void)
+{
+	union REGS regs;
+	regs.h.ah = 0x0f;
+	int86(0x10, &regs, &regs);
+	return regs.h.al == 7;
+}
+
+
 void D_DoomMain(int argc, const char * const * argv);
 
 int main(int argc, const char * const * argv)
 {
-	I_SetScreenMode(7);
+	isMDA = I_IsMDA();
+
+	I_SetScreenMode(isMDA ? 7 : 3);
 
 	printf(
 		"\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb"
@@ -411,5 +425,5 @@ int main(int argc, const char * const * argv)
 void I_Endoom(void)
 {
 	int16_t lumpnum = W_GetNumForName("ENDOOM");
-	W_ReadLumpByNum(lumpnum, D_MK_FP(0xb000, 0 + __djgpp_conventional_base));
+	W_ReadLumpByNum(lumpnum, D_MK_FP(isMDA ? 0xb000 : 0xb800, 0 + __djgpp_conventional_base));
 }
