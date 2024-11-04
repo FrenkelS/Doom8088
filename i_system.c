@@ -316,16 +316,13 @@ static void I_Shutdown(void)
 }
 
 
-#if !defined ENDOOM_SEGMENT
-#define ENDOOM_SEGMENT 0xb800
-#endif
+void I_Endoom(void);
 
 void I_Quit(void)
 {
 	I_Shutdown();
 
-	int16_t lumpnum = W_GetNumForName("ENDOOM");
-	W_ReadLumpByNum(lumpnum, D_MK_FP(ENDOOM_SEGMENT, 0 + __djgpp_conventional_base));
+	I_Endoom();
 
 	union REGS regs;
 	regs.h.ah = 2;

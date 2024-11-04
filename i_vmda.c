@@ -406,3 +406,10 @@ int main(int argc, const char * const * argv)
 	D_DoomMain(argc, argv);
 	return 0;
 }
+
+
+void I_Endoom(void)
+{
+	int16_t lumpnum = W_GetNumForName("ENDOOM");
+	W_ReadLumpByNum(lumpnum, D_MK_FP(0xb000, 0 + __djgpp_conventional_base));
+}
