@@ -65,6 +65,21 @@ void I_ReloadPalette(void)
 }
 
 
+static void I_UploadNewPalette(int8_t pal)
+{
+	uint8_t a;
+
+	if (1 <= pal && pal <= 8)
+		a = 0x70;
+	else
+		a = 0x07;
+
+	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 +  8 * 2 + 1] = a;
+	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 +  9 * 2 + 1] = a;
+	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 + 10 * 2 + 1] = a;
+}
+
+
 void I_InitGraphicsHardwareSpecificCode(void)
 {
 	I_SetScreenMode(isMDA ? 7 : 3);
@@ -98,14 +113,26 @@ void I_ShutdownGraphics(void)
 }
 
 
+static int8_t newpal;
+
+
 void I_SetPalette(int8_t pal)
 {
-	// Do nothing
+	newpal = pal;
 }
+
+
+#define NO_PALETTE_CHANGE 100
 
 
 void I_FinishUpdate(void)
 {
+	if (newpal != NO_PALETTE_CHANGE)
+	{
+		I_UploadNewPalette(newpal);
+		newpal = NO_PALETTE_CHANGE;
+	}
+
 	I_DrawBuffer(_s_screen);
 }
 
