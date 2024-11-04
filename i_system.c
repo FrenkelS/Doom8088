@@ -71,6 +71,12 @@ static void I_ShutdownGraphics(void)
 }
 
 
+void I_InitScreen(void)
+{
+	I_SetScreenMode(3);
+}
+
+
 //**************************************************************************************
 //
 // Keyboard code
@@ -103,10 +109,9 @@ static void __interrupt I_KeyboardISR(void)
 	outp(0x20, 0x20);
 }
 
-void I_InitScreen(void)
-{
-	I_SetScreenMode(3);
 
+void I_InitKeyboard(void)
+{
 	replaceInterrupt(oldkeyboardisr, newkeyboardisr, KEYBOARDINT, I_KeyboardISR);
 	isKeyboardIsrSet = true;
 }
