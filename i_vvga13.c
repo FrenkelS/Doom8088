@@ -159,9 +159,9 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 }
 
 
-void I_ShutdownGraphicsHardwareSpecificCode(void)
+void I_ShutdownGraphics(void)
 {
-	// Do nothing
+	I_SetScreenMode(3);
 }
 
 
