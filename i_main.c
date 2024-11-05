@@ -88,15 +88,16 @@ static void tprintf(void)
 
 int main(int argc, const char * const * argv)
 {
-	/* cphipps - call to video specific startup code */
-	I_InitScreen();
+	I_SetScreenMode(3);
 
 	tprintf();
 
-	I_InitTimer();
-
-	I_InitSound();
-
 	D_DoomMain(argc, argv);
 	return 0;
+}
+
+
+segment_t I_GetTextModeVideoMemorySegment(void)
+{
+	return 0xb800;
 }
