@@ -131,12 +131,6 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
-void I_ShutdownGraphicsHardwareSpecificCode(void)
-{
-	// Do nothing
-}
-
-
 static boolean drawStatusBar = true;
 
 

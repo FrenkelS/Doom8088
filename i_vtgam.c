@@ -115,9 +115,9 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
-void I_ShutdownGraphicsHardwareSpecificCode(void)
+void I_ShutdownGraphics(void)
 {
-	// Do nothing
+	I_SetScreenMode(3);
 }
 
 

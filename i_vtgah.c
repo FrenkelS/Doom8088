@@ -172,7 +172,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
-void I_ShutdownGraphicsHardwareSpecificCode(void)
+void I_ShutdownGraphics(void)
 {
 	// select 80 column text mode, disable video
 	outp(0x3d8, 0x13);
@@ -184,6 +184,8 @@ void I_ShutdownGraphicsHardwareSpecificCode(void)
 
 	// select 80 column text mode, enable blinking, enable video
 	outp(0x3d8, 0x29);
+
+	I_SetScreenMode(3);
 }
 
 
