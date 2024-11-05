@@ -316,13 +316,14 @@ static void I_Shutdown(void)
 }
 
 
-void I_Endoom(void);
+segment_t I_GetTextModeVideoMemorySegment(void);
 
 void I_Quit(void)
 {
 	I_Shutdown();
 
-	I_Endoom();
+	int16_t lumpnum = W_GetNumForName("ENDOOM");
+	W_ReadLumpByNum(lumpnum, D_MK_FP(I_GetTextModeVideoMemorySegment(), 0 + __djgpp_conventional_base));
 
 	union REGS regs;
 	regs.h.ah = 2;

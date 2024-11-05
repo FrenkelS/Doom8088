@@ -80,12 +80,18 @@ static void I_UploadNewPalette(int8_t pal)
 }
 
 
+segment_t I_GetTextModeVideoMemorySegment(void)
+{
+	return isMDA ? 0xb000 : 0xb800;
+}
+
+
 void I_InitGraphicsHardwareSpecificCode(void)
 {
 	I_SetScreenMode(isMDA ? 7 : 3);
 
 	__djgpp_nearptr_enable();
-	videomemory = D_MK_FP(isMDA ? 0xb000 : 0xb800, 0 + __djgpp_conventional_base);
+	videomemory = D_MK_FP(I_GetTextModeVideoMemorySegment(), 0 + __djgpp_conventional_base);
 
 	_s_screen = Z_MallocStatic(VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
 	_fmemset(_s_screen, 0, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
@@ -561,11 +567,4 @@ int main(int argc, const char * const * argv)
 
 	D_DoomMain(argc, argv);
 	return 0;
-}
-
-
-void I_Endoom(void)
-{
-	int16_t lumpnum = W_GetNumForName("ENDOOM");
-	W_ReadLumpByNum(lumpnum, D_MK_FP(isMDA ? 0xb000 : 0xb800, 0 + __djgpp_conventional_base));
 }

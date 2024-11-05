@@ -97,8 +97,7 @@ int main(int argc, const char * const * argv)
 }
 
 
-void I_Endoom(void)
+segment_t I_GetTextModeVideoMemorySegment(void)
 {
-	int16_t lumpnum = W_GetNumForName("ENDOOM");
-	W_ReadLumpByNum(lumpnum, D_MK_FP(0xb800, 0 + __djgpp_conventional_base));
+	return 0xb800;
 }
