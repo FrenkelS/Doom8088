@@ -48,6 +48,9 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ### Text mode 40x25 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomt40x25.png?raw=true)
 
+### Text mode 80x25 2 color mode
+![Doom8088 in 16 colors](readme_imgs/doomt80x25m.png?raw=true)
+
 ## Controls:
 |Action                 |             |
 |-----------------------|-------------|
