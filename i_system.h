@@ -44,7 +44,7 @@ int32_t I_GetTime(void);
 void _Noreturn I_Quit(void);
 void _Noreturn I_Error(const char *error, ...);
 
-void I_InitScreen(void);
+void I_InitKeyboard(void);
 
 void I_InitGraphics(void);
 

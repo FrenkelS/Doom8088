@@ -18,7 +18,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - Supports only Doom 1 Episode 1
  - Rotating overlaid automap
  - Only demo3 is supported
- - 256 and 16 color modes
+ - 256, 16 and 2 color modes
  - PC speaker sound effects
  - No music
  - No texture mapped floors and ceilings
@@ -56,6 +56,9 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 ### Text mode 40x25 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomt40x25.png?raw=true)
+
+### Text mode 80x25 2 color mode
+![Doom8088 in 16 colors](readme_imgs/doomt80x25m.png?raw=true)
 
 ## Controls:
 |Action                 |             |
@@ -114,6 +117,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |`bt80x43.sh` |Text mode 80x43 16 colors   |
 |`bt80x25.sh` |Text mode 80x25 16 colors   |
 |`bt40x25.sh` |Text mode 40x25 16 colors   |
+|`bmda.sh`    |Text mode 80x25 2 colors|
 
 It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2).
 First run `setenvdj.bat` once and then `bdj32.bat` for DJGPP, and `setenvwc.bat` followed by `bwc32.bat` for Watcom.

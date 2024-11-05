@@ -165,9 +165,9 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 }
 
 
-void I_ShutdownGraphicsHardwareSpecificCode(void)
+void I_ShutdownGraphics(void)
 {
-	// Do nothing
+	I_SetScreenMode(3);
 }
 
 
@@ -793,7 +793,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 static void wipe_initMelt()
 {
-	wipe_y_lookup = Z_MallocStatic(SCREENWIDTH);
+	wipe_y_lookup = Z_MallocStatic((SCREENWIDTH / 2) * sizeof(int16_t));
 
 	// setup initial column positions (y<0 => not ready to scroll yet)
 	wipe_y_lookup[0] = -(M_Random() % 16);

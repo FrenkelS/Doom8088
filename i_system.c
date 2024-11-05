@@ -38,7 +38,7 @@
 
 
 void I_InitGraphicsHardwareSpecificCode(void);
-void I_ShutdownGraphicsHardwareSpecificCode(void);
+void I_ShutdownGraphics(void);
 
 
 static boolean isGraphicsModeSet = false;
@@ -61,13 +61,6 @@ void I_InitGraphics(void)
 {
 	I_InitGraphicsHardwareSpecificCode();
 	isGraphicsModeSet = true;
-}
-
-
-static void I_ShutdownGraphics(void)
-{
-	I_ShutdownGraphicsHardwareSpecificCode();
-	I_SetScreenMode(3);
 }
 
 
@@ -103,10 +96,9 @@ static void __interrupt I_KeyboardISR(void)
 	outp(0x20, 0x20);
 }
 
-void I_InitScreen(void)
-{
-	I_SetScreenMode(3);
 
+void I_InitKeyboard(void)
+{
 	replaceInterrupt(oldkeyboardisr, newkeyboardisr, KEYBOARDINT, I_KeyboardISR);
 	isKeyboardIsrSet = true;
 }
@@ -324,12 +316,14 @@ static void I_Shutdown(void)
 }
 
 
+segment_t I_GetTextModeVideoMemorySegment(void);
+
 void I_Quit(void)
 {
 	I_Shutdown();
 
 	int16_t lumpnum = W_GetNumForName("ENDOOM");
-	W_ReadLumpByNum(lumpnum, D_MK_FP(0xb800, __djgpp_conventional_base));
+	W_ReadLumpByNum(lumpnum, D_MK_FP(I_GetTextModeVideoMemorySegment(), 0 + __djgpp_conventional_base));
 
 	union REGS regs;
 	regs.h.ah = 2;

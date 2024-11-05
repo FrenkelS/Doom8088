@@ -260,7 +260,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
-void I_ShutdownGraphicsHardwareSpecificCode(void)
+void I_ShutdownGraphics(void)
 {
 	if (videocard == VGA)
 	{
@@ -270,6 +270,8 @@ void I_ShutdownGraphicsHardwareSpecificCode(void)
 		regs.h.bl = 0x30;
 		int86(0x10, &regs, &regs);
 	}
+
+	I_SetScreenMode(3);
 }
 
 
