@@ -65,18 +65,27 @@ void I_ReloadPalette(void)
 }
 
 
+static const int8_t colors[14] =
+{
+	0x07,											// normal
+	0x70, 0x70, 0x70, 0x70, 0x78, 0x78, 0x78, 0x78,	// red
+	0x0e, 0x0e, 0x8e, 0x8e,							// yellow
+	0x01											// green
+};
+
+
 static void I_UploadNewPalette(int8_t pal)
 {
-	uint8_t a;
+	uint8_t attribute = colors[pal];
 
-	if (1 <= pal && pal <= 8)
-		a = 0x70;
-	else
-		a = 0x07;
+	for (int16_t y = VIEWWINDOWHEIGHT - 5; y < VIEWWINDOWHEIGHT - 1; y++)
+	{
+		for (int16_t x = 1; x < 11; x++)
+			videomemory[y * VIEWWINDOWWIDTH * 2 + x * 2 + 1] = attribute;
 
-	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 +  8 * 2 + 1] = a;
-	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 +  9 * 2 + 1] = a;
-	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 + 10 * 2 + 1] = a;
+		for (int16_t x = VIEWWINDOWWIDTH - 13; x < VIEWWINDOWWIDTH - 1; x++)
+			videomemory[y * VIEWWINDOWWIDTH * 2 + x * 2 + 1] = attribute;
+	}
 }
 
 
