@@ -157,7 +157,7 @@ uint8_t nearcolormap[256];
 static uint16_t nearcolormapoffset = 0xffff;
 
 const uint8_t __far* source;
-uint8_t __far* dest;
+uint8_t *dest;
 
 
 #if defined C_ONLY
