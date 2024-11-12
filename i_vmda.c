@@ -42,7 +42,7 @@
 
 extern const int16_t CENTERY;
 
-static uint8_t __far* _s_screen;
+static uint8_t _s_screen[VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT];
 static uint8_t __far* videomemory;
 
 
@@ -101,9 +101,6 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	__djgpp_nearptr_enable();
 	videomemory = D_MK_FP(I_GetTextModeVideoMemorySegment(), 0 + __djgpp_conventional_base);
-
-	_s_screen = Z_MallocStatic(VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
-	_fmemset(_s_screen, 0, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
 }
 
 
@@ -231,7 +228,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t *dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
 	switch (count)
 	{
@@ -289,7 +286,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t *dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
 	static int16_t fuzzpos = 0;
 
@@ -308,7 +305,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void V_FillRect(byte colour)
 {
-	_fmemset(_s_screen, colour, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
+	memset(_s_screen, colour, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
 }
 
 
@@ -352,7 +349,7 @@ void V_DrawBackground(void)
 
 	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
 	{
-		uint8_t __far* dest = _s_screen + y * VIEWWINDOWWIDTH;
+		uint8_t *dest = _s_screen + y * VIEWWINDOWWIDTH;
 		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
 		{
 			*dest++ = src[((y * 2) & 63) * 64 + ((x * 2) & 63)];
@@ -396,7 +393,7 @@ void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s)
 {
 	UNUSED(color);
 
-	uint8_t __far* dst = _s_screen + y * VIEWWINDOWWIDTH + x;
+	uint8_t *dst = _s_screen + y * VIEWWINDOWWIDTH + x;
 
 	while (*s)
 	{
@@ -443,7 +440,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 {
 	boolean done = true;
 
-	uint8_t __far* backbuffer = _s_screen;
+	uint8_t *backbuffer = _s_screen;
 
 	while (ticks--)
 	{
