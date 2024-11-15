@@ -72,8 +72,7 @@ byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
 	if (picnum == -3)
 		picnum = nukage;
 
-	uint8_t index = picnum;
-	return colormap[index];
+	return colormap[picnum];
 }
 
 #else
