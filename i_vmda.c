@@ -65,7 +65,7 @@ void I_ReloadPalette(void)
 }
 
 
-static const int8_t colors[14] =
+static const uint8_t colors[14] =
 {
 	0x07,											// normal
 	0x70, 0x70, 0x70, 0x70, 0x78, 0x78, 0x78, 0x78,	// red
@@ -267,7 +267,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 #define FUZZCOLOR4 0xb0
 #define FUZZTABLE 50
 
-static const int8_t fuzzcolors[FUZZTABLE] =
+static const uint8_t fuzzcolors[FUZZTABLE] =
 {
 	FUZZCOLOR1,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,
 	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR2,
@@ -373,6 +373,22 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 	}
 	else
 		W_ReadLumpByNum(num, _s_screen);
+}
+
+
+void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
+{
+	UNUSED(x);
+	UNUSED(y);
+	UNUSED(patch);
+}
+
+
+void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
+{
+	UNUSED(x);
+	UNUSED(y);
+	UNUSED(patch);
 }
 
 
