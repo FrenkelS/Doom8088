@@ -136,17 +136,17 @@ static void ST_drawWidgets(void)
 
 	// keys
 	if (_g_player.cards[0])
-		V_DrawCharacter(8, VIEWWINDOWHEIGHT - 5, 9, '\x14');
+		V_DrawCharacter(8, VIEWWINDOWHEIGHT - 5, 9, 'B'); // Blue
 	else
 		V_DrawCharacter(8, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
 
 	if (_g_player.cards[1])
-		V_DrawCharacter(9, VIEWWINDOWHEIGHT - 5, 14, '\x14');
+		V_DrawCharacter(9, VIEWWINDOWHEIGHT - 5, 14, 'Y'); // Yellow
 	else
 		V_DrawCharacter(9, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
 
 	if (_g_player.cards[2])
-		V_DrawCharacter(10, VIEWWINDOWHEIGHT - 5, 12, '\x14');
+		V_DrawCharacter(10, VIEWWINDOWHEIGHT - 5, 12, 'R'); // Red
 	else
 		V_DrawCharacter(10, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
 }
