@@ -99,9 +99,9 @@ void I_InitGraphicsHardwareSpecificCode(void)
 		for (int16_t x = 0; x < 16; x++)
 		{
 			int16_t plane = 1;
-			for (int16_t j = 0; j < 4; j++)
+			for (int16_t p = 0; p < 4; p++)
 			{
-				int16_t c;
+				uint8_t c;
 				if (plane & x)
 				{
 					if (plane & y)
