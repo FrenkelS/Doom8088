@@ -54,7 +54,8 @@
 extern const int16_t CENTERY;
 
 
-static uint8_t  __far* _s_screen;
+static uint8_t __far* _s_screen;
+static uint8_t __far* colors;
 
 
 void I_ReloadPalette(void)
@@ -88,7 +89,8 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	__djgpp_nearptr_enable();
 	_s_screen = D_MK_FP(0xa200, 0 + __djgpp_conventional_base);
 
-	volatile uint8_t __far* dst = D_MK_FP(0xa600, 0 + __djgpp_conventional_base);
+	colors = D_MK_FP(0xa600, 0 + __djgpp_conventional_base);
+	volatile uint8_t __far* dst = colors;
 
 	outp(SC_INDEX, SC_MAPMASK);
 
@@ -167,58 +169,23 @@ void I_FinishUpdate(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-uint8_t nearcolormap[256];
+static uint8_t nearcolormap[256];
 
 #define L_FP_OFF D_FP_OFF
 static uint16_t nearcolormapoffset = 0xffff;
 
-const uint8_t __far* source;
-uint8_t __far* dest;
+static const uint8_t __far* source;
+static uint8_t __far* dest;
 
 
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
-	int16_t l = count >> 4;
-	while (l--)
+	while (count--)
 	{
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-	}
-
-	switch (count & 15)
-	{
-		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
+		volatile uint8_t loadLatches = colors[nearcolormap[source[frac >> COLBITS]]];
+		*dest = 0;
+		dest += PLANEWIDTH;
+		frac += fracstep;
 	}
 }
 
@@ -248,7 +215,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 	//  e.g. a DDA-lile scaling.
 	// This is as fast as it gets.
 
-	//R_DrawColumn2(fracstep, frac, count);
+	R_DrawColumn2(fracstep, frac, count);
 }
 
 
@@ -260,7 +227,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	volatile uint8_t loadLatches = *(uint8_t __far*)D_MK_FP(0xa600, color + __djgpp_conventional_base);
+	volatile uint8_t loadLatches = colors[color];
 	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
 	while (count--)
