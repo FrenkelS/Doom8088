@@ -87,7 +87,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
-	_s_screen = D_MK_FP(0xa200, 0 + __djgpp_conventional_base);
+	_s_screen = D_MK_FP(0xa200, (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 8 + __djgpp_conventional_base);
 
 	colors = D_MK_FP(0xa600, 0 + __djgpp_conventional_base);
 	volatile uint8_t __far* dst = colors;
