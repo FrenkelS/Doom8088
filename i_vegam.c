@@ -82,13 +82,45 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	I_ReloadPalette();
 	I_UploadNewPalette(0);
 
-	__djgpp_nearptr_enable();
-	_s_screen = D_MK_FP(0xa200, 0 + __djgpp_conventional_base);
-
 	outp(SC_INDEX, SC_MAPMASK);
 	outp(SC_INDEX + 1, 15);
 
+	__djgpp_nearptr_enable();
 	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
+
+	_s_screen = D_MK_FP(0xa600, 0 + __djgpp_conventional_base);
+	int16_t i = 0;
+	for (int16_t y = 0; y < 16; y++)
+	{
+		for (int16_t x = 0; x < 16; x++)
+		{
+			int16_t plane = 1;
+			for (int16_t j = 0; j < 4; j++)
+			{
+				int16_t c;
+				if (plane & x)
+				{
+					if (plane & y)
+						c = 0xff;
+					else
+						c = 0x55;
+				}
+				else
+				{
+					if (plane & y)
+						c = 0xaa;
+					else
+						c = 0;
+				}
+				outp(SC_INDEX + 1, plane);
+				_s_screen[i] = c;
+				plane <<= 1;
+			}
+			i++;
+		}
+	}
+
+	_s_screen = D_MK_FP(0xa200, 0 + __djgpp_conventional_base);
 }
 
 
