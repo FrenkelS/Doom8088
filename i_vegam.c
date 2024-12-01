@@ -47,6 +47,9 @@
 #define CRTC_INDEX              0x3d4
 #define CRTC_STARTHIGH          12
 
+#define GC_INDEX                0x3ce
+#define GC_MODE                 5
+
 
 extern const int16_t CENTERY;
 
@@ -82,14 +85,13 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	I_ReloadPalette();
 	I_UploadNewPalette(0);
 
-	outp(SC_INDEX, SC_MAPMASK);
-	outp(SC_INDEX + 1, 15);
-
 	__djgpp_nearptr_enable();
-	_fmemset(D_MK_FP(0xa000, 0 + __djgpp_conventional_base), 0, 0xffff);
+	_s_screen = D_MK_FP(0xa200, 0 + __djgpp_conventional_base);
 
-	_s_screen = D_MK_FP(0xa600, 0 + __djgpp_conventional_base);
-	int16_t i = 0;
+	volatile uint8_t __far* dst = D_MK_FP(0xa600, 0 + __djgpp_conventional_base);
+
+	outp(SC_INDEX, SC_MAPMASK);
+
 	for (int16_t y = 0; y < 16; y++)
 	{
 		for (int16_t x = 0; x < 16; x++)
@@ -113,14 +115,17 @@ void I_InitGraphicsHardwareSpecificCode(void)
 						c = 0;
 				}
 				outp(SC_INDEX + 1, plane);
-				_s_screen[i] = c;
+				*dst = c;
 				plane <<= 1;
 			}
-			i++;
+			dst++;
 		}
 	}
+	outp(SC_INDEX + 1, 15);
 
-	_s_screen = D_MK_FP(0xa200, 0 + __djgpp_conventional_base);
+	// set write mode 1
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
 }
 
 
@@ -243,7 +248,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 	//  e.g. a DDA-lile scaling.
 	// This is as fast as it gets.
 
-	R_DrawColumn2(fracstep, frac, count);
+	//R_DrawColumn2(fracstep, frac, count);
 }
 
 
@@ -255,11 +260,12 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
+	volatile uint8_t loadLatches = *(uint8_t __far*)D_MK_FP(0xa600, color + __djgpp_conventional_base);
 	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
 	while (count--)
 	{
-		*dest = color;
+		*dest = 0;
 		dest += PLANEWIDTH;
 	}
 }
