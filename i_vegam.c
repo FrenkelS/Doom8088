@@ -275,9 +275,46 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 }
 
 
+#define FUZZCOLOR1 0x00
+#define FUZZCOLOR2 0x08
+#define FUZZCOLOR3 0x80
+#define FUZZCOLOR4 0x88
+#define FUZZTABLE 50
+
+static const uint8_t fuzzcolors[FUZZTABLE] =
+{
+	FUZZCOLOR1,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,
+	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR2,
+	FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR4,FUZZCOLOR2,
+	FUZZCOLOR1,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR4,
+	FUZZCOLOR3,FUZZCOLOR2,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR1,
+	FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR4,FUZZCOLOR2,FUZZCOLOR1,FUZZCOLOR3,
+	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,FUZZCOLOR1
+};
+
+
 void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 {
-	// TODO implement me
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	if (count <= 0)
+		return;
+
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
+
+	static int16_t fuzzpos = 0;
+
+	do
+	{
+		volatile uint8_t loadLatches = colors[fuzzcolors[fuzzpos]];
+		*dest = 0;
+		dest += PLANEWIDTH;
+
+		fuzzpos++;
+		if (fuzzpos >= FUZZTABLE)
+			fuzzpos = 0;
+
+	} while (--count);
 }
 
 
