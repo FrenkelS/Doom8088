@@ -74,9 +74,22 @@ void I_ReloadPalette(void)
 }
 
 
+static const int8_t palcolors[14] =
+{
+	0,									// normal
+	4, 4, 4, 4, 0x1c, 0x1c, 0x1c, 0x1c,	// red
+	6, 6, 0x1e, 0x1e,					// yellow
+	2									// green
+};
+
+
 static void I_UploadNewPalette(int8_t pal)
 {
-	// TODO implement me
+	union REGS regs;
+	regs.w.ax = 0x1000;
+	regs.h.bl = 0x00;
+	regs.h.bh = palcolors[pal];
+	int86(0x10, &regs, &regs);
 }
 
 
