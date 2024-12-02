@@ -161,6 +161,8 @@ void I_SetPalette(int8_t pal)
 
 #define NO_PALETTE_CHANGE 100
 
+static uint16_t st_needrefresh = 0;
+
 void I_FinishUpdate(void)
 {
 	// palette
@@ -168,6 +170,27 @@ void I_FinishUpdate(void)
 	{
 		I_UploadNewPalette(newpal);
 		newpal = NO_PALETTE_CHANGE;
+	}
+
+	// status bar
+	if (st_needrefresh)
+	{
+		st_needrefresh--;
+
+		if (st_needrefresh != 2)
+		{
+			uint8_t __far* src = (uint8_t __far*)(((uint32_t)_s_screen) - 0x02000000);
+			if ((((uint32_t)src) & 0x9e000000) == 0x9e000000)
+				src = (uint8_t __far*)(((uint32_t)src) + 0x06000000);
+
+			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			for (int16_t i = 0; i < VIEWWINDOWWIDTH * ST_HEIGHT; i++)
+			{
+				volatile uint8_t loadLatches = *src++;
+				*dest++ = 0;
+			}
+		}
 	}
 
 	// page flip between segments A000, A200 and A400
@@ -363,15 +386,12 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 			uint16_t lumpLength = W_LumpLength(num);
 			cachedLumpHeight = lumpLength / SCREENWIDTH;
 			uint8_t __far* src  = (uint8_t __far*)lump;
-			uint8_t __far* dest = D_MK_FP(0xa610, offset * PLANEWIDTH + __djgpp_conventional_base);		
-			for (int16_t y = 0; y < cachedLumpHeight; y++)
+			uint8_t __far* dest = D_MK_FP(0xa610, 0 + __djgpp_conventional_base);
+			for (int16_t i = 0; i < VIEWWINDOWWIDTH * cachedLumpHeight; i++)
 			{
-				for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
-				{
-					volatile uint8_t loadLatches = colors[*src];
-					*dest++ = 0;
-					src += 6;
-				}
+				volatile uint8_t loadLatches = colors[*src];
+				*dest++ = 0;
+				src += 6;
 			}
 
 			Z_ChangeTagToCache(lump);
@@ -394,7 +414,11 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 void ST_Drawer(void)
 {
-	// TODO implement me
+	if (ST_NeedUpdate())
+	{
+		ST_doRefresh();
+		st_needrefresh = 3; //3 screen pages
+	}
 }
 
 
