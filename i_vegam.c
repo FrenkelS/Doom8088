@@ -351,7 +351,47 @@ void V_DrawBackground(void)
 
 void V_DrawRaw(int16_t num, uint16_t offset)
 {
-	// TODO implement me
+	static int16_t cachedLumpNum;
+	static int16_t cachedLumpHeight;
+
+	if (cachedLumpNum != num)
+	{
+		const uint8_t __far* lump = W_TryGetLumpByNum(num);
+
+		if (lump != NULL)
+		{
+			uint16_t lumpLength = W_LumpLength(num);
+			cachedLumpHeight = lumpLength / SCREENWIDTH;
+			uint8_t __far* src  = (uint8_t __far*)lump;
+			uint8_t __far* dest = D_MK_FP(0xa610, offset * PLANEWIDTH + __djgpp_conventional_base);		
+			for (int16_t y = 0; y < cachedLumpHeight; y++)
+			{
+				for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+				{
+					volatile uint8_t loadLatches = colors[*src];
+					*dest++ = 0;
+					src += 6;
+				}
+			}
+
+			Z_ChangeTagToCache(lump);
+			cachedLumpNum = num;
+		}
+	}
+
+	if (cachedLumpNum == num)
+	{
+		uint8_t __far* src  = D_MK_FP(0xa610, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
+		for (int16_t y = 0; y < cachedLumpHeight; y++)
+		{
+			for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+			{
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
+			}
+		}
+	}
 }
 
 
