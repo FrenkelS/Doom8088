@@ -383,13 +383,10 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 	{
 		uint8_t __far* src  = D_MK_FP(0xa610, 0 + __djgpp_conventional_base);
 		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
-		for (int16_t y = 0; y < cachedLumpHeight; y++)
+		for (int16_t i = 0; i < VIEWWINDOWWIDTH * cachedLumpHeight; i++)
 		{
-			for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
-			{
-				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
-				dest[y * PLANEWIDTH + x] = 0;
-			}
+			volatile uint8_t loadLatches = *src++;
+			*dest++ = 0;
 		}
 	}
 }
