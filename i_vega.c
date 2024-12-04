@@ -156,7 +156,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	// set write mode 1
 	outp(GC_INDEX, GC_MODE);
-	outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+	outp(GC_INDEX + 1, 1);
 }
 
 
