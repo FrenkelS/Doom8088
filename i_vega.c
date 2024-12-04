@@ -56,6 +56,7 @@
 #define PAGE3	(PAGE2+PAGE_SIZE)
 #define PAGEMINUS1	(PAGE0-PAGE_SIZE)
 
+
 #define SC_INDEX                0x3c4
 #define SC_MAPMASK              2
 
