@@ -11,7 +11,7 @@ export CPU=i286
 nasm m_fixed.asm  -f elf
 nasm z_xms.asm    -f elf
 
-ia16-elf-gcc -c i_vegam.c  $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
+ia16-elf-gcc -c i_vega.c   $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_map.c    $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_sight.c  $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
@@ -37,8 +37,8 @@ export GLOBOBJS+=" hu_stuff.c"
 export GLOBOBJS+=" i_audio.c"
 export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
-#export GLOBOBJS+=" i_vegam.c"
-export GLOBOBJS+=" i_vegam.o"
+#export GLOBOBJS+=" i_vega.c"
+export GLOBOBJS+=" i_vega.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_fixed.o"
@@ -92,7 +92,7 @@ ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 rm m_fixed.o
 rm z_xms.o
 
-rm i_vegam.o
+rm i_vega.o
 rm p_map.o
 rm p_maputl.o
 rm p_sight.o

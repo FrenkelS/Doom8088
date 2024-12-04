@@ -136,7 +136,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
-	_s_screen = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + (((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * SCREENWIDTH_VGA) / 4 + __djgpp_conventional_base);
+	_s_screen = D_MK_FP(0xa400, ((SCREENWIDTH_VGA - SCREENWIDTH) / 2) / 4 + ((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * PLANEWIDTH + __djgpp_conventional_base);
 
 	outp(SC_INDEX, SC_MEMMODE);
 	outp(SC_INDEX + 1, (inp(SC_INDEX + 1) & ~8) | 4);
