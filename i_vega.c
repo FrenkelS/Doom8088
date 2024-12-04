@@ -65,6 +65,7 @@
 
 #define GC_INDEX                0x3ce
 #define GC_MODE                 5
+#define GC_BITMASK              8
 
 
 extern const int16_t CENTERY;
@@ -391,11 +392,17 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	int16_t err = dx + dy;
 
-	volatile uint8_t loadLatches = colors[color];
+	// set write mode 2
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, 2);
+
+	outp(GC_INDEX, GC_BITMASK);
+	outp(GC_INDEX + 1, 128 >> (x0 & 7));
 
 	while (true)
 	{
-		_s_screen[y0 * VIEWWINDOWWIDTH + x0] = 0;
+		volatile uint8_t loadLatches = _s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)];
+		_s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)] = color;
 
 		if (x0 == x1 && y0 == y1)
 			break;
@@ -406,6 +413,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 		{
 			err += dy;
 			x0  += sx;
+			outp(GC_INDEX + 1, 128 >> (x0 & 7));
 		}
 
 		if (e2 <= dx)
@@ -414,6 +422,10 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 			y0  += sy;
 		}
 	}
+
+	// set write mode 1
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, 1);
 }
 
 
