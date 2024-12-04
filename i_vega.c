@@ -374,7 +374,10 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void V_FillRect(byte colour)
 {
-	// TODO implement me
+	uint8_t __far* dest = _s_screen;
+	volatile uint8_t loadLatches = colors[colour];
+	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
+		*dest++ = 0;
 }
 
 
