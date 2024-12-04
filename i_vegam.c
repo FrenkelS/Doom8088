@@ -424,7 +424,45 @@ void ST_Drawer(void)
 
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
-	// TODO implement me
+	y -= patch->topoffset;
+	x -= patch->leftoffset;
+
+	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + (x / 6);
+
+	int16_t width = patch->width;
+
+	for (int16_t col = 0; col < width; col += 6, desttop++)
+	{
+		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			const byte __far* source = (const byte __far*)column + 3;
+			byte __far* dest = desttop + (column->topdelta * PLANEWIDTH);
+
+			volatile uint8_t loadLatches;
+			uint16_t count = column->length;
+
+			uint16_t l = count >> 2;
+			while (l--)
+			{
+				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+			}
+
+			switch (count & 3)
+			{
+				case 3: loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				case 2: loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				case 1: loadLatches = colors[*source++]; *dest = 0;
+			}
+
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+	}
 }
 
 
