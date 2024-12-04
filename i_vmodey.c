@@ -214,9 +214,9 @@ void I_FinishUpdate(void)
 			if (D_FP_SEG(src) == PAGEMINUS1)
 				src = D_MK_FP(PAGE2, D_FP_OFF(src));
 #else
-			uint8_t __far* src = _s_screen - 0x04000;
-			if ((((uint32_t)src) & 0x9c000) == 0x9c000)
-				src += 0x0c000;
+			uint8_t __far* src = _s_screen - (PAGE_SIZE << 4);
+			if ((((uint32_t)src) & (PAGEMINUS1 << 4)) == (PAGEMINUS1 << 4))
+				src += (0x10000 - (PAGE_SIZE << 4));
 #endif
 			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
 			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
@@ -244,9 +244,9 @@ void I_FinishUpdate(void)
 		_s_screen = D_MK_FP(PAGE0, D_FP_OFF(_s_screen));
 #else
 	outp(CRTC_INDEX + 1, (D_FP_SEG(_s_screen) >> 4) & 0xf0);
-	_s_screen += 0x04000;
-	if ((((uint32_t)_s_screen) & 0xac000) == 0xac000)
-		_s_screen -= 0x0c000;
+	_s_screen += (PAGE_SIZE << 4);
+	if ((((uint32_t)_s_screen) & (PAGE3 << 4)) == (PAGE3 << 4))
+		_s_screen -= (0x10000 - (PAGE_SIZE << 4));
 #endif
 }
 
@@ -765,9 +765,9 @@ void D_Wipe(void)
 	if (D_FP_SEG(frontbuffer) == PAGEMINUS1)
 		frontbuffer = D_MK_FP(PAGE2, D_FP_OFF(frontbuffer));
 #else
-	frontbuffer	= _s_screen - 0x04000;
-	if ((((uint32_t)frontbuffer) & 0x9c000) == 0x9c000)
-		frontbuffer += 0x0c000;
+	frontbuffer	= _s_screen - (PAGE_SIZE << 4);
+	if ((((uint32_t)frontbuffer) & (PAGEMINUS1 << 4)) == (PAGEMINUS1 << 4))
+		frontbuffer += (0x10000 - (PAGE_SIZE << 4));
 #endif
 
 	// set write mode 1
