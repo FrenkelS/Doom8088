@@ -389,7 +389,19 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 void V_DrawBackground(void)
 {
-	// TODO implement me
+	const byte __far* src = W_GetLumpByName("FLOOR4_8");
+	uint8_t __far* dest = _s_screen;
+
+	for (int16_t y = 0; y < SCREENHEIGHT; y++)
+	{
+		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+		{
+			volatile uint8_t loadLatches = colors[src[(y & 63) * 64 + ((x * 4) & 63)]];
+			*dest++ = 0;
+		}
+	}
+
+	Z_ChangeTagToCache(src);
 }
 
 
