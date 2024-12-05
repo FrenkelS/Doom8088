@@ -77,7 +77,7 @@ extern const int16_t CENTERY;
 
 static uint8_t __far* _s_screen;
 static uint8_t __far* colors;
-static uint16_t colorsoffset;
+uint16_t colorsoffset;
 
 
 void I_ReloadPalette(void)
@@ -241,15 +241,16 @@ void I_FinishUpdate(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-static uint8_t nearcolormap[256];
+uint8_t nearcolormap[256];
 
 #define L_FP_OFF D_FP_OFF
 static uint16_t nearcolormapoffset = 0xffff;
 
-static const uint8_t __far* source;
-static uint8_t __far* dest;
+const uint8_t __far* source;
+uint8_t __far* dest;
 
 
+#if defined C_ONLY
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	const uint8_t __far* clrs = D_MK_FP(D_FP_SEG(dest), colorsoffset + __djgpp_conventional_base);
@@ -299,7 +300,9 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 		case  1: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0;
 	}
 }
-
+#else
+void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
+#endif
 
 void R_DrawColumn(const draw_column_vars_t *dcvars)
 {

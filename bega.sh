@@ -8,8 +8,9 @@ export RENDER_OPTIONS="-DFLAT_SPAN -DFLAT_NUKAGE1_COLOR=32 -DWAD_FILE=\"DOOM16D.
 #export CPU=i8088
 export CPU=i286
 
-nasm m_fixed.asm  -f elf
-nasm z_xms.asm    -f elf
+nasm i_vegaa.asm -f elf -DCPU=$CPU -DPLANEWIDTH=$((4*$1/3))
+nasm m_fixed.asm -f elf
+nasm z_xms.asm   -f elf
 
 ia16-elf-gcc -c i_vega.c   $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_map.c    $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
@@ -39,6 +40,7 @@ export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
 #export GLOBOBJS+=" i_vega.c"
 export GLOBOBJS+=" i_vega.o"
+export GLOBOBJS+=" i_vegaa.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_fixed.o"
@@ -89,6 +91,7 @@ export GLOBOBJS+=" z_zone.o"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
 
+rm i_vegaa.o
 rm m_fixed.o
 rm z_xms.o
 
