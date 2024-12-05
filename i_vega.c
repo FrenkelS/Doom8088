@@ -453,6 +453,7 @@ void V_DrawBackground(void)
 			volatile uint8_t loadLatches = colors[src[(y & 63) * 64 + ((x * 4) & 63)]];
 			*dest++ = 0;
 		}
+		dest += PLANEWIDTH - VIEWWINDOWWIDTH;
 	}
 
 	Z_ChangeTagToCache(src);
