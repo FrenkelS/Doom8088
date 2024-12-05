@@ -39,16 +39,18 @@
 #include "globdata.h"
 
 
-#if VIEWWINDOWWIDTH == 40
+#if VIEWWINDOWWIDTH == 30
 #define SCREEN_MODE	0x0d
-#elif VIEWWINDOWWIDTH == 80
+#define PLANEWIDTH 40
+#elif VIEWWINDOWWIDTH == 60
 #define SCREEN_MODE 0x0e
+#define PLANEWIDTH 80
 #else
 #error unsupported VIEWWINDOWWIDTH value
 #endif
 
 
-#define PAGE_SIZE (((VIEWWINDOWWIDTH * 200 + 511) & ~511) >> 4)
+#define PAGE_SIZE (((PLANEWIDTH * SCREENHEIGHT_VGA + 511) & ~511) >> 4)
 
 #define PAGE0	0xa000
 #define PAGE1	(PAGE0+PAGE_SIZE)
@@ -117,7 +119,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
-	_s_screen = D_MK_FP(PAGE1, ((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * VIEWWINDOWWIDTH + __djgpp_conventional_base);
+	_s_screen = D_MK_FP(PAGE1, ((PLANEWIDTH - VIEWWINDOWWIDTH) / 2) + ((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * PLANEWIDTH + __djgpp_conventional_base);
 
 	colors = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
 	volatile uint8_t __far* dst = colors;
@@ -200,12 +202,17 @@ void I_FinishUpdate(void)
 			if (D_FP_SEG(src) == PAGEMINUS1)
 				src = D_MK_FP(PAGE2, D_FP_OFF(src));
 
-			src += (SCREENHEIGHT - ST_HEIGHT) * VIEWWINDOWWIDTH;
-			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * VIEWWINDOWWIDTH;
-			for (int16_t i = 0; i < VIEWWINDOWWIDTH * ST_HEIGHT; i++)
+			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			for (int16_t y = 0; y < ST_HEIGHT; y++)
 			{
-				volatile uint8_t loadLatches = *src++;
-				*dest++ = 0;
+				for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+				{
+					volatile uint8_t loadLatches = *src++;
+					*dest++ = 0;
+				}
+				src  += PLANEWIDTH - VIEWWINDOWWIDTH;
+				dest += PLANEWIDTH - VIEWWINDOWWIDTH;
 			}
 		}
 	}
@@ -240,43 +247,43 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 	int16_t l = count >> 4;
 	while (l--)
 	{
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
 
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
 
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
 
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
 	}
 
 	switch (count & 15)
 	{
-		case 15: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 14: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 13: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 12: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 11: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 10: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  9: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  8: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  7: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  6: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  5: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  4: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  3: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  2: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 15: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case 14: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case 13: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case 12: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case 11: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case 10: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case  9: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case  8: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case  7: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case  6: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case  5: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case  4: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case  3: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		case  2: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
 		case  1: loadLatches = colors[nearcolormap[source[frac >> COLBITS]]]; *dest = 0;
 	}
 }
@@ -298,7 +305,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 		nearcolormapoffset = L_FP_OFF(dcvars->colormap);
 	}
 
-	dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
 	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
 	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
@@ -320,12 +327,12 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 		return;
 
 	volatile uint8_t loadLatches = colors[color];
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
 	while (count--)
 	{
 		*dest = 0;
-		dest += VIEWWINDOWWIDTH;
+		dest += PLANEWIDTH;
 	}
 }
 
@@ -355,7 +362,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
 	static int16_t fuzzpos = 0;
 
@@ -363,7 +370,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	{
 		volatile uint8_t loadLatches = colors[fuzzcolors[fuzzpos]];
 		*dest = 0;
-		dest += VIEWWINDOWWIDTH;
+		dest += PLANEWIDTH;
 
 		fuzzpos++;
 		if (fuzzpos >= FUZZTABLE)
@@ -401,8 +408,8 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	while (true)
 	{
-		volatile uint8_t loadLatches = _s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)];
-		_s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)] = color;
+		volatile uint8_t loadLatches = _s_screen[y0 * PLANEWIDTH + (x0 >> 3)];
+		_s_screen[y0 * PLANEWIDTH + (x0 >> 3)] = color;
 
 		if (x0 == x1 && y0 == y1)
 			break;
@@ -462,11 +469,15 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 			cachedLumpHeight = lumpLength / SCREENWIDTH;
 			uint8_t __far* src  = (uint8_t __far*)lump;
 			uint8_t __far* dest = D_MK_FP(PAGE3 + (256 >> 4), 0 + __djgpp_conventional_base);
-			for (int16_t i = 0; i < VIEWWINDOWWIDTH * cachedLumpHeight; i++)
+			for (int16_t y = 0; y < cachedLumpHeight; y++)
 			{
-				volatile uint8_t loadLatches = colors[*src];
-				*dest++ = 0;
-				src += (SCREENWIDTH / VIEWWINDOWWIDTH);
+				for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+				{
+					volatile uint8_t loadLatches = colors[*src];
+					*dest++ = 0;
+					src += (SCREENWIDTH / VIEWWINDOWWIDTH);
+				}
+				dest += PLANEWIDTH - VIEWWINDOWWIDTH;
 			}
 
 			Z_ChangeTagToCache(lump);
@@ -477,11 +488,16 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 	if (cachedLumpNum == num)
 	{
 		uint8_t __far* src  = D_MK_FP(PAGE3 + (256 >> 4), 0 + __djgpp_conventional_base);
-		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * VIEWWINDOWWIDTH;
-		for (int16_t i = 0; i < VIEWWINDOWWIDTH * cachedLumpHeight; i++)
+		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
+		for (int16_t y = 0; y < cachedLumpHeight; y++)
 		{
-			volatile uint8_t loadLatches = *src++;
-			*dest++ = 0;
+			for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+			{
+				volatile uint8_t loadLatches = *src++;
+				*dest++ = 0;
+			}
+			src  += PLANEWIDTH - VIEWWINDOWWIDTH;
+			dest += PLANEWIDTH - VIEWWINDOWWIDTH;
 		}
 	}
 }
@@ -502,7 +518,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	y -= patch->topoffset;
 	x -= patch->leftoffset;
 
-	byte __far* desttop = _s_screen + (y * VIEWWINDOWWIDTH) + (x / (SCREENWIDTH / VIEWWINDOWWIDTH));
+	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + (x / (SCREENWIDTH / VIEWWINDOWWIDTH));
 
 	int16_t width = patch->width;
 
@@ -514,7 +530,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		while (column->topdelta != 0xff)
 		{
 			const byte __far* source = (const byte __far*)column + 3;
-			byte __far* dest = desttop + (column->topdelta * VIEWWINDOWWIDTH);
+			byte __far* dest = desttop + (column->topdelta * PLANEWIDTH);
 
 			volatile uint8_t loadLatches;
 			uint16_t count = column->length;
@@ -522,16 +538,16 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			uint16_t l = count >> 2;
 			while (l--)
 			{
-				loadLatches = colors[*source++]; *dest = 0; dest += VIEWWINDOWWIDTH;
-				loadLatches = colors[*source++]; *dest = 0; dest += VIEWWINDOWWIDTH;
-				loadLatches = colors[*source++]; *dest = 0; dest += VIEWWINDOWWIDTH;
-				loadLatches = colors[*source++]; *dest = 0; dest += VIEWWINDOWWIDTH;
+				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
 			}
 
 			switch (count & 3)
 			{
-				case 3: loadLatches = colors[*source++]; *dest = 0; dest += VIEWWINDOWWIDTH;
-				case 2: loadLatches = colors[*source++]; *dest = 0; dest += VIEWWINDOWWIDTH;
+				case 3: loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				case 2: loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
 				case 1: loadLatches = colors[*source++]; *dest = 0;
 			}
 
@@ -576,7 +592,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 			int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
 
-			byte __far* dest = _s_screen + (dc_yl * VIEWWINDOWWIDTH) + dc_x;
+			byte __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dc_x;
 
 			int16_t frac = 0;
 
@@ -587,7 +603,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			{
 				volatile uint8_t loadLatches = colors[source[frac >> 8]];
 				*dest = 0;
-				dest += VIEWWINDOWWIDTH;
+				dest += PLANEWIDTH;
 				frac += DYI;
 			}
 
@@ -632,8 +648,8 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
 					dy = SCREENHEIGHT - wipe_y_lookup[i];
 
-				uint8_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - 1 - dy) * VIEWWINDOWWIDTH);
-				uint8_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1)      * VIEWWINDOWWIDTH);
+				uint8_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - 1 - dy) * PLANEWIDTH);
+				uint8_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1)      * PLANEWIDTH);
 
 				// scroll down the column. Of course we need to copy from the bottom... up to
 				// SCREENHEIGHT - yLookup - dy
@@ -641,19 +657,19 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				for (int16_t j = SCREENHEIGHT - wipe_y_lookup[i] - dy; j; j--)
 				{
 					*d = *s;
-					d += -VIEWWINDOWWIDTH;
-					s += -VIEWWINDOWWIDTH;
+					d += -PLANEWIDTH;
+					s += -PLANEWIDTH;
 				}
 
 				// copy new screen. We need to copy only between y_lookup and + dy y_lookup
-				s = &backbuffer[i]  + wipe_y_lookup[i] * VIEWWINDOWWIDTH;
-				d = &frontbuffer[i] + wipe_y_lookup[i] * VIEWWINDOWWIDTH;
+				s = &backbuffer[i]  + wipe_y_lookup[i] * PLANEWIDTH;
+				d = &frontbuffer[i] + wipe_y_lookup[i] * PLANEWIDTH;
 
 				for (int16_t j = 0 ; j < dy; j++)
 				{
 					*d = *s;
-					d += VIEWWINDOWWIDTH;
-					s += VIEWWINDOWWIDTH;
+					d += PLANEWIDTH;
+					s += PLANEWIDTH;
 				}
 
 				wipe_y_lookup[i] += dy;

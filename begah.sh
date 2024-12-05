@@ -1,1 +1,1 @@
-source ./bega.sh 80
+source ./bega.sh 60
