@@ -77,6 +77,7 @@ extern const int16_t CENTERY;
 
 static uint8_t __far* _s_screen;
 static uint8_t __far* colors;
+static uint16_t colorsoffset;
 
 
 void I_ReloadPalette(void)
@@ -123,7 +124,8 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	__djgpp_nearptr_enable();
 	_s_screen = D_MK_FP(PAGE1, ((PLANEWIDTH - VIEWWINDOWWIDTH) / 2) + ((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * PLANEWIDTH + __djgpp_conventional_base);
 
-	colors = D_MK_FP(D_FP_SEG(_s_screen), (PAGE_SIZE * 2) << 4 + __djgpp_conventional_base); // PAGE3:0000
+	colorsoffset = (PAGE_SIZE * 2) << 4;
+	colors = D_MK_FP(D_FP_SEG(_s_screen), colorsoffset + __djgpp_conventional_base); // PAGE3:0000
 	volatile uint8_t __far* dst = colors;
 
 	outp(SC_INDEX, SC_MAPMASK);
@@ -225,11 +227,13 @@ void I_FinishUpdate(void)
 	outp(CRTC_INDEX, CRTC_STARTHIGH);
 	outp(CRTC_INDEX + 1, D_FP_SEG(_s_screen) >> 4);
 	_s_screen = D_MK_FP(D_FP_SEG(_s_screen) + PAGE_SIZE, D_FP_OFF(_s_screen));
-	colors = D_MK_FP(D_FP_SEG(_s_screen), D_FP_OFF(colors) - (PAGE_SIZE << 4) + __djgpp_conventional_base);
+	colorsoffset = D_FP_OFF(colors) - (PAGE_SIZE << 4);
+	colors = D_MK_FP(D_FP_SEG(_s_screen), colorsoffset + __djgpp_conventional_base);
 	if (D_FP_SEG(_s_screen) == PAGE3)
 	{
 		_s_screen = D_MK_FP(PAGE0, D_FP_OFF(_s_screen));
-		colors = D_MK_FP(D_FP_SEG(_s_screen), (PAGE_SIZE * 3) << 4 + __djgpp_conventional_base);
+		colorsoffset = (PAGE_SIZE * 3) << 4 ;
+		colors = D_MK_FP(D_FP_SEG(_s_screen), colorsoffset + __djgpp_conventional_base);
 	}
 }
 
@@ -244,7 +248,6 @@ static uint16_t nearcolormapoffset = 0xffff;
 
 static const uint8_t __far* source;
 static uint8_t __far* dest;
-static uint16_t colorsoffset;
 
 
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
@@ -318,8 +321,6 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 
 	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
 	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
-
-	colorsoffset = D_FP_OFF(colors);
 
 	R_DrawColumn2(fracstep, frac, count);
 }
