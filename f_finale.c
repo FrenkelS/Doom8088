@@ -58,6 +58,7 @@ static boolean midstage;                 // whether we're in "mid-stage"
 
 
 static int16_t help2num;
+static int16_t backgroundnum;
 
 
 // defines for the end mission display text                     // phares
@@ -150,7 +151,10 @@ void F_Ticker(void)
 void F_Drawer (void)
 {
 	if (!finalestage)
+	{
+		V_DrawBackground(backgroundnum);
 		F_TextWrite(finalecount, Get_TextSpeed());
+	}
 	else
 		V_DrawRawFullScreen(help2num);
 }
@@ -158,5 +162,6 @@ void F_Drawer (void)
 
 void F_Init(void)
 {
-	help2num = W_GetNumForName("HELP2");
+	help2num      = W_GetNumForName("HELP2");
+	backgroundnum = W_GetNumForName("FLOOR4_8");
 }

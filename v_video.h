@@ -48,7 +48,7 @@
 // VIDEO
 //
 
-void V_DrawBackground(void);
+void V_DrawBackground(int16_t backgroundnum);
 
 void V_DrawRaw(int16_t num, uint16_t offset);
 void V_DrawRawFullScreen(int16_t num);

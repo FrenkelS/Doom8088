@@ -469,9 +469,9 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 }
 
 
-void V_DrawBackground(void)
+void V_DrawBackground(int16_t backgroundnum)
 {
-	const byte __far* src = W_GetLumpByName("FLOOR4_8");
+	const byte __far* src = W_GetLumpByNum(backgroundnum);
 
 	for (int16_t plane = 0; plane < 4; plane++)
 	{

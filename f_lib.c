@@ -43,8 +43,6 @@
 // written.
 void F_TextWrite(int32_t finalecount, int32_t textSpeed)
 {
-	V_DrawBackground();
-
 	int16_t font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 
 	// draw some of the text onto the screen
