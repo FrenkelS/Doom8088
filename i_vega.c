@@ -384,8 +384,13 @@ void V_FillRect(byte colour)
 {
 	uint8_t __far* dest = _s_screen;
 	volatile uint8_t loadLatches = colors[colour];
-	for (int16_t i = 0; i < VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT; i++)
-		*dest++ = 0;
+	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
+	{
+		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+			*dest++ = 0;
+
+		dest += PLANEWIDTH - VIEWWINDOWWIDTH;
+	}
 }
 
 
