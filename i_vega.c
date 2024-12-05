@@ -664,8 +664,8 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
-	static const int32_t DX  = (((int32_t)VIEWWINDOWWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
-	static const int16_t DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / VIEWWINDOWWIDTH) >> 8;
+	static const int32_t DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
+	static const int16_t DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH) >> 8;
 	static const int32_t DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
 	static const int16_t DYI = ((((int32_t)SCREENHEIGHT_VGA)<<FRACBITS) / SCREENHEIGHT) >> 8;
 
@@ -678,14 +678,27 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 	uint16_t col = 0;
 
+	// set write mode 2
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, 2);
+
+	outp(GC_INDEX, GC_BITMASK);
+
 	for (int16_t dc_x = left; dc_x < right; dc_x++, col += DXI)
 	{
 		if (dc_x < 0)
 			continue;
-		else if (dc_x >= VIEWWINDOWWIDTH)
+		else if (dc_x >= SCREENWIDTH)
 			break;
 
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
+		const column_t __far* column;
+		column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
+
+		uint8_t bitmask = 128 >> ((dc_x * SCALE_FACTOR) & 7);
+#if VIEWWINDOWWIDTH == 30
+
+#elif VIEWWINDOWWIDTH == 60
+		outp(GC_INDEX + 1, bitmask);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
@@ -697,7 +710,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 			int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
 
-			byte __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dc_x;
+			byte __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + ((dc_x * SCALE_FACTOR) >> 3);
 
 			int16_t frac = 0;
 
@@ -706,8 +719,44 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			int16_t count = dc_yh - dc_yl;
 			while (count--)
 			{
-				volatile uint8_t loadLatches = colors[source[frac >> 8]];
-				*dest = 0;
+				volatile uint8_t loadLatches = *dest;
+				*dest = source[frac >> 8] >> 4;
+				dest += PLANEWIDTH;
+				frac += DYI;
+			}
+
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+
+		column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
+		bitmask >>= 1;
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
+
+		outp(GC_INDEX + 1, bitmask);
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			int16_t dc_yl = (((y + column->topdelta) * DY) >> FRACBITS);
+
+			if ((dc_yl >= SCREENHEIGHT) || (dc_yl > bottom))
+				break;
+
+			int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
+
+			byte __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + ((dc_x * SCALE_FACTOR) >> 3);
+
+			int16_t frac = 0;
+
+			const byte __far* source = (const byte __far*)column + 3;
+
+			int16_t count = dc_yh - dc_yl;
+			while (count--)
+			{
+				volatile uint8_t loadLatches = *dest;
+				*dest = source[frac >> 8];
 				dest += PLANEWIDTH;
 				frac += DYI;
 			}
@@ -715,6 +764,10 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
 		}
 	}
+
+	// set write mode 1
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, 1);
 }
 
 
