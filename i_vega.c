@@ -244,54 +244,56 @@ static uint16_t nearcolormapoffset = 0xffff;
 
 static const uint8_t __far* source;
 static uint8_t __far* dest;
+static uint16_t colorsoffset;
 
 
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
-	const uint8_t __far* clrs = D_MK_FP(D_FP_SEG(dest), D_FP_OFF(colors) + __djgpp_conventional_base);
+	const uint8_t __far* clrs = D_MK_FP(D_FP_SEG(dest), colorsoffset + __djgpp_conventional_base);
 	volatile uint8_t loadLatches;
+	uint8_t __far* dst = dest;
 
 	int16_t l = count >> 4;
 	while (l--)
 	{
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
 
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
 
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
 
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
 	}
 
 	switch (count & 15)
 	{
-		case 15: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case 14: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case 13: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case 12: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case 11: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case 10: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  9: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  8: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  7: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  6: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  5: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  4: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  3: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  2: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0; dest += PLANEWIDTH; frac += fracstep;
-		case  1: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dest = 0;
+		case 15: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case 14: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case 13: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case 12: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case 11: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case 10: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  9: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  8: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  7: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  6: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  5: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  4: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  3: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  2: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0; dst += PLANEWIDTH; frac += fracstep;
+		case  1: loadLatches = clrs[nearcolormap[source[frac >> COLBITS]]]; *dst = 0;
 	}
 }
 
@@ -317,9 +319,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
 	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
 
-	// Inner loop that does the actual texture mapping,
-	//  e.g. a DDA-lile scaling.
-	// This is as fast as it gets.
+	colorsoffset = D_FP_OFF(colors);
 
 	R_DrawColumn2(fracstep, frac, count);
 }
