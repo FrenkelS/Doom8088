@@ -469,31 +469,69 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 }
 
 
-void V_DrawBackground(int16_t backgroundnum)
-{
-	const byte __far* src = W_GetLumpByNum(backgroundnum);
+static int16_t cachedLumpNum;
 
-	for (int16_t plane = 0; plane < 4; plane++)
+
+static void V_Blit(int16_t num, int16_t offset, int16_t height)
+{
+	if (cachedLumpNum == num)
 	{
-		outp(SC_INDEX + 1, 1 << plane);
-		for (int16_t y = 0; y < SCREENHEIGHT; y++)
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+		uint8_t __far* src  = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
+		for (int16_t y = 0; y < height; y++)
 		{
-			uint8_t __far* dest = _s_screen + y * PLANEWIDTH;
 			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
 			{
-				*dest++ = src[(y & 63) * 64 + (((x * 4) + plane) & 63)];
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
 			}
 		}
-	}
-	outp(SC_INDEX + 1, 15);
 
-	Z_ChangeTagToCache(src);
+		// set write mode 0
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+	}
+}
+
+
+void V_DrawBackground(int16_t backgroundnum)
+{
+	if (cachedLumpNum != backgroundnum)
+	{
+		const uint8_t __far* lump = W_TryGetLumpByNum(backgroundnum);
+
+		if (lump != NULL)
+		{
+			for (int16_t plane = 0; plane < 4; plane++)
+			{
+				outp(SC_INDEX + 1, 1 << plane);
+				for (int16_t y = 0; y < SCREENHEIGHT; y++)
+				{
+					uint8_t __far* dest = D_MK_FP(PAGE3, y * PLANEWIDTH + __djgpp_conventional_base);
+					for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+					{
+						*dest++ = lump[(y & 63) * 64 + (((x * 4) + plane) & 63)];
+					}
+				}
+			}
+			outp(SC_INDEX + 1, 15);
+
+			Z_ChangeTagToCache(lump);
+
+			cachedLumpNum = backgroundnum;
+		}
+	}
+
+	V_Blit(backgroundnum, 0, SCREENHEIGHT);
 }
 
 
 void V_DrawRaw(int16_t num, uint16_t offset)
 {
-	static int16_t cachedLumpNum;
 	static int16_t cachedLumpHeight;
 
 	if (cachedLumpNum != num)
@@ -523,27 +561,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 		}
 	}
 
-	if (cachedLumpNum == num)
-	{
-		// set write mode 1
-		outp(GC_INDEX, GC_MODE);
-		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
-
-		uint8_t __far* src  = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
-		uint8_t __far* dest = _s_screen + (offset / SCREENWIDTH) * PLANEWIDTH;
-		for (int16_t y = 0; y < cachedLumpHeight; y++)
-		{
-			for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
-			{
-				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
-				dest[y * PLANEWIDTH + x] = 0;
-			}
-		}
-
-		// set write mode 0
-		outp(GC_INDEX, GC_MODE);
-		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
-	}
+	V_Blit(num, offset, cachedLumpHeight);
 }
 
 
