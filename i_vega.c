@@ -473,23 +473,57 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 		if (lump != NULL)
 		{
+			// set write mode 2
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, 2);
+
+			outp(GC_INDEX, GC_BITMASK);
+			uint8_t bitmask = 128;
+
 			uint16_t lumpLength = W_LumpLength(num);
 			cachedLumpHeight = lumpLength / SCREENWIDTH;
 			uint8_t __far* src  = (uint8_t __far*)lump;
+#if VIEWWINDOWWIDTH == 60
+			volatile
+#endif
 			uint8_t __far* dest = D_MK_FP(PAGE3 + (256 >> 4), 0 + __djgpp_conventional_base);
 			for (int16_t y = 0; y < cachedLumpHeight; y++)
 			{
-				for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+				for (int16_t x = 0; x < SCREENWIDTH; x++)
 				{
-					volatile uint8_t loadLatches = colors[*src];
-					*dest++ = 0;
-					src += (SCREENWIDTH / VIEWWINDOWWIDTH);
+					volatile uint8_t loadLatches;
+					uint8_t c = *src++;
+					outp(GC_INDEX + 1, bitmask);
+					loadLatches = *dest;
+
+#if VIEWWINDOWWIDTH == 30
+
+#elif VIEWWINDOWWIDTH == 60
+					*dest = c >> 4;
+					bitmask >>= 1;
+					outp(GC_INDEX + 1, bitmask);
+					loadLatches = *dest;
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
+
+					*dest = c;
+					bitmask >>= 1;
+					if (!bitmask)
+					{
+						bitmask = 128;
+						dest++;
+					}
 				}
 				dest += PLANEWIDTH - VIEWWINDOWWIDTH;
 			}
 
 			Z_ChangeTagToCache(lump);
 			cachedLumpNum = num;
+
+			// set write mode 1
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, 1);
 		}
 	}
 
