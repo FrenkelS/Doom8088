@@ -472,7 +472,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 static int16_t cachedLumpNum;
 
 
-static void V_Blit(int16_t num, int16_t offset, int16_t height)
+static void V_Blit(int16_t num, uint16_t offset, int16_t height)
 {
 	if (cachedLumpNum == num)
 	{
