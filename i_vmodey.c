@@ -502,28 +502,25 @@ void V_DrawBackground(int16_t backgroundnum)
 {
 	if (cachedLumpNum != backgroundnum)
 	{
-		const uint8_t __far* lump = W_TryGetLumpByNum(backgroundnum);
+		const uint8_t __far* lump = W_GetLumpByNum(backgroundnum);
 
-		if (lump != NULL)
+		for (int16_t plane = 0; plane < 4; plane++)
 		{
-			for (int16_t plane = 0; plane < 4; plane++)
+			outp(SC_INDEX + 1, 1 << plane);
+			for (int16_t y = 0; y < SCREENHEIGHT; y++)
 			{
-				outp(SC_INDEX + 1, 1 << plane);
-				for (int16_t y = 0; y < SCREENHEIGHT; y++)
+				uint8_t __far* dest = D_MK_FP(PAGE3, y * PLANEWIDTH + __djgpp_conventional_base);
+				for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
 				{
-					uint8_t __far* dest = D_MK_FP(PAGE3, y * PLANEWIDTH + __djgpp_conventional_base);
-					for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
-					{
-						*dest++ = lump[(y & 63) * 64 + (((x * 4) + plane) & 63)];
-					}
+					*dest++ = lump[(y & 63) * 64 + (((x * 4) + plane) & 63)];
 				}
 			}
-			outp(SC_INDEX + 1, 15);
-
-			Z_ChangeTagToCache(lump);
-
-			cachedLumpNum = backgroundnum;
 		}
+		outp(SC_INDEX + 1, 15);
+
+		Z_ChangeTagToCache(lump);
+
+		cachedLumpNum = backgroundnum;
 	}
 
 	V_Blit(backgroundnum, 0, SCREENHEIGHT);

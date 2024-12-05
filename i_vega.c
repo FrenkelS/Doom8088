@@ -470,52 +470,49 @@ void V_DrawBackground(int16_t backgroundnum)
 {
 	if (cachedLumpNum != backgroundnum)
 	{
-		const byte __far* lump = W_TryGetLumpByNum(backgroundnum);
+		const byte __far* lump = W_GetLumpByNum(backgroundnum);
 
-		if (lump != NULL)
+		volatile uint8_t __far* dest = D_MK_FP(PAGE3 + (256 >> 4), 0 + __djgpp_conventional_base);
+
+		// set write mode 2
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, 2);
+
+		outp(GC_INDEX, GC_BITMASK);	
+
+		for (int16_t y = 0; y < SCREENHEIGHT; y++)
 		{
-			volatile uint8_t __far* dest = D_MK_FP(PAGE3 + (256 >> 4), 0 + __djgpp_conventional_base);
-
-			// set write mode 2
-			outp(GC_INDEX, GC_MODE);
-			outp(GC_INDEX + 1, 2);
-
-			outp(GC_INDEX, GC_BITMASK);	
-
-			for (int16_t y = 0; y < SCREENHEIGHT; y++)
+			for (int16_t x = 0; x < SCREENWIDTH; x++)
 			{
-				for (int16_t x = 0; x < SCREENWIDTH; x++)
-				{
-					uint8_t c = lump[(y & 63) * 64 + (x & 63)];
-					uint16_t offset = y * PLANEWIDTH + ((x * SCALE_FACTOR) >> 3);
-					volatile uint8_t loadLatches;
+				uint8_t c = lump[(y & 63) * 64 + (x & 63)];
+				uint16_t offset = y * PLANEWIDTH + ((x * SCALE_FACTOR) >> 3);
+				volatile uint8_t loadLatches;
 
 #if VIEWWINDOWWIDTH == 30
-					outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 0) & 7));
-					loadLatches = dest[offset];
-					dest[offset] = c;
+				outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 0) & 7));
+				loadLatches = dest[offset];
+				dest[offset] = c;
 #elif VIEWWINDOWWIDTH == 60
-					outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 0) & 7));
-					loadLatches = dest[offset];
-					dest[offset] = c >> 4;
+				outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 0) & 7));
+				loadLatches = dest[offset];
+				dest[offset] = c >> 4;
 
-					outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 1) & 7));
-					loadLatches = dest[offset];
-					dest[offset] = c;
+				outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 1) & 7));
+				loadLatches = dest[offset];
+				dest[offset] = c;
 #else
 #error unsupported VIEWWINDOWWIDTH value
 #endif
-				}
 			}
-
-			Z_ChangeTagToCache(lump);
-
-			cachedLumpNum = backgroundnum;
-
-			// set write mode 1
-			outp(GC_INDEX, GC_MODE);
-			outp(GC_INDEX + 1, 1);
 		}
+
+		Z_ChangeTagToCache(lump);
+
+		cachedLumpNum = backgroundnum;
+
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, 1);
 	}
 
 	V_Blit(backgroundnum, 0, SCREENHEIGHT);
