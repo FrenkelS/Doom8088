@@ -42,9 +42,11 @@
 #if VIEWWINDOWWIDTH == 30
 #define SCREEN_MODE	0x0d
 #define PLANEWIDTH 40
+#define SCALE_FACTOR 1
 #elif VIEWWINDOWWIDTH == 60
 #define SCREEN_MODE 0x0e
 #define PLANEWIDTH 80
+#define SCALE_FACTOR 2
 #else
 #error unsupported VIEWWINDOWWIDTH value
 #endif
@@ -523,14 +525,29 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
 	y -= patch->topoffset;
 	x -= patch->leftoffset;
+	x *= SCALE_FACTOR;
 
-	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + (x / (SCREENWIDTH / VIEWWINDOWWIDTH));
+	byte __far* desttop = _s_screen + (y * PLANEWIDTH) + (x >> 3);
 
 	int16_t width = patch->width;
 
-	for (int16_t col = 0; col < width; col += (SCREENWIDTH / VIEWWINDOWWIDTH), desttop++)
+	// set write mode 2
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, 2);
+
+	outp(GC_INDEX, GC_BITMASK);
+	uint8_t bitmask = 128 >> (x & 7);
+
+	for (int16_t col = 0; col < width; col++)
 	{
-		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
+		const column_t __far* column;
+
+#if VIEWWINDOWWIDTH == 30
+
+#elif VIEWWINDOWWIDTH == 60
+		outp(GC_INDEX + 1, bitmask);
+
+		column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
@@ -544,22 +561,70 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			uint16_t l = count >> 2;
 			while (l--)
 			{
-				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
-				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
-				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
-				loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
 			}
 
 			switch (count & 3)
 			{
-				case 3: loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
-				case 2: loadLatches = colors[*source++]; *dest = 0; dest += PLANEWIDTH;
-				case 1: loadLatches = colors[*source++]; *dest = 0;
+				case 3: loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				case 2: loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				case 1: loadLatches = *dest; *dest = (*source++) >> 4;
 			}
 
 			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
 		}
+
+		bitmask >>= 1;
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
+
+		outp(GC_INDEX + 1, bitmask);
+
+		column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			const byte __far* source = (const byte __far*)column + 3;
+			byte __far* dest = desttop + (column->topdelta * PLANEWIDTH);
+
+			volatile uint8_t loadLatches;
+			uint16_t count = column->length;
+
+			uint16_t l = count >> 2;
+			while (l--)
+			{
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+			}
+
+			switch (count & 3)
+			{
+				case 3: loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				case 2: loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				case 1: loadLatches = *dest; *dest = *source++;
+			}
+
+			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
+		}
+
+		bitmask >>= 1;
+		if (!bitmask)
+		{
+			bitmask = 128;
+			desttop++;
+		}
 	}
+
+	// set write mode 1
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, 1);
 }
 
 
