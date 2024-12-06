@@ -790,7 +790,7 @@ static void AM_drawMline(mline_t* ml, uint8_t color)
 {
     fline_t fl;
 
-    if (color==247) // jff 4/3/98 if color is 247 (xparent), use black
+    if (color==mapcolor_back) // jff 4/3/98 if color is 247 (xparent), use black
         color=0;
 
     if (AM_clipMline(ml, &fl))
