@@ -82,6 +82,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |IDBEHOLDA |Auto-map                 |
 |IDBEHOLDL |Lite-Amp Goggles         |
 |IDCLEV    |Exit Level               |
+|IDEND     |Show end text            |
 |IDROCKET  |Enemy Rockets (GoldenEye)|
 |IDRATE    |Toggle FPS counter       |
 
