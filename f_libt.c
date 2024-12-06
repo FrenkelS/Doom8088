@@ -35,8 +35,6 @@
 
 void F_TextWrite(int32_t finalecount, int32_t textSpeed)
 {
-	V_DrawBackground();
-
 	// draw some of the text onto the screen
 	int16_t         cx = (VIEWWINDOWWIDTH  - 32) / 2;
 	int16_t         cy = (VIEWWINDOWHEIGHT - 12) / 2;

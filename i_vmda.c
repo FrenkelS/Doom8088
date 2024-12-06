@@ -42,7 +42,7 @@
 
 extern const int16_t CENTERY;
 
-static uint8_t __far* _s_screen;
+static uint8_t _s_screen[VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT];
 static uint8_t __far* videomemory;
 
 
@@ -65,18 +65,27 @@ void I_ReloadPalette(void)
 }
 
 
+static const uint8_t colors[14] =
+{
+	0x07,											// normal
+	0x70, 0x70, 0x70, 0x70, 0x78, 0x78, 0x78, 0x78,	// red
+	0x0e, 0x0e, 0x0e, 0x0e,							// yellow
+	0x01											// green
+};
+
+
 static void I_UploadNewPalette(int8_t pal)
 {
-	uint8_t a;
+	uint8_t attribute = colors[pal];
 
-	if (1 <= pal && pal <= 8)
-		a = 0x70;
-	else
-		a = 0x07;
+	for (int16_t y = VIEWWINDOWHEIGHT - 5; y < VIEWWINDOWHEIGHT - 1; y++)
+	{
+		for (int16_t x = 1; x < 11; x++)
+			videomemory[y * VIEWWINDOWWIDTH * 2 + x * 2 + 1] = attribute;
 
-	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 +  8 * 2 + 1] = a;
-	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 +  9 * 2 + 1] = a;
-	videomemory[(VIEWWINDOWHEIGHT - 4) * VIEWWINDOWWIDTH * 2 + 10 * 2 + 1] = a;
+		for (int16_t x = VIEWWINDOWWIDTH - 13; x < VIEWWINDOWWIDTH - 1; x++)
+			videomemory[y * VIEWWINDOWWIDTH * 2 + x * 2 + 1] = attribute;
+	}
 }
 
 
@@ -92,9 +101,6 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	__djgpp_nearptr_enable();
 	videomemory = D_MK_FP(I_GetTextModeVideoMemorySegment(), 0 + __djgpp_conventional_base);
-
-	_s_screen = Z_MallocStatic(VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
-	_fmemset(_s_screen, 0, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
 }
 
 
@@ -151,7 +157,7 @@ uint8_t nearcolormap[256];
 static uint16_t nearcolormapoffset = 0xffff;
 
 const uint8_t __far* source;
-uint8_t __far* dest;
+uint8_t *dest;
 
 
 #if defined C_ONLY
@@ -222,7 +228,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t *dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
 	switch (count)
 	{
@@ -261,7 +267,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 #define FUZZCOLOR4 0xb0
 #define FUZZTABLE 50
 
-static const int8_t fuzzcolors[FUZZTABLE] =
+static const uint8_t fuzzcolors[FUZZTABLE] =
 {
 	FUZZCOLOR1,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,
 	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR2,
@@ -280,7 +286,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t *dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
 	static int16_t fuzzpos = 0;
 
@@ -299,7 +305,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void V_FillRect(byte colour)
 {
-	_fmemset(_s_screen, colour, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
+	memset(_s_screen, colour, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
 }
 
 
@@ -337,13 +343,13 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 }
 
 
-void V_DrawBackground(void)
+void V_DrawBackground(int16_t backgroundnum)
 {
-	const byte __far* src = W_GetLumpByName("FLOOR4_8");
+	const byte __far* src = W_GetLumpByNum(backgroundnum);
 
 	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
 	{
-		uint8_t __far* dest = _s_screen + y * VIEWWINDOWWIDTH;
+		uint8_t *dest = _s_screen + y * VIEWWINDOWWIDTH;
 		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
 		{
 			*dest++ = src[((y * 2) & 63) * 64 + ((x * 2) & 63)];
@@ -370,6 +376,22 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 }
 
 
+void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
+{
+	UNUSED(x);
+	UNUSED(y);
+	UNUSED(patch);
+}
+
+
+void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
+{
+	UNUSED(x);
+	UNUSED(y);
+	UNUSED(patch);
+}
+
+
 void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c)
 {
 	UNUSED(color);
@@ -387,7 +409,7 @@ void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s)
 {
 	UNUSED(color);
 
-	uint8_t __far* dst = _s_screen + y * VIEWWINDOWWIDTH + x;
+	uint8_t *dst = _s_screen + y * VIEWWINDOWWIDTH + x;
 
 	while (*s)
 	{
@@ -434,7 +456,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 {
 	boolean done = true;
 
-	uint8_t __far* backbuffer = _s_screen;
+	uint8_t *backbuffer = _s_screen;
 
 	while (ticks--)
 	{

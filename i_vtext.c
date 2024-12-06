@@ -426,7 +426,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 #define FUZZCOLOR4 0x88
 #define FUZZTABLE 50
 
-static const int8_t fuzzcolors[FUZZTABLE] =
+static const uint8_t fuzzcolors[FUZZTABLE] =
 {
 	FUZZCOLOR1,FUZZCOLOR2,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,
 	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR1,FUZZCOLOR2,
@@ -510,29 +510,44 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 }
 
 
-void V_DrawBackground(void)
-{
-	const byte __far* src = W_GetLumpByName("FLOOR4_8");
+static int16_t cachedLumpNum;
 
-	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
+
+static void V_Blit(int16_t num)
+{
+	if (cachedLumpNum == num)
+		_fmemcpy(_s_screen - 1, D_MK_FP(PAGE3, 0 + __djgpp_conventional_base), PLANEWIDTH * VIEWWINDOWHEIGHT);
+}
+
+
+void V_DrawBackground(int16_t backgroundnum)
+{
+	if (cachedLumpNum != backgroundnum)
 	{
-		uint8_t __far* dest = _s_screen + y * PLANEWIDTH;
-		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+		const uint8_t __far* lump = W_GetLumpByNum(backgroundnum);
+
+		for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
 		{
-			*dest++ = src[((y * 2) & 63) * 64 + ((x * 2) & 63)];
-			dest++;
+			uint8_t __far* dest = D_MK_FP(PAGE3, y * PLANEWIDTH + 1 + __djgpp_conventional_base);
+			for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
+			{
+				*dest++ = lump[((y * 2) & 63) * 64 + ((x * 2) & 63)];
+				dest++;
+			}
 		}
+
+		Z_ChangeTagToCache(lump);
+
+		cachedLumpNum = backgroundnum;
 	}
 
-	Z_ChangeTagToCache(src);
+	V_Blit(backgroundnum);
 }
 
 
 void V_DrawRaw(int16_t num, uint16_t offset)
 {
 	UNUSED(offset);
-
-	static int16_t cachedLumpNum;
 
 	if (cachedLumpNum != num)
 	{
@@ -561,8 +576,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 		}
 	}
 
-	if (cachedLumpNum == num)
-		_fmemcpy(_s_screen - 1, D_MK_FP(PAGE3, 0 + __djgpp_conventional_base), PLANEWIDTH * VIEWWINDOWHEIGHT);
+	V_Blit(num);
 }
 
 

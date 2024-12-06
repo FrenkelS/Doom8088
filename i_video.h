@@ -54,7 +54,7 @@ void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *ds
 
 void V_FillRect(byte colour);
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color);
-void V_DrawBackground(void);
+void V_DrawBackground(int16_t backgroundnum);
 void V_DrawRaw(int16_t num, uint16_t offset);
 
 void ST_Drawer(void);
