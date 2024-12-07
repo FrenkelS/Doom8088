@@ -414,9 +414,9 @@ void V_InitDrawLine(void)
 	outp(GC_INDEX, GC_BITMASK);
 }
 
+
 void V_ShutdownDrawLine(void)
 {
-
 	// set write mode 1
 	outp(GC_INDEX, GC_MODE);
 	outp(GC_INDEX + 1, 1);
