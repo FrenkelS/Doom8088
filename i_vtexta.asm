@@ -59,15 +59,15 @@ R_DrawColumn2:
 %assign i VIEWWINDOWHEIGHT
 %rep VIEWWINDOWHEIGHT-1
 last_pixel%+i:
-	mov al, dh
-	shr al, 1
-	mov bx, si
-	xlat
-	mov bx, cx
-	ss xlat
-	stosb
-	add di, PLANEWIDTH-1
-	add dx, bp
+	mov al, dh						; al = hi byte of frac
+	shr al, 1						; 0 <= al <= 127
+	mov bx, si						; bx = source
+	xlat							; al = source[al]
+	mov bx, cx						; bx = nearcolormap
+	ss xlat							; al = nearcolormap[al]
+	stosb							; write pixel
+	add di, PLANEWIDTH-1			; point to next line
+	add dx, bp						; frac += fracstep
 %assign i i-1
 %endrep
 
