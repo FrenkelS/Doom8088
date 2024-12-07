@@ -40,9 +40,12 @@
 #include "globdata.h"
 
 
+#define PLANEWIDTH (VIEWWINDOWWIDTH*2)
+
+
 extern const int16_t CENTERY;
 
-static uint8_t _s_screen[VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT];
+static uint8_t _s_screen[PLANEWIDTH * VIEWWINDOWHEIGHT];
 static uint8_t __far* videomemory;
 
 
@@ -81,10 +84,10 @@ static void I_UploadNewPalette(int8_t pal)
 	for (int16_t y = VIEWWINDOWHEIGHT - 5; y < VIEWWINDOWHEIGHT - 1; y++)
 	{
 		for (int16_t x = 1; x < 11; x++)
-			videomemory[y * VIEWWINDOWWIDTH * 2 + x * 2 + 1] = attribute;
+			_s_screen[y * PLANEWIDTH + x * 2 + 1] = attribute;
 
 		for (int16_t x = VIEWWINDOWWIDTH - 13; x < VIEWWINDOWWIDTH - 1; x++)
-			videomemory[y * VIEWWINDOWWIDTH * 2 + x * 2 + 1] = attribute;
+			_s_screen[y * PLANEWIDTH + x * 2 + 1] = attribute;
 	}
 }
 
@@ -101,21 +104,15 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	__djgpp_nearptr_enable();
 	videomemory = D_MK_FP(I_GetTextModeVideoMemorySegment(), 0 + __djgpp_conventional_base);
+
+	for (int16_t i = 1; i < PLANEWIDTH * VIEWWINDOWHEIGHT; i += 2)
+		_s_screen[i] = colors[0];
 }
 
 
 static void I_DrawBuffer(uint8_t __far* buffer)
 {
-	uint8_t __far* src = buffer;
-	uint8_t __far* dst = videomemory;
-	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
-	{
-		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
-		{
-			*dst++ = *src++;
-			dst++;
-		}
-	}
+	_fmemcpy(videomemory, buffer, PLANEWIDTH * VIEWWINDOWHEIGHT);
 }
 
 
@@ -165,30 +162,30 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	switch (count)
 	{
-		case 25: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 24: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 23: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 22: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 21: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 20: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 19: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 18: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 17: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 16: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
-		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 25: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 24: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 23: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 22: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 21: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 20: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 19: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 18: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 17: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 16: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
 		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
 	}
 }
@@ -212,7 +209,7 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
 	}
 
-	dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x * 2;
 
 	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
 	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
@@ -228,34 +225,34 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t *dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t *dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x * 2;
 
 	switch (count)
 	{
-		case 25: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 24: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 23: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 22: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 21: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 20: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 19: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 18: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 17: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 16: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 15: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 14: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 13: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 12: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 11: *dest = color; dest += VIEWWINDOWWIDTH;
-		case 10: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  9: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  8: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  7: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  6: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  5: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  4: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  3: *dest = color; dest += VIEWWINDOWWIDTH;
-		case  2: *dest = color; dest += VIEWWINDOWWIDTH;
+		case 25: *dest = color; dest += PLANEWIDTH;
+		case 24: *dest = color; dest += PLANEWIDTH;
+		case 23: *dest = color; dest += PLANEWIDTH;
+		case 22: *dest = color; dest += PLANEWIDTH;
+		case 21: *dest = color; dest += PLANEWIDTH;
+		case 20: *dest = color; dest += PLANEWIDTH;
+		case 19: *dest = color; dest += PLANEWIDTH;
+		case 18: *dest = color; dest += PLANEWIDTH;
+		case 17: *dest = color; dest += PLANEWIDTH;
+		case 16: *dest = color; dest += PLANEWIDTH;
+		case 15: *dest = color; dest += PLANEWIDTH;
+		case 14: *dest = color; dest += PLANEWIDTH;
+		case 13: *dest = color; dest += PLANEWIDTH;
+		case 12: *dest = color; dest += PLANEWIDTH;
+		case 11: *dest = color; dest += PLANEWIDTH;
+		case 10: *dest = color; dest += PLANEWIDTH;
+		case  9: *dest = color; dest += PLANEWIDTH;
+		case  8: *dest = color; dest += PLANEWIDTH;
+		case  7: *dest = color; dest += PLANEWIDTH;
+		case  6: *dest = color; dest += PLANEWIDTH;
+		case  5: *dest = color; dest += PLANEWIDTH;
+		case  4: *dest = color; dest += PLANEWIDTH;
+		case  3: *dest = color; dest += PLANEWIDTH;
+		case  2: *dest = color; dest += PLANEWIDTH;
 		case  1: *dest = color;
 	}
 }
@@ -286,14 +283,14 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t *dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+	uint8_t *dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x * 2;
 
 	static int16_t fuzzpos = 0;
 
 	do
 	{
 		*dest = fuzzcolors[fuzzpos];
-		dest += VIEWWINDOWWIDTH;
+		dest += PLANEWIDTH;
 
 		fuzzpos++;
 		if (fuzzpos >= FUZZTABLE)
@@ -305,7 +302,8 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void V_FillRect(byte colour)
 {
-	memset(_s_screen, colour, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
+	for (int16_t i = 0; i < PLANEWIDTH * VIEWWINDOWHEIGHT; i += 2)
+		_s_screen[i] = colour;
 }
 
 
@@ -321,7 +319,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	while (true)
 	{
-		_s_screen[y0 * VIEWWINDOWWIDTH + x0] = color;
+		_s_screen[y0 * PLANEWIDTH + x0 * 2] = color;
 
 		if (x0 == x1 && y0 == y1)
 			break;
@@ -349,10 +347,11 @@ void V_DrawBackground(int16_t backgroundnum)
 
 	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
 	{
-		uint8_t *dest = _s_screen + y * VIEWWINDOWWIDTH;
+		uint8_t *dest = _s_screen + y * PLANEWIDTH;
 		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
 		{
 			*dest++ = src[((y * 2) & 63) * 64 + ((x * 2) & 63)];
+			dest++;
 		}
 	}
 
@@ -368,7 +367,7 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 	if (lump != NULL)
 	{
-		_fmemcpy(_s_screen, lump, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
+		_fmemcpy(_s_screen, lump, PLANEWIDTH * VIEWWINDOWHEIGHT);
 		Z_ChangeTagToCache(lump);
 	}
 	else
@@ -395,7 +394,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c)
 {
 	UNUSED(color);
-	_s_screen[y * VIEWWINDOWWIDTH + x] = c;
+	_s_screen[y * PLANEWIDTH + x * 2 + 0] = c;
 }
 
 
@@ -409,11 +408,12 @@ void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s)
 {
 	UNUSED(color);
 
-	uint8_t *dst = _s_screen + y * VIEWWINDOWWIDTH + x;
+	uint8_t *dst = _s_screen + y * PLANEWIDTH + x * 2;
 
 	while (*s)
 	{
 		*dst++ = *s++;
+		dst++;
 	}
 }
 
@@ -443,11 +443,11 @@ static int16_t __far* wipe_y_lookup;
 
 void wipe_StartScreen(void)
 {
-	frontbuffer = Z_TryMallocStatic(VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
+	frontbuffer = Z_TryMallocStatic(PLANEWIDTH * VIEWWINDOWHEIGHT);
 	if (frontbuffer)
 	{
 		// copy back buffer to front buffer
-		_fmemcpy(frontbuffer, _s_screen, VIEWWINDOWWIDTH * VIEWWINDOWHEIGHT);
+		_fmemcpy(frontbuffer, _s_screen, PLANEWIDTH * VIEWWINDOWHEIGHT);
 	}
 }
 
@@ -461,7 +461,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 	while (ticks--)
 	{
 		I_DrawBuffer(frontbuffer);
-		for (int16_t i = 0; i < VIEWWINDOWWIDTH; i++)
+		for (int16_t i = 0; i < PLANEWIDTH; i++)
 		{
 			if (wipe_y_lookup[i] < 0)
 			{
@@ -478,8 +478,8 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				if (wipe_y_lookup[i] + dy >= VIEWWINDOWHEIGHT)
 					dy = VIEWWINDOWHEIGHT - wipe_y_lookup[i];
 
-				uint8_t __far* s = &frontbuffer[i] + ((VIEWWINDOWHEIGHT - dy - 1) * VIEWWINDOWWIDTH);
-				uint8_t __far* d = &frontbuffer[i] + ((VIEWWINDOWHEIGHT - 1) * VIEWWINDOWWIDTH);
+				uint8_t __far* s = &frontbuffer[i] + ((VIEWWINDOWHEIGHT - dy - 1) * PLANEWIDTH);
+				uint8_t __far* d = &frontbuffer[i] + ((VIEWWINDOWHEIGHT - 1) * PLANEWIDTH);
 
 				// scroll down the column. Of course we need to copy from the bottom... up to
 				// VIEWWINDOWHEIGHT - yLookup - dy
@@ -487,19 +487,19 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				for (int16_t j = VIEWWINDOWHEIGHT - wipe_y_lookup[i] - dy; j; j--)
 				{
 					*d = *s;
-					d += -VIEWWINDOWWIDTH;
-					s += -VIEWWINDOWWIDTH;
+					d += -PLANEWIDTH;
+					s += -PLANEWIDTH;
 				}
 
 				// copy new screen. We need to copy only between y_lookup and + dy y_lookup
-				s = &backbuffer[i]  + wipe_y_lookup[i] * VIEWWINDOWWIDTH;
-				d = &frontbuffer[i] + wipe_y_lookup[i] * VIEWWINDOWWIDTH;
+				s = &backbuffer[i]  + wipe_y_lookup[i] * PLANEWIDTH;
+				d = &frontbuffer[i] + wipe_y_lookup[i] * PLANEWIDTH;
 
 				for (int16_t j = 0 ; j < dy; j++)
 				{
 					*d = *s;
-					d += VIEWWINDOWWIDTH;
-					s += VIEWWINDOWWIDTH;
+					d += PLANEWIDTH;
+					s += PLANEWIDTH;
 				}
 
 				wipe_y_lookup[i] += dy;
@@ -514,11 +514,11 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 static void wipe_initMelt()
 {
-	wipe_y_lookup = Z_MallocStatic(VIEWWINDOWWIDTH * sizeof(int16_t));
+	wipe_y_lookup = Z_MallocStatic(PLANEWIDTH * sizeof(int16_t));
 
 	// setup initial column positions (y<0 => not ready to scroll yet)
 	wipe_y_lookup[0] = -(M_Random() % 16);
-	for (int16_t i = 1; i < VIEWWINDOWWIDTH; i++)
+	for (int16_t i = 1; i < PLANEWIDTH; i++)
 	{
 		int16_t r = (M_Random() % 3) - 1;
 
