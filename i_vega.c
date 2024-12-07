@@ -493,25 +493,24 @@ void V_DrawBackground(int16_t backgroundnum)
 		{
 			for (int16_t x = 0; x < SCREENWIDTH; x++)
 			{
-				uint8_t c = lump[(y & 63) * 64 + (x & 63)];
-				uint16_t offset = y * PLANEWIDTH + ((x * SCALE_FACTOR) >> 3);
-				volatile uint8_t loadLatches;
-
 #if VIEWWINDOWWIDTH == 30
-				outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 0) & 7));
-				loadLatches = dest[offset];
-				dest[offset] = c;
+				uint8_t c = lump[((y / 2) & 63) * 64 + (x & 63)];
 #elif VIEWWINDOWWIDTH == 60
-				outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 0) & 7));
-				loadLatches = dest[offset];
-				dest[offset] = c >> 4;
-
-				outp(GC_INDEX + 1, 128 >> ((x * SCALE_FACTOR + 1) & 7));
-				loadLatches = dest[offset];
-				dest[offset] = c;
+				uint8_t c = lump[( y      & 63) * 64 + (x & 63)];
 #else
 #error unsupported VIEWWINDOWWIDTH value
 #endif
+
+				uint16_t offset = y * PLANEWIDTH + ((x * 2) >> 3);
+				volatile uint8_t loadLatches;
+
+				outp(GC_INDEX + 1, 128 >> ((x * 2 + 0) & 7));
+				loadLatches = dest[offset];
+				dest[offset] = c >> 4;
+
+				outp(GC_INDEX + 1, 128 >> ((x * 2 + 1) & 7));
+				loadLatches = dest[offset];
+				dest[offset] = c;
 			}
 		}
 
