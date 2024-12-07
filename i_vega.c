@@ -405,6 +405,24 @@ void V_FillRect(byte colour)
 }
 
 
+void V_InitDrawLine(void)
+{
+	// set write mode 2
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, 2);
+
+	outp(GC_INDEX, GC_BITMASK);
+}
+
+void V_ShutdownDrawLine(void)
+{
+
+	// set write mode 1
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, 1);
+}
+
+
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
 	int16_t dx = abs(x1 - x0);
@@ -415,11 +433,6 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	int16_t err = dx + dy;
 
-	// set write mode 2
-	outp(GC_INDEX, GC_MODE);
-	outp(GC_INDEX + 1, 2);
-
-	outp(GC_INDEX, GC_BITMASK);
 	outp(GC_INDEX + 1, 128 >> (x0 & 7));
 
 	while (true)
@@ -445,10 +458,6 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 			y0  += sy;
 		}
 	}
-
-	// set write mode 1
-	outp(GC_INDEX, GC_MODE);
-	outp(GC_INDEX + 1, 1);
 }
 
 
