@@ -84,7 +84,7 @@ void R_DrawSky(draw_column_vars_t *dcvars)
 		const column_t __far* column = (const column_t __far*) ((const byte __far*)skypatch + (uint16_t)skypatch->columnofs[xc]);
 
 		dcvars->source = (const byte __far*)column + 3;
-		R_DrawColumn(dcvars);
+		R_DrawColumnWall(dcvars);
 	}
 }
 

@@ -17,8 +17,12 @@
 
 bits 16
 
+PLANEWIDTH equ 160
+VIEWWINDOWHEIGHT equ 25
+
 extern source
 extern nearcolormap
+extern attribute
 extern dest
 
 last_pixel_jump_table:
@@ -51,6 +55,7 @@ R_DrawColumn2:
 	mov bx, cx						; bx = count
 
 	mov cx, nearcolormap
+	mov ah, [attribute]
 
 	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
@@ -65,7 +70,7 @@ last_pixel%+i:
 	es xlat							; al = source[al]
 	mov bx, cx						; bx = nearcolormap
 	xlat							; al = nearcolormap[al]
-	mov [di], al					; write pixel
+	mov [di], ax					; write pixel
 	add di, PLANEWIDTH				; point to next line
 	add dx, bp						; frac += fracstep
 %assign i i-1
@@ -79,7 +84,7 @@ last_pixel1:
 	es xlat
 	mov bx, cx
 	xlat
-	mov [di], al
+	mov [di], ax
 
 last_pixel0:
 	pop bp

@@ -284,6 +284,12 @@ void I_SetPalette(int8_t pal)
 }
 
 
+void V_SetSTPalette(void)
+{
+	// Do nothing
+}
+
+
 #define NO_PALETTE_CHANGE 100
 
 
@@ -356,7 +362,7 @@ void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
 #endif
 
 
-void R_DrawColumn(const draw_column_vars_t *dcvars)
+void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -377,6 +383,12 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
 
 	R_DrawColumn2(fracstep, frac, count);
+}
+
+
+void R_DrawColumnWall(const draw_column_vars_t *dcvars)
+{
+	R_DrawColumnSprite(dcvars);
 }
 
 
@@ -599,6 +611,12 @@ void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c)
 }
 
 
+void V_DrawSTCharacter(int16_t x, int16_t y, uint8_t color, char c)
+{
+	V_DrawCharacter(x, y, color, c);
+}
+
+
 void V_DrawCharacterForeground(int16_t x, int16_t y, uint8_t color, char c)
 {
 	_s_screen[y * PLANEWIDTH + (x << 1) - 1] = c;
@@ -620,6 +638,12 @@ void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s)
 		x += 2;
 		s++;
 	}
+}
+
+
+void V_DrawSTString(int16_t x, int16_t y, uint8_t color, const char* s)
+{
+	V_DrawString(x, y, color, s);
 }
 
 
