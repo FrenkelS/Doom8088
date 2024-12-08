@@ -304,7 +304,8 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
 #endif
 
-void R_DrawColumn(const draw_column_vars_t *dcvars)
+
+void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -326,6 +327,12 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
 
 	R_DrawColumn2(fracstep, frac, count);
+}
+
+
+void R_DrawColumnWall(const draw_column_vars_t *dcvars)
+{
+	R_DrawColumnSprite(dcvars);
 }
 
 
