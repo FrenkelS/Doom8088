@@ -907,7 +907,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
 {
     fixed_t  frac;
 
-    R_DrawColumn_f colfunc = R_DrawColumn;
+    R_DrawColumn_f colfunc = R_DrawColumnSprite;
     draw_column_vars_t dcvars;
     dcvars.colormap = vis->colormap;
 
@@ -1046,7 +1046,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 			// draw the texture
 			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[xc]);
 
-			R_DrawMaskedColumn(R_DrawColumn, &dcvars, column);
+			R_DrawMaskedColumn(R_DrawColumnWall, &dcvars, column);
 			maskedtexturecol[dcvars.x] = SHRT_MAX; // dropoff overflow
 		}
 	}
@@ -1711,7 +1711,7 @@ static void R_DrawSegTextureColumn(const texture_t __far* tex, int16_t texture, 
             const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[x_c]);
 
             dcvars->source = (const byte __far*)column + 3;
-            R_DrawColumn (dcvars);
+            R_DrawColumnWall(dcvars);
             Z_ChangeTagToCache(patch);
         }
     }
@@ -1723,7 +1723,7 @@ static void R_DrawSegTextureColumn(const texture_t __far* tex, int16_t texture, 
         else
         {
             dcvars->source = source;
-            R_DrawColumn (dcvars);
+            R_DrawColumnWall(dcvars);
         }
     }
 }

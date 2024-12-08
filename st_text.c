@@ -69,22 +69,22 @@ static void STlib_drawNum(int16_t x, int16_t y, uint8_t color, int16_t num)
 {
 	if (0 <= num && num <= 9)
 	{
-		V_DrawCharacter(x + 2, y, color, '0' + num);
-		V_DrawCharacter(x + 1, y, color, ' ');
-		V_DrawCharacter(x + 0, y, color, ' ');
+		V_DrawSTCharacter(x + 2, y, color, '0' + num);
+		V_DrawSTCharacter(x + 1, y, color, ' ');
+		V_DrawSTCharacter(x + 0, y, color, ' ');
 	}
 	else if (10 <= num && num <= 99)
 	{
-		V_DrawCharacter(x + 2, y, color, '0' + (num % 10));
-		V_DrawCharacter(x + 1, y, color, '0' + (num / 10));
-		V_DrawCharacter(x + 0, y, color, ' ');
+		V_DrawSTCharacter(x + 2, y, color, '0' + (num % 10));
+		V_DrawSTCharacter(x + 1, y, color, '0' + (num / 10));
+		V_DrawSTCharacter(x + 0, y, color, ' ');
 	}
 	else
 	{
-		V_DrawCharacter(x + 2, y, color, '0' + (num % 10));
+		V_DrawSTCharacter(x + 2, y, color, '0' + (num % 10));
 		num /= 10;
-		V_DrawCharacter(x + 1, y, color, '0' + (num % 10));
-		V_DrawCharacter(x + 0, y, color, '0' + (num / 10));
+		V_DrawSTCharacter(x + 1, y, color, '0' + (num % 10));
+		V_DrawSTCharacter(x + 0, y, color, '0' + (num / 10));
 	}
 }
 
@@ -93,22 +93,22 @@ static void STlib_drawFps(int16_t x, int16_t y, uint8_t color, int16_t num)
 {
 	if (0 <= num && num <= 9)
 	{
-		V_DrawCharacter(x + 3, y, color, '0' + num);
-		V_DrawCharacter(x + 1, y, color, '0');
-		V_DrawCharacter(x + 0, y, color, ' ');
+		V_DrawSTCharacter(x + 3, y, color, '0' + num);
+		V_DrawSTCharacter(x + 1, y, color, '0');
+		V_DrawSTCharacter(x + 0, y, color, ' ');
 	}
 	else if (10 <= num && num <= 99)
 	{
-		V_DrawCharacter(x + 3, y, color, '0' + (num % 10));
-		V_DrawCharacter(x + 1, y, color, '0' + (num / 10));
-		V_DrawCharacter(x + 0, y, color, ' ');
+		V_DrawSTCharacter(x + 3, y, color, '0' + (num % 10));
+		V_DrawSTCharacter(x + 1, y, color, '0' + (num / 10));
+		V_DrawSTCharacter(x + 0, y, color, ' ');
 	}
 	else
 	{
-		V_DrawCharacter(x + 3, y, color, '0' + (num % 10));
+		V_DrawSTCharacter(x + 3, y, color, '0' + (num % 10));
 		num /= 10;
-		V_DrawCharacter(x + 1, y, color, '0' + (num % 10));
-		V_DrawCharacter(x + 0, y, color, '0' + (num / 10));
+		V_DrawSTCharacter(x + 1, y, color, '0' + (num % 10));
+		V_DrawSTCharacter(x + 0, y, color, '0' + (num / 10));
 	}
 }
 
@@ -121,7 +121,7 @@ static void ST_drawWidgets(void)
 	else if (weaponinfo[_g_player.readyweapon].ammo != am_noammo)
 		STlib_drawNum(8, VIEWWINDOWHEIGHT - 2, 4, _g_player.ammo[weaponinfo[_g_player.readyweapon].ammo]);
 	else
-		V_DrawString(8, VIEWWINDOWHEIGHT - 2, 4, "   ");
+		V_DrawSTString(8, VIEWWINDOWHEIGHT - 2, 4, "   ");
 
 	for (int16_t i = 0; i < NUMAMMO; i++)
 	{
@@ -136,42 +136,42 @@ static void ST_drawWidgets(void)
 
 	// keys
 	if (_g_player.cards[0])
-		V_DrawCharacter(8, VIEWWINDOWHEIGHT - 5, 9, 'B'); // Blue
+		V_DrawSTCharacter(8, VIEWWINDOWHEIGHT - 5, 9, 'B'); // Blue
 	else
-		V_DrawCharacter(8, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
+		V_DrawSTCharacter(8, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
 
 	if (_g_player.cards[1])
-		V_DrawCharacter(9, VIEWWINDOWHEIGHT - 5, 14, 'Y'); // Yellow
+		V_DrawSTCharacter(9, VIEWWINDOWHEIGHT - 5, 14, 'Y'); // Yellow
 	else
-		V_DrawCharacter(9, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
+		V_DrawSTCharacter(9, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
 
 	if (_g_player.cards[2])
-		V_DrawCharacter(10, VIEWWINDOWHEIGHT - 5, 12, 'R'); // Red
+		V_DrawSTCharacter(10, VIEWWINDOWHEIGHT - 5, 12, 'R'); // Red
 	else
-		V_DrawCharacter(10, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
+		V_DrawSTCharacter(10, VIEWWINDOWHEIGHT - 5, 7, '\xf9');
 }
 
 
 static void ST_refreshBackground(void)
 {
-	V_DrawString(1, VIEWWINDOWHEIGHT - 5, 7, "Keys   ");
-	V_DrawString(1, VIEWWINDOWHEIGHT - 4, 7, "Health ");
-	V_DrawString(1, VIEWWINDOWHEIGHT - 3, 7, "Armor  ");
+	V_DrawSTString(1, VIEWWINDOWHEIGHT - 5, 7, "Keys   ");
+	V_DrawSTString(1, VIEWWINDOWHEIGHT - 4, 7, "Health ");
+	V_DrawSTString(1, VIEWWINDOWHEIGHT - 3, 7, "Armor  ");
 
 	if (_g_fps_show)
-		V_DrawString(1, VIEWWINDOWHEIGHT - 2, 7, "FPS     .");
+		V_DrawSTString(1, VIEWWINDOWHEIGHT - 2, 7, "FPS     .");
 	else
-		V_DrawString(1, VIEWWINDOWHEIGHT - 2, 7, "Ammo   ");
+		V_DrawSTString(1, VIEWWINDOWHEIGHT - 2, 7, "Ammo   ");
 
-	V_DrawString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 5, 7, "Bull ");
-	V_DrawString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 4, 7, "Shel ");
-	V_DrawString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 3, 7, "Rckt ");
-	V_DrawString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 2, 7, "Cell ");
+	V_DrawSTString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 5, 7, "Bull ");
+	V_DrawSTString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 4, 7, "Shel ");
+	V_DrawSTString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 3, 7, "Rckt ");
+	V_DrawSTString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 2, 7, "Cell ");
 
-	V_DrawCharacter(VIEWWINDOWWIDTH - 5, VIEWWINDOWHEIGHT - 5, 7, '/');
-	V_DrawCharacter(VIEWWINDOWWIDTH - 5, VIEWWINDOWHEIGHT - 4, 7, '/');
-	V_DrawCharacter(VIEWWINDOWWIDTH - 5, VIEWWINDOWHEIGHT - 3, 7, '/');
-	V_DrawCharacter(VIEWWINDOWWIDTH - 5, VIEWWINDOWHEIGHT - 2, 7, '/');
+	V_DrawSTCharacter(VIEWWINDOWWIDTH - 5, VIEWWINDOWHEIGHT - 5, 7, '/');
+	V_DrawSTCharacter(VIEWWINDOWWIDTH - 5, VIEWWINDOWHEIGHT - 4, 7, '/');
+	V_DrawSTCharacter(VIEWWINDOWWIDTH - 5, VIEWWINDOWHEIGHT - 3, 7, '/');
+	V_DrawSTCharacter(VIEWWINDOWWIDTH - 5, VIEWWINDOWHEIGHT - 2, 7, '/');
 }
 
 
@@ -182,6 +182,8 @@ void ST_Drawer(void)
 
   // and refresh all widgets
   ST_drawWidgets();
+
+  V_SetSTPalette();
 }
 
 
