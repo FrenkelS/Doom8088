@@ -27,8 +27,11 @@
 #define __I_TEXT_MODE__
 
 void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c);
+void V_DrawSTCharacter(int16_t x, int16_t y, uint8_t color, char c);
 void V_DrawCharacterForeground(int16_t x, int16_t y, uint8_t color, char c);
 void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
+void V_DrawSTString(int16_t x, int16_t y, uint8_t color, const char* s);
+void V_SetSTPalette(void);
 void V_ClearString(int16_t y, size_t len);
 void I_InitScreenPage(void);
 void I_InitScreenPages(void);

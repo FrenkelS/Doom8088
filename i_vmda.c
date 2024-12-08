@@ -77,9 +77,12 @@ static const uint8_t colors[14] =
 };
 
 
-static void I_UploadNewPalette(int8_t pal)
+static int8_t newpal;
+
+
+void V_SetSTPalette(void)
 {
-	uint8_t attribute = colors[pal];
+	uint8_t attribute = colors[newpal];
 
 	for (int16_t y = VIEWWINDOWHEIGHT - 5; y < VIEWWINDOWHEIGHT - 1; y++)
 	{
@@ -104,9 +107,6 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	__djgpp_nearptr_enable();
 	videomemory = D_MK_FP(I_GetTextModeVideoMemorySegment(), 0 + __djgpp_conventional_base);
-
-	for (int16_t i = 1; i < PLANEWIDTH * VIEWWINDOWHEIGHT; i += 2)
-		_s_screen[i] = colors[0];
 }
 
 
@@ -122,26 +122,14 @@ void I_ShutdownGraphics(void)
 }
 
 
-static int8_t newpal;
-
-
 void I_SetPalette(int8_t pal)
 {
 	newpal = pal;
 }
 
 
-#define NO_PALETTE_CHANGE 100
-
-
 void I_FinishUpdate(void)
 {
-	if (newpal != NO_PALETTE_CHANGE)
-	{
-		I_UploadNewPalette(newpal);
-		newpal = NO_PALETTE_CHANGE;
-	}
-
 	I_DrawBuffer(_s_screen);
 }
 
@@ -155,6 +143,7 @@ static uint16_t nearcolormapoffset = 0xffff;
 
 const uint8_t __far* source;
 uint8_t *dest;
+uint8_t attribute;
 
 
 #if defined C_ONLY
@@ -194,7 +183,7 @@ void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
 #endif
 
 
-void R_DrawColumn(const draw_column_vars_t *dcvars)
+static void R_DrawColumn(const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -218,6 +207,20 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 }
 
 
+void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
+{
+	attribute = 0x0f;
+	R_DrawColumn(dcvars);
+}
+
+
+void R_DrawColumnWall(const draw_column_vars_t *dcvars)
+{
+	attribute = 0x07;
+	R_DrawColumn(dcvars);
+}
+
+
 void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
@@ -225,35 +228,36 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	uint8_t *dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x * 2;
+	uint16_t *dest = (uint16_t*)(_s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x * 2);
+	uint16_t c = 0x0700 | color;
 
 	switch (count)
 	{
-		case 25: *dest = color; dest += PLANEWIDTH;
-		case 24: *dest = color; dest += PLANEWIDTH;
-		case 23: *dest = color; dest += PLANEWIDTH;
-		case 22: *dest = color; dest += PLANEWIDTH;
-		case 21: *dest = color; dest += PLANEWIDTH;
-		case 20: *dest = color; dest += PLANEWIDTH;
-		case 19: *dest = color; dest += PLANEWIDTH;
-		case 18: *dest = color; dest += PLANEWIDTH;
-		case 17: *dest = color; dest += PLANEWIDTH;
-		case 16: *dest = color; dest += PLANEWIDTH;
-		case 15: *dest = color; dest += PLANEWIDTH;
-		case 14: *dest = color; dest += PLANEWIDTH;
-		case 13: *dest = color; dest += PLANEWIDTH;
-		case 12: *dest = color; dest += PLANEWIDTH;
-		case 11: *dest = color; dest += PLANEWIDTH;
-		case 10: *dest = color; dest += PLANEWIDTH;
-		case  9: *dest = color; dest += PLANEWIDTH;
-		case  8: *dest = color; dest += PLANEWIDTH;
-		case  7: *dest = color; dest += PLANEWIDTH;
-		case  6: *dest = color; dest += PLANEWIDTH;
-		case  5: *dest = color; dest += PLANEWIDTH;
-		case  4: *dest = color; dest += PLANEWIDTH;
-		case  3: *dest = color; dest += PLANEWIDTH;
-		case  2: *dest = color; dest += PLANEWIDTH;
-		case  1: *dest = color;
+		case 25: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 24: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 23: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 22: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 21: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 20: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 19: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 18: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 17: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 16: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 15: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 14: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 13: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 12: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 11: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case 10: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  9: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  8: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  7: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  6: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  5: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  4: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  3: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  2: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
+		case  1: *dest = c;
 	}
 }
 
@@ -289,8 +293,9 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	do
 	{
-		*dest = fuzzcolors[fuzzpos];
-		dest += PLANEWIDTH;
+		*dest++ = fuzzcolors[fuzzpos];
+		*dest   = 0x07;
+		dest += PLANEWIDTH-1;
 
 		fuzzpos++;
 		if (fuzzpos >= FUZZTABLE)
@@ -351,7 +356,7 @@ void V_DrawBackground(int16_t backgroundnum)
 		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
 		{
 			*dest++ = src[((y * 2) & 63) * 64 + ((x * 2) & 63)];
-			dest++;
+			*dest++ = 0x07;
 		}
 	}
 
@@ -393,8 +398,15 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c)
 {
-	UNUSED(color);
 	_s_screen[y * PLANEWIDTH + x * 2 + 0] = c;
+	_s_screen[y * PLANEWIDTH + x * 2 + 1] = color;
+}
+
+
+void V_DrawSTCharacter(int16_t x, int16_t y, uint8_t color, char c)
+{
+	UNUSED(color);
+	_s_screen[y * PLANEWIDTH + x * 2] = c;
 }
 
 
@@ -405,6 +417,18 @@ void V_DrawCharacterForeground(int16_t x, int16_t y, uint8_t color, char c)
 
 
 void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s)
+{
+	uint8_t *dst = _s_screen + y * PLANEWIDTH + x * 2;
+
+	while (*s)
+	{
+		*dst++ = *s++;
+		*dst++ = color;
+	}
+}
+
+
+void V_DrawSTString(int16_t x, int16_t y, uint8_t color, const char* s)
 {
 	UNUSED(color);
 
@@ -461,7 +485,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 	while (ticks--)
 	{
 		I_DrawBuffer(frontbuffer);
-		for (int16_t i = 0; i < PLANEWIDTH; i++)
+		for (int16_t i = 0; i < VIEWWINDOWWIDTH; i++)
 		{
 			if (wipe_y_lookup[i] < 0)
 			{
@@ -478,8 +502,8 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				if (wipe_y_lookup[i] + dy >= VIEWWINDOWHEIGHT)
 					dy = VIEWWINDOWHEIGHT - wipe_y_lookup[i];
 
-				uint8_t __far* s = &frontbuffer[i] + ((VIEWWINDOWHEIGHT - dy - 1) * PLANEWIDTH);
-				uint8_t __far* d = &frontbuffer[i] + ((VIEWWINDOWHEIGHT - 1) * PLANEWIDTH);
+				uint16_t __far* s = (uint16_t __far*)(&frontbuffer[i<<1] + ((VIEWWINDOWHEIGHT - 1 - dy) * PLANEWIDTH));
+				uint16_t __far* d = (uint16_t __far*)(&frontbuffer[i<<1] + ((VIEWWINDOWHEIGHT - 1)      * PLANEWIDTH));
 
 				// scroll down the column. Of course we need to copy from the bottom... up to
 				// VIEWWINDOWHEIGHT - yLookup - dy
@@ -487,19 +511,19 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				for (int16_t j = VIEWWINDOWHEIGHT - wipe_y_lookup[i] - dy; j; j--)
 				{
 					*d = *s;
-					d += -PLANEWIDTH;
-					s += -PLANEWIDTH;
+					d += -VIEWWINDOWWIDTH;
+					s += -VIEWWINDOWWIDTH;
 				}
 
 				// copy new screen. We need to copy only between y_lookup and + dy y_lookup
-				s = &backbuffer[i]  + wipe_y_lookup[i] * PLANEWIDTH;
-				d = &frontbuffer[i] + wipe_y_lookup[i] * PLANEWIDTH;
+				s = (uint16_t __far*)(&backbuffer[i<<1]  + wipe_y_lookup[i] * PLANEWIDTH);
+				d = (uint16_t __far*)(&frontbuffer[i<<1] + wipe_y_lookup[i] * PLANEWIDTH);
 
 				for (int16_t j = 0 ; j < dy; j++)
 				{
 					*d = *s;
-					d += PLANEWIDTH;
-					s += PLANEWIDTH;
+					d += VIEWWINDOWWIDTH;
+					s += VIEWWINDOWWIDTH;
 				}
 
 				wipe_y_lookup[i] += dy;
@@ -514,11 +538,11 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 static void wipe_initMelt()
 {
-	wipe_y_lookup = Z_MallocStatic(PLANEWIDTH * sizeof(int16_t));
+	wipe_y_lookup = Z_MallocStatic(VIEWWINDOWWIDTH * sizeof(int16_t));
 
 	// setup initial column positions (y<0 => not ready to scroll yet)
 	wipe_y_lookup[0] = -(M_Random() % 16);
-	for (int16_t i = 1; i < PLANEWIDTH; i++)
+	for (int16_t i = 1; i < VIEWWINDOWWIDTH; i++)
 	{
 		int16_t r = (M_Random() % 3) - 1;
 
