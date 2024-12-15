@@ -1612,7 +1612,7 @@ static uint16_t columnCacheEntries[MAX_CACHE_ENTRIES];
 
 static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 {
-	uint16_t hash = ((column >> 2) ^ texture) & (MAX_CACHE_ENTRIES - 1);
+	uint16_t hash = ((column >> 2) ^ (texture * 71)) & (MAX_CACHE_ENTRIES - 1);
 	uint16_t key = hash;
 
 	uint16_t cx = CACHE_ENTRY(column, texture);
@@ -1622,7 +1622,7 @@ static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 		if (columnCacheEntries[key] == 0 || columnCacheEntries[key] == cx)
 			return key;
 
-		key += (MAX_CACHE_ENTRIES / MAX_CACHE_TRIES);
+		key += 119;
 		key &= (MAX_CACHE_ENTRIES - 1);
 	}
 
