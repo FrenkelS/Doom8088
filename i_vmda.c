@@ -195,7 +195,7 @@ static void R_DrawColumn(const draw_column_vars_t *dcvars)
 
 	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x * 2;
 
-	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
+	const uint16_t fracstep = dcvars->fracstep;
 	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * fracstep;
 
 	R_DrawColumn2(fracstep, frac, count);

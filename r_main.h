@@ -44,7 +44,7 @@ typedef struct {
   int16_t              x;
   int16_t              yl;
   int16_t              yh;
-  fixed_t              iscale;
+  uint16_t             fracstep;
   fixed_t              texturemid;
 
   const byte    __far* source; // first pixel in a column
