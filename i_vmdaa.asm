@@ -21,7 +21,7 @@ PLANEWIDTH equ 160
 VIEWWINDOWHEIGHT equ 25
 
 extern source
-extern nearcolormap
+extern colormap
 extern attribute
 extern dest
 
@@ -49,13 +49,13 @@ R_DrawColumn2:
 
 	xchg bp, ax						; bp = fracstep
 
-	mov di, [dest]					; ds:di = dest
-	les si, [source]				; es:si = source
-
 	mov bx, cx						; bx = count
 
-	mov cx, nearcolormap
+	mov cx, [colormap]
 	mov ah, [attribute]
+
+	les di, [dest]					; es:di = dest
+	lds si, [source]				; ds:si = source
 
 	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
@@ -67,11 +67,11 @@ last_pixel%+i:
 	mov al, dh						; al = hi byte of frac
 	shr al, 1						; 0 <= al <= 127
 	mov bx, si						; bx = source
-	es xlat							; al = source[al]
-	mov bx, cx						; bx = nearcolormap
-	xlat							; al = nearcolormap[al]
-	mov [di], ax					; write pixel
-	add di, PLANEWIDTH				; point to next line
+	xlat							; al = source[al]
+	mov bx, cx						; bx = colormap
+	ss xlat							; al = colormap[al]
+	stosw							; write pixel
+	add di, PLANEWIDTH-2			; point to next line
 	add dx, bp						; frac += fracstep
 %assign i i-1
 %endrep
@@ -81,14 +81,16 @@ last_pixel1:
 	mov al, dh
 	shr al, 1
 	mov bx, si
-	es xlat
-	mov bx, cx
 	xlat
-	mov [di], ax
+	mov bx, cx
+	ss xlat
+	stosw
 
 last_pixel0:
 	pop bp
 	pop es
 	pop di
 	pop si
+	mov ax, ss
+	mov ds, ax
 	retf

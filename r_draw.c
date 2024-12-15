@@ -345,8 +345,8 @@ static fixed_t  rw_midtexturemid;
 static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
-const uint8_t __far* fullcolormap;
-const uint8_t __far* fixedcolormap;
+const uint8_t fullcolormap[256 * 34];
+const uint8_t* fixedcolormap;
 
 static int16_t extralight;                           // bumped light from gun blasts
 
@@ -781,7 +781,7 @@ static CONSTFUNC int16_t R_PointToDist(int16_t x, int16_t y)
 #define NUMCOLORMAPS 32
 
 
-const uint8_t __far* R_LoadColorMap(int16_t lightlevel)
+const uint8_t* R_LoadColorMap(int16_t lightlevel)
 {
     if (fixedcolormap)
         return fixedcolormap;
@@ -866,7 +866,9 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
 //
 void R_InitColormaps(void)
 {
-	fullcolormap = W_GetLumpByName("COLORMAP"); // Never freed
+	const uint8_t __far* colormap = W_GetLumpByName("COLORMAP");
+	_fmemcpy((uint8_t __far*)fullcolormap, colormap, 256 * 34);
+	Z_Free(colormap);
 }
 
 
@@ -890,7 +892,7 @@ typedef struct vissprite_s
   int16_t patch_topoffset;
 
   // for color translation and shadow draw, maxbright frames as well
-  const uint8_t __far* colormap;
+  const uint8_t* colormap;
 
 } vissprite_t;
 

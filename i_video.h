@@ -46,7 +46,7 @@ typedef struct {
   uint32_t             position;
   uint32_t             step;
   const byte    __far* source; // start of a 64*64 tile image
-  const uint8_t __far* colormap;
+  const uint8_t* colormap;
 } draw_span_vars_t;
 
 void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *dsvars);

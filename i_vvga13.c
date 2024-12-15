@@ -206,8 +206,7 @@ void I_FinishUpdate(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-uint8_t nearcolormap[256];
-static uint16_t nearcolormapoffset = 0xffff;
+const uint8_t* colormap;
 
 const uint8_t __far* source;
 uint8_t __far* dest;
@@ -215,7 +214,7 @@ uint8_t __far* dest;
 
 inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, uint16_t frac)
 {
-	uint16_t color = nearcolormap[source[frac>>COLBITS]];
+	uint16_t color = colormap[source[frac>>COLBITS]];
 	color = (color | (color << 8));
 
 	uint16_t __far* d = (uint16_t __far*) dest;
@@ -285,11 +284,7 @@ void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 
 	source = dcvars->source;
 
-	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
-	{
-		_fmemcpy(nearcolormap, dcvars->colormap, 256);
-		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
-	}
+	colormap = dcvars->colormap;
 
 	dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 
@@ -411,11 +406,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	if (nearcolormapoffset != D_FP_OFF(&fullcolormap[6 * 256]))
-	{
-		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
-		nearcolormapoffset = D_FP_OFF(&fullcolormap[6 * 256]);
-	}
+	colormap = &fullcolormap[6 * 256];
 
 	uint8_t __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + (dcvars->x << 2);
 

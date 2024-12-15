@@ -18,7 +18,7 @@
 bits 16
 
 extern source
-extern nearcolormap
+extern colormap
 extern dest
 
 last_pixel_jump_table:
@@ -45,12 +45,12 @@ R_DrawColumn2:
 
 	xchg bp, ax						; bp = fracstep
 
-	les di, [dest]					; es:di = dest
-	lds si, [source]				; ds:si = source
-
 	mov bx, cx						; bx = count
 
-	mov cx, nearcolormap
+	mov cx, [colormap]
+
+	les di, [dest]					; es:di = dest
+	lds si, [source]				; ds:si = source
 
 	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
@@ -63,8 +63,8 @@ last_pixel%+i:
 	shr al, 1						; 0 <= al <= 127
 	mov bx, si						; bx = source
 	xlat							; al = source[al]
-	mov bx, cx						; bx = nearcolormap
-	ss xlat							; al = nearcolormap[al]
+	mov bx, cx						; bx = colormap
+	ss xlat							; al = colormap[al]
 	stosb							; write pixel
 	add di, PLANEWIDTH-1			; point to next line
 	add dx, bp						; frac += fracstep
@@ -86,6 +86,6 @@ last_pixel0:
 	pop es
 	pop di
 	pop si
-	push ss
-	pop ds
+	mov ax, ss
+	mov ds, ax
 	retf

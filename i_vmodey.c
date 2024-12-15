@@ -254,15 +254,7 @@ void I_FinishUpdate(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-uint8_t nearcolormap[256];
-
-#if defined _M_I86
-#define L_FP_OFF D_FP_OFF
-static uint16_t nearcolormapoffset = 0xffff;
-#else
-#define L_FP_OFF(p) ((uint32_t)(p))
-static uint32_t nearcolormapoffset = 0xffffffff;
-#endif
+const uint8_t* colormap;
 
 const uint8_t __far* source;
 uint8_t __far* dest;
@@ -274,44 +266,44 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 	int16_t l = count >> 4;
 	while (l--)
 	{
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
 
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
 
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
 
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
 	}
 
 	switch (count & 15)
 	{
-		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
-		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
+		case 15: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 14: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 13: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 12: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 11: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 10: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  9: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  8: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  7: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  6: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  5: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  4: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  3: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  2: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case  1: *dest = colormap[source[frac >> COLBITS]];
 	}
 }
 #else
@@ -329,11 +321,7 @@ void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 
 	source = dcvars->source;
 
-	if (nearcolormapoffset != L_FP_OFF(dcvars->colormap))
-	{
-		_fmemcpy(nearcolormap, dcvars->colormap, 256);
-		nearcolormapoffset = L_FP_OFF(dcvars->colormap);
-	}
+	colormap = dcvars->colormap;
 
 	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
@@ -406,11 +394,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	if (nearcolormapoffset != L_FP_OFF(&fullcolormap[6 * 256]))
-	{
-		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
-		nearcolormapoffset = L_FP_OFF(&fullcolormap[6 * 256]);
-	}
+	colormap = &fullcolormap[6 * 256];
 
 	uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
 
@@ -418,7 +402,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	do
 	{
-		*dest = nearcolormap[dest[fuzzoffset[fuzzpos]]];
+		*dest = colormap[dest[fuzzoffset[fuzzpos]]];
 		dest += PLANEWIDTH;
 
 		fuzzpos++;
