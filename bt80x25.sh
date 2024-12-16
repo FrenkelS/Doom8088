@@ -1,1 +1,1 @@
-source ./btxtmode.sh 80 25 $1 $2
+./btxtmode.sh 80 25 $1 $2

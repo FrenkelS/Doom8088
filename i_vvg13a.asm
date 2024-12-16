@@ -30,7 +30,7 @@ bits 16
 SCREENWIDTH equ 240
 
 extern source
-extern nearcolormap
+extern colormap
 extern dest
 
 last_pixel_jump_table:
@@ -67,9 +67,6 @@ R_DrawColumn2:
 
 	xchg bp, ax						; bp = fracstep
 
-	les di, [dest]					; es:di = dest
-	lds si, [source]				; ds:si = source
-
 	mov bx, cx						; bx = count
 
 	mov al, cl						; 1 <= al <= 128
@@ -83,7 +80,10 @@ R_DrawColumn2:
 	shr al, 4						; 0 <= al <= 8
 %endif
 
-	mov cx, nearcolormap
+	mov cx, [colormap]
+
+	les di, [dest]					; es:di = dest
+	lds si, [source]				; ds:si = source
 
 	or al, al						; if al = 0
 	jz last_pixels					;  then jump to last_pixels
@@ -97,8 +97,8 @@ loop_pixels:
 	shr al, 1						; 0 <= al <= 127
 	mov bx, si						; bx = source
 	xlat							; al = source[al]
-	mov bx, cx						; bx = nearcolormap
-	ss xlat							; al = nearcolormap[al]
+	mov bx, cx						; bx = colormap
+	ss xlat							; al = colormap[al]
 	mov ah, al
 	stosw							; write pixel
 	stosw
@@ -496,6 +496,6 @@ last_pixel0:
 	pop es
 	pop di
 	pop si
-	push ss
-	pop ds
+	mov ax, ss
+	mov ds, ax
 	retf

@@ -345,8 +345,8 @@ static fixed_t  rw_midtexturemid;
 static fixed_t  rw_toptexturemid;
 static fixed_t  rw_bottomtexturemid;
 
-const uint8_t __far* fullcolormap;
-const uint8_t __far* fixedcolormap;
+const uint8_t fullcolormap[256 * 34];
+const uint8_t* fixedcolormap;
 
 static int16_t extralight;                           // bumped light from gun blasts
 
@@ -388,6 +388,8 @@ uint16_t validcount = 1;         // increment every time a check is made
 // Constants
 //*****************************************
 
+#define COLEXTRABITS (8 - 1)
+
 static const int16_t CENTERX = VIEWWINDOWWIDTH  / 2;
        const int16_t CENTERY = VIEWWINDOWHEIGHT / 2;
 
@@ -397,7 +399,7 @@ static const int16_t PSPRITESCALE  = FRACUNIT * VIEWWINDOWWIDTH / SCREENWIDTH_VG
 static const fixed_t PSPRITEISCALE = FRACUNIT * SCREENWIDTH_VGA / VIEWWINDOWWIDTH; // = FixedReciprocal(PSPRITESCALE)
 
 static const uint16_t PSPRITEYSCALE = FRACUNIT * (VIEWWINDOWHEIGHT * 5 / 4) / SCREENHEIGHT_VGA;
-static const fixed_t PSPRITEYISCALE = FRACUNIT * SCREENHEIGHT_VGA / (VIEWWINDOWHEIGHT * 5 / 4); // = FixedReciprocal(PSPRITEYSCALE)
+static const uint16_t PSPRITEYFRACSTEP = (FRACUNIT * SCREENHEIGHT_VGA / (VIEWWINDOWHEIGHT * 5 / 4)) >> COLEXTRABITS; // = FixedReciprocal(PSPRITEYSCALE) >> COLEXTRABITS
 
 static const angle16_t clipangle = 0x2008; // = xtoviewangleTable[0]
 
@@ -781,7 +783,7 @@ static CONSTFUNC int16_t R_PointToDist(int16_t x, int16_t y)
 #define NUMCOLORMAPS 32
 
 
-const uint8_t __far* R_LoadColorMap(int16_t lightlevel)
+const uint8_t* R_LoadColorMap(int16_t lightlevel)
 {
     if (fixedcolormap)
         return fixedcolormap;
@@ -866,7 +868,9 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
 //
 void R_InitColormaps(void)
 {
-	fullcolormap = W_GetLumpByName("COLORMAP"); // Never freed
+	const uint8_t __far* colormap = W_GetLumpByName("COLORMAP");
+	_fmemcpy((uint8_t __far*)fullcolormap, colormap, 256 * 34);
+	Z_Free(colormap);
 }
 
 
@@ -884,13 +888,13 @@ typedef struct vissprite_s
   fixed_t scale;
   fixed_t xiscale;             // negative if flipped
   fixed_t texturemid;
-  fixed_t iscale;
+  uint16_t fracstep;
 
   int16_t lump_num;
   int16_t patch_topoffset;
 
   // for color translation and shadow draw, maxbright frames as well
-  const uint8_t __far* colormap;
+  const uint8_t* colormap;
 
 } vissprite_t;
 
@@ -918,7 +922,7 @@ static void R_DrawVisSprite(const vissprite_t *vis)
         colfunc = R_DrawFuzzColumn;    // killough 3/14/98
 
     // proff 11/06/98: Changed for high-res
-    dcvars.iscale = vis->iscale;
+    dcvars.fracstep = vis->fracstep;
     dcvars.texturemid = vis->texturemid;
     frac = vis->startfrac;
 
@@ -1041,7 +1045,7 @@ static void R_RenderMaskedSegRange(const drawseg_t *ds, int16_t x1, int16_t x2)
 
 			sprtopscreen = CENTERY * FRACUNIT - FixedMul(dcvars.texturemid, spryscale);
 
-			dcvars.iscale = FixedReciprocal((uint32_t)spryscale);
+			dcvars.fracstep = FixedReciprocal((uint32_t)spryscale) >> COLEXTRABITS;
 
 			// draw the texture
 			const column_t __far* column = (const column_t __far*) ((const byte __far*)patch + (uint16_t)patch->columnofs[xc]);
@@ -1230,7 +1234,7 @@ static void R_DrawPSprite (pspdef_t *psp, int16_t lightlevel)
     vis->x2 = x2 >= VIEWWINDOWWIDTH ? VIEWWINDOWWIDTH - 1 : x2;
     // proff 11/06/98: Added for high-res
     vis->scale = PSPRITEYSCALE;
-    vis->iscale = PSPRITEYISCALE;
+    vis->fracstep = PSPRITEYFRACSTEP;
 
     vis->xiscale = PSPRITEISCALE;
     vis->startfrac = 0;
@@ -1498,7 +1502,7 @@ static void R_ProjectSprite (mobj_t __far* thing, int16_t lightlevel)
 
     //vis->scale           = FixedDiv(PROJECTIONY, tz);
     vis->scale           = (VIEWWINDOWHEIGHT * FRACUNIT) / (tz >> FRACBITS);
-    vis->iscale          = tz / VIEWWINDOWHEIGHT;
+    vis->fracstep        = tz / (VIEWWINDOWHEIGHT << COLEXTRABITS);
     vis->lump_num        = sprframe->lump[rot];
     vis->patch_topoffset = patch->topoffset;
     vis->gx              = fx;
@@ -1612,7 +1616,7 @@ static uint16_t columnCacheEntries[MAX_CACHE_ENTRIES];
 
 static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 {
-	uint16_t hash = ((column >> 2) ^ texture) & (MAX_CACHE_ENTRIES - 1);
+	uint16_t hash = ((column >> 2) ^ (texture * 71)) & (MAX_CACHE_ENTRIES - 1);
 	uint16_t key = hash;
 
 	uint16_t cx = CACHE_ENTRY(column, texture);
@@ -1622,7 +1626,7 @@ static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 		if (columnCacheEntries[key] == 0 || columnCacheEntries[key] == cx)
 			return key;
 
-		key += (MAX_CACHE_ENTRIES / MAX_CACHE_TRIES);
+		key += 119;
 		key &= (MAX_CACHE_ENTRIES - 1);
 	}
 
@@ -1630,20 +1634,9 @@ static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 }
 
 
-static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int16_t texcolumn, uint16_t iscale)
+static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int16_t texcolumn)
 {
     uint16_t colmask = 0xfffc;
-
-    if (tex->width > 8)
-    {
-        if (iscale > 4)
-            colmask = 0xffe0;
-        else if (iscale > 3)
-            colmask = 0xfff0;
-        else if (iscale > 2)
-            colmask = 0xfff8;
-    }
-
 
     const int16_t xc = (texcolumn & colmask) & tex->widthmask;
 
@@ -1717,7 +1710,7 @@ static void R_DrawSegTextureColumn(const texture_t __far* tex, int16_t texture, 
     }
     else
     {
-        const byte __far* source = R_ComposeColumn(texture, tex, texcolumn, dcvars->iscale >> FRACBITS);
+        const byte __far* source = R_ComposeColumn(texture, tex, texcolumn);
         if (source == NULL)
             R_DrawColumnFlat(texture, dcvars);
         else
@@ -1836,7 +1829,7 @@ static void R_RenderSegLoop(int16_t rw_x, boolean segtextured, boolean markfloor
 			}
 #endif
 
-            dcvars.iscale = FixedReciprocal((uint32_t)rw_scale);
+            dcvars.fracstep = FixedReciprocal((uint32_t)rw_scale) >> COLEXTRABITS;
         }
 
         // draw the wall tiers

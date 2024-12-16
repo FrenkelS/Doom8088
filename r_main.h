@@ -44,12 +44,12 @@ typedef struct {
   int16_t              x;
   int16_t              yl;
   int16_t              yh;
-  fixed_t              iscale;
+  uint16_t             fracstep;
   fixed_t              texturemid;
 
   const byte    __far* source; // first pixel in a column
 
-  const uint8_t __far* colormap;
+  const uint8_t* colormap;
 } draw_column_vars_t;
 
 
@@ -65,8 +65,8 @@ extern fixed_t  viewcos, viewsin;
 
 extern angle_t viewangle;
 
-extern const uint8_t __far* fullcolormap;
-extern const uint8_t __far* fixedcolormap;
+extern const uint8_t fullcolormap[256 * 34];
+extern const uint8_t* fixedcolormap;
 
 extern int16_t   __far* textureheight; //needed for texture pegging (and TFE fix - killough)
 
@@ -82,7 +82,7 @@ angle_t R_PointToAngle3(fixed_t x, fixed_t y);
 subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y);
 
 void R_InitColormaps(void);
-const uint8_t __far* R_LoadColorMap(int16_t lightlevel);
+const uint8_t* R_LoadColorMap(int16_t lightlevel);
 
 int16_t V_NumPatchWidth(int16_t num);
 
