@@ -193,8 +193,7 @@ void I_FinishUpdate(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-uint8_t nearcolormap[256];
-static uint16_t nearcolormapoffset = 0xffff;
+const uint8_t* colormap;
 
 const uint8_t __far* source;
 uint8_t __far* dest;
@@ -205,44 +204,44 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 	int16_t l = count >> 3;
 	while (l--)
 	{
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
 
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
 
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
 
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
 	}
 
 	switch ((count << 1) & 15)
 	{
-		case 15: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 14: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 13: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 12: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 11: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 10: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  9: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  8: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  7: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  6: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  5: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  4: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  3: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  2: *dest = nearcolormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  1: *dest = nearcolormap[source[frac >> COLBITS]];
+		case 15: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 14: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 13: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 12: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 11: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 10: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  9: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  8: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  7: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  6: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  5: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  4: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  3: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  2: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case  1: *dest = colormap[source[frac >> COLBITS]];
 	}
 }
 
@@ -257,16 +256,12 @@ void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 
 	source = dcvars->source;
 
-	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
-	{
-		_fmemcpy(nearcolormap, dcvars->colormap, 256);
-		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
-	}
+	colormap = dcvars->colormap;
 
 	dest = _s_screen + (dcvars->yl * SCREENWIDTH << 1) + (dcvars->x << 2);
 
-	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS) >> 1;
-	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
+	const uint16_t fracstep = dcvars->fracstep;
+	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * fracstep;
 
 	// Inner loop that does the actual texture mapping,
 	//  e.g. a DDA-lile scaling.
