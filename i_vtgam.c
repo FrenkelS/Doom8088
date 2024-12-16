@@ -246,7 +246,7 @@ void I_FinishUpdate(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-uint8_t* colormap;
+const uint8_t* colormap;
 
 const uint8_t __far* source;
 uint8_t __far* dest;
@@ -314,8 +314,8 @@ void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 
 	dest = _s_screen + (dcvars->yl * SCREENWIDTH << 2) + (dcvars->x << 2);
 
-	const uint16_t fracstep = dcvars->fracstep;
-	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * fracstep;
+	const uint16_t fracstep = dcvars->fracstep >> 2;
+	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * dcvars->fracstep;
 
 	// Inner loop that does the actual texture mapping,
 	//  e.g. a DDA-lile scaling.

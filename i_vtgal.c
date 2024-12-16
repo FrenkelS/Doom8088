@@ -260,8 +260,8 @@ void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 
 	dest = _s_screen + (dcvars->yl * SCREENWIDTH << 1) + (dcvars->x << 2);
 
-	const uint16_t fracstep = dcvars->fracstep;
-	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * fracstep;
+	const uint16_t fracstep = dcvars->fracstep >> 1;
+	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * dcvars->fracstep;
 
 	// Inner loop that does the actual texture mapping,
 	//  e.g. a DDA-lile scaling.
