@@ -654,20 +654,50 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			volatile uint8_t loadLatches;
 			uint16_t count = column->length;
 
-			uint16_t l = count >> 2;
-			while (l--)
+			if (count == 7)
 			{
 				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
 				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
 				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
 				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4;
 			}
-
-			switch (count & 3)
+			else if (count == 3)
 			{
-				case 3: loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
-				case 2: loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
-				case 1: loadLatches = *dest; *dest = (*source++) >> 4;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4;
+			}
+			else if (count == 5)
+			{
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4;
+			}
+			else if (count == 6)
+			{
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4;
+			}
+			else if (count == 2)
+			{
+				loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = (*source++) >> 4;
+			}
+			else
+			{
+				while (count--)
+				{
+					loadLatches = *dest; *dest = (*source++) >> 4; dest += PLANEWIDTH;
+				}
 			}
 
 			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
@@ -691,20 +721,50 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			volatile uint8_t loadLatches;
 			uint16_t count = column->length;
 
-			uint16_t l = count >> 2;
-			while (l--)
+			if (count == 7)
 			{
 				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
 				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
 				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
 				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++;
 			}
-
-			switch (count & 3)
+			else if (count == 3)
 			{
-				case 3: loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
-				case 2: loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
-				case 1: loadLatches = *dest; *dest = *source++;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++;
+			}
+			else if (count == 5)
+			{
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++;
+			}
+			else if (count == 6)
+			{
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++;
+			}
+			else if (count == 2)
+			{
+				loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				loadLatches = *dest; *dest = *source++;
+			}
+			else
+			{
+				while (count--)
+				{
+					loadLatches = *dest; *dest = *source++; dest += PLANEWIDTH;
+				}
 			}
 
 			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
