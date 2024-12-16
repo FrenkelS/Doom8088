@@ -281,21 +281,18 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 
 	switch ((count << 2) & 15)
 	{
-		case 15: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case 14: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case 13: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
 		case 12: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case 11: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case 10: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case  9: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
 		case  8: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case  7: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case  6: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case  5: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
 		case  4: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case  3: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case  2: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
-		case  1: c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c; dest += SCREENWIDTH - 2; frac += fracstep;
+		         c = colormap[source[frac >> COLBITS]]; *dest = c; dest += 2; *dest = c;
 	}
 }
 
