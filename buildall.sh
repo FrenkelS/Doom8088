@@ -1,3 +1,7 @@
+./begah.sh    i8088 D8088EH.EXE
+./begah.sh    i286  D286EH.EXE
+./begam.sh    i8088 D8088EM.EXE
+./begam.sh    i286  D286EM.EXE
 ./bmda.sh     i8088 D8088MDA.EXE
 ./bmda.sh     i286  D286MDA.EXE
 ./bmode13h.sh i8088 D8088M13.EXE

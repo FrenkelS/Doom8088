@@ -26,7 +26,7 @@ cpu 286
 bits 16
 
 extern source
-extern nearcolormap
+extern colormap
 extern dest
 extern colorsoffset
 
@@ -89,8 +89,8 @@ loop_pixels:
 	shr al, 1						; 0 <= al <= 127
 	mov bx, si						; bx = source
 	xlat							; al = source[al]
-	mov bx, nearcolormap			; bx = nearcolormap
-	ss xlat							; al = nearcolormap[al]
+	mov bx, colormap				; bx = colormap
+	ss xlat							; al = colormap[al]
 	mov bx, cx						; bx = colors
 	es xlat							; al = colors[al]
 	stosb							; write pixel
@@ -101,7 +101,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -113,7 +113,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -125,7 +125,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -137,7 +137,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -149,7 +149,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -161,7 +161,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -173,7 +173,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -185,7 +185,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -197,7 +197,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -209,7 +209,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -221,7 +221,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -233,7 +233,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -245,7 +245,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -257,7 +257,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -269,7 +269,7 @@ loop_pixels:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -293,7 +293,7 @@ last_pixel15:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -306,7 +306,7 @@ last_pixel14:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -319,7 +319,7 @@ last_pixel13:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -332,7 +332,7 @@ last_pixel12:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -345,7 +345,7 @@ last_pixel11:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -358,7 +358,7 @@ last_pixel10:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -371,7 +371,7 @@ last_pixel9:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -384,7 +384,7 @@ last_pixel8:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -397,7 +397,7 @@ last_pixel7:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -410,7 +410,7 @@ last_pixel6:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -423,7 +423,7 @@ last_pixel5:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -436,7 +436,7 @@ last_pixel4:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -449,7 +449,7 @@ last_pixel3:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -462,7 +462,7 @@ last_pixel2:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
@@ -475,7 +475,7 @@ last_pixel1:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, nearcolormap
+	mov bx, colormap
 	ss xlat
 	mov bx, cx
 	es xlat
