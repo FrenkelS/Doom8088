@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023, 2024 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -58,17 +58,19 @@ __inline static void __far* getelem(bmalpool_t __far* p, size_t size, size_t n)
 }
 
 
-__inline static PUREFUNC uint32_t linearAddress(const void __far* ptr)
-{
-	uint32_t seg = D_FP_SEG(ptr);
-	uint16_t off = D_FP_OFF(ptr);
-	return seg * 16 + off;
-}
-
-
 __inline static PUREFUNC int16_t iselem(const bmalpool_t __far* pool, size_t size, const void __far* p)
 {
-	int32_t dif = linearAddress(p) - linearAddress(pool);
+#if defined _M_I86
+	if (D_FP_SEG(p) != D_FP_SEG(pool))
+		return -1;
+
+	uint16_t dif = D_FP_OFF(p) - D_FP_OFF(pool);
+	dif -= sizeof(bmalpool_t);
+	dif -= pool->blocks;
+	dif /= size;
+	return dif;
+#else
+	int32_t dif = (const char*)p - (const char*)pool;
 
 	dif -= sizeof(bmalpool_t);
 	dif -= pool->blocks;
@@ -77,6 +79,7 @@ __inline static PUREFUNC int16_t iselem(const bmalpool_t __far* pool, size_t siz
 
 	dif /= size;
 	return (((size_t)dif >= pool->blocks) ? -1 : dif);
+#endif
 }
 
 
