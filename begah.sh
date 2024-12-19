@@ -1,1 +1,1 @@
-source ./bega.sh 60
+./bega.sh 60 $1 $2
