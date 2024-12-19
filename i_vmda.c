@@ -407,7 +407,8 @@ void V_DrawSTCharacter(int16_t x, int16_t y, uint8_t color, char c)
 
 void V_DrawCharacterForeground(int16_t x, int16_t y, uint8_t color, char c)
 {
-	V_DrawCharacter(x, y, color, c);
+	_s_screen[y * PLANEWIDTH + x * 2 + 0] = c;
+	_s_screen[y * PLANEWIDTH + x * 2 + 1] = color;
 }
 
 
