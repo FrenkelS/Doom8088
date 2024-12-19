@@ -17,6 +17,8 @@
 
 %ifidn CPU, i8088
 cpu 8086
+%elifidn CPU, i8086
+cpu 8086
 %elifidn CPU, i286
 cpu 286
 %else
@@ -69,6 +71,9 @@ R_DrawColumn2:
 
 	mov al, cl						; 1 <= al <= 128
 %ifidn CPU, i8088
+	mov cl, 4
+	shr al, cl						; 0 <= al <= 8
+%elifidn CPU, i8086
 	mov cl, 4
 	shr al, cl						; 0 <= al <= 8
 %else
