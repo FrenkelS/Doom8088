@@ -307,6 +307,18 @@ void V_FillRect(byte colour)
 }
 
 
+void V_InitDrawLine(void)
+{
+	// Do nothing
+}
+
+
+void V_ShutdownDrawLine(void)
+{
+	// Do nothing
+}
+
+
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
 	int16_t dx = abs(x1 - x0);
