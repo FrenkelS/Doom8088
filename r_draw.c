@@ -78,7 +78,7 @@ typedef struct drawseg_s
   int16_t *maskedtexturecol; // dropoff overflow
 } drawseg_t;
 
-#define MAXDRAWSEGS   192
+#define MAXDRAWSEGS   128
 
 static drawseg_t _s_drawsegs[MAXDRAWSEGS];
 
@@ -1299,7 +1299,7 @@ static void isort(vissprite_t **s, int16_t n)
 	}
 }
 
-#define MAXVISSPRITES 96
+#define MAXVISSPRITES 80
 static int16_t num_vissprite;
 static vissprite_t vissprites[MAXVISSPRITES];
 static vissprite_t* vissprite_ptrs[MAXVISSPRITES];
