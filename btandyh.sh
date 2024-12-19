@@ -5,8 +5,19 @@ unset CFLAGS
 #export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR"
 export RENDER_OPTIONS="-DFLAT_SPAN -DFLAT_NUKAGE1_COLOR=32 -DWAD_FILE=\"DOOM16D.WAD\" -DNR_OF_COLORS=16"
 
-export CPU=i8086
-#export CPU=i286
+export CPU=$1
+export OUTPUT=$2
+
+if [ -z "$CPU" ]
+then
+  #export CPU=i8088
+  export CPU=i286
+fi
+
+if [ -z "$OUTPUT" ]
+then
+  export OUTPUT=DOOM8088.EXE
+fi
 
 nasm i_vvg13a.asm -f elf -DCPU=$CPU
 nasm m_fixed.asm  -f elf
@@ -79,7 +90,7 @@ export GLOBOBJS+=" z_bmallo.c"
 export GLOBOBJS+=" z_xms.o"
 export GLOBOBJS+=" z_zone.c"
 
-ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/DOOM8088.EXE
+ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/$OUTPUT
 
 rm i_vvg13a.o
 rm m_fixed.o
