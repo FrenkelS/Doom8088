@@ -37,11 +37,8 @@
 // This program displays the background and text at end-mission
 // text time. It draws both repeatedly so that other displays,
 // like the main menu, can be drawn over it dynamically and
-// erased dynamically. The TEXTSPEED constant is changed into
-// the Get_TextSpeed function so that the speed of writing the
-// text can be increased, and there's still time to read what's
-// written.
-void F_TextWrite(int32_t finalecount, int32_t textSpeed)
+// erased dynamically.
+void F_TextWrite(int32_t count)
 {
 	int16_t font_lump_offset = W_GetNumForName(HU_FONTSTART_LUMP) - HU_FONTSTART;
 
@@ -49,10 +46,6 @@ void F_TextWrite(int32_t finalecount, int32_t textSpeed)
 	int16_t         cx = 10;
 	int16_t         cy = 10;
 	const char* ch = E1TEXT;
-	int32_t         count = (finalecount - 10)*100/textSpeed;
-
-	if (count < 0)
-		count = 0;
 
 	for ( ; count ; count-- )
 	{
