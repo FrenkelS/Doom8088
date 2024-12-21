@@ -582,9 +582,6 @@ static void STlib_drawNum(st_number_t* n)
   int16_t   numdigits = n->width;
   int16_t   num = *n->num;
 
-  const int16_t   w = V_NumPatchWidth(n->p[0]);
-  int16_t   x = n->x;
-
   // CPhipps - compact some code, use num instead of *n->num
   if ((n->oldnum = num) < 0)
   {
@@ -596,14 +593,12 @@ static void STlib_drawNum(st_number_t* n)
     num = -num;
   }
 
-  // clear the area
-  x = n->x - numdigits*w;
-
   // if non-number, do not draw it
   if (num == largeammo)
     return;
 
-  x = n->x;
+  const int16_t   w = V_NumPatchWidth(n->p[0]);
+  int16_t   x = n->x;
 
   // in the special case of 0, you draw 0
   if (!num)

@@ -230,7 +230,6 @@ void I_FinishUpdate(void)
 			}
 
 			// set write mode 0
-			outp(GC_INDEX, GC_MODE);
 			outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
 		}
 	}
@@ -494,7 +493,6 @@ static void V_Blit(int16_t num, uint16_t offset, int16_t height)
 		}
 
 		// set write mode 0
-		outp(GC_INDEX, GC_MODE);
 		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
 	}
 }
@@ -732,6 +730,10 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 	uint8_t __far* backbuffer = _s_screen;
 
+	// set write mode 1
+	outp(GC_INDEX, GC_MODE);
+	outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
 	while (ticks--)
 	{
 		for (int16_t i = 0; i < SCREENWIDTH / 4; i++)
@@ -781,6 +783,9 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 		}
 	}
 
+	// set write mode 0
+	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+
 	return done;
 }
 
@@ -817,10 +822,6 @@ void D_Wipe(void)
 		frontbuffer += (0x10000 - (PAGE_SIZE << 4));
 #endif
 
-	// set write mode 1
-	outp(GC_INDEX, GC_MODE);
-	outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
-
 	wipe_initMelt();
 
 	boolean done;
@@ -844,8 +845,4 @@ void D_Wipe(void)
 	} while (!done);
 
 	Z_Free(wipe_y_lookup);
-
-	// set write mode 0
-	outp(GC_INDEX, GC_MODE);
-	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
 }
