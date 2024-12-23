@@ -148,12 +148,21 @@ void F_Ticker(void)
 //
 // F_Drawer
 //
+// The TEXTSPEED constant is changed into the Get_TextSpeed
+// function so that the speed of writing the text can be
+// increased, and there's still time to read what's written.
+//
 void F_Drawer (void)
 {
 	if (!finalestage)
 	{
 		V_DrawBackground(backgroundnum);
-		F_TextWrite(finalecount, Get_TextSpeed());
+
+		int32_t count = (finalecount - 10) * 100 / Get_TextSpeed();
+		if (count < 0)
+			count = 0;
+
+		F_TextWrite(count);
 	}
 	else
 		V_DrawRawFullScreen(help2num);
