@@ -106,6 +106,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 |Build script |Version                  |
 |-------------|-------------------------|
+|`buildall.sh`|Build all versions       |
 |`bmodey.sh`  |Mode Y                   |
 |`bmode13h.sh`|Mode 13h                 |
 |`begah.sh`   |EGA 640x200 16 colors    |
