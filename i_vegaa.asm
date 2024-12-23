@@ -486,6 +486,6 @@ last_pixel0:
 	pop es
 	pop di
 	pop si
-	push ss
-	pop ds
+	mov ax, ss
+	mov ds, ax
 	retf
