@@ -481,10 +481,17 @@ last_pixel1:
 	mov bx, si
 	xlat
 	mov bx, cx
-	ss xlat
+	mov dx, ss
+	mov ds, dx
+	xlat
 	mov ah, al
 	stosw
 	stosw
+	pop bp
+	pop es
+	pop di
+	pop si
+	retf
 
 last_pixel0:
 	pop bp
