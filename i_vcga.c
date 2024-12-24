@@ -307,10 +307,7 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void V_FillRect(byte colour)
 {
-	// TODO
-	return;
-
-	_fmemset(_s_screen, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
+	_fmemset(_s_screen, colour, VIEWWINDOWWIDTH * (SCREENHEIGHT - ST_HEIGHT));
 }
 
 
@@ -328,8 +325,7 @@ void V_ShutdownDrawLine(void)
 
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
-	// TODO
-	return;
+	static uint8_t bitmasks[4] = {0x3f, 0xcf, 0xf3, 0xfc};
 
 	int16_t dx = abs(x1 - x0);
 	int16_t sx = x0 < x1 ? 1 : -1;
@@ -339,9 +335,13 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	int16_t err = dx + dy;
 
+	int16_t p = x0 & 3;
+	uint8_t bitmask = bitmasks[p];
+
 	while (true)
 	{
-		_s_screen[y0 * SCREENWIDTH + (x0 & 0xfffc)] = color;
+		uint8_t c = _s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 2)];
+		_s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 2)] = (c & bitmask) | (color >> (p * 2));
 
 		if (x0 == x1 && y0 == y1)
 			break;
@@ -352,6 +352,9 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 		{
 			err += dy;
 			x0  += sx;
+
+			p       = x0 & 3;
+			bitmask = bitmasks[p];
 		}
 
 		if (e2 <= dx)
