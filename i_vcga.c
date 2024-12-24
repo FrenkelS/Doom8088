@@ -110,38 +110,26 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 
 	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++)
 	{
-		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
-		{
-			*dst++ = *src++;
-		}
+		_fmemcpy(dst, src, VIEWWINDOWWIDTH);
+		dst += 0x2000;
+		src += VIEWWINDOWWIDTH;
 
-		dst += 0x2000 - VIEWWINDOWWIDTH;
-
-		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
-		{
-			*dst++ = *src++;
-		}
-
-		dst -= 0x2000 - (PLANEWIDTH - VIEWWINDOWWIDTH);
+		_fmemcpy(dst, src, VIEWWINDOWWIDTH);
+		dst -= 0x2000 - PLANEWIDTH;
+		src += VIEWWINDOWWIDTH;
 	}
 
 	if (drawStatusBar)
 	{
 		for (uint_fast8_t y = 0; y < ST_HEIGHT / 2; y++)
 		{
-			for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
-			{
-				*dst++ = *src++;
-			}
+			_fmemcpy(dst, src, VIEWWINDOWWIDTH);
+			dst += 0x2000;
+			src += VIEWWINDOWWIDTH;
 
-			dst += 0x2000 - VIEWWINDOWWIDTH;
-
-			for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
-			{
-				*dst++ = *src++;
-			}
-
-			dst -= 0x2000 - (PLANEWIDTH - VIEWWINDOWWIDTH);
+			_fmemcpy(dst, src, VIEWWINDOWWIDTH);
+			dst -= 0x2000 - PLANEWIDTH;
+			src += VIEWWINDOWWIDTH;
 		}
 	}
 	drawStatusBar = true;
