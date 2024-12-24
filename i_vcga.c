@@ -264,9 +264,9 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 
 #define FUZZCOLOR1 0x00
-#define FUZZCOLOR2 0x08
-#define FUZZCOLOR3 0x80
-#define FUZZCOLOR4 0x88
+#define FUZZCOLOR2 0x02
+#define FUZZCOLOR3 0x20
+#define FUZZCOLOR4 0x22
 #define FUZZTABLE 50
 
 static const int8_t fuzzcolors[FUZZTABLE] =
@@ -283,23 +283,20 @@ static const int8_t fuzzcolors[FUZZTABLE] =
 
 void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 {
-	// TODO
-	return;
-
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
+	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
 	static int16_t fuzzpos = 0;
 
 	do
 	{
 		*dest = fuzzcolors[fuzzpos];
-		dest += SCREENWIDTH;
+		dest += VIEWWINDOWWIDTH;
 
 		fuzzpos++;
 		if (fuzzpos >= FUZZTABLE)
