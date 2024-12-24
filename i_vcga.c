@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for Tandy 160x200 16 color
+ *      Video code for CGA 320x200 4 color
  *
  *-----------------------------------------------------------------------------*/
  
@@ -40,12 +40,12 @@
 
 
 #define PLANEWIDTH        80
-#define SCREENHEIGHT_TGA 200
+#define SCREENHEIGHT_CGA 200
 
 
 extern const int16_t CENTERY;
 
-// The screen is [SCREENWIDTH * SCREENHEIGHT];
+
 static uint8_t __far* _s_screen;
 static uint8_t __far* videomemory;
 
@@ -85,9 +85,9 @@ void I_InitGraphicsHardwareSpecificCode(void)
 {
 	__djgpp_nearptr_enable();
 
-	I_SetScreenMode(8);
+	I_SetScreenMode(4);
 
-	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_TGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
+	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_CGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
 	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
@@ -155,18 +155,11 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 static int8_t newpal;
 
 
-//
-// I_SetPalette
-//
 void I_SetPalette(int8_t pal)
 {
 	newpal = pal;
 }
 
-
-//
-// I_FinishUpdate
-//
 
 #define NO_PALETTE_CHANGE 100
 
@@ -182,21 +175,13 @@ void I_FinishUpdate(void)
 }
 
 
-//
-// A column is a vertical slice/span from a wall texture that,
-//  given the DOOM style restrictions on the view orientation,
-//  will always have constant z depth.
-// Thus a special case loop for very fast rendering can
-//  be used. It has also been used with Wolfenstein 3D.
-//
-
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-const uint8_t* colormap;
+static const uint8_t* colormap;
 
-const uint8_t __far* source;
-uint8_t __far* dest;
+static const uint8_t __far* source;
+static uint8_t __far* dest;
 
 
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
@@ -248,6 +233,9 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 
 void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 {
+	// TODO
+	return;
+
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
@@ -279,6 +267,9 @@ void R_DrawColumnWall(const draw_column_vars_t *dcvars)
 
 void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 {
+	// TODO
+	return;
+
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
@@ -311,16 +302,12 @@ static const int8_t fuzzcolors[FUZZTABLE] =
 	FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR4,FUZZCOLOR1,FUZZCOLOR3,FUZZCOLOR2,FUZZCOLOR1
 };
 
-//
-// Framebuffer postprocessing.
-// Creates a fuzzy image by copying pixels
-//  from adjacent ones to left and right.
-// Used with an all black colormap, this
-//  could create the SHADOW effect,
-//  i.e. spectres and invisible players.
-//
+
 void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 {
+	// TODO
+	return;
+
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
@@ -343,11 +330,11 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 }
 
 
-//
-// V_FillRect
-//
 void V_FillRect(byte colour)
 {
+	// TODO
+	return;
+
 	_fmemset(_s_screen, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
 }
 
@@ -364,17 +351,11 @@ void V_ShutdownDrawLine(void)
 }
 
 
-//
-// V_DrawLine()
-//
-// Draw a line in the frame buffer.
-// Classic Bresenham w/ whatever optimizations needed for speed
-//
-// Passed the frame coordinates of line, and the color to be drawn
-// Returns nothing
-//
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
+	// TODO
+	return;
+
 	int16_t dx = abs(x1 - x0);
 	int16_t sx = x0 < x1 ? 1 : -1;
 
@@ -407,15 +388,11 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 }
 
 
-/*
- * V_DrawBackground tiles a 64x64 patch over the entire screen, providing the
- * background for the Help and Setup screens, and plot text between levels.
- * cphipps - used to have M_DrawBackground, but that was used the framebuffer
- * directly, so this is my code from the equivalent function in f_finale.c
- */
 void V_DrawBackground(int16_t backgroundnum)
 {
-	/* erase the entire screen to a tiled background */
+	// TODO
+	return;
+
 	const byte __far* src = W_GetLumpByNum(backgroundnum);
 
 	for(uint8_t y = 0; y < SCREENHEIGHT; y++)
@@ -440,6 +417,9 @@ void V_DrawBackground(int16_t backgroundnum)
 
 void V_DrawRaw(int16_t num, uint16_t offset)
 {
+	// TODO
+	return;
+
 	const uint8_t __far* lump = W_TryGetLumpByNum(num);
 
 	if (lump != NULL)
@@ -464,6 +444,9 @@ void ST_Drawer(void)
 
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
+	// TODO
+	return;
+
 	y -= patch->topoffset;
 	x -= patch->leftoffset;
 
@@ -537,6 +520,9 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
+	// TODO
+	return;
+
 	static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
 	static const int16_t   DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH) >> 8;
 	static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
@@ -596,12 +582,9 @@ static  int16_t __far* wipe_y_lookup;
 
 void wipe_StartScreen(void)
 {
-	frontbuffer = Z_TryMallocStatic(SCREENWIDTH * SCREENHEIGHT);
+	frontbuffer = NULL; // TODO Z_TryMallocStatic(SCREENWIDTH * SCREENHEIGHT);
 	if (frontbuffer)
-	{
-		// copy back buffer to front buffer
 		_fmemcpy(frontbuffer, _s_screen, SCREENWIDTH * SCREENHEIGHT);
-	}
 }
 
 
@@ -626,11 +609,6 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 			// scroll down columns, which are still visible
 			if (wipe_y_lookup[i] < SCREENHEIGHT)
 			{
-				/* cph 2001/07/29 -
-				 *  The original melt rate was 8 pixels/sec, i.e. 25 frames to melt
-				 *  the whole screen, so make the melt rate depend on SCREENHEIGHT
-				 *  so it takes no longer in high res
-				 */
 				int16_t dy = (wipe_y_lookup[i] < 16) ? wipe_y_lookup[i] + 1 : SCREENHEIGHT / 25;
 				// At most dy shall be so that the column is shifted by SCREENHEIGHT (i.e. just invisible)
 				if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
@@ -675,7 +653,6 @@ static void wipe_initMelt()
 {
 	wipe_y_lookup = Z_MallocStatic(SCREENWIDTH);
 
-	// setup initial column positions (y<0 => not ready to scroll yet)
 	wipe_y_lookup[0] = -(M_Random() % 16);
 	for (int8_t i = 1; i < SCREENWIDTH / 2; i++)
 	{
@@ -690,13 +667,6 @@ static void wipe_initMelt()
 	}
 }
 
-
-//
-// D_Wipe
-//
-// CPhipps - moved the screen wipe code from D_Display to here
-// The screens to wipe between are already stored, this just does the timing
-// and screen updating
 
 void D_Wipe(void)
 {
