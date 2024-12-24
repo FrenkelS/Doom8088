@@ -89,8 +89,8 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_CGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
-	_s_screen = Z_MallocStatic(SCREENWIDTH * SCREENHEIGHT);
-	_fmemset(_s_screen, 0, SCREENWIDTH * SCREENHEIGHT);
+	_s_screen = Z_MallocStatic(VIEWWINDOWWIDTH * SCREENHEIGHT);
+	_fmemset(_s_screen, 0, VIEWWINDOWWIDTH * SCREENHEIGHT);
 }
 
 
@@ -112,16 +112,14 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 	{
 		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
 		{
-			*dst++ = *src;
-			src += 4;
+			*dst++ = *src++;
 		}
 
 		dst += 0x2000 - VIEWWINDOWWIDTH;
 
 		for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
 		{
-			*dst++ = *src;
-			src += 4;
+			*dst++ = *src++;
 		}
 
 		dst -= 0x2000 - (PLANEWIDTH - VIEWWINDOWWIDTH);
@@ -133,16 +131,14 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 		{
 			for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
 			{
-				*dst++ = *src;
-				src += 4;
+				*dst++ = *src++;
 			}
 
 			dst += 0x2000 - VIEWWINDOWWIDTH;
 
 			for (uint_fast8_t x = 0; x < VIEWWINDOWWIDTH; x++)
 			{
-				*dst++ = *src;
-				src += 4;
+				*dst++ = *src++;
 			}
 
 			dst -= 0x2000 - (PLANEWIDTH - VIEWWINDOWWIDTH);
@@ -189,43 +185,43 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 	int16_t l = count >> 4;
 	while (l--)
 	{
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
 
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
 
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
 
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		*dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		*dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
 	}
 
 	switch (count & 15)
 	{
-		case 15: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 14: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 13: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 12: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 11: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case 10: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  9: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  8: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  7: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  6: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  5: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  4: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  3: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
-		case  2: *dest = colormap[source[frac >> COLBITS]]; dest += SCREENWIDTH; frac += fracstep;
+		case 15: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 14: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 13: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 12: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 11: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case 10: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case  9: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case  8: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case  7: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case  6: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case  5: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case  4: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case  3: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
+		case  2: *dest = colormap[source[frac >> COLBITS]]; dest += VIEWWINDOWWIDTH; frac += fracstep;
 		case  1: *dest = colormap[source[frac >> COLBITS]];
 	}
 }
@@ -233,9 +229,6 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 
 void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 {
-	// TODO
-	return;
-
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
@@ -246,7 +239,7 @@ void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 
 	colormap = dcvars->colormap;
 
-	dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
+	dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
 	const uint16_t fracstep = dcvars->fracstep;
 	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * fracstep;
@@ -267,20 +260,17 @@ void R_DrawColumnWall(const draw_column_vars_t *dcvars)
 
 void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 {
-	// TODO
-	return;
-
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
 	// Zero length, column does not exceed a pixel.
 	if (count <= 0)
 		return;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
+	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
 	for (int16_t i = 0; i < count; i++)
 	{
-		*dest = color; dest += SCREENWIDTH;
+		*dest = color; dest += VIEWWINDOWWIDTH;
 	}
 }
 
