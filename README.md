@@ -45,6 +45,15 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ### EGA 320x200 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomegam.png?raw=true)
 
+### Tandy 1000 640x200 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomth.png?raw=true)
+
+### Tandy 1000 320x200 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomtm.png?raw=true)
+
+### Tandy 1000 160x200 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomtl.png?raw=true)
+
 ### Text mode 80x43 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomt80x43.png?raw=true)
 
@@ -93,28 +102,32 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |IDRATE    |Toggle FPS counter       |
 
 ## Command line arguments:
-|Command line argument|Effect       |
-|---------------------|-------------|
-|-noems               |Disable EMS  |
-|-noxms               |Disable XMS  |
-|-timedemo demo3      |Run benchmark|
+|Command line argument|Effect                    |
+|---------------------|--------------------------|
+|-hiddencard          |Disable video memory check|
+|-noems               |Disable EMS               |
+|-noxms               |Disable XMS               |
+|-timedemo demo3      |Run benchmark             |
 
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.
 
 2) Run one of the build scripts:
 
-|Build script |Version                  |
-|-------------|-------------------------|
-|`buildall.sh`|Build all versions       |
-|`bmodey.sh`  |Mode Y                   |
-|`bmode13h.sh`|Mode 13h                 |
-|`begah.sh`   |EGA 640x200 16 colors    |
-|`begam.sh`   |EGA 320x200 16 colors    |
-|`bt80x43.sh` |Text mode 80x43 16 colors|
-|`bt80x25.sh` |Text mode 80x25 16 colors|
-|`bt40x25.sh` |Text mode 40x25 16 colors|
-|`bmda.sh`    |Text mode 80x25  2 colors|
+|Build script |Version                     |
+|-------------|----------------------------|
+|`buildall.sh`|Build all versions          |
+|`bmodey.sh`  |Mode Y                      |
+|`bmode13h.sh`|Mode 13h                    |
+|`begah.sh`   |EGA 640x200 16 colors       |
+|`begam.sh`   |EGA 320x200 16 colors       |
+|`btandyh.sh` |Tandy 1000 640x200 16 colors|
+|`btandym.sh` |Tandy 1000 320x200 16 colors|
+|`btandyl.sh` |Tandy 1000 160x200 16 colors|
+|`bt80x43.sh` |Text mode 80x43 16 colors   |
+|`bt80x25.sh` |Text mode 80x25 16 colors   |
+|`bt40x25.sh` |Text mode 40x25 16 colors   |
+|`bmda.sh`    |Text mode 80x25  2 colors   |
 
 It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2).
 First run `setenvdj.bat` once and then `bdj32.bat` for DJGPP, and `setenvwc.bat` followed by `bwc32.bat` for Watcom.

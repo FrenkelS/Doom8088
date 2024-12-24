@@ -14,3 +14,9 @@
 ./bt80x25.sh  i286  D2T80X25.EXE
 ./bt80x43.sh  i8088 D8T80X43.EXE
 ./bt80x43.sh  i286  D2T80X43.EXE
+./btandyh.sh  i8088 D8088TH.EXE
+./btandyh.sh  i286  D286TH.EXE
+./btandyl.sh  i8088 D8088TL.EXE
+./btandyl.sh  i286  D286TL.EXE
+./btandym.sh  i8088 D8088TM.EXE
+./btandym.sh  i286  D286TM.EXE

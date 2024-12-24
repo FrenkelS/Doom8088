@@ -77,7 +77,7 @@ boolean    _g_message_dontfuckwithme;
 // Locally used constants, shortcuts.
 //
 
-#define HU_TITLEY (VIEWWINDOWHEIGHT - 1 - HU_FONT_HEIGHT)
+#define HU_TITLEY (SCREENHEIGHT - ST_HEIGHT - 1 - HU_FONT_HEIGHT)
 
 #define HU_MSGY         0
 
