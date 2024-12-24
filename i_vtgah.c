@@ -479,6 +479,18 @@ void V_FillRect(byte colour)
 }
 
 
+void V_InitDrawLine(void)
+{
+	// Do nothing
+}
+
+
+void V_ShutdownDrawLine(void)
+{
+	// Do nothing
+}
+
+
 //
 // V_DrawLine()
 //

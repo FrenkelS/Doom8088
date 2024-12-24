@@ -78,14 +78,14 @@ last_pixel1:
 	mov bx, si
 	xlat
 	mov bx, cx
-	ss xlat
+	mov dx, ss
+	mov ds, dx
+	xlat
 	stosb
 
-last_pixel0:
+last_pixel0:	; count > 0, so the code never jumps to this label
 	pop bp
 	pop es
 	pop di
 	pop si
-	mov ax, ss
-	mov ds, ax
 	retf

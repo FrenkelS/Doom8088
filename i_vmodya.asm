@@ -418,8 +418,15 @@ last_pixel1:
 	mov bx, si
 	xlat
 	mov bx, cx
-	ss xlat
+	mov dx, ss
+	mov ds, dx
+	xlat
 	stosb
+	pop bp
+	pop es
+	pop di
+	pop si
+	retf
 
 last_pixel0:
 	pop bp

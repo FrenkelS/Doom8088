@@ -17,8 +17,6 @@
 
 %ifidn CPU, i8088
 cpu 8086
-%elifidn CPU, i8086
-cpu 8086
 %elifidn CPU, i286
 cpu 286
 %else
@@ -27,11 +25,10 @@ cpu 286
 
 bits 16
 
-SCREENWIDTH equ 240
-
 extern source
 extern colormap
 extern dest
+extern colorsoffset
 
 last_pixel_jump_table:
 	dw last_pixel0,
@@ -68,226 +65,220 @@ R_DrawColumn2:
 	xchg bp, ax						; bp = fracstep
 
 	mov bx, cx						; bx = count
+	mov ah, cl						; 1 <= ah <= 128
 
-	mov al, cl						; 1 <= al <= 128
 %ifidn CPU, i8088
 	mov cl, 4
-	shr al, cl						; 0 <= al <= 8
-%elifidn CPU, i8086
-	mov cl, 4
-	shr al, cl						; 0 <= al <= 8
+	shr ah, cl						; 0 <= ah <= 8
 %else
-	shr al, 4						; 0 <= al <= 8
+	shr ah, 4						; 0 <= ah <= 8
 %endif
 
-	mov cx, [colormap]
+	mov cx, [colorsoffset]			; es:cx = colors
 
 	les di, [dest]					; es:di = dest
 	lds si, [source]				; ds:si = source
 
-	or al, al						; if al = 0
+	or ah, ah						; if ah = 0
 	jz last_pixels					;  then jump to last_pixels
 
 	push bx							; push count
 
 loop_pixels:
-	push ax
-
 	mov al, dh						; al = hi byte of frac
 	shr al, 1						; 0 <= al <= 127
 	mov bx, si						; bx = source
 	xlat							; al = source[al]
-	mov bx, cx						; bx = colormap
+	mov bx, colormap				; bx = colormap
 	ss xlat							; al = colormap[al]
-	mov ah, al
-	stosw							; write pixel
-	stosw
-	add di, SCREENWIDTH-4			; point to next line
+	mov bx, cx						; bx = colors
+	es xlat							; al = colors[al]
+	stosb							; write pixel
+	add di, PLANEWIDTH-1			; point to next line
 	add dx, bp						; frac += fracstep
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
-	pop ax
-	dec al
-	jnz loop_pixels					; if --al != 0 then jump to loop_pixels
+	dec ah
+	jnz loop_pixels					; if --ah != 0 then jump to loop_pixels
 
 	pop bx							; pop count
 
@@ -297,18 +288,17 @@ last_pixels:
 	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
 
-
 last_pixel15:
 	mov al, dh
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel14:
@@ -316,12 +306,12 @@ last_pixel14:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel13:
@@ -329,12 +319,12 @@ last_pixel13:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel12:
@@ -342,12 +332,12 @@ last_pixel12:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel11:
@@ -355,12 +345,12 @@ last_pixel11:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel10:
@@ -368,12 +358,12 @@ last_pixel10:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel9:
@@ -381,12 +371,12 @@ last_pixel9:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel8:
@@ -394,12 +384,12 @@ last_pixel8:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel7:
@@ -407,12 +397,12 @@ last_pixel7:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel6:
@@ -420,12 +410,12 @@ last_pixel6:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel5:
@@ -433,12 +423,12 @@ last_pixel5:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel4:
@@ -446,12 +436,12 @@ last_pixel4:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel3:
@@ -459,12 +449,12 @@ last_pixel3:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel2:
@@ -472,12 +462,12 @@ last_pixel2:
 	shr al, 1
 	mov bx, si
 	xlat
-	mov bx, cx
+	mov bx, colormap
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	mov bx, cx
+	es xlat
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel1:
@@ -485,18 +475,11 @@ last_pixel1:
 	shr al, 1
 	mov bx, si
 	xlat
+	mov bx, colormap
+	ss xlat
 	mov bx, cx
-	mov dx, ss
-	mov ds, dx
-	xlat
-	mov ah, al
-	stosw
-	stosw
-	pop bp
-	pop es
-	pop di
-	pop si
-	retf
+	es xlat
+	stosb
 
 last_pixel0:
 	pop bp

@@ -6,7 +6,7 @@ It's mostly written in C code with very little assembly code.
 It has been ported to all kinds of systems.
 Usually these systems are 32-bit or more and have a flat memory model.
 
-Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286, and with VGA or MCGA graphics.
+Doom8088 is a port for PCs with a 16-bit processor like an 8088 or a 286, and with MDA, CGA, EGA, VGA or MCGA graphics.
 It uses 64 kB of EMS memory, if available.
 And 1506 kB of XMS memory, if available.
 It's based on [GBADoom](https://github.com/doomhack/GBADoom), a port of PrBoom to the Game Boy Advance.
@@ -39,6 +39,12 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13H
 ![Doom8088 in 256 colors](readme_imgs/doom8088.png?raw=true)
 
+### EGA 640x200 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomegah.png?raw=true)
+
+### EGA 320x200 16 color mode
+![Doom8088 in 16 colors](readme_imgs/doomegam.png?raw=true)
+
 ### Tandy 1000 640x200 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomth.png?raw=true)
 
@@ -58,7 +64,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ![Doom8088 in 16 colors](readme_imgs/doomt40x25.png?raw=true)
 
 ### Text mode 80x25 2 color mode
-![Doom8088 in 16 colors](readme_imgs/doomt80x25m.png?raw=true)
+![Doom8088 in 2 colors](readme_imgs/doomt80x25m.png?raw=true)
 
 ## Controls:
 |Action                 |             |
@@ -110,15 +116,18 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 |Build script |Version                     |
 |-------------|----------------------------|
+|`buildall.sh`|Build all versions          |
 |`bmodey.sh`  |Mode Y                      |
 |`bmode13h.sh`|Mode 13h                    |
+|`begah.sh`   |EGA 640x200 16 colors       |
+|`begam.sh`   |EGA 320x200 16 colors       |
 |`btandyh.sh` |Tandy 1000 640x200 16 colors|
 |`btandym.sh` |Tandy 1000 320x200 16 colors|
 |`btandyl.sh` |Tandy 1000 160x200 16 colors|
 |`bt80x43.sh` |Text mode 80x43 16 colors   |
 |`bt80x25.sh` |Text mode 80x25 16 colors   |
 |`bt40x25.sh` |Text mode 40x25 16 colors   |
-|`bmda.sh`    |Text mode 80x25 2 colors    |
+|`bmda.sh`    |Text mode 80x25  2 colors   |
 
 It's possible to build a 32-bit version of Doom8088 with [DJGPP](https://github.com/andrewwutw/build-djgpp) and [Watcom](https://github.com/open-watcom/open-watcom-v2).
 First run `setenvdj.bat` once and then `bdj32.bat` for DJGPP, and `setenvwc.bat` followed by `bwc32.bat` for Watcom.
