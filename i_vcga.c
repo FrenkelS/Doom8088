@@ -65,6 +65,65 @@ void I_ReloadPalette(void)
 }
 
 
+typedef enum
+{
+	MDA,
+	CGA,
+	PCJR,
+	TANDY,
+	EGA,
+	VGA,
+	MCGA
+} videocardsenum_t;
+
+
+static videocardsenum_t videocard;
+
+
+static videocardsenum_t I_DetectVideoCard(void)
+{
+	// This code is based on Jason M. Knight's Paku Paku code
+
+	union REGS regs;
+	regs.w.ax = 0x1200;
+	regs.h.bl = 0x32;
+	int86(0x10, &regs, &regs);
+
+	if (regs.h.al == 0x12)
+	{
+		regs.w.ax = 0x1a00;
+		regs.h.bl = 0;
+		int86(0x10, &regs, &regs);
+		return (0x0a <= regs.h.bl && regs.h.bl <= 0x0c) ? MCGA : VGA;
+	}
+
+	regs.h.ah = 0x12;
+	regs.h.bl = 0x10;
+	int86(0x10, &regs, &regs);
+	if (regs.h.bl & 3)
+		return EGA;
+
+	regs.h.ah = 0x0f;
+	int86(0x10, &regs, &regs);
+	if (regs.h.al == 7)
+		return MDA;
+
+	uint8_t __far* fp;
+	fp = D_MK_FP(0xffff, 0x000e);
+	if (*fp == 0xfd)
+		return PCJR;
+
+	if (*fp == 0xff)
+	{
+		fp = D_MK_FP(0xfc00, 0);
+		if (*fp == 0x21)
+			return TANDY;
+	}
+
+	return CGA;
+}
+
+
 static const int8_t colors[14] =
 {
 	0,							// normal
@@ -76,14 +135,30 @@ static const int8_t colors[14] =
 
 static void I_UploadNewPalette(int8_t pal)
 {
-	outp(0x3da, 0x10);
-	outp(0x3de, colors[pal]);
+	if (videocard == CGA)
+	{
+		outp(0x3d9, 0x30 | colors[pal]);
+		return;
+	}
+
+	int8_t c = colors[pal];
+
+	if (c > 7)
+		c |= 0x10;
+
+	union REGS regs;
+	regs.w.ax = 0x1000;
+	regs.h.bl = 0x00;
+	regs.h.bh = c;
+	int86(0x10, &regs, &regs);
 }
 
 
 void I_InitGraphicsHardwareSpecificCode(void)
 {
 	__djgpp_nearptr_enable();
+
+	videocard = I_DetectVideoCard();
 
 	I_SetScreenMode(4);
 
