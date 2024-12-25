@@ -540,9 +540,6 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
-	// TODO
-	return;
-
 	static const int32_t   DX  = (((int32_t)SCREENWIDTH)<<FRACBITS) / SCREENWIDTH_VGA;
 	static const int16_t   DXI = ((((int32_t)SCREENWIDTH_VGA)<<FRACBITS) / SCREENWIDTH) >> 8;
 	static const int32_t   DY  = ((((int32_t)SCREENHEIGHT)<<FRACBITS)+(FRACUNIT-1)) / SCREENHEIGHT_VGA;
@@ -566,6 +563,9 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
 
+		int16_t p = dc_x & 3;
+		uint8_t bitmask = bitmasks[p];
+
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
 		{
@@ -576,7 +576,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 			int16_t dc_yh = (((y + column->topdelta + column->length) * DY) >> FRACBITS);
 
-			byte __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + dc_x;
+			byte __far* dest = _s_screen + (dc_yl * VIEWWINDOWWIDTH) + (dc_x >> 2);
 
 			int16_t frac = 0;
 
@@ -585,8 +585,10 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			int16_t count = dc_yh - dc_yl;
 			while (count--)
 			{
-				*dest = source[frac >> 8];
-				dest += SCREENWIDTH;
+				uint8_t c = *dest;
+				uint8_t color = source[frac >> 8];
+				*dest = (c & bitmask) | (color >> (p * 2));
+				dest += VIEWWINDOWWIDTH;
 				frac += DYI;
 			}
 
