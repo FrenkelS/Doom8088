@@ -183,7 +183,7 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 	uint8_t __far* src = buffer;
 	uint8_t __far* dst = videomemory;
 
-	for (uint_fast8_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++)
+	for (int16_t y = 0; y < (SCREENHEIGHT - ST_HEIGHT) / 2; y++)
 	{
 		_fmemcpy(dst, src, VIEWWINDOWWIDTH);
 		dst += 0x2000;
@@ -196,7 +196,7 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 
 	if (drawStatusBar)
 	{
-		for (uint_fast8_t y = 0; y < ST_HEIGHT / 2; y++)
+		for (int16_t y = 0; y < ST_HEIGHT / 2; y++)
 		{
 			_fmemcpy(dst, src, VIEWWINDOWWIDTH);
 			dst += 0x2000;
@@ -443,22 +443,19 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 void V_DrawBackground(int16_t backgroundnum)
 {
-	// TODO
-	return;
-
 	const byte __far* src = W_GetLumpByNum(backgroundnum);
 
-	for(uint8_t y = 0; y < SCREENHEIGHT; y++)
+	for (int16_t y = 0; y < SCREENHEIGHT; y++)
 	{
-		for(uint16_t x = 0; x < SCREENWIDTH; x+=64)
+		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x += 16)
 		{
-			uint8_t __far* d = &_s_screen[y * SCREENWIDTH + x];
-			const byte __far* s = &src[((y&63) * 64) + (x&63)];
+			uint8_t __far* d = &_s_screen[y * VIEWWINDOWWIDTH + x];
+			const byte __far* s = &src[((y & 63) * 16)];
 
-			uint8_t len = 64;
+			size_t len = 16;
 
-			if (SCREENWIDTH - x < 64)
-				len = SCREENWIDTH - x;
+			if (VIEWWINDOWWIDTH - x < 16)
+				len = VIEWWINDOWWIDTH - x;
 
 			_fmemcpy(d, s, len);
 		}
