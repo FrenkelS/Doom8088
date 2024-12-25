@@ -398,10 +398,11 @@ void V_ShutdownDrawLine(void)
 }
 
 
+static uint8_t bitmasks[4] = {0x3f, 0xcf, 0xf3, 0xfc};
+
+
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
-	static uint8_t bitmasks[4] = {0x3f, 0xcf, 0xf3, 0xfc};
-
 	int16_t dx = abs(x1 - x0);
 	int16_t sx = x0 < x1 ? 1 : -1;
 
@@ -493,17 +494,17 @@ void ST_Drawer(void)
 
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
-	// TODO
-	return;
-
 	y -= patch->topoffset;
 	x -= patch->leftoffset;
 
-	byte __far* desttop = _s_screen + (y * SCREENWIDTH) + x;
+	byte __far* desttop = _s_screen + (y * VIEWWINDOWWIDTH) + (x >> 2);
 
 	int16_t width = patch->width;
 
-	for (int16_t col = 0; col < width; col++, desttop++)
+	int16_t p = x & 3;
+	uint8_t bitmask = bitmasks[p];
+
+	for (int16_t col = 0; col < width; col++)
 	{
 		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col]);
 
@@ -511,58 +512,28 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		while (column->topdelta != 0xff)
 		{
 			const byte __far* source = (const byte __far*)column + 3;
-			byte __far* dest = desttop + (column->topdelta * SCREENWIDTH);
+			byte __far* dest = desttop + (column->topdelta * VIEWWINDOWWIDTH);
 
 			uint16_t count = column->length;
 
-			if (count == 7)
+			while (count--)
 			{
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++;
-			}
-			else if (count == 3)
-			{
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++;
-			}
-			else if (count == 5)
-			{
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++;
-			}
-			else if (count == 6)
-			{
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++;
-			}
-			else if (count == 2)
-			{
-				*dest = *source++; dest += SCREENWIDTH;
-				*dest = *source++;
-			}
-			else
-			{
-				while (count--)
-				{
-					*dest = *source++; dest += SCREENWIDTH;
-				}
+				uint8_t c = *dest;
+				uint8_t color = *source++;
+				*dest = (c & bitmask) | (color >> (p * 2));
+				dest += VIEWWINDOWWIDTH;
 			}
 
 			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
 		}
+
+		p++;
+		if (p == 4)
+		{
+			p = 0;
+			desttop++;
+		}
+		bitmask = bitmasks[p];
 	}
 }
 
