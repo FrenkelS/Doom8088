@@ -625,15 +625,15 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 }
 
 
-static uint16_t __far* frontbuffer;
-static  int16_t __far* wipe_y_lookup;
+static uint8_t __far* frontbuffer;
+static int16_t __far* wipe_y_lookup;
 
 
 void wipe_StartScreen(void)
 {
-	frontbuffer = NULL; // TODO Z_TryMallocStatic(SCREENWIDTH * SCREENHEIGHT);
+	frontbuffer = Z_TryMallocStatic(VIEWWINDOWWIDTH * SCREENHEIGHT);
 	if (frontbuffer)
-		_fmemcpy(frontbuffer, _s_screen, SCREENWIDTH * SCREENHEIGHT);
+		_fmemcpy(frontbuffer, _s_screen, VIEWWINDOWWIDTH * SCREENHEIGHT);
 }
 
 
@@ -641,12 +641,12 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 {
 	boolean done = true;
 
-	uint16_t __far* backbuffer = (uint16_t __far*)_s_screen;
+	uint8_t __far* backbuffer = _s_screen;
 
 	while (ticks--)
 	{
-		I_DrawBuffer((uint8_t __far*)frontbuffer);
-		for (int16_t i = 0; i < SCREENWIDTH / 2; i++)
+		I_DrawBuffer(frontbuffer);
+		for (int16_t i = 0; i < VIEWWINDOWWIDTH; i++)
 		{
 			if (wipe_y_lookup[i] < 0)
 			{
@@ -663,9 +663,9 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				if (wipe_y_lookup[i] + dy >= SCREENHEIGHT)
 					dy = SCREENHEIGHT - wipe_y_lookup[i];
 
-				uint16_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - dy - 1) * (SCREENWIDTH / 2));
+				uint8_t __far* s = &frontbuffer[i] + ((SCREENHEIGHT - dy - 1) * VIEWWINDOWWIDTH);
 
-				uint16_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1) * (SCREENWIDTH / 2));
+				uint8_t __far* d = &frontbuffer[i] + ((SCREENHEIGHT - 1) * VIEWWINDOWWIDTH);
 
 				// scroll down the column. Of course we need to copy from the bottom... up to
 				// SCREENHEIGHT - yLookup - dy
@@ -673,19 +673,19 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 				for (int16_t j = SCREENHEIGHT - wipe_y_lookup[i] - dy; j; j--)
 				{
 					*d = *s;
-					d += -(SCREENWIDTH / 2);
-					s += -(SCREENWIDTH / 2);
+					d += -VIEWWINDOWWIDTH;
+					s += -VIEWWINDOWWIDTH;
 				}
 
 				// copy new screen. We need to copy only between y_lookup and + dy y_lookup
-				s = &backbuffer[i]  + wipe_y_lookup[i] * SCREENWIDTH / 2;
-				d = &frontbuffer[i] + wipe_y_lookup[i] * SCREENWIDTH / 2;
+				s = &backbuffer[i]  + wipe_y_lookup[i] * VIEWWINDOWWIDTH;
+				d = &frontbuffer[i] + wipe_y_lookup[i] * VIEWWINDOWWIDTH;
 
 				for (int16_t j = 0 ; j < dy; j++)
 				{
 					*d = *s;
-					d += (SCREENWIDTH / 2);
-					s += (SCREENWIDTH / 2);
+					d += VIEWWINDOWWIDTH;
+					s += VIEWWINDOWWIDTH;
 				}
 
 				wipe_y_lookup[i] += dy;
@@ -700,12 +700,12 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 static void wipe_initMelt()
 {
-	wipe_y_lookup = Z_MallocStatic(SCREENWIDTH);
+	wipe_y_lookup = Z_MallocStatic(VIEWWINDOWWIDTH * sizeof(int16_t));
 
 	wipe_y_lookup[0] = -(M_Random() % 16);
-	for (int8_t i = 1; i < SCREENWIDTH / 2; i++)
+	for (int16_t i = 1; i < VIEWWINDOWWIDTH; i++)
 	{
-		int8_t r = (M_Random() % 3) - 1;
+		int16_t r = (M_Random() % 3) - 1;
 
 		wipe_y_lookup[i] = wipe_y_lookup[i - 1] + r;
 
