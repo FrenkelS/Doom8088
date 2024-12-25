@@ -470,10 +470,9 @@ void V_DrawBackground(int16_t backgroundnum)
 
 void V_DrawRaw(int16_t num, uint16_t offset)
 {
-	// TODO
-	return;
-
 	const uint8_t __far* lump = W_TryGetLumpByNum(num);
+
+	offset = (offset / SCREENWIDTH) * VIEWWINDOWWIDTH;
 
 	if (lump != NULL)
 	{
