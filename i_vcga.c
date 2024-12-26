@@ -372,7 +372,7 @@ void R_DrawColumnWall(const draw_column_vars_t *dcvars)
 }
 
 
-void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
+void R_DrawColumnFlat(uint8_t color0, const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -382,10 +382,16 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
-	for (int16_t i = 0; i < count; i++)
+	uint8_t color1 = (color0 << 4) | (color0 >> 4);
+
+	for (int16_t i = 0; i < count / 2; i++)
 	{
-		*dest = color; dest += VIEWWINDOWWIDTH;
+		*dest = color0; dest += VIEWWINDOWWIDTH;
+		*dest = color1; dest += VIEWWINDOWWIDTH;
 	}
+
+	if (count & 1)
+		*dest = color0;
 }
 
 
