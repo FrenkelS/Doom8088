@@ -133,24 +133,73 @@ static const int8_t colors[14] =
 };
 
 
-static void I_UploadNewPalette(int8_t pal)
+static const uint8_t colorsNonCGA[6][3] =
 {
-	if (videocard == CGA)
-	{
-		outp(0x3d9, 0x30 | colors[pal]);
-		return;
-	}
+	{11, 13, 15}, // light cyan, light magenta, white
+	{ 3,  4,  7}, // cyan, red, light gray
+	{11, 12, 15}, // light cyan, light red, white
+	{ 2,  4,  6}, // green, red, brown
+	{10, 12, 14}, // light green, light red, yellow
+	{ 3,  5,  7}  // cyan, magenta, light gray
+};
 
-	int8_t c = colors[pal];
 
-	if (c > 7)
-		c |= 0x10;
+static int16_t palette;
+static int8_t pal;
+
+
+static void I_SetPaletteNonCGA(uint8_t paletteRegisterNumber, uint8_t color)
+{
+	if (color > 7)
+		color |= 0x10;
 
 	union REGS regs;
 	regs.w.ax = 0x1000;
-	regs.h.bl = 0x00;
-	regs.h.bh = c;
+	regs.h.bl = paletteRegisterNumber;
+	regs.h.bh = color;
 	int86(0x10, &regs, &regs);
+}
+
+
+static void I_UploadNewPalette(void)
+{
+	uint8_t background = colors[pal];
+
+	if (videocard == CGA)
+	{
+		uint8_t mode;
+		uint8_t colour;
+		switch (palette)
+		{
+			case 0: colour = 0x30 | background; mode = 0x0a; break; // background, light cyan, light magenta, white
+			case 1: colour = 0x00 | background; mode = 0x0e; break; // background, cyan, red, light gray
+			case 2: colour = 0x10 | background; mode = 0x0e; break; // background, light cyan, light red, white
+			case 3: colour = 0x00 | background; mode = 0x0a; break; // background, green, red, brown
+			case 4: colour = 0x10 | background; mode = 0x0a; break; // background, light green, light red, yellow
+			case 5: colour = 0x20 | background; mode = 0x0a; break; // background, cyan, magenta, light gray
+		}
+		outp(0x3d8, mode);
+		outp(0x3d9, colour);
+	}
+	else
+		I_SetPaletteNonCGA(0, background);
+}
+
+
+void I_SwitchPalette(void)
+{
+	palette++;
+	if (palette == 6)
+		palette = 0;
+
+	if (videocard == CGA)
+		I_UploadNewPalette();
+	else
+	{
+		I_SetPaletteNonCGA(1, colorsNonCGA[palette][0]);
+		I_SetPaletteNonCGA(2, colorsNonCGA[palette][1]);
+		I_SetPaletteNonCGA(3, colorsNonCGA[palette][2]);
+	}
 }
 
 
@@ -162,7 +211,7 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	I_SetScreenMode(4);
 	I_ReloadPalette();
-	I_UploadNewPalette(0);
+	I_UploadNewPalette();
 
 	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_CGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
@@ -216,9 +265,9 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 static int8_t newpal;
 
 
-void I_SetPalette(int8_t pal)
+void I_SetPalette(int8_t p)
 {
-	newpal = pal;
+	pal = newpal = p;
 }
 
 
@@ -228,7 +277,7 @@ void I_FinishUpdate(void)
 {
 	if (newpal != NO_PALETTE_CHANGE)
 	{
-		I_UploadNewPalette(newpal);
+		I_UploadNewPalette();
 		newpal = NO_PALETTE_CHANGE;
 	}
 

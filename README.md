@@ -58,20 +58,21 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ![Doom8088 in 2 colors](readme_imgs/doomt80x25m.png?raw=true)
 
 ## Controls:
-|Action                 |             |
-|-----------------------|-------------|
-|Fire                   |Ctrl         |
-|Use                    |Enter & Space|
-|Sprint                 |Shift        |
-|Walk                   |Arrow keys   |
-|Strafe                 |Alt          |
-|Strafe left and right  |< & >        |
-|Automap                |Tab          |
-|Automap zoom in and out|+ & -        |
-|Automap follow mode    |F            |
-|Weapon up and down     |[ & ]        |
-|Menu                   |Esc          |
-|Quit to DOS            |F10          |
+|Action                           |             |
+|---------------------------------|-------------|
+|Fire                             |Ctrl         |
+|Use                              |Enter & Space|
+|Sprint                           |Shift        |
+|Walk                             |Arrow keys   |
+|Strafe                           |Alt          |
+|Strafe left and right            |< & >        |
+|Automap                          |Tab          |
+|Automap zoom in and out          |+ & -        |
+|Automap follow mode              |F            |
+|Weapon up and down               |[ & ]        |
+|Menu                             |Esc          |
+|Switch palette (CGA version only)|F5           |
+|Quit to DOS                      |F10          |
 
 ## Cheats:
 |Code      |Effects                  |

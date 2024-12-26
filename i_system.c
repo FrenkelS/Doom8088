@@ -132,6 +132,12 @@ void I_InitKeyboard(void)
 #define SC_M	0x32
 
 
+#if defined VIDEO_MODE_CGA
+#define SC_F5				0x3f
+void I_SwitchPalette(void);
+#endif
+
+
 void I_StartTic(void)
 {
 	//
@@ -224,6 +230,13 @@ void I_StartTic(void)
 			case SC_BRACKET_RIGHT:
 				ev.data1 = KEYD_BRACKET_RIGHT;
 				break;
+
+#if defined VIDEO_MODE_CGA
+			case SC_F5:
+				if (ev.type == ev_keydown)
+					I_SwitchPalette();
+				continue;
+#endif
 
 			case SC_F10:
 				I_Quit();
