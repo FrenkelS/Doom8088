@@ -2,8 +2,8 @@ mkdir GCCIA16
 
 unset CFLAGS
 
-#export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR"
-export RENDER_OPTIONS="-DFLAT_SPAN"
+
+export RENDER_OPTIONS="-DFLAT_SPAN -DFLAT_NUKAGE1_COLOR=65 -DWAD_FILE=\"DOOM4.WAD\" -DNR_OF_COLORS=4 -DVIDEO_MODE_CGA"
 
 export CPU=$1
 export OUTPUT=$2
@@ -19,11 +19,11 @@ then
   export OUTPUT=DOOM8088.EXE
 fi
 
-nasm i_vmodya.asm -f elf -DCPU=$CPU -DPLANEWIDTH=80
+nasm i_vmodya.asm -f elf -DCPU=$CPU -DPLANEWIDTH=60
 nasm m_fixed.asm  -f elf
 nasm z_xms.asm    -f elf
 
-ia16-elf-gcc -c i_vmodey.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
+ia16-elf-gcc -c i_vcga.c   $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_map.c    $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_sight.c  $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
@@ -49,8 +49,8 @@ export GLOBOBJS+=" hu_stuff.c"
 export GLOBOBJS+=" i_audio.c"
 export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
-#export GLOBOBJS+=" i_vmodey.c"
-export GLOBOBJS+=" i_vmodey.o"
+#export GLOBOBJS+=" i_vcga.c"
+export GLOBOBJS+=" i_vcga.o"
 export GLOBOBJS+=" i_vmodya.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
@@ -106,7 +106,7 @@ rm i_vmodya.o
 rm m_fixed.o
 rm z_xms.o
 
-rm i_vmodey.o
+rm i_vcga.o
 rm p_map.o
 rm p_maputl.o
 rm p_sight.o

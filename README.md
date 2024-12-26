@@ -45,6 +45,9 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ### EGA 320x200 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomegam.png?raw=true)
 
+### CGA 320x200 4 color mode
+![Doom8088 in 4 colors](readme_imgs/doomcga.png?raw=true)
+
 ### Text mode 80x43 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomt80x43.png?raw=true)
 
@@ -58,20 +61,21 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ![Doom8088 in 2 colors](readme_imgs/doomt80x25m.png?raw=true)
 
 ## Controls:
-|Action                 |             |
-|-----------------------|-------------|
-|Fire                   |Ctrl         |
-|Use                    |Enter & Space|
-|Sprint                 |Shift        |
-|Walk                   |Arrow keys   |
-|Strafe                 |Alt          |
-|Strafe left and right  |< & >        |
-|Automap                |Tab          |
-|Automap zoom in and out|+ & -        |
-|Automap follow mode    |F            |
-|Weapon up and down     |[ & ]        |
-|Menu                   |Esc          |
-|Quit to DOS            |F10          |
+|Action                           |             |
+|---------------------------------|-------------|
+|Fire                             |Ctrl         |
+|Use                              |Enter & Space|
+|Sprint                           |Shift        |
+|Walk                             |Arrow keys   |
+|Strafe                           |Alt          |
+|Strafe left and right            |< & >        |
+|Automap                          |Tab          |
+|Automap zoom in and out          |+ & -        |
+|Automap follow mode              |F            |
+|Weapon up and down               |[ & ]        |
+|Menu                             |Esc          |
+|Switch palette (CGA version only)|F5           |
+|Quit to DOS                      |F10          |
 
 ## Cheats:
 |Code      |Effects                  |
@@ -111,6 +115,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |`bmode13h.sh`|Mode 13h                 |
 |`begah.sh`   |EGA 640x200 16 colors    |
 |`begam.sh`   |EGA 320x200 16 colors    |
+|`bcga.sh`    |CGA 320x200  4 colors    |
 |`bt80x43.sh` |Text mode 80x43 16 colors|
 |`bt80x25.sh` |Text mode 80x25 16 colors|
 |`bt40x25.sh` |Text mode 40x25 16 colors|
