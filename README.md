@@ -45,6 +45,9 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ### EGA 320x200 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomegam.png?raw=true)
 
+### CGA 320x200 4 color mode
+![Doom8088 in 4 colors](readme_imgs/doomcga.png?raw=true)
+
 ### Text mode 80x43 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomt80x43.png?raw=true)
 
