@@ -115,6 +115,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |`bmode13h.sh`|Mode 13h                 |
 |`begah.sh`   |EGA 640x200 16 colors    |
 |`begam.sh`   |EGA 320x200 16 colors    |
+|`bcga.sh`    |CGA 320x200  4 colors    |
 |`bt80x43.sh` |Text mode 80x43 16 colors|
 |`bt80x25.sh` |Text mode 80x25 16 colors|
 |`bt40x25.sh` |Text mode 40x25 16 colors|
