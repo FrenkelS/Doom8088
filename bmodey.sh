@@ -19,7 +19,7 @@ then
   export OUTPUT=DOOM8088.EXE
 fi
 
-nasm i_vmodya.asm -f elf -DCPU=$CPU
+nasm i_vmodya.asm -f elf -DCPU=$CPU -DPLANEWIDTH=80
 nasm m_fixed.asm  -f elf
 nasm z_xms.asm    -f elf
 

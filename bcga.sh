@@ -19,8 +19,9 @@ then
   export OUTPUT=DOOM8088.EXE
 fi
 
-nasm m_fixed.asm -f elf
-nasm z_xms.asm   -f elf
+nasm i_vmodya.asm -f elf -DCPU=$CPU -DPLANEWIDTH=60
+nasm m_fixed.asm  -f elf
+nasm z_xms.asm    -f elf
 
 ia16-elf-gcc -c i_vcga.c   $RENDER_OPTIONS -march=$CPU -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
 ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops
@@ -45,6 +46,7 @@ export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
 #export GLOBOBJS+=" i_vcga.c"
 export GLOBOBJS+=" i_vcga.o"
+export GLOBOBJS+=" i_vmodya.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_fixed.o"
@@ -90,6 +92,7 @@ export GLOBOBJS+=" z_zone.c"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/$OUTPUT
 
+rm i_vmodya.o
 rm m_fixed.o
 rm z_xms.o
 

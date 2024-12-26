@@ -288,12 +288,13 @@ void I_FinishUpdate(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-static const uint8_t* colormap;
+const uint8_t* colormap;
 
-static const uint8_t __far* source;
-static uint8_t __far* dest;
+const uint8_t __far* source;
+uint8_t __far* dest;
 
 
+#if defined C_ONLY
 static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	int16_t l = count >> 4;
@@ -339,6 +340,9 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 		case  1: *dest = colormap[source[frac >> COLBITS]];
 	}
 }
+#else
+void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
+#endif
 
 
 void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
