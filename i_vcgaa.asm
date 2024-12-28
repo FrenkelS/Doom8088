@@ -37,14 +37,15 @@ R_DrawColumnFlat2:
 	mov ah, al
 	ror ah, 4
 
-	shr dx, 1						; if dx = 0
+	shr dx, 1						; if yl is odd
 	jnc label_a						;  then jump to label_a
 	xchg ah, al
 
 label_a:
 	mov bx, cx						; bx = count
 	shr cx, 1						; 0 <= cx <= 64
-	jcxz last_pixel1				;  then jump to last_pixel1
+	jcxz last_pixel1				; if count = 1 then jump to last_pixel1
+
 
 loop_pixels:
 	mov [di+PLANEWIDTH*0], al		; write pixel
@@ -54,8 +55,8 @@ loop_pixels:
 	loop loop_pixels				; if --cx != 0 then jump to loop_pixels
 
 
-	or bx, bx						; if bx = 0
-	jz last_pixel0					;  then jump to last_pixel0
+	shr bx, 1						; if count is odd
+	jnc last_pixel0					;  then jump to last_pixel0
 
 
 last_pixel1:
