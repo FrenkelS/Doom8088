@@ -38,7 +38,7 @@ R_DrawColumnFlat2:
 	ror ah, 4
 
 	shr dx, 1						; if dx = 0
-	jc label_a						;  then jump to label_a
+	jnc label_a						;  then jump to label_a
 	xchg ah, al
 
 label_a:
