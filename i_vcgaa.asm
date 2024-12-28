@@ -31,9 +31,8 @@ extern dest
 global R_DrawColumnFlat2
 R_DrawColumnFlat2:
 	push di
-	push es
 
-	les di, [dest]					; es:di = dest
+	lds di, [dest]					; es:di = dest
 
 	mov ah, al
 	ror ah, 4
@@ -48,13 +47,9 @@ label_a:
 	jcxz last_pixel1				;  then jump to last_pixel1
 
 loop_pixels:
-	stosb							; write pixel
-	xchg ah, al
-	add di, PLANEWIDTH-1			; point to next line
-
-	stosb
-	xchg ah, al
-	add di, PLANEWIDTH-1
+	mov [di+PLANEWIDTH*0], al		; write pixel
+	mov [di+PLANEWIDTH*1], ah		; write pixel
+	add di, PLANEWIDTH*2			; point to next line
 
 	loop loop_pixels				; if --cx != 0 then jump to loop_pixels
 
@@ -64,9 +59,10 @@ loop_pixels:
 
 
 last_pixel1:
-	stosb
+	mov [di], al
 
 last_pixel0:
-	pop es
 	pop di
+	mov ax, ss
+	mov ds, ax
 	retf
