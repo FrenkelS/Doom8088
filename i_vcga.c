@@ -395,19 +395,12 @@ static uint8_t swapNibbles(uint8_t color)
 #endif
 
 
-void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
+#if defined C_ONLY
+static void R_DrawColumnFlat2(uint8_t color, int16_t odd, int16_t count)
 {
-	int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-	// Zero length, column does not exceed a pixel.
-	if (count <= 0)
-		return;
-
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
-
 	uint8_t color0;
 	uint8_t color1;
-	if (dcvars->yl & 1)
+	if (odd)
 	{
 		color0 = swapNibbles(color);
 		color1 = color;
@@ -426,6 +419,23 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	if (count & 1)
 		*dest = color0;
+}
+#else
+void R_DrawColumnFlat2(uint8_t color, int16_t odd, int16_t count);
+#endif
+
+
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
+{
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
+
+	dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+
+	R_DrawColumnFlat2(color, dcvars->yl & 1, count);
 }
 
 
