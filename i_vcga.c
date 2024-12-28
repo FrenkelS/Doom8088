@@ -376,30 +376,18 @@ void R_DrawColumnWall(const draw_column_vars_t *dcvars)
 }
 
 
-#if defined __IA16_FEATURE_SHIFT_IMM && !defined C_ONLY
-static uint8_t swapNibbles(uint16_t color)
-{
-	asm
-	(
-		"rorb $4, %%al"
-		: "=al" (color)
-		: "al" (color)
-	);
-	return color;
-}
-#else
+#if defined C_ONLY
 static uint8_t swapNibbles(uint8_t color)
 {
 	return (color << 4) | (color >> 4);
 }
-#endif
 
 
-#if defined C_ONLY
 static void R_DrawColumnFlat2(uint8_t color, int16_t yl, int16_t count)
 {
 	uint8_t color0;
 	uint8_t color1;
+
 	if (yl & 1)
 	{
 		color0 = swapNibbles(color);
