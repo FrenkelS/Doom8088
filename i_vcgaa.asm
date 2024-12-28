@@ -32,7 +32,7 @@ global R_DrawColumnFlat2
 R_DrawColumnFlat2:
 	push di
 
-	lds di, [dest]					; es:di = dest
+	lds di, [dest]					; ds:di = dest
 
 	mov ah, al
 	ror ah, 4
