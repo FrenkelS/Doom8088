@@ -396,11 +396,11 @@ static uint8_t swapNibbles(uint8_t color)
 
 
 #if defined C_ONLY
-static void R_DrawColumnFlat2(uint8_t color, int16_t odd, int16_t count)
+static void R_DrawColumnFlat2(uint8_t color, int16_t yl, int16_t count)
 {
 	uint8_t color0;
 	uint8_t color1;
-	if (odd)
+	if (yl & 1)
 	{
 		color0 = swapNibbles(color);
 		color1 = color;
@@ -435,7 +435,7 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
 
-	R_DrawColumnFlat2(color, dcvars->yl & 1, count);
+	R_DrawColumnFlat2(color, dcvars->yl, count);
 }
 
 

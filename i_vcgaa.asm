@@ -15,14 +15,6 @@
 ; along with this program. If not, see <https://www.gnu.org/licenses/>.
 ;
 
-%ifidn CPU, i8088
-cpu 8086
-%elifidn CPU, i286
-cpu 286
-%else
-%error unsupported cpu CPU
-%endif
-
 bits 16
 
 PLANEWIDTH equ 60
@@ -32,7 +24,7 @@ extern dest
 ;
 ; input:
 ;   al = color
-;   dx = odd
+;   dx = yl
 ;   cx = count		1 <= count <= 128	=>	ch = 0
 ;
 
@@ -46,8 +38,8 @@ R_DrawColumnFlat2:
 	mov ah, al
 	ror ah, 4
 
-	or dx, dx						; if dx = 0
-	jz label_a						;  then jump to label_a
+	shr dx, 1						; if dx = 0
+	jc label_a						;  then jump to label_a
 	xchg ah, al
 
 label_a:
