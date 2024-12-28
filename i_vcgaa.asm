@@ -35,11 +35,11 @@ R_DrawColumnFlat2:
 	lds di, [dest]					; ds:di = dest
 
 	mov ah, al
-	ror ah, 4
+	ror ah, 4						; ah = al with nibbles swapped
 
 	shr dx, 1						; if yl is odd
 	jnc label_a						;  then jump to label_a
-	xchg ah, al
+	xchg ah, al						; swap al and ah
 
 label_a:
 	mov bx, cx						; bx = count
