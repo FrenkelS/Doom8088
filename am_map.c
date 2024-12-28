@@ -1048,10 +1048,11 @@ void AM_Drawer (void)
     // CPhipps - all automap modes put into one enum
     if (!(automapmode & am_active)) return;
 
+    V_InitDrawLine();
+
     if (!(automapmode & am_overlay)) // cph - If not overlay mode, clear background for the automap
         V_ClearViewWindow();
 
-    V_InitDrawLine();
     AM_drawWalls();
     AM_drawPlayers();
     V_ShutdownDrawLine();

@@ -399,15 +399,10 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void V_ClearViewWindow(void)
 {
-	uint8_t __far* dest = _s_screen;
-	volatile uint8_t loadLatches = colors[0];
-	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
-	{
-		for (int16_t x = 0; x < VIEWWINDOWWIDTH; x++)
-			*dest++ = 0;
+	outp(GC_INDEX + 1, 255);
 
-		dest += PLANEWIDTH - VIEWWINDOWWIDTH;
-	}
+	for (int16_t y = 0; y < VIEWWINDOWHEIGHT; y++)
+		_fmemset(&_s_screen[y * PLANEWIDTH], 0, VIEWWINDOWWIDTH);
 }
 
 
