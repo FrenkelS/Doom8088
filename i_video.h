@@ -53,7 +53,7 @@ void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *ds
 #endif
 
 
-void V_FillRect(byte colour);
+void V_ClearViewWindow(void);
 void V_InitDrawLine(void);
 void V_ShutdownDrawLine(void);
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color);

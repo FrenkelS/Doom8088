@@ -497,11 +497,11 @@ void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *ds
 
 
 //
-// V_FillRect
+// V_ClearViewWindow
 //
-void V_FillRect(byte colour)
+void V_ClearViewWindow(void)
 {
-	_fmemset(_s_screen, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
+	_fmemset(_s_screen, 0, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
 }
 
 

@@ -412,10 +412,10 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 }
 
 
-void V_FillRect(byte colour)
+void V_ClearViewWindow(void)
 {
 	for (int16_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
-		_fmemset(_s_screen + y * PLANEWIDTH, colour, SCREENWIDTH / 4);
+		_fmemset(_s_screen + y * PLANEWIDTH, 0, SCREENWIDTH / 4);
 }
 
 
