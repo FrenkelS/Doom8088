@@ -376,38 +376,19 @@ void R_DrawColumnWall(const draw_column_vars_t *dcvars)
 }
 
 
-#if defined __IA16_FEATURE_SHIFT_IMM && !defined C_ONLY
-static uint8_t swapNibbles(uint16_t color)
-{
-	asm
-	(
-		"rorb $4, %%al"
-		: "=al" (color)
-		: "al" (color)
-	);
-	return color;
-}
-#else
+#if defined C_ONLY
 static uint8_t swapNibbles(uint8_t color)
 {
 	return (color << 4) | (color >> 4);
 }
-#endif
 
 
-void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
+static void R_DrawColumnFlat2(uint8_t color, int16_t yl, int16_t count)
 {
-	int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-	// Zero length, column does not exceed a pixel.
-	if (count <= 0)
-		return;
-
-	uint8_t __far* dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
-
 	uint8_t color0;
 	uint8_t color1;
-	if (dcvars->yl & 1)
+
+	if (yl & 1)
 	{
 		color0 = swapNibbles(color);
 		color1 = color;
@@ -426,6 +407,23 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	if (count & 1)
 		*dest = color0;
+}
+#else
+void R_DrawColumnFlat2(uint8_t color, int16_t odd, int16_t count);
+#endif
+
+
+void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
+{
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
+
+	dest = _s_screen + (dcvars->yl * VIEWWINDOWWIDTH) + dcvars->x;
+
+	R_DrawColumnFlat2(color, dcvars->yl, count);
 }
 
 
