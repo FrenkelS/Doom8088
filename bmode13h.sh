@@ -20,8 +20,8 @@ then
 fi
 
 nasm i_vvg13a.asm -f elf -DCPU=$CPU
-nasm m_fixed.asm  -f elf
-nasm z_xms.asm    -f elf
+nasm m_fixed.asm  -f elf -DCPU=$CPU
+nasm z_xms.asm    -f elf -DCPU=$CPU
 
 ia16-elf-gcc -c i_vvga13.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_map.c    $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple

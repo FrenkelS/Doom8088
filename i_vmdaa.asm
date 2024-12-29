@@ -15,6 +15,14 @@
 ; along with this program. If not, see <https://www.gnu.org/licenses/>.
 ;
 
+%ifidn CPU, i8088
+cpu 8086
+%elifidn CPU, i286
+cpu 286
+%else
+%error unsupported cpu CPU
+%endif
+
 bits 16
 
 PLANEWIDTH equ 160

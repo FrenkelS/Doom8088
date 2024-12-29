@@ -15,6 +15,14 @@
 ; along with this program. If not, see <https://www.gnu.org/licenses/>.
 ;
 
+%ifidn CPU, i8088
+cpu 8086
+%elifidn CPU, i286
+cpu 286
+%else
+%error unsupported cpu CPU
+%endif
+
 bits 16
 
 PLANEWIDTH equ 60
@@ -35,7 +43,14 @@ R_DrawColumnFlat2:
 	lds di, [dest]					; ds:di = dest
 
 	mov ah, al
+%ifidn CPU, i8088
+	ror ah, 1
+	ror ah, 1
+	ror ah, 1
+	ror ah, 1						; ah = al with nibbles swapped
+%else
 	ror ah, 4						; ah = al with nibbles swapped
+%endif
 
 	shr dx, 1						; if yl is odd
 	jnc label_a						;  then jump to label_a
