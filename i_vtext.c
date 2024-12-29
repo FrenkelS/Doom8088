@@ -398,6 +398,37 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	switch (count)
 	{
+#if VIEWWINDOWHEIGHT >= 50
+		case 50: *(dest + PLANEWIDTH * 49) = color;
+		case 49: *(dest + PLANEWIDTH * 48) = color;
+		case 48: *(dest + PLANEWIDTH * 47) = color;
+		case 47: *(dest + PLANEWIDTH * 46) = color;
+		case 46: *(dest + PLANEWIDTH * 45) = color;
+		case 45: *(dest + PLANEWIDTH * 44) = color;
+		case 44: *(dest + PLANEWIDTH * 43) = color;
+#endif
+
+#if VIEWWINDOWHEIGHT >= 43
+		case 43: *(dest + PLANEWIDTH * 42) = color;
+		case 42: *(dest + PLANEWIDTH * 41) = color;
+		case 41: *(dest + PLANEWIDTH * 40) = color;
+		case 40: *(dest + PLANEWIDTH * 39) = color;
+		case 39: *(dest + PLANEWIDTH * 38) = color;
+		case 38: *(dest + PLANEWIDTH * 37) = color;
+		case 37: *(dest + PLANEWIDTH * 36) = color;
+		case 36: *(dest + PLANEWIDTH * 35) = color;
+		case 35: *(dest + PLANEWIDTH * 34) = color;
+		case 34: *(dest + PLANEWIDTH * 33) = color;
+		case 33: *(dest + PLANEWIDTH * 32) = color;
+		case 32: *(dest + PLANEWIDTH * 31) = color;
+		case 31: *(dest + PLANEWIDTH * 30) = color;
+		case 30: *(dest + PLANEWIDTH * 29) = color;
+		case 29: *(dest + PLANEWIDTH * 28) = color;
+		case 28: *(dest + PLANEWIDTH * 27) = color;
+		case 27: *(dest + PLANEWIDTH * 26) = color;
+		case 26: *(dest + PLANEWIDTH * 25) = color;
+#endif
+
 		case 25: *(dest + PLANEWIDTH * 24) = color;
 		case 24: *(dest + PLANEWIDTH * 23) = color;
 		case 23: *(dest + PLANEWIDTH * 22) = color;
