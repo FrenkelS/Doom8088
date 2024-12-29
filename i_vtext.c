@@ -398,31 +398,31 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	switch (count)
 	{
-		case 25: *dest = color; dest += PLANEWIDTH;
-		case 24: *dest = color; dest += PLANEWIDTH;
-		case 23: *dest = color; dest += PLANEWIDTH;
-		case 22: *dest = color; dest += PLANEWIDTH;
-		case 21: *dest = color; dest += PLANEWIDTH;
-		case 20: *dest = color; dest += PLANEWIDTH;
-		case 19: *dest = color; dest += PLANEWIDTH;
-		case 18: *dest = color; dest += PLANEWIDTH;
-		case 17: *dest = color; dest += PLANEWIDTH;
-		case 16: *dest = color; dest += PLANEWIDTH;
-		case 15: *dest = color; dest += PLANEWIDTH;
-		case 14: *dest = color; dest += PLANEWIDTH;
-		case 13: *dest = color; dest += PLANEWIDTH;
-		case 12: *dest = color; dest += PLANEWIDTH;
-		case 11: *dest = color; dest += PLANEWIDTH;
-		case 10: *dest = color; dest += PLANEWIDTH;
-		case  9: *dest = color; dest += PLANEWIDTH;
-		case  8: *dest = color; dest += PLANEWIDTH;
-		case  7: *dest = color; dest += PLANEWIDTH;
-		case  6: *dest = color; dest += PLANEWIDTH;
-		case  5: *dest = color; dest += PLANEWIDTH;
-		case  4: *dest = color; dest += PLANEWIDTH;
-		case  3: *dest = color; dest += PLANEWIDTH;
-		case  2: *dest = color; dest += PLANEWIDTH;
-		case  1: *dest = color;
+		case 25: *(dest + PLANEWIDTH * 24) = color;
+		case 24: *(dest + PLANEWIDTH * 23) = color;
+		case 23: *(dest + PLANEWIDTH * 22) = color;
+		case 22: *(dest + PLANEWIDTH * 21) = color;
+		case 21: *(dest + PLANEWIDTH * 20) = color;
+		case 20: *(dest + PLANEWIDTH * 19) = color;
+		case 19: *(dest + PLANEWIDTH * 18) = color;
+		case 18: *(dest + PLANEWIDTH * 17) = color;
+		case 17: *(dest + PLANEWIDTH * 16) = color;
+		case 16: *(dest + PLANEWIDTH * 15) = color;
+		case 15: *(dest + PLANEWIDTH * 14) = color;
+		case 14: *(dest + PLANEWIDTH * 13) = color;
+		case 13: *(dest + PLANEWIDTH * 12) = color;
+		case 12: *(dest + PLANEWIDTH * 11) = color;
+		case 11: *(dest + PLANEWIDTH * 10) = color;
+		case 10: *(dest + PLANEWIDTH *  9) = color;
+		case  9: *(dest + PLANEWIDTH *  8) = color;
+		case  8: *(dest + PLANEWIDTH *  7) = color;
+		case  7: *(dest + PLANEWIDTH *  6) = color;
+		case  6: *(dest + PLANEWIDTH *  5) = color;
+		case  5: *(dest + PLANEWIDTH *  4) = color;
+		case  4: *(dest + PLANEWIDTH *  3) = color;
+		case  3: *(dest + PLANEWIDTH *  2) = color;
+		case  2: *(dest + PLANEWIDTH *  1) = color;
+		case  1: *(dest + PLANEWIDTH *  0) = color;
 	}
 }
 
