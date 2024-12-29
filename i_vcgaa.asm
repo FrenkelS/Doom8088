@@ -60,14 +60,25 @@ R_DrawColumnFlat2:
 
 	lds di, [dest]					; ds:di = dest
 
+	mov bx, cx						; bx = count
+	and bl, 15						; 0 <= count <= 15
+	shl bl, 1
+
 	mov ah, al
 %ifidn CPU, i8088
 	ror ah, 1
 	ror ah, 1
 	ror ah, 1
 	ror ah, 1						; ah = al with nibbles swapped
+
+	shr cx, 1
+	shr cx, 1
+	shr cx, 1
+	shr cx, 1						; 0 <= cx <= 8
 %else
 	ror ah, 4						; ah = al with nibbles swapped
+
+	shr cx, 4						; 0 <= cx <= 8
 %endif
 
 	shr dx, 1						; if yl is odd
@@ -75,8 +86,6 @@ R_DrawColumnFlat2:
 	xchg ah, al						; swap al and ah
 
 label_a:
-	mov bx, cx						; bx = count
-	shr cx, 4						; 0 <= cx <= 8
 	jcxz last_pixels				; if cx = 0 then jump to last_pixels
 
 
@@ -103,8 +112,6 @@ loop_pixels:
 
 
 last_pixels:
-	and bl, 15						; 0 <= count <= 15
-	shl bl, 1
 	cs jmp last_pixel_jump_table[bx]
 
 last_pixel15:
