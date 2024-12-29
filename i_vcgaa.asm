@@ -37,15 +37,7 @@ last_pixel_jump_table:
 	dw last_pixel4,
 	dw last_pixel5,
 	dw last_pixel6,
-	dw last_pixel7,
-	dw last_pixel8,
-	dw last_pixel9,
-	dw last_pixel10,
-	dw last_pixel11,
-	dw last_pixel12,
-	dw last_pixel13,
-	dw last_pixel14,
-	dw last_pixel15
+	dw last_pixel7
 
 ;
 ; input:
@@ -61,7 +53,7 @@ R_DrawColumnFlat2:
 	lds di, [dest]					; ds:di = dest
 
 	mov bx, cx						; bx = count
-	and bl, 15						; 0 <= count <= 15
+	and bl, 7						; 0 <= count <= 7
 	shl bl, 1
 
 	mov ah, al
@@ -73,12 +65,11 @@ R_DrawColumnFlat2:
 
 	shr cx, 1
 	shr cx, 1
-	shr cx, 1
-	shr cx, 1						; 0 <= cx <= 8
+	shr cx, 1						; 0 <= cx <= 16
 %else
 	ror ah, 4						; ah = al with nibbles swapped
 
-	shr cx, 4						; 0 <= cx <= 8
+	shr cx, 3						; 0 <= cx <= 16
 %endif
 
 	shr dx, 1						; if yl is odd
@@ -90,23 +81,15 @@ label_a:
 
 
 loop_pixels:
-	mov [di + PLANEWIDTH *  0], al	; write pixel
-	mov [di + PLANEWIDTH *  1], ah
-	mov [di + PLANEWIDTH *  2], al
-	mov [di + PLANEWIDTH *  3], ah
-	mov [di + PLANEWIDTH *  4], al
-	mov [di + PLANEWIDTH *  5], ah
-	mov [di + PLANEWIDTH *  6], al
-	mov [di + PLANEWIDTH *  7], ah
-	mov [di + PLANEWIDTH *  8], al
-	mov [di + PLANEWIDTH *  9], ah
-	mov [di + PLANEWIDTH * 10], al
-	mov [di + PLANEWIDTH * 11], ah
-	mov [di + PLANEWIDTH * 12], al
-	mov [di + PLANEWIDTH * 13], ah
-	mov [di + PLANEWIDTH * 14], al
-	mov [di + PLANEWIDTH * 15], ah
-	add  di , PLANEWIDTH * 16		; point to next line
+	mov [di + PLANEWIDTH * 0], al	; write pixel
+	mov [di + PLANEWIDTH * 1], ah
+	mov [di + PLANEWIDTH * 2], al
+	mov [di + PLANEWIDTH * 3], ah
+	mov [di + PLANEWIDTH * 4], al
+	mov [di + PLANEWIDTH * 5], ah
+	mov [di + PLANEWIDTH * 6], al
+	mov [di + PLANEWIDTH * 7], ah
+	add  di , PLANEWIDTH * 8		; point to next line
 
 	loop loop_pixels				; if --cx != 0 then jump to loop_pixels
 
@@ -114,45 +97,6 @@ loop_pixels:
 last_pixels:
 	cs jmp last_pixel_jump_table[bx]
 
-last_pixel15:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
-
-last_pixel14:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
-
-last_pixel13:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
-
-last_pixel12:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
-
-last_pixel11:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
-
-last_pixel10:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
-
-last_pixel9:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
-
-last_pixel8:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
 
 last_pixel7:
 	mov [di], al
