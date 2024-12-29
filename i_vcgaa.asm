@@ -99,37 +99,25 @@ last_pixels:
 
 
 last_pixel7:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
+	mov [di + PLANEWIDTH * 6], al
 
 last_pixel6:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
+	mov [di + PLANEWIDTH * 5], ah
 
 last_pixel5:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
+	mov [di + PLANEWIDTH * 4], al
 
 last_pixel4:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
+	mov [di + PLANEWIDTH * 3], ah
 
 last_pixel3:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
+	mov [di + PLANEWIDTH * 2], al
 
 last_pixel2:
-	mov [di], al
-	xchg ah, al
-	add di, PLANEWIDTH
+	mov [di + PLANEWIDTH * 1], ah
 
 last_pixel1:
-	mov [di], al
+	mov [di + PLANEWIDTH * 0], al
 
 last_pixel0:
 	pop di
