@@ -228,31 +228,31 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 
 	switch (count)
 	{
-		case 25: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 24: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 23: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 22: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 21: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 20: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 19: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 18: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 17: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 16: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 15: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 14: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 13: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 12: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 11: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case 10: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  9: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  8: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  7: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  6: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  5: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  4: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  3: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  2: *dest = c; dest += PLANEWIDTH / sizeof(uint16_t);
-		case  1: *dest = c;
+		case 25: dest[(PLANEWIDTH / sizeof(uint16_t)) * 24] = c;
+		case 24: dest[(PLANEWIDTH / sizeof(uint16_t)) * 23] = c;
+		case 23: dest[(PLANEWIDTH / sizeof(uint16_t)) * 22] = c;
+		case 22: dest[(PLANEWIDTH / sizeof(uint16_t)) * 21] = c;
+		case 21: dest[(PLANEWIDTH / sizeof(uint16_t)) * 20] = c;
+		case 20: dest[(PLANEWIDTH / sizeof(uint16_t)) * 19] = c;
+		case 19: dest[(PLANEWIDTH / sizeof(uint16_t)) * 18] = c;
+		case 18: dest[(PLANEWIDTH / sizeof(uint16_t)) * 17] = c;
+		case 17: dest[(PLANEWIDTH / sizeof(uint16_t)) * 16] = c;
+		case 16: dest[(PLANEWIDTH / sizeof(uint16_t)) * 15] = c;
+		case 15: dest[(PLANEWIDTH / sizeof(uint16_t)) * 14] = c;
+		case 14: dest[(PLANEWIDTH / sizeof(uint16_t)) * 13] = c;
+		case 13: dest[(PLANEWIDTH / sizeof(uint16_t)) * 12] = c;
+		case 12: dest[(PLANEWIDTH / sizeof(uint16_t)) * 11] = c;
+		case 11: dest[(PLANEWIDTH / sizeof(uint16_t)) * 10] = c;
+		case 10: dest[(PLANEWIDTH / sizeof(uint16_t)) *  9] = c;
+		case  9: dest[(PLANEWIDTH / sizeof(uint16_t)) *  8] = c;
+		case  8: dest[(PLANEWIDTH / sizeof(uint16_t)) *  7] = c;
+		case  7: dest[(PLANEWIDTH / sizeof(uint16_t)) *  6] = c;
+		case  6: dest[(PLANEWIDTH / sizeof(uint16_t)) *  5] = c;
+		case  5: dest[(PLANEWIDTH / sizeof(uint16_t)) *  4] = c;
+		case  4: dest[(PLANEWIDTH / sizeof(uint16_t)) *  3] = c;
+		case  3: dest[(PLANEWIDTH / sizeof(uint16_t)) *  2] = c;
+		case  2: dest[(PLANEWIDTH / sizeof(uint16_t)) *  1] = c;
+		case  1: dest[(PLANEWIDTH / sizeof(uint16_t)) *  0] = c;
 	}
 }
 
