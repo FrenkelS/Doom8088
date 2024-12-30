@@ -316,8 +316,7 @@ void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
 	uint16_t color = col;
 	color = (color << 8) | col;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
-	uint16_t __far* d = (uint16_t __far*) dest;
+	uint16_t __far* d = (uint16_t __far*)(_s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2));
 
 	uint16_t l = count >> 4;
 
@@ -346,21 +345,21 @@ void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
 
 	switch (count & 15)
 	{
-		case 15: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 14: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 13: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 12: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 11: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 10: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  9: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  8: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  7: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  6: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  5: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  4: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  3: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  2: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  1: *d++ = color; *d = color;
+		case 15: d[(SCREENWIDTH / 2) * 14] = color; d[(SCREENWIDTH / 2) * 14 + 1] = color;
+		case 14: d[(SCREENWIDTH / 2) * 13] = color; d[(SCREENWIDTH / 2) * 13 + 1] = color;
+		case 13: d[(SCREENWIDTH / 2) * 12] = color; d[(SCREENWIDTH / 2) * 12 + 1] = color;
+		case 12: d[(SCREENWIDTH / 2) * 11] = color; d[(SCREENWIDTH / 2) * 11 + 1] = color;
+		case 11: d[(SCREENWIDTH / 2) * 10] = color; d[(SCREENWIDTH / 2) * 10 + 1] = color;
+		case 10: d[(SCREENWIDTH / 2) *  9] = color; d[(SCREENWIDTH / 2) *  9 + 1] = color;
+		case  9: d[(SCREENWIDTH / 2) *  8] = color; d[(SCREENWIDTH / 2) *  8 + 1] = color;
+		case  8: d[(SCREENWIDTH / 2) *  7] = color; d[(SCREENWIDTH / 2) *  7 + 1] = color;
+		case  7: d[(SCREENWIDTH / 2) *  6] = color; d[(SCREENWIDTH / 2) *  6 + 1] = color;
+		case  6: d[(SCREENWIDTH / 2) *  5] = color; d[(SCREENWIDTH / 2) *  5 + 1] = color;
+		case  5: d[(SCREENWIDTH / 2) *  4] = color; d[(SCREENWIDTH / 2) *  4 + 1] = color;
+		case  4: d[(SCREENWIDTH / 2) *  3] = color; d[(SCREENWIDTH / 2) *  3 + 1] = color;
+		case  3: d[(SCREENWIDTH / 2) *  2] = color; d[(SCREENWIDTH / 2) *  2 + 1] = color;
+		case  2: d[(SCREENWIDTH / 2) *  1] = color; d[(SCREENWIDTH / 2) *  1 + 1] = color;
+		case  1: d[(SCREENWIDTH / 2) *  0] = color; d[(SCREENWIDTH / 2) *  0 + 1] = color;
 	}
 }
 
