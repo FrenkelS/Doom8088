@@ -36,6 +36,12 @@ last_pixel_jump_table:
 %assign i i+1
 %endrep
 
+last_pixel_flat_jump_table:
+%assign i 0
+%rep VIEWWINDOWHEIGHT+1
+	dw last_pixel_flat%+i,
+%assign i i+1
+%endrep
 
 ;
 ; input:
@@ -96,4 +102,34 @@ last_pixel0:	; count > 0, so the code never jumps to this label
 	pop es
 	pop di
 	pop si
+	retf
+
+
+;
+; input:
+;   al = color
+;   dx = count		1 <= count <= VIEWWINDOWHEIGHT	=>	dh = 0
+;
+
+global R_DrawColumnFlat2
+R_DrawColumnFlat2:
+	push di
+
+	lds di, [dest]
+
+	mov bx, dx
+	shl bx, 1
+	cs jmp last_pixel_flat_jump_table[bx]
+
+%assign i VIEWWINDOWHEIGHT
+%rep VIEWWINDOWHEIGHT
+last_pixel_flat%+i:
+	mov [di + PLANEWIDTH * (i - 1)], al
+%assign i i-1
+%endrep
+
+last_pixel_flat0:
+	pop di
+	mov ax, ss
+	mov ds, ax
 	retf
