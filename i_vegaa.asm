@@ -608,4 +608,6 @@ last_pixel_flat1:
 
 last_pixel_flat0:
 	pop di
+	mov ax, ss
+	mov ds, ax
 	retf
