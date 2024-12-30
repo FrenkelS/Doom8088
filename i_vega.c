@@ -346,10 +346,47 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	volatile uint8_t loadLatches = colors[color];
 	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
 
-	while (count--)
+	int16_t l = count >> 4;
+
+	while (l--)
 	{
-		*dest = 0;
-		dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+		*dest = 0; dest += PLANEWIDTH;
+	}
+
+	switch (count & 15) {
+		case 15: dest[PLANEWIDTH * 14] = 0;
+		case 14: dest[PLANEWIDTH * 13] = 0;
+		case 13: dest[PLANEWIDTH * 12] = 0;
+		case 12: dest[PLANEWIDTH * 11] = 0;
+		case 11: dest[PLANEWIDTH * 10] = 0;
+		case 10: dest[PLANEWIDTH *  9] = 0;
+		case  9: dest[PLANEWIDTH *  8] = 0;
+		case  8: dest[PLANEWIDTH *  7] = 0;
+		case  7: dest[PLANEWIDTH *  6] = 0;
+		case  6: dest[PLANEWIDTH *  5] = 0;
+		case  5: dest[PLANEWIDTH *  4] = 0;
+		case  4: dest[PLANEWIDTH *  3] = 0;
+		case  3: dest[PLANEWIDTH *  2] = 0;
+		case  2: dest[PLANEWIDTH *  1] = 0;
+		case  1: dest[PLANEWIDTH *  0] = 0;
 	}
 }
 
