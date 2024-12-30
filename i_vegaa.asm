@@ -48,6 +48,24 @@ last_pixel_jump_table:
 	dw last_pixel14,
 	dw last_pixel15
 
+last_pixel_flat_jump_table:
+	dw last_pixel_flat0,
+	dw last_pixel_flat1,
+	dw last_pixel_flat2,
+	dw last_pixel_flat3,
+	dw last_pixel_flat4,
+	dw last_pixel_flat5,
+	dw last_pixel_flat6,
+	dw last_pixel_flat7,
+	dw last_pixel_flat8,
+	dw last_pixel_flat9,
+	dw last_pixel_flat10,
+	dw last_pixel_flat11,
+	dw last_pixel_flat12,
+	dw last_pixel_flat13,
+	dw last_pixel_flat14,
+	dw last_pixel_flat15
+
 ;
 ; input:
 ;   ax = fracstep
@@ -488,4 +506,106 @@ last_pixel0:
 	pop si
 	mov ax, ss
 	mov ds, ax
+	retf
+
+
+;
+; input:
+;   ax = count		1 <= count <= 128	=>	ah = 0
+;
+
+global R_DrawColumnFlat2
+R_DrawColumnFlat2:
+	push di
+
+	lds di, [dest]					; ds:di = dest
+
+	mov bx, ax
+	and bl, 15
+	shl bl, 1
+	xchg cx, ax
+
+%ifidn CPU, i8088
+	shr cx, 1
+	shr cx, 1
+	shr cx, 1
+	shr cx, 1
+%else
+	shr cx, 4
+%endif
+	jcxz last_pixels_flat
+
+
+lab:
+	mov [di + PLANEWIDTH *  0], al
+	mov [di + PLANEWIDTH *  1], al
+	mov [di + PLANEWIDTH *  2], al
+	mov [di + PLANEWIDTH *  3], al
+	mov [di + PLANEWIDTH *  4], al
+	mov [di + PLANEWIDTH *  5], al
+	mov [di + PLANEWIDTH *  6], al
+	mov [di + PLANEWIDTH *  7], al
+	mov [di + PLANEWIDTH *  8], al
+	mov [di + PLANEWIDTH *  9], al
+	mov [di + PLANEWIDTH * 10], al
+	mov [di + PLANEWIDTH * 11], al
+	mov [di + PLANEWIDTH * 12], al
+	mov [di + PLANEWIDTH * 13], al
+	mov [di + PLANEWIDTH * 14], al
+	mov [di + PLANEWIDTH * 15], al
+	add di, PLANEWIDTH * 16
+	loop lab
+
+
+last_pixels_flat:
+	cs jmp last_pixel_flat_jump_table[bx]
+
+
+last_pixel_flat15:
+	mov [di + PLANEWIDTH * 14], al
+
+last_pixel_flat14:
+	mov [di + PLANEWIDTH * 13], al
+
+last_pixel_flat13:
+	mov [di + PLANEWIDTH * 12], al
+
+last_pixel_flat12:
+	mov [di + PLANEWIDTH * 11], al
+
+last_pixel_flat11:
+	mov [di + PLANEWIDTH * 10], al
+
+last_pixel_flat10:
+	mov [di + PLANEWIDTH *  9], al
+
+last_pixel_flat9:
+	mov [di + PLANEWIDTH *  8], al
+
+last_pixel_flat8:
+	mov [di + PLANEWIDTH *  7], al
+
+last_pixel_flat7:
+	mov [di + PLANEWIDTH *  6], al
+
+last_pixel_flat6:
+	mov [di + PLANEWIDTH *  5], al
+
+last_pixel_flat5:
+	mov [di + PLANEWIDTH *  4], al
+
+last_pixel_flat4:
+	mov [di + PLANEWIDTH *  3], al
+
+last_pixel_flat3:
+	mov [di + PLANEWIDTH *  2], al
+
+last_pixel_flat2:
+	mov [di + PLANEWIDTH *  1], al
+
+last_pixel_flat1:
+	mov [di + PLANEWIDTH *  0], al
+
+last_pixel_flat0:
+	pop di
 	retf
