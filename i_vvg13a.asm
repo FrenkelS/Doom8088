@@ -49,6 +49,16 @@ last_pixel_jump_table:
 	dw last_pixel14,
 	dw last_pixel15
 
+last_pixel_flat_jump_table:
+	dw last_pixel_flat0,
+	dw last_pixel_flat1,
+	dw last_pixel_flat2,
+	dw last_pixel_flat3,
+	dw last_pixel_flat4,
+	dw last_pixel_flat5,
+	dw last_pixel_flat6,
+	dw last_pixel_flat7
+
 ;
 ; input:
 ;   ax = fracstep
@@ -498,6 +508,96 @@ last_pixel0:
 	pop es
 	pop di
 	pop si
+	mov ax, ss
+	mov ds, ax
+	retf
+
+
+;
+; input:
+;   al = color
+;   dx = count		1 <= count <= 128	=>	dh = 0
+;
+
+global R_DrawColumnFlat2
+R_DrawColumnFlat2:
+	push di
+
+	lds di, [dest]
+
+	mov ah, al
+
+	mov bx, dx
+	and bl, 7
+	shl bl, 1
+
+	mov cx, dx
+%ifidn CPU, i8088
+	shr cx, 1
+	shr cx, 1
+	shr cx, 1
+%else
+	shr cx, 3
+%endif
+
+	jcxz last_pixels_flat
+
+
+lab:
+	mov [di + SCREENWIDTH *  0    ], ax
+	mov [di + SCREENWIDTH *  0 + 2], ax
+	mov [di + SCREENWIDTH *  1    ], ax
+	mov [di + SCREENWIDTH *  1 + 2], ax
+	mov [di + SCREENWIDTH *  2    ], ax
+	mov [di + SCREENWIDTH *  2 + 2], ax
+	mov [di + SCREENWIDTH *  3    ], ax
+	mov [di + SCREENWIDTH *  3 + 2], ax
+	mov [di + SCREENWIDTH *  4    ], ax
+	mov [di + SCREENWIDTH *  4 + 2], ax
+	mov [di + SCREENWIDTH *  5    ], ax
+	mov [di + SCREENWIDTH *  5 + 2], ax
+	mov [di + SCREENWIDTH *  6    ], ax
+	mov [di + SCREENWIDTH *  6 + 2], ax
+	mov [di + SCREENWIDTH *  7    ], ax
+	mov [di + SCREENWIDTH *  7 + 2], ax
+	add  di , SCREENWIDTH *  8
+	loop lab
+
+
+last_pixels_flat:
+	cs jmp last_pixel_flat_jump_table[bx]
+
+
+last_pixel_flat7:
+	mov [di + SCREENWIDTH *  6    ], ax
+	mov [di + SCREENWIDTH *  6 + 2], ax
+
+last_pixel_flat6:
+	mov [di + SCREENWIDTH *  5    ], ax
+	mov [di + SCREENWIDTH *  5 + 2], ax
+
+last_pixel_flat5:
+	mov [di + SCREENWIDTH *  4    ], ax
+	mov [di + SCREENWIDTH *  4 + 2], ax
+
+last_pixel_flat4:
+	mov [di + SCREENWIDTH *  3    ], ax
+	mov [di + SCREENWIDTH *  3 + 2], ax
+
+last_pixel_flat3:
+	mov [di + SCREENWIDTH *  2    ], ax
+	mov [di + SCREENWIDTH *  2 + 2], ax
+
+last_pixel_flat2:
+	mov [di + SCREENWIDTH *  1    ], ax
+	mov [di + SCREENWIDTH *  1 + 2], ax
+
+last_pixel_flat1:
+	mov [di + SCREENWIDTH *  0    ], ax
+	mov [di + SCREENWIDTH *  0 + 2], ax
+
+last_pixel_flat0:
+	pop di
 	mov ax, ss
 	mov ds, ax
 	retf

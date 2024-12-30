@@ -305,18 +305,13 @@ void R_DrawColumnWall(const draw_column_vars_t *dcvars)
 }
 
 
-void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
+#if defined C_ONLY
+static void R_DrawColumnFlat2(uint8_t col, int16_t count)
 {
-	int16_t count = (dcvars->yh - dcvars->yl) + 1;
-
-	// Zero length, column does not exceed a pixel.
-	if (count <= 0)
-		return;
-
 	uint16_t color = col;
 	color = (color << 8) | col;
 
-	uint16_t __far* d = (uint16_t __far*)(_s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2));
+	uint16_t __far* d = (uint16_t __far*)dest;
 
 	uint16_t l = count >> 4;
 
@@ -361,6 +356,23 @@ void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
 		case  2: d[(SCREENWIDTH / 2) *  1] = color; d[(SCREENWIDTH / 2) *  1 + 1] = color;
 		case  1: d[(SCREENWIDTH / 2) *  0] = color; d[(SCREENWIDTH / 2) *  0 + 1] = color;
 	}
+}
+#else
+void R_DrawColumnFlat2(uint8_t col, int16_t count);
+#endif
+
+
+void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
+{
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
+
+	dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
+
+	R_DrawColumnFlat2(col, count);
 }
 
 
