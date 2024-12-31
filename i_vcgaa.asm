@@ -29,23 +29,23 @@ PLANEWIDTH equ 60
 
 extern dest
 
-last_pixel_jump_table:
-	dw last_pixel0,
-	dw last_pixel1,
-	dw last_pixel2,
-	dw last_pixel3,
-	dw last_pixel4,
-	dw last_pixel5,
-	dw last_pixel6,
-	dw last_pixel7,
-	dw last_pixel8,
-	dw last_pixel9,
-	dw last_pixel10,
-	dw last_pixel11,
-	dw last_pixel12,
-	dw last_pixel13,
-	dw last_pixel14,
-	dw last_pixel15
+last_pixel_flat_jump_table:
+	dw last_pixel_flat0,
+	dw last_pixel_flat1,
+	dw last_pixel_flat2,
+	dw last_pixel_flat3,
+	dw last_pixel_flat4,
+	dw last_pixel_flat5,
+	dw last_pixel_flat6,
+	dw last_pixel_flat7,
+	dw last_pixel_flat8,
+	dw last_pixel_flat9,
+	dw last_pixel_flat10,
+	dw last_pixel_flat11,
+	dw last_pixel_flat12,
+	dw last_pixel_flat13,
+	dw last_pixel_flat14,
+	dw last_pixel_flat15
 
 ;
 ; input:
@@ -86,10 +86,10 @@ R_DrawColumnFlat2:
 	xchg ah, al						; swap al and ah
 
 label_a:
-	jcxz last_pixels				; if cx = 0 then jump to last_pixels
+	jcxz last_pixels_flat				; if cx = 0 then jump to last_pixels_flat
 
 
-loop_pixels:
+lab:
 	mov [di + PLANEWIDTH *  0], al	; write pixels
 	mov [di + PLANEWIDTH *  1], ah
 	mov [di + PLANEWIDTH *  2], al
@@ -108,59 +108,59 @@ loop_pixels:
 	mov [di + PLANEWIDTH * 15], ah
 	add  di , PLANEWIDTH * 16		; point to next line
 
-	loop loop_pixels				; if --cx != 0 then jump to loop_pixels
+	loop lab				; if --cx != 0 then jump to lab
 
 
-last_pixels:
-	cs jmp last_pixel_jump_table[bx]
+last_pixels_flat:
+	cs jmp last_pixel_flat_jump_table[bx]
 
 
-last_pixel15:
+last_pixel_flat15:
 	mov [di + PLANEWIDTH * 14], al
 
-last_pixel14:
+last_pixel_flat14:
 	mov [di + PLANEWIDTH * 13], ah
 
-last_pixel13:
+last_pixel_flat13:
 	mov [di + PLANEWIDTH * 12], al
 
-last_pixel12:
+last_pixel_flat12:
 	mov [di + PLANEWIDTH * 11], ah
 
-last_pixel11:
+last_pixel_flat11:
 	mov [di + PLANEWIDTH * 10], al
 
-last_pixel10:
+last_pixel_flat10:
 	mov [di + PLANEWIDTH *  9], ah
 
-last_pixel9:
+last_pixel_flat9:
 	mov [di + PLANEWIDTH *  8], al
 
-last_pixel8:
+last_pixel_flat8:
 	mov [di + PLANEWIDTH *  7], ah
 
-last_pixel7:
+last_pixel_flat7:
 	mov [di + PLANEWIDTH *  6], al
 
-last_pixel6:
+last_pixel_flat6:
 	mov [di + PLANEWIDTH *  5], ah
 
-last_pixel5:
+last_pixel_flat5:
 	mov [di + PLANEWIDTH *  4], al
 
-last_pixel4:
+last_pixel_flat4:
 	mov [di + PLANEWIDTH *  3], ah
 
-last_pixel3:
+last_pixel_flat3:
 	mov [di + PLANEWIDTH *  2], al
 
-last_pixel2:
+last_pixel_flat2:
 	mov [di + PLANEWIDTH *  1], ah
 
-last_pixel1:
+last_pixel_flat1:
 	mov [di + PLANEWIDTH *  0], al
 
-last_pixel0:
+last_pixel_flat0:
 	pop di
 	mov ax, ss
 	mov ds, ax
