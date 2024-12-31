@@ -306,8 +306,10 @@ void R_DrawColumnWall(const draw_column_vars_t *dcvars)
 
 
 #if defined C_ONLY
-static void R_DrawColumnFlat2(uint8_t col, int16_t count)
+static void R_DrawColumnFlat2(uint8_t col, uint8_t dontcare, int16_t count)
 {
+	UNUSED(dontcare);
+
 	uint16_t color = col;
 	color = (color << 8) | col;
 
@@ -358,7 +360,7 @@ static void R_DrawColumnFlat2(uint8_t col, int16_t count)
 	}
 }
 #else
-void R_DrawColumnFlat2(uint8_t col, int16_t count);
+void R_DrawColumnFlat2(uint8_t col, uint8_t dontcare, int16_t count);
 #endif
 
 
@@ -372,7 +374,7 @@ void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
 
 	dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
 
-	R_DrawColumnFlat2(col, count);
+	R_DrawColumnFlat2(col, col, count);
 }
 
 

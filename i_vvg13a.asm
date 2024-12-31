@@ -516,7 +516,8 @@ last_pixel0:
 ;
 ; input:
 ;   al = color
-;   dx = count		1 <= count <= 128	=>	dh = 0
+;   dl = dontcare
+;   cx = count		1 <= count <= 128	=>	ch = 0
 ;
 
 global R_DrawColumnFlat2
@@ -527,11 +528,10 @@ R_DrawColumnFlat2:
 
 	mov ah, al
 
-	mov bx, dx
+	mov bx, cx
 	and bl, 7
 	shl bl, 1
 
-	mov cx, dx
 %ifidn CPU, i8088
 	shr cx, 1
 	shr cx, 1
