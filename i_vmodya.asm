@@ -25,6 +25,8 @@ cpu 286
 
 bits 16
 
+PLANEWIDTH equ 80
+
 extern source
 extern colormap
 extern dest
