@@ -26,6 +26,7 @@ nasm z_xms.asm    -f elf -DCPU=$CPU
 ia16-elf-gcc -c i_vtext.c  $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_map.c    $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
+ia16-elf-gcc -c p_mobj.c   $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_sight.c  $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c r_draw.c   $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c r_plane.c  $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
@@ -66,7 +67,8 @@ export GLOBOBJS+=" p_lights.c"
 export GLOBOBJS+=" p_map.o"
 #export GLOBOBJS+=" p_maputl.c"
 export GLOBOBJS+=" p_maputl.o"
-export GLOBOBJS+=" p_mobj.c"
+#export GLOBOBJS+=" p_mobj.c"
+export GLOBOBJS+=" p_mobj.o"
 export GLOBOBJS+=" p_plats.c"
 export GLOBOBJS+=" p_pspr.c"
 export GLOBOBJS+=" p_setup.c"
@@ -109,6 +111,7 @@ rm z_xms.o
 rm i_vtext.o
 rm p_map.o
 rm p_maputl.o
+rm p_mobj.o
 rm p_sight.o
 rm r_draw.o
 rm r_plane.o

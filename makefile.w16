@@ -109,6 +109,9 @@ p_map.obj : p_map.c
 p_maputl.obj : p_maputl.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
+p_mobj.obj : p_mobj.c
+ wcc $(CCOPTST) $[* /fo=WC16\$^&
+
 p_sight.obj : p_sight.c
  wcc $(CCOPTST) $[* /fo=WC16\$^&
 
