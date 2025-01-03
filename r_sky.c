@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2023-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -28,7 +28,10 @@
 #include "w_wad.h"
 
 
-#define FLAT_SKY_COLOR 100
+#if !defined FLAT_SKY_COLOR
+#define FLAT_SKY_COLOR 99
+#endif
+
 
 #define ANGLETOSKYSHIFT         22
 
