@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -34,8 +34,6 @@
  *
  *-----------------------------------------------------------------------------*/
 
-// killough 5/3/98: reformatted
-
 #include <stddef.h>
 
 #ifdef HAVE_CONFIG_H
@@ -50,58 +48,58 @@
 //
 
 const sfxinfo_t S_sfx[] = {
-  { "none"  ,   0,  0 }, // S_sfx[0] needs to be a dummy for odd reasons.
-  { "pistol",  64, 18 },
-  { "shotgn",  64, 30 },
-  { "sgcock",  64, 19 },
-  { "sawup" ,  64, 52 },
-  { "sawidl", 118, 24 },
-  { "sawful",  64, 58 },
-  { "sawhit",  64, 26 },
-  { "rlaunc",  64, 49 },
-  { "rxplod",  70, 46 },
-  { "firsht",  70, 47 },
-  { "firxpl",  70, 38 },
-  { "pstart", 100, 26 },
-  { "pstop" , 100, 21 },
-  { "doropn", 100, 44 },
-  { "dorcls", 100, 45 },
-  { "stnmov", 119, 10 },
-  { "swtchn",  78, 20 },
-  { "swtchx",  78, 18 },
-  { "plpain",  96, 48 },
-  { "dmpain",  96, 31 },
-  { "popain",  96, 28 },
-  { "slop"  ,  78, 36 },
-  { "itemup",  78,  7 },
-  { "wpnup" ,  78, 19 },
-  { "oof"   ,  96, 13 },
-  { "telept",  32, 49 },
-  { "posit1",  98, 17 },
-  { "posit2",  98, 36 },
-  { "posit3",  98, 35 },
-  { "bgsit1",  98, 44 },
-  { "bgsit2",  98, 52 },
-  { "sgtsit",  98, 36 },
-  { "brssit",  94, 44 },
-  { "sgtatk",  70, 30 },
-  { "claw"  ,  70, 21 },
-  { "pldeth",  32, 35 },
-  { "pdiehi",  32, 35 },
-  { "podth1",  70, 41 },
-  { "podth2",  70, 30 },
-  { "podth3",  70, 35 },
-  { "bgdth1",  70, 23 },
-  { "bgdth2",  70, 30 },
-  { "sgtdth",  70, 39 },
-  { "brsdth",  32, 35 },
-  { "posact", 120, 34 },
-  { "bgact" , 120, 32 },
-  { "dmact" , 120, 38 },
-  { "noway" ,  78, 13 },
-  { "barexp",  60, 59 },
-  { "punch" ,  64,  8 },
-  { "chgun" ,  64, 18 },
-  { "tink"  ,  60,  1 },
-  { "getpow",  60, 26 },
+  { 0,   0,  0 }, // none   S_sfx[0] needs to be a dummy for odd reasons.
+  { 0,  64, 18 }, // pistol
+  { 0,  64, 30 }, // shotgn
+  { 0,  64, 19 }, // sgcock
+  { 0,  64, 52 }, // sawup
+  { 0, 118, 24 }, // sawidl
+  { 0,  64, 58 }, // sawful
+  { 0,  64, 26 }, // sawhit
+  { 0,  64, 49 }, // rlaunc
+  { 0,  70, 46 }, // rxplod
+  { 0,  70, 47 }, // firsht
+  { 0,  70, 38 }, // firxpl
+  { 0, 100, 26 }, // pstart
+  { 0, 100, 21 }, // pstop
+  { 0, 100, 44 }, // doropn
+  { 0, 100, 45 }, // dorcls
+  { 0, 119, 10 }, // stnmov
+  { 0,  78, 20 }, // swtchn
+  { 0,  78, 18 }, // swtchx
+  { 0,  96, 48 }, // plpain
+  { 0,  96, 31 }, // dmpain
+  { 0,  96, 28 }, // popain
+  { 0,  78, 36 }, // slop
+  { 0,  78,  7 }, // itemup
+  { 0,  78, 19 }, // wpnup
+  { 0,  96, 13 }, // oof
+  { 0,  32, 49 }, // telept
+  { 0,  98, 17 }, // posit1
+  { 0,  98, 36 }, // posit2
+  { 0,  98, 35 }, // posit3
+  { 0,  98, 44 }, // bgsit1
+  { 0,  98, 52 }, // bgsit2
+  { 0,  98, 36 }, // sgtsit
+  { 0,  94, 44 }, // brssit
+  { 0,  70, 30 }, // sgtatk
+  { 0,  70, 21 }, // claw
+  { 0,  32, 35 }, // pldeth
+  { 0,  32, 35 }, // pdiehi
+  { 0,  70, 41 }, // podth1
+  { 0,  70, 30 }, // podth2
+  { 0,  70, 35 }, // podth3
+  { 0,  70, 23 }, // bgdth1
+  { 0,  70, 30 }, // bgdth2
+  { 0,  70, 39 }, // sgtdth
+  { 0,  32, 35 }, // brsdth
+  { 0, 120, 34 }, // posact
+  { 0, 120, 32 }, // bgact
+  { 0, 120, 38 }, // dmact
+  { 0,  78, 13 }, // noway
+  { 0,  60, 59 }, // barexp
+  { 0,  64,  8 }, // punch
+  { 1,  64, 18 }, // chgun
+  { 0,  60,  1 }, // tink 
+  { 0,  60, 26 }, // getpow
 };

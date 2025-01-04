@@ -200,7 +200,7 @@ static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int16_t
     sfx = &S_sfx[sfx_id];
 
     // Initialize sound parameters
-    if (strcmp("chgun", sfx->name) == 0)
+    if (sfx->chgun)
     {
         volume += 150;
 
@@ -331,7 +331,7 @@ void S_UpdateSounds(void)
 		{
             if (S_SoundIsPlaying(c->handle))
 			{
-				if (strcmp("chgun", sfx->name) == 0)
+				if (sfx->chgun)
 				{
 					if (snd_SfxVolume + 150 < 1)
 					{
