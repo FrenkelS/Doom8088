@@ -32,17 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __PCFX_H
 #define __PCFX_H
 
-typedef struct {
-	uint16_t	type; // 0 = PC Speaker
-	uint16_t	length;
-	uint8_t		data[];
-} dmxpcs_t;
-
-
-void	PCFX_Play(uint16_t length, const uint16_t __far* data);
+void	PCFX_Play(int16_t lumpnum);
 void	PCFX_Init(void);
 void	PCFX_Shutdown(void);
-
-uint16_t __far*	PCFX_Convert(const dmxpcs_t __far* dmxpcs);
 
 #endif

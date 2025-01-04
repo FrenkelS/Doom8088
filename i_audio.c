@@ -68,13 +68,7 @@
 #define MAX_CHANNELS    1
 
 
-typedef struct {
-	uint16_t		length;
-	uint16_t __far*	data;
-} pcsfx_t;
-
-
-static pcsfx_t pcsfx[NUMSFX];
+static int16_t firstsfx;
 
 
 int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep)
@@ -94,7 +88,15 @@ int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep)
 //	 || id == sfx_sawidl)
 //		return -1;
 
-	PCFX_Play(pcsfx[id].length, pcsfx[id].data);
+	int16_t lumpnum;
+	if (id < sfx_chgun)
+		lumpnum = firstsfx + id;
+	else if (id == sfx_chgun)
+		lumpnum = firstsfx + sfx_pistol;
+	else // id > sfx_chgun
+		lumpnum = firstsfx + id - 1;
+
+	PCFX_Play(lumpnum);
 
 	return channel;
 }
@@ -114,26 +116,7 @@ void I_InitSound(void)
 
 void I_InitSound2(void)
 {
-	int16_t firstsfx = W_GetNumForName("DPPISTOL") - 1;
-
-	dmxpcs_t __far* buffer = Z_MallocStatic(150); // size of largest PC Speaker lump
-
-	for (int16_t id = 1; id < NUMSFX; id++)
-	{
-		int16_t lumpnum;
-		if (id < sfx_chgun)
-			lumpnum = firstsfx + id;
-		else if (id == sfx_chgun)
-			lumpnum = firstsfx + sfx_pistol;
-		else // id > sfx_chgun
-			lumpnum = firstsfx + id - 1;
-
-		W_ReadLumpByNum(lumpnum, buffer);
-		pcsfx[id].length = buffer->length;
-		pcsfx[id].data   = PCFX_Convert(buffer);
-	}
-
-	Z_Free(buffer);
+	firstsfx = W_GetNumForName("DPPISTOL") - 1;
 }
 
 

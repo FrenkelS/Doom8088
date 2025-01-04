@@ -39,14 +39,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "doomdef.h"
 #include "a_pcfx.h"
 #include "a_taskmn.h"
+#include "w_wad.h"
 
 #define PCFX_PRIORITY 1
 
 #define SND_TICRATE     140     // tic rate for updating sound
 
+
+typedef struct {
+	uint16_t	length;
+	uint16_t	data[];
+} pcspkmuse_t;
+
+
+static const pcspkmuse_t __far* pcspkmuse;
 static int16_t	PCFX_LengthLeft;
 static const uint16_t	__far* PCFX_Sound = NULL;
-static uint16_t	PCFX_LastSample;
+static uint16_t	PCFX_LastSample = 0;
 
 static boolean	PCFX_Installed = false;
 
@@ -68,10 +77,11 @@ static void PCFX_Stop(void)
 	outp(0x61, inp(0x61) & 0xfc);
 
 	PCFX_Sound      = NULL;
-	PCFX_LengthLeft = 0;
 	PCFX_LastSample = 0;
 
 	_enable();
+
+	Z_ChangeTagToCache(pcspkmuse);
 }
 
 
@@ -83,11 +93,9 @@ static void PCFX_Stop(void)
 
 static void PCFX_Service(void)
 {
-	uint16_t value;
-
 	if (PCFX_Sound)
 	{
-		value = *PCFX_Sound++;
+		uint16_t value = *PCFX_Sound++;
 
 		if (value != PCFX_LastSample)
 		{
@@ -114,48 +122,18 @@ static void PCFX_Service(void)
    Starts playback of a Muse sound effect.
 ---------------------------------------------------------------------*/
 
-void PCFX_Play(uint16_t length, const uint16_t __far* data)
+void PCFX_Play(int16_t lumpnum)
 {
 	PCFX_Stop();
 
+	pcspkmuse = W_GetLumpByNum(lumpnum);
+
 	_disable();
 
-	PCFX_LengthLeft = length;
-	PCFX_Sound      = data;
+	PCFX_LengthLeft = pcspkmuse->length;
+	PCFX_Sound      = pcspkmuse->data;
 
 	_enable();
-}
-
-
-static const uint16_t divisors[] = {
-	0,
-	6818, 6628, 6449, 6279, 6087, 5906, 5736, 5575,
-	5423, 5279, 5120, 4971, 4830, 4697, 4554, 4435,
-	4307, 4186, 4058, 3950, 3836, 3728, 3615, 3519,
-	3418, 3323, 3224, 3131, 3043, 2960, 2875, 2794,
-	2711, 2633, 2560, 2485, 2415, 2348, 2281, 2213,
-	2153, 2089, 2032, 1975, 1918, 1864, 1810, 1757,
-	1709, 1659, 1612, 1565, 1521, 1478, 1435, 1395,
-	1355, 1316, 1280, 1242, 1207, 1173, 1140, 1107,
-	1075, 1045, 1015,  986,  959,  931,  905,  879,
-	 854,  829,  806,  783,  760,  739,  718,  697,
-	 677,  658,  640,  621,  604,  586,  570,  553,
-	 538,  522,  507,  493,  479,  465,  452,  439,
-	 427,  415,  403,  391,  380,  369,  359,  348,
-	 339,  329,  319,  310,  302,  293,  285,  276,
-	 269,  261,  253,  246,  239,  232,  226,  219,
-	 213,  207,  201,  195,  190,  184,  179,
-};
-
-
-uint16_t __far* PCFX_Convert(const dmxpcs_t __far* dmxpcs)
-{
-	uint16_t __far* data = Z_MallocStatic(dmxpcs->length * sizeof(uint16_t));
-
-	for (uint16_t i = 0; i < dmxpcs->length; i++)
-		data[i] = divisors[dmxpcs->data[i]];
-
-	return data;
 }
 
 
