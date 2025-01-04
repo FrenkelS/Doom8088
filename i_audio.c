@@ -116,6 +116,8 @@ void I_InitSound2(void)
 {
 	int16_t firstsfx = W_GetNumForName("DPPISTOL") - 1;
 
+	dmxpcs_t __far* buffer = Z_MallocStatic(150); // size of largest PC Speaker lump
+
 	for (int16_t id = 1; id < NUMSFX; id++)
 	{
 		int16_t lumpnum;
@@ -126,11 +128,12 @@ void I_InitSound2(void)
 		else // id > sfx_chgun
 			lumpnum = firstsfx + id - 1;
 
-		const dmxpcs_t __far* lump = W_GetLumpByNum(lumpnum);
-		pcsfx[id].length = lump->length;
-		pcsfx[id].data   = PCFX_Convert(lump);
-		Z_Free(lump);
+		W_ReadLumpByNum(lumpnum, buffer);
+		pcsfx[id].length = buffer->length;
+		pcsfx[id].data   = PCFX_Convert(buffer);
 	}
+
+	Z_Free(buffer);
 }
 
 
