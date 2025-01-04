@@ -1,6 +1,6 @@
 /*
 Copyright (C) 1994-1995 Apogee Software, Ltd.
-Copyright (C) 2023 Frenkel Smeijers
+Copyright (C) 2023-2025 Frenkel Smeijers
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __PCFX_H
 #define __PCFX_H
 
-int16_t	PCFX_Play(const void __far* vdata);
+void	PCFX_Play(const void __far* vdata);
 void	PCFX_Init(void);
 void	PCFX_Shutdown(void);
 

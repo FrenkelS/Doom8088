@@ -1,6 +1,6 @@
 /*
 Copyright (C) 1994-1995 Apogee Software, Ltd.
-Copyright (C) 2023-2024 Frenkel Smeijers
+Copyright (C) 2023-2025 Frenkel Smeijers
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -121,16 +121,10 @@ typedef	struct
 	uint8_t		data[];
 } PCSound;
 
-#define PCFX_MinVoiceHandle 1
-static int16_t	PCFX_VoiceHandle = PCFX_MinVoiceHandle;
 
-static int16_t ASS_PCFX_Play(PCSound *sound)
+static void ASS_PCFX_Play(PCSound *sound)
 {
 	PCFX_Stop();
-
-	PCFX_VoiceHandle++;
-	if (PCFX_VoiceHandle < PCFX_MinVoiceHandle)
-		PCFX_VoiceHandle = PCFX_MinVoiceHandle;
 
 	_disable();
 
@@ -138,8 +132,6 @@ static int16_t ASS_PCFX_Play(PCSound *sound)
 	PCFX_Sound = &sound->data[0];
 
 	_enable();
-
-	return PCFX_VoiceHandle;
 }
 
 static const uint16_t divisors[] = {
@@ -175,7 +167,7 @@ typedef struct {
 	uint8_t		data[];
 } dmxpcs_t;
 
-int16_t PCFX_Play(const void __far* vdata)
+void PCFX_Play(const void __far* vdata)
 {
 	dmxpcs_t __far* dmxpcs = (dmxpcs_t __far* )vdata;
 
@@ -183,7 +175,7 @@ int16_t PCFX_Play(const void __far* vdata)
 	for (uint_fast16_t i = 0; i < dmxpcs->length; i++)
 		pcspkmuse.data[i] = divisors[dmxpcs->data[i]];
 
-	return ASS_PCFX_Play((PCSound *)&pcspkmuse);
+	ASS_PCFX_Play((PCSound *)&pcspkmuse);
 }
 
 
