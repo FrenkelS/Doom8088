@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -68,6 +68,9 @@
 #define MAX_CHANNELS    1
 
 
+static int16_t firstsfx;
+
+
 int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep)
 {
 	UNUSED(vol);
@@ -85,13 +88,13 @@ int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep)
 //	 || id == sfx_sawidl)
 //		return -1;
 
-	int16_t lumpnum = 96 - 1; // TODO should be W_GetNumForName("DPPISTOL") - 1;
+	int16_t lumpnum;
 	if (id < sfx_chgun)
-		lumpnum += id;
+		lumpnum = firstsfx + id;
 	else if (id == sfx_chgun)
-		lumpnum += sfx_pistol;
-	else
-		lumpnum += id - 1;
+		lumpnum = firstsfx + sfx_pistol;
+	else // id > sfx_chgun
+		lumpnum = firstsfx + id - 1;
 
 	const void __far* soundpatch = W_GetLumpByNum(lumpnum);
 	PCFX_Play(soundpatch);
@@ -110,6 +113,12 @@ void I_InitSound(void)
 
 	// Finished initialization.
 	printf("I_InitSound: sound ready\n");
+}
+
+
+void I_InitSound2(void)
+{
+	firstsfx = W_GetNumForName("DPPISTOL") - 1;
 }
 
 

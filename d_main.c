@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -464,6 +464,8 @@ static void D_DoomMainSetup(void)
 
     printf("W_Init: Init WADfiles.\n");
     W_Init(); // CPhipps - handling of wadfiles init changed
+
+    I_InitSound2();
 
     D_Init();
     F_Init();
