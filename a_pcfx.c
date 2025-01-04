@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SND_TICRATE     140     // tic rate for updating sound
 
 static int16_t	PCFX_LengthLeft;
-static uint16_t	*PCFX_Sound = NULL;
+static const uint16_t	__far* PCFX_Sound = NULL;
 static uint16_t	PCFX_LastSample;
 
 static boolean	PCFX_Installed = false;
@@ -114,26 +114,18 @@ static void PCFX_Service(void)
    Starts playback of a Muse sound effect.
 ---------------------------------------------------------------------*/
 
-typedef struct {
-	uint16_t	length;
-	uint16_t	data[146];
-} pcspkmuse_t;
-
-
-static pcspkmuse_t pcspkmuse;
-
-
-static void ASS_PCFX_Play(void)
+void PCFX_Play(uint16_t length, const uint16_t __far* data)
 {
 	PCFX_Stop();
 
 	_disable();
 
-	PCFX_LengthLeft =  pcspkmuse.length;
-	PCFX_Sound      = &pcspkmuse.data[0];
+	PCFX_LengthLeft = length;
+	PCFX_Sound      = data;
 
 	_enable();
 }
+
 
 static const uint16_t divisors[] = {
 	0,
@@ -156,21 +148,14 @@ static const uint16_t divisors[] = {
 };
 
 
-typedef struct {
-	uint16_t	type; // 0 = PC Speaker
-	uint16_t	length;
-	uint8_t		data[];
-} dmxpcs_t;
-
-void PCFX_Play(const void __far* vdata)
+uint16_t __far* PCFX_Convert(const dmxpcs_t __far* dmxpcs)
 {
-	dmxpcs_t __far* dmxpcs = (dmxpcs_t __far* )vdata;
+	uint16_t __far* data = Z_MallocStatic(dmxpcs->length * sizeof(uint16_t));
 
-	pcspkmuse.length = dmxpcs->length;
-	for (uint_fast16_t i = 0; i < dmxpcs->length; i++)
-		pcspkmuse.data[i] = divisors[dmxpcs->data[i]];
+	for (uint16_t i = 0; i < dmxpcs->length; i++)
+		data[i] = divisors[dmxpcs->data[i]];
 
-	ASS_PCFX_Play();
+	return data;
 }
 
 
