@@ -47,9 +47,6 @@ typedef struct sfxinfo_struct sfxinfo_t;
 
 struct sfxinfo_struct {
 
-  // chgun is special
-  int8_t chgun;
-
   // Sfx priority
   int8_t priority;
 

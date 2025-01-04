@@ -58,6 +58,7 @@ typedef struct
   void __far* origin;        // origin of sound
   int16_t handle;          // handle of the sound being played
   boolean is_pickup;       // whether sound is a player's weapon
+  boolean chgun;
 } channel_t;
 
 
@@ -109,7 +110,7 @@ static void S_StopMusic(void);
 
 static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int16_t *vol, int16_t *sep);
 
-static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup);
+static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup, boolean chgun);
 
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
@@ -200,7 +201,7 @@ static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int16_t
     sfx = &S_sfx[sfx_id];
 
     // Initialize sound parameters
-    if (sfx->chgun)
+    if (sfx_id == sfx_chgun)
     {
         volume += 150;
 
@@ -232,7 +233,7 @@ static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int16_t
         }
 
     // try to find a channel
-    cnum = S_getChannel(origin, sfx, is_pickup);
+    cnum = S_getChannel(origin, sfx, is_pickup, sfx_id == sfx_chgun);
 
     if (cnum<0)
         return;
@@ -331,7 +332,7 @@ void S_UpdateSounds(void)
 		{
             if (S_SoundIsPlaying(c->handle))
 			{
-				if (sfx->chgun)
+				if (c->chgun)
 				{
 					if (snd_SfxVolume + 150 < 1)
 					{
@@ -526,7 +527,7 @@ static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source,
 //   If none available, return -1.  Otherwise channel #.
 //
 
-static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup)
+static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup, boolean chgun)
 {
     // channel number to use
     int16_t cnum;
@@ -558,8 +559,9 @@ static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolea
     }
 
     c = &channels[cnum];              // channel is decided to be cnum.
-    c->sfxinfo = sfxinfo;
-    c->origin = origin;
+    c->sfxinfo   = sfxinfo;
+    c->origin    = origin;
     c->is_pickup = is_pickup;
+    c->chgun     = chgun;
     return cnum;
 }
