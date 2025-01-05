@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -57,19 +57,6 @@ static fixed_t dropoff_deltax, dropoff_deltay, floorz;
 
 
 static const fixed_t distfriend = 128L << FRACBITS;
-
-typedef enum {
-  DI_EAST,
-  DI_NORTHEAST,
-  DI_NORTH,
-  DI_NORTHWEST,
-  DI_WEST,
-  DI_SOUTHWEST,
-  DI_SOUTH,
-  DI_SOUTHEAST,
-  DI_NODIR,
-  NUMDIRS
-} dirtype_t;
 
 
 //
@@ -189,80 +176,6 @@ static boolean P_IsOnLift(const mobj_t __far* actor)
     return true;
 
   return false;
-}
-
-
-//
-// P_Move
-// Move in the current direction,
-// returns false if the move is blocked.
-//
-
-static const fixed_t xspeed[8] = {FRACUNIT,47000,0,-47000,-FRACUNIT,-47000,0,47000};
-static const fixed_t yspeed[8] = {0,47000,FRACUNIT,47000,0,-47000,-FRACUNIT,-47000};
-
-static boolean P_Move(mobj_t __far* actor)
-{
-  fixed_t tryx, tryy, deltax, deltay, origx, origy;
-  boolean try_ok;
-  int32_t speed;
-
-  if (actor->movedir == DI_NODIR)
-    return false;
-
-#ifdef RANGECHECK
-  if (actor->movedir >= 8)
-    I_Error ("P_Move: Weird actor->movedir!");
-#endif
-
-  speed = mobjinfo[actor->type].speed;
-
-  tryx = (origx = actor->x) + (deltax = speed * xspeed[actor->movedir]);
-  tryy = (origy = actor->y) + (deltay = speed * yspeed[actor->movedir]);
-
-  try_ok = P_TryMove(actor, tryx, tryy);
-
-  if (!try_ok)
-    {      // open any specials
-      if (!_g_numspechit)
-        return false;
-
-      actor->movedir = DI_NODIR;
-
-      /* if the special is not a door that can be opened, return false
-       *
-       * killough 8/9/98: this is what caused monsters to get stuck in
-       * doortracks, because it thought that the monster freed itself
-       * by opening a door, even if it was moving towards the doortrack,
-       * and not the door itself.
-       *
-       * killough 9/9/98: If a line blocking the monster is activated,
-       * return true 90% of the time. If a line blocking the monster is
-       * not activated, but some other line is, return false 90% of the
-       * time. A bit of randomness is needed to ensure it's free from
-       * lockups, but for most cases, it returns the correct result.
-       *
-       * Do NOT simply return false 1/4th of the time (causes monsters to
-       * back out when they shouldn't, and creates secondary stickiness).
-       */
-
-      boolean good = false;
-      for ( ; _g_numspechit--; )
-        if (P_UseSpecialLine(actor, _g_spechit[_g_numspechit]))
-          good = true;
-
-      /* cph - compatibility maze here
-       * Boom v2.01 and orig. Doom return "good"
-       * Boom v2.02 and LxDoom return good && (P_Random(pr_trywalk)&3)
-       * MBF plays even more games
-       */
-      return good;
-    }
-
-  /* fall more slowly, under gravity */
-  actor->z = actor->floorz;
-
-  return true;
 }
 
 

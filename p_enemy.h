@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -39,6 +39,23 @@
 #define __P_ENEMY__
 
 #include "p_mobj.h"
+
+
+typedef enum {
+  DI_EAST,
+  DI_NORTHEAST,
+  DI_NORTH,
+  DI_NORTHWEST,
+  DI_WEST,
+  DI_SOUTHWEST,
+  DI_SOUTH,
+  DI_SOUTHEAST,
+  DI_NODIR,
+  NUMDIRS
+} dirtype_t;
+
+
+boolean P_Move(mobj_t __far* actor);
 
 
 // ********************************************************************

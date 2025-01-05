@@ -24,6 +24,7 @@ nasm m_fixed.asm  -f elf -DCPU=$CPU
 nasm z_xms.asm    -f elf -DCPU=$CPU
 
 ia16-elf-gcc -c i_vvga13.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
+ia16-elf-gcc -c p_enemy2.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_map.c    $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
 ia16-elf-gcc -c p_mobj.c   $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-loops -freorder-blocks-algorithm=simple
@@ -61,6 +62,8 @@ export GLOBOBJS+=" m_menu.c"
 export GLOBOBJS+=" m_random.c"
 export GLOBOBJS+=" p_doors.c"
 export GLOBOBJS+=" p_enemy.c"
+#export GLOBOBJS+=" p_enemy2.c"
+export GLOBOBJS+=" p_enemy2.o"
 export GLOBOBJS+=" p_floor.c"
 export GLOBOBJS+=" p_inter.c"
 export GLOBOBJS+=" p_lights.c"
@@ -111,6 +114,7 @@ rm m_fixed.o
 rm z_xms.o
 
 rm i_vvga13.o
+rm p_enemy2.o
 rm p_map.o
 rm p_maputl.o
 rm p_mobj.o
