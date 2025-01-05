@@ -29,6 +29,7 @@ set CFLAGS=%CFLAGS% -DFLAT_SPAN -DC_ONLY
 @set GLOBOBJS=%GLOBOBJS% m_random.c
 @set GLOBOBJS=%GLOBOBJS% p_doors.c
 @set GLOBOBJS=%GLOBOBJS% p_enemy.c
+@set GLOBOBJS=%GLOBOBJS% p_enemy2.c
 @set GLOBOBJS=%GLOBOBJS% p_floor.c
 @set GLOBOBJS=%GLOBOBJS% p_inter.c
 @set GLOBOBJS=%GLOBOBJS% p_lights.c
