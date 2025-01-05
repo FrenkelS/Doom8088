@@ -139,7 +139,6 @@ typedef enum {
   sfx_noway,
   sfx_barexp,
   sfx_punch,
-  sfx_chgun,
   sfx_tink,
   sfx_getpow,
   NUMSFX

@@ -88,14 +88,7 @@ int16_t I_StartSound(sfxenum_t id, int16_t channel, int16_t vol, int16_t sep)
 //	 || id == sfx_sawidl)
 //		return -1;
 
-	int16_t lumpnum;
-	if (id < sfx_chgun)
-		lumpnum = firstsfx + id;
-	else if (id == sfx_chgun)
-		lumpnum = firstsfx + sfx_pistol;
-	else // id > sfx_chgun
-		lumpnum = firstsfx + id - 1;
-
+	int16_t lumpnum = firstsfx + id;
 	PCFX_Play(lumpnum);
 
 	return channel;

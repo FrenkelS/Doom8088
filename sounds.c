@@ -99,7 +99,6 @@ const sfxinfo_t S_sfx[] = {
   {  78, 13 }, // noway
   {  60, 59 }, // barexp
   {  64,  8 }, // punch
-  {  64, 18 }, // chgun
   {  60,  1 }, // tink 
   {  60, 26 }, // getpow
 };

@@ -58,7 +58,6 @@ typedef struct
   void __far* origin;        // origin of sound
   int16_t handle;          // handle of the sound being played
   boolean is_pickup;       // whether sound is a player's weapon
-  boolean chgun;
 } channel_t;
 
 
@@ -110,7 +109,7 @@ static void S_StopMusic(void);
 
 static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source, int16_t *vol, int16_t *sep);
 
-static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup, boolean chgun);
+static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup);
 
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
@@ -200,20 +199,7 @@ static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int16_t
 
     sfx = &S_sfx[sfx_id];
 
-    // Initialize sound parameters
-    if (sfx_id == sfx_chgun)
-    {
-        volume += 150;
-
-        if (volume < 1)
-            return;
-
-        if (volume > snd_SfxVolume)
-            volume = snd_SfxVolume;
-    }
-
     // Check to see if it is audible, modify the params
-    // killough 3/7/98, 4/25/98: code rearranged slightly
 
     if (!origin || origin == _g_player.mo)
     {
@@ -233,7 +219,7 @@ static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int16_t
         }
 
     // try to find a channel
-    cnum = S_getChannel(origin, sfx, is_pickup, sfx_id == sfx_chgun);
+    cnum = S_getChannel(origin, sfx, is_pickup);
 
     if (cnum<0)
         return;
@@ -325,24 +311,16 @@ void S_UpdateSounds(void)
 	
 	for (cnum=0 ; cnum<numChannels ; cnum++)
 	{
-        const sfxinfo_t *sfx;
-        channel_t *c = &channels[cnum];
-		
+		const sfxinfo_t *sfx;
+		channel_t *c = &channels[cnum];
+
 		if ((sfx = c->sfxinfo))
 		{
-            if (S_SoundIsPlaying(c->handle))
+			if (!S_SoundIsPlaying(c->handle))
 			{
-				if (c->chgun)
-				{
-					if (snd_SfxVolume + 150 < 1)
-					{
-						S_StopChannel(cnum);
-						continue;
-					}
-				}
-			}
-			else   // if channel is allocated but sound has stopped, free it
+				// if channel is allocated but sound has stopped, free it
 				S_StopChannel(cnum);
+			}
 		}
 	}
 }
@@ -527,7 +505,7 @@ static boolean S_AdjustSoundParams(mobj_t __far* listener, mobj_t __far* source,
 //   If none available, return -1.  Otherwise channel #.
 //
 
-static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup, boolean chgun)
+static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolean is_pickup)
 {
     // channel number to use
     int16_t cnum;
@@ -562,6 +540,5 @@ static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolea
     c->sfxinfo   = sfxinfo;
     c->origin    = origin;
     c->is_pickup = is_pickup;
-    c->chgun     = chgun;
     return cnum;
 }
