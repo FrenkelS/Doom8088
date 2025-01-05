@@ -55,7 +55,10 @@ typedef enum {
 } dirtype_t;
 
 
-boolean P_Move(mobj_t __far* actor);
+boolean P_TryWalk(mobj_t __far* actor);
+boolean P_CheckMeleeRange(mobj_t __far* actor);
+boolean P_CheckMissileRange(mobj_t __far* actor);
+void P_NewChaseDir(mobj_t __far* actor);
 
 
 // ********************************************************************
