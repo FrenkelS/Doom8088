@@ -166,8 +166,6 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	videocard = I_DetectVideoCard();
 
 	I_SetScreenMode(6);
-	I_ReloadPalette();
-	I_UploadNewPalette(0);
 
 	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_CGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 

@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2024-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -118,8 +118,6 @@ static void I_UploadNewPalette(int8_t pal)
 void I_InitGraphicsHardwareSpecificCode(void)
 {
 	I_SetScreenMode(SCREEN_MODE);
-	I_ReloadPalette();
-	I_UploadNewPalette(0);
 
 	__djgpp_nearptr_enable();
 	_s_screen = D_MK_FP(PAGE1, ((PLANEWIDTH - VIEWWINDOWWIDTH) / 2) + ((SCREENHEIGHT_VGA - SCREENHEIGHT) / 2) * PLANEWIDTH + __djgpp_conventional_base);

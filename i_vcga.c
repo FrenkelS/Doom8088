@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2024-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -210,8 +210,6 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	videocard = I_DetectVideoCard();
 
 	I_SetScreenMode(4);
-	I_ReloadPalette();
-	I_UploadNewPalette();
 
 	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_CGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
