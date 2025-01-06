@@ -18,7 +18,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
  - Supports only Doom 1 Episode 1
  - Rotating overlaid automap
  - Only demo3 is supported
- - 256, 16 and 2 color modes
+ - 256, 16, 4 and 2 color modes
  - PC speaker sound effects
  - No music
  - No texture mapped floors and ceilings
@@ -47,6 +47,9 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 ### CGA 320x200 4 color mode
 ![Doom8088 in 4 colors](readme_imgs/doomcga.png?raw=true)
+
+### CGA 640x200 2 color mode
+![Doom8088 in 2 colors](readme_imgs/doomcgabw.png?raw=true)
 
 ### Text mode 80x50 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomt80x50.png?raw=true)
@@ -119,6 +122,8 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |`begah.sh`   |EGA 640x200 16 colors    |
 |`begam.sh`   |EGA 320x200 16 colors    |
 |`bcga.sh`    |CGA 320x200  4 colors    |
+|`bcgabw.sh`  |CGA 640x200  2 colors    |
+|`bt80x50.sh` |Text mode 80x50 16 colors|
 |`bt80x43.sh` |Text mode 80x43 16 colors|
 |`bt80x25.sh` |Text mode 80x25 16 colors|
 |`bt40x25.sh` |Text mode 40x25 16 colors|
