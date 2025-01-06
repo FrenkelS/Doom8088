@@ -1,5 +1,7 @@
 ./bcga.sh     i8088 D8088CGA.EXE
 ./bcga.sh     i286  D286CGA.EXE
+./bcgabw.sh   i8088 D8088CBW.EXE
+./bcgabw.sh   i286  D286CBW.EXE
 ./begah.sh    i8088 D8088EH.EXE
 ./begah.sh    i286  D286EH.EXE
 ./begam.sh    i8088 D8088EM.EXE

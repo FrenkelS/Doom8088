@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
  *  02111-1307, USA.
  *
  * DESCRIPTION:
- *      Video code for CGA 320x200 4 color
+ *      Video code for CGA 640x200 2 color
  *
  *-----------------------------------------------------------------------------*/
  
@@ -124,81 +124,37 @@ static videocardsenum_t I_DetectVideoCard(void)
 }
 
 
-static const int8_t colors[14] =
+static const uint8_t colors[14] =
 {
-	0,							// normal
-	4, 4, 4, 4, 12, 12, 12, 12,	// red
-	6, 6, 14, 14,				// yellow
-	2							// green
+	15,							// normal
+	12, 12, 12, 12, 4, 4, 4, 4,	// red
+	14, 14, 6, 6,				// yellow
+	10							// green
 };
-
-
-static const uint8_t colorsNonCGA[6][3] =
-{
-	{11, 13, 15}, // light cyan, light magenta, white
-	{ 3,  4,  7}, // cyan, red, light gray
-	{11, 12, 15}, // light cyan, light red, white
-	{ 2,  4,  6}, // green, red, brown
-	{10, 12, 14}, // light green, light red, yellow
-	{ 3,  5,  7}  // cyan, magenta, light gray
-};
-
-
-static int16_t palette;
-static int8_t pal;
 
 
 static void I_SetPaletteNonCGA(uint8_t paletteRegisterNumber, uint8_t color)
 {
-	if (color > 7)
-		color |= 0x10;
 
-	union REGS regs;
-	regs.w.ax = 0x1000;
-	regs.h.bl = paletteRegisterNumber;
-	regs.h.bh = color;
-	int86(0x10, &regs, &regs);
 }
 
 
-static void I_UploadNewPalette(void)
+static void I_UploadNewPalette(int8_t pal)
 {
-	uint8_t background = colors[pal];
+	uint8_t color = colors[pal];
 
 	if (videocard == CGA)
-	{
-		uint8_t mode;
-		uint8_t colour;
-		switch (palette)
-		{
-			case 0: colour = 0x30 | background; mode = 0x0a; break; // background, light cyan, light magenta, white
-			case 1: colour = 0x00 | background; mode = 0x0e; break; // background, cyan, red, light gray
-			case 2: colour = 0x10 | background; mode = 0x0e; break; // background, light cyan, light red, white
-			case 3: colour = 0x00 | background; mode = 0x0a; break; // background, green, red, brown
-			case 4: colour = 0x10 | background; mode = 0x0a; break; // background, light green, light red, yellow
-			case 5: colour = 0x20 | background; mode = 0x0a; break; // background, cyan, magenta, light gray
-		}
-		outp(0x3d8, mode);
-		outp(0x3d9, colour);
-	}
-	else
-		I_SetPaletteNonCGA(0, background);
-}
-
-
-void I_SwitchPalette(void)
-{
-	palette++;
-	if (palette == 6)
-		palette = 0;
-
-	if (videocard == CGA)
-		I_UploadNewPalette();
+		outp(0x3d9, color);
 	else
 	{
-		I_SetPaletteNonCGA(1, colorsNonCGA[palette][0]);
-		I_SetPaletteNonCGA(2, colorsNonCGA[palette][1]);
-		I_SetPaletteNonCGA(3, colorsNonCGA[palette][2]);
+		if (color > 7)
+			color |= 0x10;
+
+		union REGS regs;
+		regs.w.ax = 0x1000;
+		regs.h.bl = 1;
+		regs.h.bh = color;
+		int86(0x10, &regs, &regs);
 	}
 }
 
@@ -209,9 +165,9 @@ void I_InitGraphicsHardwareSpecificCode(void)
 
 	videocard = I_DetectVideoCard();
 
-	I_SetScreenMode(4);
+	I_SetScreenMode(6);
 	I_ReloadPalette();
-	I_UploadNewPalette();
+	I_UploadNewPalette(0);
 
 	videomemory = D_MK_FP(0xb800, (((SCREENHEIGHT_CGA - SCREENHEIGHT) / 2) / 2) * PLANEWIDTH + (PLANEWIDTH - VIEWWINDOWWIDTH) / 2 + __djgpp_conventional_base);
 
@@ -267,7 +223,7 @@ static int8_t newpal;
 
 void I_SetPalette(int8_t p)
 {
-	pal = newpal = p;
+	newpal = p;
 }
 
 
@@ -277,7 +233,7 @@ void I_FinishUpdate(void)
 {
 	if (newpal != NO_PALETTE_CHANGE)
 	{
-		I_UploadNewPalette();
+		I_UploadNewPalette(newpal);
 		newpal = NO_PALETTE_CHANGE;
 	}
 
@@ -487,11 +443,10 @@ void V_ShutdownDrawLine(void)
 }
 
 
-static const uint8_t bitmasks[4] = {0x3f, 0xcf, 0xf3, 0xfc};
-
-
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
+	static const uint8_t bitmasks8[8] = {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe};
+
 	int16_t dx = abs(x1 - x0);
 	int16_t sx = x0 < x1 ? 1 : -1;
 
@@ -500,13 +455,13 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	int16_t err = dx + dy;
 
-	int16_t p = x0 & 3;
-	uint8_t bitmask = bitmasks[p];
+	int16_t p = x0 & 7;
+	uint8_t bitmask = bitmasks8[p];
 
 	while (true)
 	{
-		uint8_t c = _s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 2)];
-		_s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 2)] = (c & bitmask) | (color >> (p * 2));
+		uint8_t c = _s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)];
+		_s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)] = (c & bitmask) | (color >> p);
 
 		if (x0 == x1 && y0 == y1)
 			break;
@@ -518,8 +473,8 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 			err += dy;
 			x0  += sx;
 
-			p       = x0 & 3;
-			bitmask = bitmasks[p];
+			p       = x0 & 7;
+			bitmask = bitmasks8[p];
 		}
 
 		if (e2 <= dx)
@@ -581,6 +536,9 @@ void ST_Drawer(void)
 }
 
 
+static const uint8_t bitmasks4[4] = {0x3f, 0xcf, 0xf3, 0xfc};
+
+
 void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 {
 	y -= patch->topoffset;
@@ -591,7 +549,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 	int16_t width = patch->width;
 
 	int16_t p = x & 3;
-	uint8_t bitmask = bitmasks[p];
+	uint8_t bitmask = bitmasks4[p];
 
 	for (int16_t col = 0; col < width; col++)
 	{
@@ -658,7 +616,7 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 			p = 0;
 			desttop++;
 		}
-		bitmask = bitmasks[p];
+		bitmask = bitmasks4[p];
 	}
 }
 
@@ -689,7 +647,7 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		const column_t __far* column = (const column_t __far*)((const byte __far*)patch + (uint16_t)patch->columnofs[col >> 8]);
 
 		int16_t p = dc_x & 3;
-		uint8_t bitmask = bitmasks[p];
+		uint8_t bitmask = bitmasks4[p];
 
 		// step through the posts in a column
 		while (column->topdelta != 0xff)
