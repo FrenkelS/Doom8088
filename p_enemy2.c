@@ -23,6 +23,9 @@
  *
  *-----------------------------------------------------------------------------*/
 
+#include <stdint.h>
+
+#include "i_system.h"
 #include "m_fixed.h"
 #include "m_random.h"
 #include "p_enemy.h"
