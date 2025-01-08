@@ -46,15 +46,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SND_TICRATE     140     // tic rate for updating sound
 
 
-typedef struct {
-	uint16_t	length;
-	uint16_t	data[];
-} pcspkmuse_t;
-
-
-static const pcspkmuse_t __far* pcspkmuse;
+static uint16_t	data[146];
 static int16_t	PCFX_LengthLeft;
-static const uint16_t	__far* PCFX_Sound = NULL;
+static const uint16_t *PCFX_Sound = NULL;
 static uint16_t	PCFX_LastSample = 0;
 
 static boolean	PCFX_Installed = false;
@@ -80,8 +74,6 @@ static void PCFX_Stop(void)
 	PCFX_LastSample = 0;
 
 	_enable();
-
-	Z_ChangeTagToCache(pcspkmuse);
 }
 
 
@@ -122,16 +114,24 @@ static void PCFX_Service(void)
    Starts playback of a Muse sound effect.
 ---------------------------------------------------------------------*/
 
+typedef struct {
+	uint16_t	length;
+	uint16_t	data[];
+} pcspkmuse_t;
+
+
 void PCFX_Play(int16_t lumpnum)
 {
 	PCFX_Stop();
 
-	pcspkmuse = W_GetLumpByNum(lumpnum);
+	const pcspkmuse_t __far* pcspkmuse = W_GetLumpByNum(lumpnum);
+	PCFX_LengthLeft = pcspkmuse->length;
+	_fmemcpy(data, pcspkmuse->data, pcspkmuse->length * sizeof(uint16_t));
+	Z_ChangeTagToCache(pcspkmuse);
 
 	_disable();
 
-	PCFX_LengthLeft = pcspkmuse->length;
-	PCFX_Sound      = pcspkmuse->data;
+	PCFX_Sound = &data[0];
 
 	_enable();
 }
