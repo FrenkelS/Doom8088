@@ -133,12 +133,6 @@ static const uint8_t colors[14] =
 };
 
 
-static void I_SetPaletteNonCGA(uint8_t paletteRegisterNumber, uint8_t color)
-{
-
-}
-
-
 static void I_UploadNewPalette(int8_t pal)
 {
 	uint8_t color = colors[pal];
