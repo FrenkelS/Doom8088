@@ -357,7 +357,7 @@ static void R_DrawColumnFlat2(uint8_t color, int16_t yl, int16_t count)
 		*dest = color0;
 }
 #else
-void R_DrawColumnFlat2(uint8_t color, int16_t odd, int16_t count);
+void R_DrawColumnFlat2(uint8_t color, int16_t yl, int16_t count);
 #endif
 
 
