@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -90,7 +90,7 @@ boolean EV_Teleport(const line_t __far* line, int16_t side, mobj_t __far* thing)
           if (!P_TeleportMove(thing, m->x, m->y, false)) /* killough 8/9/98 */
             return false;
 
-            thing->z = thing->floorz;
+          thing->z = thing->floorz;
 
           if (player)
             player->viewz = thing->z + player->viewheight;
