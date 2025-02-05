@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2023-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -78,10 +78,10 @@ static boolean isKeyboardIsrSet = false;
 #if defined __DJGPP__ 
 static _go32_dpmi_seginfo oldkeyboardisr, newkeyboardisr;
 #else
-static void (__interrupt *oldkeyboardisr)(void);
+static void __interrupt __far (*oldkeyboardisr)(void);
 #endif
 
-static void __interrupt I_KeyboardISR(void)	
+static void __interrupt __far I_KeyboardISR(void)	
 {
 	// Get the scan code
 	keyboardqueue[kbdhead & (KBDQUESIZE - 1)] = inp(0x60);

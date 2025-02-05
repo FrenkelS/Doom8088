@@ -1,6 +1,6 @@
 /*
 Copyright (C) 1994-1995 Apogee Software, Ltd.
-Copyright (C) 2023 Frenkel Smeijers
+Copyright (C) 2023-2025 Frenkel Smeijers
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -61,7 +61,7 @@ static task_t tasks[MAX_TASKS];
 #if defined __DJGPP__
 static _go32_dpmi_seginfo OldInt8, NewInt8;
 #else
-static void (__interrupt *OldInt8)(void);
+static void __interrupt __far (*OldInt8)(void);
 #endif
 
 
@@ -100,7 +100,7 @@ static void TS_SetClockSpeed(int32_t speed)
    Interrupt service routine
 ---------------------------------------------------------------------*/
 
-static void __interrupt TS_ServiceSchedule (void)
+static void __interrupt __far TS_ServiceSchedule (void)
 {
 	for (int16_t i = 0; i < MAX_TASKS; i++)
 	{
