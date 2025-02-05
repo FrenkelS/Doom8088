@@ -103,11 +103,13 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |IDRATE    |Toggle FPS counter       |
 
 ## Command line arguments:
-|Command line argument|Effect       |
-|---------------------|-------------|
-|-noems               |Disable EMS  |
-|-noxms               |Disable XMS  |
-|-timedemo demo3      |Run benchmark|
+|Command line argument|Effect               |
+|---------------------|---------------------|
+|-noems               |Disable EMS          |
+|-noxms               |Disable XMS          |
+|-nosfx               |Disable sound effects|
+|-nosound             |Disable sound effects|
+|-timedemo demo3      |Run benchmark        |
 
 ## Building:
 1) Install [gcc-ia16](https://launchpad.net/%7Etkchia/+archive/ubuntu/build-ia16) (including [libi86](https://gitlab.com/tkchia/libi86)) and [NASM](https://www.nasm.us) on Ubuntu.

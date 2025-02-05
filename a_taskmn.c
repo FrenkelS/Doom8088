@@ -201,6 +201,13 @@ void TS_ScheduleTask(void (*function)(void), int16_t rate, int16_t priority)
 	tasks[priority].rate        = TS_SetTimer(rate);
 	tasks[priority].count       = 0;
 	tasks[priority].active      = false;
+
+
+	_disable();
+
+	tasks[priority].active = true;
+
+	_enable();
 }
 
 
@@ -241,23 +248,6 @@ void TS_Terminate(int16_t priority)
 	tasks[priority].rate = MAX_SERVICE_RATE;
 
 	TS_SetTimerToMaxTaskRate();
-
-	_enable();
-}
-
-
-/*---------------------------------------------------------------------
-   Function: TS_Dispatch
-
-   Begins processing of all inactive tasks.
----------------------------------------------------------------------*/
-
-void TS_Dispatch(void)
-{
-	_disable();
-
-	for (int16_t i = 0; i < MAX_TASKS; i++)
-		tasks[i].active = true;
 
 	_enable();
 }

@@ -150,7 +150,6 @@ void PCFX_Init(void)
 
 	PCFX_Stop();
 	TS_ScheduleTask(&PCFX_Service, SND_TICRATE, PCFX_PRIORITY);
-	TS_Dispatch();
 
 	PCFX_Installed = true;
 }

@@ -291,7 +291,6 @@ int32_t I_GetTime(void)
 void I_InitTimer(void)
 {
 	TS_ScheduleTask(I_TimerISR, TICRATE, TIMER_PRIORITY);
-	TS_Dispatch();
 
 	isTimerSet = true;
 }
