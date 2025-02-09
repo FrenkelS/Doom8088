@@ -36,7 +36,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 ## Supported video modes
 
-### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13H
+### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13h
 ![Doom8088 in 256 colors](readme_imgs/doom8088.png?raw=true)
 
 ### EGA 640x200 16 color mode
@@ -67,7 +67,7 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 ![Doom8088 in 2 colors](readme_imgs/doomt80x25m.png?raw=true)
 
 ## Controls:
-|Action                           |             |
+|Action                           |Keys         |
 |---------------------------------|-------------|
 |Fire                             |Ctrl         |
 |Use                              |Enter & Space|
