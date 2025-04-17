@@ -151,26 +151,44 @@ static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 }
 
 
-union int64_u {
-	int64_t ll;
-	PACKEDATTR_PRE struct {
-		int16_t wl;
-		fixed_t dw;
-		int16_t wh;
-	} PACKEDATTR_POST s;
-};
-
-typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
-
-
 static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 {
-	union int64_u r;
-	// r.ll = (int64_t)a << FRACBITS;
-	r.s.wl = 0;
-	r.s.dw = a;
-	r.s.wh = (a < 0) ? 0xffff : 0x0000;
-	return r.ll / b;
+	a = D_abs(a);
+	b = D_abs(b);
+
+	uint16_t bit = 1;
+	do
+	{
+		b   <<= 1;
+		bit <<= 1;
+	} while (b < a);
+
+	int16_t ch = 0;
+	do
+	{
+		if (a >= b)
+		{
+			a  -= b;
+			ch |= bit;
+		}
+		a   <<= 1;
+		bit >>= 1;
+	} while (bit && a);
+
+	uint16_t cl = 0;
+	bit = 0x8000;
+	do
+	{
+		if (a >= b)
+		{
+			a  -= b;
+			cl |= bit;
+		}
+		a   <<= 1;
+		bit >>= 1;
+	} while (bit && a);
+
+	return (((fixed_t)ch) << FRACBITS) | cl;
 }
 
 
