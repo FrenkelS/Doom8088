@@ -178,15 +178,23 @@ static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 	}
 
 	uint16_t cl = 0;
-	for (uint16_t fbit = 0x8000; fbit != 0; fbit >>= 1)
-	{
-		if (a >= b)
-		{
-			a  -= b;
-			cl |= fbit;
-		}
-		a <<= 1;
-	}
+	uint16_t fbit = 0x8000;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
+	if (a >= b) {a -= b; cl |= fbit;}
 
 	return (((fixed_t)ch) << FRACBITS) | cl;
 }
