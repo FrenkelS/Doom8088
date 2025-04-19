@@ -153,40 +153,40 @@ static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 
 static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 {
-	a = D_abs(a);
-	b = D_abs(b);
-
-	uint16_t bit = 1;
-	do
+	if (a < 0)
 	{
-		b   <<= 1;
-		bit <<= 1;
-	} while (b < a);
+		a = -a;
+		b = -b;
+	}
+
+	uint16_t ibit = 1;
+	while (b < a)
+	{
+		b    <<= 1;
+		ibit <<= 1;
+	}
 
 	int16_t ch = 0;
-	do
+	for (; ibit != 0; ibit >>= 1)
 	{
 		if (a >= b)
 		{
 			a  -= b;
-			ch |= bit;
+			ch |= ibit;
 		}
-		a   <<= 1;
-		bit >>= 1;
-	} while (bit && a);
+		a <<= 1;
+	}
 
 	uint16_t cl = 0;
-	bit = 0x8000;
-	do
+	for (uint16_t fbit = 0x8000; fbit != 0; fbit >>= 1)
 	{
 		if (a >= b)
 		{
 			a  -= b;
-			cl |= bit;
+			cl |= fbit;
 		}
-		a   <<= 1;
-		bit >>= 1;
-	} while (bit && a);
+		a <<= 1;
+	}
 
 	return (((fixed_t)ch) << FRACBITS) | cl;
 }
