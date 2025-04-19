@@ -178,23 +178,22 @@ static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 	}
 
 	uint16_t cl = 0;
-	uint16_t fbit = 0x8000;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;} a <<= 1; fbit >>= 1;
-	if (a >= b) {a -= b; cl |= fbit;}
+	if (a >= b) {a -= b; cl |= 0x8000;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x4000;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x2000;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x1000;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0800;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0400;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0200;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0100;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0080;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0040;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0020;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0010;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0008;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0004;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0002;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0001;}
 
 	return (((fixed_t)ch) << FRACBITS) | cl;
 }
