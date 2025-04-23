@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -472,7 +472,12 @@ fixed_t CONSTFUNC FixedMulAngle(fixed_t a, fixed_t b)
 }
 
 
-inline static fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
+#if defined __WATCOMC__
+//
+#else
+inline
+#endif
+fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 {
 	uint16_t alw = a;
 	 int16_t ahw = a >> FRACBITS;
