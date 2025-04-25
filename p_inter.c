@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -520,7 +520,7 @@ static void P_KillMobj(mobj_t __far* source, mobj_t __far* target)
   target->height >>= 2;
 
 
-  if (!((target->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
+  if (!((target->flags ^ MF_COUNTKILL) & MF_COUNTKILL))
     _g_totallive--;
 
   if (source && P_MobjIsPlayer(source))
@@ -689,9 +689,6 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
       return;
     }
 
-      /* If target is a player, set player's target to source,
-       * so that a friend can tell who's hurting a player
-       */
       if (player)
         target->target = source;
 
@@ -715,10 +712,7 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
        * killough 9/9/98: cleaned up, made more consistent:
        */
 
-      if (!target->lastenemy || target->lastenemy->health <= 0 ||
-    (
-     !((target->flags ^ target->lastenemy->flags) & MF_FRIEND) &&
-     target->target != source)) // remember last enemy - killough
+      if (!target->lastenemy || target->lastenemy->health <= 0 || target->target != source) // remember last enemy - killough
        target->lastenemy = target->target;
 
       target->target    = source;
@@ -728,9 +722,6 @@ void P_DamageMobj(mobj_t __far* target, mobj_t __far* inflictor, mobj_t __far* s
         P_SetMobjState (target, mobjinfo[target->type].seestate);
     }
 
-  /* killough 11/98: Don't attack a friend, unless hit by that friend.
-   * cph 2006/04/01 - implicitly this is only if mbf_features */
-  if (justhit && (target->target == source || !target->target ||
-      !(target->flags & target->target->flags & MF_FRIEND)))
+  if (justhit)
     target->flags |= MF_JUSTHIT;    // fight back!
 }

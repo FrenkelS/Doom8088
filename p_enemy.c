@@ -56,9 +56,6 @@
 static fixed_t dropoff_deltax, dropoff_deltay, floorz;
 
 
-static const fixed_t distfriend = 128L << FRACBITS;
-
-
 //
 // ENEMY THINKING
 // Enemies are always spawned
@@ -75,30 +72,13 @@ boolean P_CheckMeleeRange(mobj_t __far* actor)
 {
   mobj_t __far* pl = actor->target;
 
-  return  // killough 7/18/98: friendly monsters don't attack other friends
-    pl && !(actor->flags & pl->flags & MF_FRIEND) &&
+  return
+    pl &&
     (P_AproxDistance(pl->x-actor->x, pl->y-actor->y) <
      MELEERANGE - 20*FRACUNIT + mobjinfo[pl->type].radius) &&
     P_CheckSight(actor, actor->target);
 }
 
-//
-// P_HitFriend()
-//
-// killough 12/98
-// This function tries to prevent shooting at friends
-
-static boolean P_HitFriend(mobj_t __far* actor)
-{
-  return actor->flags & MF_FRIEND && actor->target &&
-    (P_AimLineAttack(actor,
-         R_PointToAngle2(actor->x, actor->y,
-             actor->target->x, actor->target->y),
-         P_AproxDistance(actor->x-actor->target->x,
-             actor->y-actor->target->y)),
-     _g_linetarget) && _g_linetarget != actor->target &&
-    !((_g_linetarget->flags ^ actor->flags) & MF_FRIEND);
-}
 
 //
 // P_CheckMissileRange
@@ -114,23 +94,8 @@ boolean P_CheckMissileRange(mobj_t __far* actor)
   {      // the target just hit the enemy, so fight back!
       actor->flags &= ~MF_JUSTHIT;
 
-      /* killough 7/18/98: no friendly fire at corpses
-       * killough 11/98: prevent too much infighting among friends
-       * cph - yikes, talk about fitting everything on one line... */
-
-      return
-              !(actor->flags & MF_FRIEND) ||
-              (actor->target->health > 0 &&
-               (!(actor->target->flags & MF_FRIEND) ||
-                (P_MobjIsPlayer(actor->target) ? true :
-                     !(actor->target->flags & MF_JUSTHIT) && P_Random() >128)));
+      return true;
   }
-
-  /* killough 7/18/98: friendly monsters don't attack other friendly
-   * monsters or players (except when attacked, and then only once)
-   */
-  if (actor->flags & actor->target->flags & MF_FRIEND)
-    return false;
 
   if (actor->reactiontime)
     return false;       // do not attack yet
@@ -148,9 +113,6 @@ boolean P_CheckMissileRange(mobj_t __far* actor)
     dist = 200;
 
   if (P_Random() < dist)
-    return false;
-
-  if (P_HitFriend(actor))
     return false;
 
   return true;
@@ -328,9 +290,7 @@ void P_NewChaseDir(mobj_t __far* actor)
     fixed_t deltay = target->y - actor->y;
 
     // killough 8/8/98: sometimes move away from target, keeping distance
-    //
-    // 1) Stay a certain distance away from a friend, to avoid being in their way
-    // 2) Take advantage over an enemy without missiles, by keeping distance
+    // Take advantage over an enemy without missiles, by keeping distance
 
     if (actor->floorz - actor->dropoffz > FRACUNIT*24 &&
             actor->z <= actor->floorz &&
@@ -345,21 +305,6 @@ void P_NewChaseDir(mobj_t __far* actor)
         actor->movecount = 1;
         return;
     }
-    else
-    {
-        fixed_t dist = P_AproxDistance(deltax, deltay);
-
-        // Move away from friends when too close, except
-        // in certain situations (e.g. a crowded lift)
-
-        if (actor->flags & target->flags & MF_FRIEND &&
-                distfriend > dist &&
-                !P_IsOnLift(target))
-        {
-            deltax = -deltax, deltay = -deltay;
-        }
-    }
-
 
     P_DoNewChaseDir(actor, deltax, deltay);
 }

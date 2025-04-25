@@ -293,9 +293,7 @@ static boolean PIT_CheckLine (line_t __far* ld)
       if (ld->flags & ML_BLOCKING)           // explicitly blocking everything
   return tmunstuck && !untouched(ld);  // killough 8/1/98: allow escape
 
-      // killough 8/9/98: monster-blockers don't affect friends
-      if (!(tmthing->flags & MF_FRIEND || P_MobjIsPlayer(tmthing))
-    && ld->flags & ML_BLOCKMONSTERS)
+      if (!P_MobjIsPlayer(tmthing) && ld->flags & ML_BLOCKMONSTERS)
   return false; // block monsters only
     }
 

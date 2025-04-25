@@ -708,10 +708,6 @@ static void P_NightmareRespawn(mobj_t __far* mobj)
 
     mo = P_SpawnMobj(x, y, ONFLOORZ, mobj->type);
     mo->angle = mobj->angle;
-
-    /* killough 11/98: transfer friendliness from deceased */
-    mo->flags = (mo->flags & ~MF_FRIEND) | (mobj->flags & MF_FRIEND);
-
     mo->reactiontime = 18;
 
     // remove the old monster,
@@ -855,11 +851,7 @@ mobj_t __far* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
     mobj->y = y;
     mobj->radius = info->radius;
     mobj->height = info->height;                                      // phares
-    mobj->flags  |= info->flags;
-
-    if (type == MT_PLAYER)         // Except in old demos, players
-        mobj->flags |= MF_FRIEND;    // are always friends.
-
+    mobj->flags |= info->flags;
     mobj->health = info->spawnhealth;
 
     if (_g_gameskill != sk_nightmare)
@@ -892,7 +884,7 @@ mobj_t __far* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
 
     mobj->target = mobj->tracer = mobj->lastenemy = NULL;
     P_AddThinker (&mobj->thinker);
-    if (!((mobj->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
+    if (!((mobj->flags ^ MF_COUNTKILL) & MF_COUNTKILL))
         _g_totallive++;
     return mobj;
 }
@@ -1049,8 +1041,7 @@ void P_SpawnMapThing(const mapthing_t __far* mthing)
     if (mobj->tics > 0)
         mobj->tics = 1 + (P_Random () % mobj->tics);
 
-    /* killough 7/20/98: exclude friends */
-    if (!((mobj->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
+    if (!((mobj->flags ^ MF_COUNTKILL) & MF_COUNTKILL))
         _g_totalkills++;
 
     if (mobj->flags & MF_COUNTITEM)

@@ -195,12 +195,6 @@ void A_Look(mobj_t __far* actor)
 {
     mobj_t __far* targ = actor->subsector->sector->soundtarget;
     actor->threshold = 0; // any shot will wake up
-
-    /* killough 7/18/98:
-   * Friendly monsters go after other monsters first, but
-   * also return to player, without attacking them, if they
-   * cannot find any targets. A marine's best friend :)
-   */
     actor->pursuecount = 0;
 
     boolean seen = false;
@@ -340,31 +334,11 @@ void A_Chase(mobj_t __far* actor)
             actor->pursuecount = BASETHRESHOLD;
 
           /* Unless (we have a live target
-           *         and it's not friendly
            *         and we can see it)
            *  try to find a new one; return if sucessful */
 
-            if (!(actor->target && actor->target->health > 0 &&
-                  (
-                      (((actor->target->flags ^ actor->flags) & MF_FRIEND ||
-                        (!(actor->flags & MF_FRIEND))) &&
-                       P_CheckSight(actor, actor->target))))
-                    && P_LookForTargets(actor, true))
+            if (!(actor->target && actor->target->health > 0 && P_CheckSight(actor, actor->target)) && P_LookForTargets(actor, true))
                 return;
-
-            /* (Current target was good, or no new target was found.)
-           *
-           * If monster is a missile-less friend, give up pursuit and
-           * return to player, if no attacks have occurred recently.
-           */
-
-            if (!mobjinfo[actor->type].missilestate && actor->flags & MF_FRIEND)
-            {
-                if (actor->flags & MF_JUSTHIT)          /* if recent action, */
-                    actor->flags &= ~MF_JUSTHIT;          /* keep fighting */
-                else if (P_LookForPlayers(actor, true)) /* else return to player */
-                    return;
-            }
         }
     }
 
