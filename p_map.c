@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -735,9 +735,6 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
 }
 
 
-// for more intelligent autoaiming
-static uint32_t aim_flags_mask;
-
 static fixed_t  aimslope;
 
 
@@ -800,12 +797,6 @@ static boolean PTR_AimTraverse (intercept_t* in)
 
     if (!(th->flags&MF_SHOOTABLE))
         return true;    // corpse or something
-
-    /* killough 7/19/98, 8/2/98:
-   * friends don't aim at friends (except players), at least not first
-   */
-    if (th->flags & shootthing->flags & aim_flags_mask && !P_MobjIsPlayer(th))
-        return true;
 
     // check angles to see if the thing can be aimed at
 
@@ -1003,7 +994,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 //
 // P_AimLineAttack
 //
-fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boolean friend)
+fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance)
   {
   fixed_t x2;
   fixed_t y2;
@@ -1022,9 +1013,6 @@ fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boole
 
   attackrange = distance;
   _g_linetarget  = NULL;
-
-  // prevent friends from aiming at friends
-  aim_flags_mask = friend ? MF_FRIEND : 0;
 
   P_PathTraverse(t1->x,t1->y,x2,y2,PT_ADDLINES|PT_ADDTHINGS,PTR_AimTraverse);
 

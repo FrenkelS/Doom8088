@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -642,9 +642,7 @@ void A_Punch(player_t *player, pspdef_t *psp)
 	t = P_Random();
 	angle += (t - P_Random())<<18;
 
-	/* killough 8/2/98: make autoaiming prefer enemies */
-	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE, true), !_g_linetarget))
-		slope = P_AimLineAttack(player->mo, angle, MELEERANGE, false);
+	slope = P_AimLineAttack(player->mo, angle, MELEERANGE);
 
 	P_LineAttack(player->mo, angle, MELEERANGE, slope, damage);
 
@@ -672,10 +670,8 @@ void A_Saw(player_t *player, pspdef_t *psp)
 
 	UNUSED(psp);
 
-	/* Use meleerange + 1 so that the puff doesn't skip the flash
-	 * killough 8/2/98: make autoaiming prefer enemies */
-	if ((slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, true), !_g_linetarget))
-		slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1, false);
+	// Use meleerange + 1 so that the puff doesn't skip the flash
+	slope = P_AimLineAttack(player->mo, angle, MELEERANGE+1);
 
 	P_LineAttack(player->mo, angle, MELEERANGE+1, slope, damage);
 
@@ -731,18 +727,11 @@ static void P_BulletSlope(mobj_t __far* mo)
 {
 	angle_t an = mo->angle;    // see which target is to be aimed at
 
-	/* killough 8/2/98: make autoaiming prefer enemies */
-	boolean friend = true;
-
-	do
-	{
-		bulletslope = P_AimLineAttack(mo, an, 16 * 64 * FRACUNIT, friend);
-		if (!_g_linetarget)
-			bulletslope = P_AimLineAttack(mo, an += 1L << 26, 16 * 64 * FRACUNIT, friend);
-		if (!_g_linetarget)
-			bulletslope = P_AimLineAttack(mo, an -= 2L << 26, 16 * 64 * FRACUNIT, friend);
-	}
-	while (friend && (friend = false, !_g_linetarget));
+	bulletslope = P_AimLineAttack(mo, an, 16 * 64 * FRACUNIT);
+	if (!_g_linetarget)
+		bulletslope = P_AimLineAttack(mo, an += 1L << 26, 16 * 64 * FRACUNIT);
+	if (!_g_linetarget)
+		bulletslope = P_AimLineAttack(mo, an -= 2L << 26, 16 * 64 * FRACUNIT);
 }
 
 

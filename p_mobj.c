@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -1199,23 +1199,13 @@ void P_SpawnPlayerMissile(mobj_t __far* source)
 
 	angle_t an = source->angle;
 
-	// killough 7/19/98: autoaiming was not in original beta
-	{
-		// killough 8/2/98: prefer autoaiming at enemies
-		boolean friend = true;
-
-		do
-		{
-			slope = P_AimLineAttack(source, an, 16 * 64 * FRACUNIT, friend);
-			if (!_g_linetarget)
-				slope = P_AimLineAttack(source, an += 1L << 26, 16 * 64 * FRACUNIT, friend);
-			if (!_g_linetarget)
-				slope = P_AimLineAttack(source, an -= 2l << 26, 16 * 64 * FRACUNIT, friend);
-			if (!_g_linetarget)
-				an = source->angle, slope = 0;
-		}
-		while (friend && (friend = false, !_g_linetarget));
-	}
+	slope = P_AimLineAttack(source, an, 16 * 64 * FRACUNIT);
+	if (!_g_linetarget)
+		slope = P_AimLineAttack(source, an += 1L << 26, 16 * 64 * FRACUNIT);
+	if (!_g_linetarget)
+		slope = P_AimLineAttack(source, an -= 2l << 26, 16 * 64 * FRACUNIT);
+	if (!_g_linetarget)
+		an = source->angle, slope = 0;
 
 	x = source->x;
 	y = source->y;

@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@ boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss);
 boolean P_CheckSight(mobj_t __far* t1, mobj_t __far* t2);
 void    P_UseLines(player_t *player);
 
-fixed_t P_AimLineAttack(mobj_t __far*t1, angle_t angle, fixed_t distance, boolean friend);
+fixed_t P_AimLineAttack(mobj_t __far*t1, angle_t angle, fixed_t distance);
 
 void    P_LineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, fixed_t slope, int16_t damage);
 void    P_RadiusAttack(mobj_t __far* spot, mobj_t __far* source, int16_t damage);

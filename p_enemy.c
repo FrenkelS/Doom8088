@@ -95,7 +95,7 @@ static boolean P_HitFriend(mobj_t __far* actor)
          R_PointToAngle2(actor->x, actor->y,
              actor->target->x, actor->target->y),
          P_AproxDistance(actor->x-actor->target->x,
-             actor->y-actor->target->y), false),
+             actor->y-actor->target->y)),
      _g_linetarget) && _g_linetarget != actor->target &&
     !((_g_linetarget->flags ^ actor->flags) & MF_FRIEND);
 }
@@ -401,7 +401,7 @@ void A_PosAttack(mobj_t __far* actor)
     return;
   A_FaceTarget(actor);
   angle = actor->angle;
-  slope = P_AimLineAttack(actor, angle, MISSILERANGE, false);
+  slope = P_AimLineAttack(actor, angle, MISSILERANGE);
   S_StartSound(actor, sfx_pistol);
 
   // killough 5/5/98: remove dependence on order of evaluation:
@@ -422,7 +422,7 @@ void A_SPosAttack(mobj_t __far* actor)
   S_StartSound(actor, sfx_shotgn);
   A_FaceTarget(actor);
   bangle = actor->angle;
-  slope = P_AimLineAttack(actor, bangle, MISSILERANGE, false);
+  slope = P_AimLineAttack(actor, bangle, MISSILERANGE);
   for (i=0; i<3; i++)
     {  // killough 5/5/98: remove dependence on order of evaluation:
       angle_t t = P_Random();
