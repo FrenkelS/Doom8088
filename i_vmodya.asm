@@ -84,6 +84,7 @@ R_DrawColumn2:
 	xchg bp, ax						; bp = fracstep
 
 	mov bx, cx						; bx = count
+	;mov cx, bx
 
 	mov ah, cl						; 1 <= ah <= 128
 %ifidn CPU, i8088

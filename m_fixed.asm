@@ -85,6 +85,8 @@ shift_loop:
 
 global FixedReciprocalSmall
 FixedReciprocalSmall:
+;push bx
+;push cx
 	xchg    bx, ax             ; bx = divisor
 	mov     ax, 0ffffh         ;
 	mov     cx, ax             ;
@@ -94,6 +96,8 @@ FixedReciprocalSmall:
 
 	div     bx                 ; ax = quotient-lo
 	mov     dx, cx             ; dx = quotient-hi
+;pop cx
+;pop bx
 	retf                       ; return quotient in dx:ax
 
 
