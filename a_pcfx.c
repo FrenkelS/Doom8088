@@ -103,7 +103,13 @@ static void PCFX_Service(void)
 		}
 
 		if (--PCFX_LengthLeft == 0)
-			PCFX_Stop();
+		{
+			// Turn off speaker
+			outp(0x61, inp(0x61) & 0xfc);
+
+			PCFX_Sound      = NULL;
+			PCFX_LastSample = 0;
+		}
 	}
 }
 
