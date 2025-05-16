@@ -80,23 +80,23 @@ Controls:
 |Quit to DOS                      |F10          |
 
 Cheats:
-|Code      |Effects                  |
-|----------|-------------------------|
-|IDCHOPPERS|Chainsaw                 |
-|IDDQD     |God mode                 |
-|IDKFA     |Weapons & Keys           |
-|IDFA      |Weapons                  |
-|IDSPISPOPD|No Clipping              |
-|IDBEHOLDV |Invincibility            |
-|IDBEHOLDS |Berserk                  |
-|IDBEHOLDI |Invisibility             |
-|IDBEHOLDR |Radiation shielding suit |
-|IDBEHOLDA |Auto-map                 |
-|IDBEHOLDL |Lite-Amp Goggles         |
-|IDCLEV    |Exit Level               |
-|IDEND     |Show end text            |
-|IDROCKET  |Enemy Rockets (GoldenEye)|
-|IDRATE    |Toggle FPS counter       |
+|Code      |Effects                  |Notes                           |
+|----------|-------------------------|--------------------------------|
+|IDCHOPPERS|Chainsaw                 |                                |
+|IDDQD     |God mode                 |                                |
+|IDKFA     |Weapons & Keys           |                                |
+|IDFA      |Weapons                  |                                |
+|IDSPISPOPD|No Clipping              |                                |
+|IDBEHOLDV |Invincibility            |                                |
+|IDBEHOLDS |Berserk                  |                                |
+|IDBEHOLDI |Invisibility             |                                |
+|IDBEHOLDR |Radiation shielding suit |                                |
+|IDBEHOLDA |Auto-map                 |                                |
+|IDBEHOLDL |Lite-Amp Goggles         |                                |
+|IDCLEV    |Exit Level               |                                |
+|IDEND     |Show end text            |                                |
+|IDROCKET  |Enemy Rockets            |(GoldenEye)                     |
+|IDRATE    |Toggle FPS counter       |Divide by 10 to get the real FPS|
 
 Command line arguments:
 |Command line argument|Effect               |
