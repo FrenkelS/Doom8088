@@ -880,9 +880,7 @@ static void R_DrawMaskedColumn(R_DrawColumn_f colfunc, draw_column_vars_t *dcvar
 //
 void R_InitColormaps(void)
 {
-	const uint8_t __far* colormap = W_GetLumpByName("COLORMAP");
-	_fmemcpy((uint8_t __far*)fullcolormap, colormap, 256 * 34);
-	Z_Free(colormap);
+	W_ReadLumpByNum(W_GetNumForName("COLORMAP"), (uint8_t __far*)fullcolormap);
 }
 
 
