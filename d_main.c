@@ -384,7 +384,7 @@ static int16_t  demosequence;
  * This cycles through the demo sequences.
  */
 
-void D_DoAdvanceDemo(void)
+static void D_DoAdvanceDemo(void)
 {
     _g_player.playerstate = PST_LIVE;  /* not reborn */
     advancedemo = _g_usergame = false;

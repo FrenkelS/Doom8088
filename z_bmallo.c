@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -52,13 +52,13 @@ typedef struct bmalpool_s {
 } bmalpool_t;
 
 
-__inline static void __far* getelem(bmalpool_t __far* p, size_t size, size_t n)
+inline static void __far* getelem(bmalpool_t __far* p, size_t size, size_t n)
 {
 	return (((byte __far*)p) + sizeof(bmalpool_t) + sizeof(byte) * (p->blocks) + size * n);
 }
 
 
-__inline static PUREFUNC int16_t iselem(const bmalpool_t __far* pool, size_t size, const void __far* p)
+inline static PUREFUNC int16_t iselem(const bmalpool_t __far* pool, size_t size, const void __far* p)
 {
 #if defined _M_I86
 	if (D_FP_SEG(p) != D_FP_SEG(pool))
