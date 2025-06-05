@@ -57,7 +57,15 @@ last_pixel_flat_jump_table:
 	dw last_pixel_flat4,
 	dw last_pixel_flat5,
 	dw last_pixel_flat6,
-	dw last_pixel_flat7
+	dw last_pixel_flat7,
+	dw last_pixel_flat8,
+	dw last_pixel_flat9,
+	dw last_pixel_flat10,
+	dw last_pixel_flat11,
+	dw last_pixel_flat12,
+	dw last_pixel_flat13,
+	dw last_pixel_flat14,
+	dw last_pixel_flat15
 
 ;
 ; input:
@@ -498,30 +506,39 @@ R_DrawColumnFlat2:
 	mov ah, al
 
 	mov bx, cx
-	and bl, 7
+	and bl, 15
 	shl bl, 1
 
 %ifidn CPU, i8088
 	shr cx, 1
 	shr cx, 1
 	shr cx, 1
+	shr cx, 1
 %else
-	shr cx, 3
+	shr cx, 4
 %endif
 
 	jcxz last_pixels_flat
 
 
 lab:
-	mov [di + SCREENWIDTH *  0    ], ax
-	mov [di + SCREENWIDTH *  1    ], ax
-	mov [di + SCREENWIDTH *  2    ], ax
-	mov [di + SCREENWIDTH *  3    ], ax
-	mov [di + SCREENWIDTH *  4    ], ax
-	mov [di + SCREENWIDTH *  5    ], ax
-	mov [di + SCREENWIDTH *  6    ], ax
-	mov [di + SCREENWIDTH *  7    ], ax
-	add  di , SCREENWIDTH *  8
+	mov [di + SCREENWIDTH *  0], ax
+	mov [di + SCREENWIDTH *  1], ax
+	mov [di + SCREENWIDTH *  2], ax
+	mov [di + SCREENWIDTH *  3], ax
+	mov [di + SCREENWIDTH *  4], ax
+	mov [di + SCREENWIDTH *  5], ax
+	mov [di + SCREENWIDTH *  6], ax
+	mov [di + SCREENWIDTH *  7], ax
+	mov [di + SCREENWIDTH *  8], ax
+	mov [di + SCREENWIDTH *  9], ax
+	mov [di + SCREENWIDTH * 10], ax
+	mov [di + SCREENWIDTH * 11], ax
+	mov [di + SCREENWIDTH * 12], ax
+	mov [di + SCREENWIDTH * 13], ax
+	mov [di + SCREENWIDTH * 14], ax
+	mov [di + SCREENWIDTH * 15], ax
+	add  di , SCREENWIDTH * 16
 	loop lab
 
 
@@ -529,26 +546,50 @@ last_pixels_flat:
 	cs jmp last_pixel_flat_jump_table[bx]
 
 
+last_pixel_flat15:
+	mov [di + SCREENWIDTH * 14], ax
+
+last_pixel_flat14:
+	mov [di + SCREENWIDTH * 13], ax
+
+last_pixel_flat13:
+	mov [di + SCREENWIDTH * 12], ax
+
+last_pixel_flat12:
+	mov [di + SCREENWIDTH * 11], ax
+
+last_pixel_flat11:
+	mov [di + SCREENWIDTH * 10], ax
+
+last_pixel_flat10:
+	mov [di + SCREENWIDTH *  9], ax
+
+last_pixel_flat9:
+	mov [di + SCREENWIDTH *  8], ax
+
+last_pixel_flat8:
+	mov [di + SCREENWIDTH *  7], ax
+
 last_pixel_flat7:
-	mov [di + SCREENWIDTH *  6    ], ax
+	mov [di + SCREENWIDTH *  6], ax
 
 last_pixel_flat6:
-	mov [di + SCREENWIDTH *  5    ], ax
+	mov [di + SCREENWIDTH *  5], ax
 
 last_pixel_flat5:
-	mov [di + SCREENWIDTH *  4    ], ax
+	mov [di + SCREENWIDTH *  4], ax
 
 last_pixel_flat4:
-	mov [di + SCREENWIDTH *  3    ], ax
+	mov [di + SCREENWIDTH *  3], ax
 
 last_pixel_flat3:
-	mov [di + SCREENWIDTH *  2    ], ax
+	mov [di + SCREENWIDTH *  2], ax
 
 last_pixel_flat2:
-	mov [di + SCREENWIDTH *  1    ], ax
+	mov [di + SCREENWIDTH *  1], ax
 
 last_pixel_flat1:
-	mov [di + SCREENWIDTH *  0    ], ax
+	mov [di + SCREENWIDTH *  0], ax
 
 last_pixel_flat0:
 	pop di
