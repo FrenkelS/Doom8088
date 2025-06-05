@@ -3,7 +3,7 @@ mkdir GCCIA16
 unset CFLAGS
 
 #export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR"
-export RENDER_OPTIONS="-DFLAT_SPAN -DVIEWWINDOWWIDTH=240"
+export RENDER_OPTIONS="-DFLAT_SPAN -DVIEWWINDOWWIDTH=120"
 
 export CPU=$1
 export OUTPUT=$2
@@ -19,7 +19,7 @@ then
   export OUTPUT=DOOM8088.EXE
 fi
 
-nasm i_vv13ha.asm -f elf -DCPU=$CPU
+nasm i_vv13ma.asm -f elf -DCPU=$CPU
 nasm m_fixed.asm  -f elf -DCPU=$CPU
 nasm z_xms.asm    -f elf -DCPU=$CPU
 
@@ -54,7 +54,7 @@ export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
 #export GLOBOBJS+=" i_vvga13.c"
 export GLOBOBJS+=" i_vvga13.o"
-export GLOBOBJS+=" i_vv13ha.o"
+export GLOBOBJS+=" i_vv13ma.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_fixed.o"
@@ -109,7 +109,7 @@ export GLOBOBJS+=" z_zone.o"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/$OUTPUT
 
-rm i_vv13ha.o
+rm i_vv13ma.o
 rm m_fixed.o
 rm z_xms.o
 
