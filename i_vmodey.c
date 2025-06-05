@@ -20,6 +20,9 @@
  *
  * DESCRIPTION:
  *      Video code for VGA Mode Y 320x200 256 colors
+ *      Effective resolutions  60x128
+ *                            120x128
+ *                            240x128
  *
  *-----------------------------------------------------------------------------*/
  
