@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2023-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -158,7 +158,9 @@ void I_InitGraphicsHardwareSpecificCode(void)
 	outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~2);
 
 	outp(SC_INDEX, SC_MAPMASK);
+#if VIEWWINDOWWIDTH == 60
 	outp(SC_INDEX + 1, 15);
+#endif
 
 	_fmemset(D_MK_FP(PAGE0, 0 + __djgpp_conventional_base), 0, 0xffff);
 
@@ -205,6 +207,10 @@ void I_FinishUpdate(void)
 
 		if (st_needrefresh != 2)
 		{
+#if VIEWWINDOWWIDTH != 60
+			outp(SC_INDEX + 1, 15);
+#endif
+
 			// set write mode 1
 			outp(GC_INDEX, GC_MODE);
 			outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
@@ -322,7 +328,17 @@ void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 
 	colormap = dcvars->colormap;
 
+#if VIEWWINDOWWIDTH == 60
 	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
+#elif VIEWWINDOWWIDTH == 120
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x / 2;
+	outp(SC_INDEX + 1, 3 << (2 * (dcvars->x & 1)));
+#elif VIEWWINDOWWIDTH == 240
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x / 4;
+	outp(SC_INDEX + 1, 1 << (dcvars->x & 3));
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 
 	const uint16_t fracstep = dcvars->fracstep;
 	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * fracstep;
@@ -403,7 +419,17 @@ void R_DrawColumnFlat(uint8_t color, const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
+#if VIEWWINDOWWIDTH == 60
 	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
+#elif VIEWWINDOWWIDTH == 120
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x / 2;
+	outp(SC_INDEX + 1, 3 << (2 * (dcvars->x & 1)));
+#elif VIEWWINDOWWIDTH == 240
+	dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x / 4;
+	outp(SC_INDEX + 1, 1 << (dcvars->x & 3));
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 
 	R_DrawColumnFlat2(color, color, count);
 }
@@ -445,7 +471,21 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 	colormap = &fullcolormap[6 * 256];
 
-	uint8_t __far* dest = _s_screen + (dc_yl * PLANEWIDTH) + dcvars->x;
+#if VIEWWINDOWWIDTH == 60
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x;
+#elif VIEWWINDOWWIDTH == 120
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x / 2;
+	outp(SC_INDEX + 1, 3 << (2 * (dcvars->x & 1)));
+	outp(GC_INDEX, GC_READMAP);
+	outp(GC_INDEX + 1, 2 * (dcvars->x & 1));
+#elif VIEWWINDOWWIDTH == 240
+	uint8_t __far* dest = _s_screen + (dcvars->yl * PLANEWIDTH) + dcvars->x / 4;
+	outp(SC_INDEX + 1, 1 << (dcvars->x & 3));
+	outp(GC_INDEX, GC_READMAP);
+	outp(GC_INDEX + 1, dcvars->x & 3);
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 
 	static int16_t fuzzpos = 0;
 
@@ -516,7 +556,9 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 		}
 	}
 
+#if VIEWWINDOWWIDTH == 60
 	outp(SC_INDEX + 1, 15);
+#endif
 }
 
 
@@ -527,6 +569,10 @@ static void V_Blit(int16_t num, uint16_t offset, int16_t height)
 {
 	if (cachedLumpNum == num)
 	{
+#if VIEWWINDOWWIDTH != 60
+		outp(SC_INDEX + 1, 15);
+#endif
+
 		// set write mode 1
 		outp(GC_INDEX, GC_MODE);
 		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
@@ -566,7 +612,9 @@ void V_DrawBackground(int16_t backgroundnum)
 				}
 			}
 		}
+#if VIEWWINDOWWIDTH == 60
 		outp(SC_INDEX + 1, 15);
+#endif
 
 		Z_ChangeTagToCache(lump);
 
@@ -601,7 +649,9 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 					}
 				}
 			}
+#if VIEWWINDOWWIDTH == 60
 			outp(SC_INDEX + 1, 15);
+#endif
 			Z_ChangeTagToCache(lump);
 
 			cachedLumpNum = num;
@@ -702,7 +752,9 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		}
 	}
 
+#if VIEWWINDOWWIDTH == 60
 	outp(SC_INDEX + 1, 15);
+#endif
 }
 
 
@@ -760,7 +812,9 @@ void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
 		}
 	}
 
+#if VIEWWINDOWWIDTH == 60
 	outp(SC_INDEX + 1, 15);
+#endif
 }
 
 
@@ -870,6 +924,10 @@ void D_Wipe(void)
 	frontbuffer	= _s_screen - (PAGE_SIZE << 4);
 	if ((((uint32_t)frontbuffer) & (PAGEMINUS1 << 4)) == (PAGEMINUS1 << 4))
 		frontbuffer += (0x10000 - (PAGE_SIZE << 4));
+#endif
+
+#if VIEWWINDOWWIDTH != 60
+	outp(SC_INDEX + 1, 15);
 #endif
 
 	wipe_initMelt();
