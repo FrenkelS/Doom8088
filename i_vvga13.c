@@ -393,7 +393,7 @@ void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
 }
 
 
-#define FUZZOFF 120 /* SCREENWIDTH / 2 so it fits in a uint8_t */
+#define FUZZOFF 120 /* SCREENWIDTH / 2 so it fits in a int8_t */
 #define FUZZTABLE 50
 
 static const int8_t fuzzoffset[FUZZTABLE] =
