@@ -148,6 +148,6 @@ For debugging purposes, the Zone memory can be increased significantly this way.
 It's also possible to build a 16-bit version with Watcom: Run `setenvwc.bat` followed by `bwc16.bat`.
 
 
-3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
+3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe), just like all the other 16-bit id Software games.
 
 4) Doom8088 needs an IWAD file that has been preprocessed by [jWadUtil](https://github.com/FrenkelS/jWadUtil).
