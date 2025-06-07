@@ -1,5 +1,5 @@
 ## Doom8088
-![Doom8088](readme_imgs/doom8088.png?raw=true)
+![Doom8088](readme_imgs/doomvgah.png?raw=true)
 
 Doom was originally designed in 1993 for 32-bit DOS computers with 4 MB of RAM.
 It's mostly written in C code with very little assembly code.
@@ -36,8 +36,14 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 
 ## Supported video modes
 
-### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13h
-![Doom8088 in 256 colors](readme_imgs/doom8088.png?raw=true)
+### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13h, effective resolution 240x128
+![Doom8088 in 256 colors](readme_imgs/doomvgah.png?raw=true)
+
+### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13h, effective resolution 120x128
+![Doom8088 in 256 colors](readme_imgs/doomvgam.png?raw=true)
+
+### VGA 320x200 256 color Mode Y and MCGA 320x200 256 color Mode 13h, effective resolution  60x128
+![Doom8088 in 256 colors](readme_imgs/doomvgal.png?raw=true)
 
 ### EGA 640x200 16 color mode
 ![Doom8088 in 16 colors](readme_imgs/doomegah.png?raw=true)
@@ -119,8 +125,12 @@ Watch what it looks like on a real PC [here](https://www.youtube.com/watch?v=oAX
 |Build script |Version                  |
 |-------------|-------------------------|
 |`buildall.sh`|Build all versions       |
-|`bmodey.sh`  |Mode Y                   |
-|`bmode13h.sh`|Mode 13h                 |
+|`bmodeyh.sh` |Mode Y 240x128           |
+|`bmodeym.sh` |Mode Y 120x128           |
+|`bmodeyl.sh` |Mode Y  60x128           |
+|`bmode13h.sh`|Mode 13h 240x128         |
+|`bmode13m.sh`|Mode 13h 120x128         |
+|`bmode13l.sh`|Mode 13h  60x128         |
 |`begah.sh`   |EGA 640x200 16 colors    |
 |`begam.sh`   |EGA 320x200 16 colors    |
 |`bcga.sh`    |CGA 320x200  4 colors    |
@@ -138,6 +148,6 @@ For debugging purposes, the Zone memory can be increased significantly this way.
 It's also possible to build a 16-bit version with Watcom: Run `setenvwc.bat` followed by `bwc16.bat`.
 
 
-3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe.html), just like all the other 16-bit id Software games.
+3) (Optional) Compress `DOOM8088.EXE` with [LZEXE](https://bellard.org/lzexe), just like all the other 16-bit id Software games.
 
 4) Doom8088 needs an IWAD file that has been preprocessed by [jWadUtil](https://github.com/FrenkelS/jWadUtil).

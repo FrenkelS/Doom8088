@@ -3,10 +3,10 @@ mkdir GCCIA16
 unset CFLAGS
 
 #export RENDER_OPTIONS="-DONE_WALL_TEXTURE -DFLAT_WALL -DFLAT_SPAN -DFLAT_SKY -DDISABLE_STATUS_BAR"
-export RENDER_OPTIONS="-DFLAT_SPAN -DVIEWWINDOWWIDTH=$1"
+export RENDER_OPTIONS="-DFLAT_SPAN"
 
-export CPU=$2
-export OUTPUT=$3
+export CPU=$1
+export OUTPUT=$2
 
 if [ -z "$CPU" ]
 then
@@ -19,11 +19,11 @@ then
   export OUTPUT=DOOM8088.EXE
 fi
 
-nasm i_vmodya.asm -f elf -DCPU=$CPU
+nasm i_vv13la.asm -f elf -DCPU=$CPU
 nasm m_fixed.asm  -f elf -DCPU=$CPU
 nasm z_xms.asm    -f elf -DCPU=$CPU
 
-ia16-elf-gcc -c i_vmodey.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-all-loops -fira-loop-pressure -freorder-blocks-algorithm=simple -fno-tree-pre
+ia16-elf-gcc -c i_vvga13.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-all-loops -fira-loop-pressure -freorder-blocks-algorithm=simple -fno-tree-pre
 ia16-elf-gcc -c p_enemy2.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-all-loops -fira-loop-pressure -freorder-blocks-algorithm=simple -fno-tree-pre
 ia16-elf-gcc -c p_map.c    $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-all-loops -fira-loop-pressure -freorder-blocks-algorithm=simple -fno-tree-pre
 ia16-elf-gcc -c p_maputl.c $RENDER_OPTIONS -march=$CPU -mcmodel=medium -mnewlib-nano-stdio -Ofast -fomit-frame-pointer -fgcse-sm -fgcse-las -fipa-pta -mregparmcall -flto -fwhole-program -funroll-all-loops -fira-loop-pressure -freorder-blocks-algorithm=simple -fno-tree-pre
@@ -52,9 +52,9 @@ export GLOBOBJS+=" hu_stuff.c"
 export GLOBOBJS+=" i_audio.c"
 export GLOBOBJS+=" i_main.c"
 export GLOBOBJS+=" i_system.c"
-#export GLOBOBJS+=" i_vmodey.c"
-export GLOBOBJS+=" i_vmodey.o"
-export GLOBOBJS+=" i_vmodya.o"
+#export GLOBOBJS+=" i_vvga13.c"
+export GLOBOBJS+=" i_vvga13.o"
+export GLOBOBJS+=" i_vv13la.o"
 export GLOBOBJS+=" info.c"
 export GLOBOBJS+=" m_cheat.c"
 export GLOBOBJS+=" m_fixed.o"
@@ -109,11 +109,11 @@ export GLOBOBJS+=" z_zone.o"
 
 ia16-elf-gcc $GLOBOBJS $CFLAGS $RENDER_OPTIONS -o GCCIA16/$OUTPUT
 
-rm i_vmodya.o
+rm i_vv13la.o
 rm m_fixed.o
 rm z_xms.o
 
-rm i_vmodey.o
+rm i_vvga13.o
 rm p_enemy2.o
 rm p_map.o
 rm p_maputl.o

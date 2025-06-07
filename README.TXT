@@ -36,23 +36,27 @@ Known bugs:
    only the border changes color
 
 Supported video modes:
-|Video mode                     |Executable 8088|Executable 286|Notes |
-|-------------------------------|---------------|--------------|------|
-|VGA  320x200 256 color Mode Y  |D8088MY.EXE    |D286MY.EXE    |*1, *2|
-|MCGA 320x200 256 color Mode 13h|D8088M13.EXE   |D286M13.EXE   |*3    |
-|EGA  640x200  16 color mode    |D8088EH.EXE    |D286EH.EXE    |*4    |
-|EGA  320x200  16 color mode    |D8088EM.EXE    |D286EH.EXE    |*4    |
-|CGA  320x200   4 color mode    |D8088CGA.EXE   |D286CGA.EXE   |*5    |
-|CGA  640x200   2 color mode    |D8088CBW.EXE   |D286BW.EXE    |*5    |
-|Text mode 80x50 16 color mode  |D8T80X50.EXE   |D2T80X50.EXE  |*6    |
-|Text mode 80x43 16 color mode  |D8T80X43.EXE   |D2T80X43.EXE  |*7    |
-|Text mode 80x25 16 color mode  |D8T80X25.EXE   |D2T80X25.EXE  |      |
-|Text mode 40x25 16 color mode  |D8T40X25.EXE   |D2T40X25.EXE  |      |
-|Text mode 80x25  2 color mode  |D8088MDA.EXE   |D286MDA.EXE   |*8    |
+|Video mode                             |Executable 8088|Executable 286|Notes |
+|---------------------------------------|---------------|--------------|------|
+|VGA  320x200 256 color Mode Y   240x128|D8088MYH.EXE   |D286MYH.EXE   |*1, *2|
+|VGA  320x200 256 color Mode Y   120x128|D8088MYM.EXE   |D286MYM.EXE   |*1    |
+|VGA  320x200 256 color Mode Y    60x128|D8088MYL.EXE   |D286MYL.EXE   |*1    |
+|MCGA 320x200 256 color Mode 13h 240x128|D8M13H.EXE     |D2M13H.EXE    |*3    |
+|MCGA 320x200 256 color Mode 13h 120x128|D8M13M.EXE     |D2M13M.EXE    |*3    |
+|MCGA 320x200 256 color Mode 13h  60x128|D8M13L.EXE     |D2M13L.EXE    |*3    |
+|EGA  640x200  16 color mode            |D8088EH.EXE    |D286EH.EXE    |*4    |
+|EGA  320x200  16 color mode            |D8088EM.EXE    |D286EM.EXE    |*4    |
+|CGA  320x200   4 color mode            |D8088CGA.EXE   |D286CGA.EXE   |*5    |
+|CGA  640x200   2 color mode            |D8088CBW.EXE   |D286CBW.EXE   |*5    |
+|Text mode 80x50 16 color mode          |D8T80X50.EXE   |D2T80X50.EXE  |*6    |
+|Text mode 80x43 16 color mode          |D8T80X43.EXE   |D2T80X43.EXE  |*7    |
+|Text mode 80x25 16 color mode          |D8T80X25.EXE   |D2T80X25.EXE  |      |
+|Text mode 40x25 16 color mode          |D8T40X25.EXE   |D2T40X25.EXE  |      |
+|Text mode 80x25  2 color mode          |D8088MDA.EXE   |D286MDA.EXE   |*8    |
 
 *1 VGA Mode Y should be faster than MCGA Mode 13h.
    Benchmark it with -timedemo demo3 or IDRATE to be sure.
-*2 D386MY.EXE is a 386 version of the VGA Mode Y version.
+*2 D386MYH.EXE is a 386 version of the VGA Mode Y 240x128 version.
    It requires CWSDPR0.EXE to be in the same directory.
 *3 The MCGA version also runs on VGA.
 *4 The EGA version also runs on VGA.
