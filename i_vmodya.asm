@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 2024 Frenkel Smeijers
+; Copyright (C) 2024-2025 Frenkel Smeijers
 ;
 ; This program is free software; you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License
@@ -83,8 +83,8 @@ R_DrawColumn2:
 
 	xchg bp, ax						; bp = fracstep
 
-	mov bx, cx						; bx = count
-	;mov cx, bx
+	;mov bx, cx						; bx = count
+	mov cx, bx
 
 	mov ah, cl						; 1 <= ah <= 128
 %ifidn CPU, i8088
@@ -470,7 +470,8 @@ R_DrawColumnFlat2:
 
 	lds di, [dest]					; ds:di = dest
 
-	mov bx, cx
+	;mov bx, cx
+	mov cx, bx
 	and bl, 15
 	shl bl, 1
 

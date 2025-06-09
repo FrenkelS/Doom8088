@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 2023 Frenkel Smeijers
+; Copyright (C) 2023-2025 Frenkel Smeijers
 ;
 ; This program is free software; you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License
@@ -85,8 +85,8 @@ shift_loop:
 
 global FixedReciprocalSmall
 FixedReciprocalSmall:
-;push bx
-;push cx
+push bx
+push cx
 	xchg    bx, ax             ; bx = divisor
 	mov     ax, 0ffffh         ;
 	mov     cx, ax             ;
@@ -96,8 +96,8 @@ FixedReciprocalSmall:
 
 	div     bx                 ; ax = quotient-lo
 	mov     dx, cx             ; dx = quotient-hi
-;pop cx
-;pop bx
+pop cx
+pop bx
 	retf                       ; return quotient in dx:ax
 
 

@@ -32,10 +32,10 @@
 #
 # --------------------------------------------------------------------------
 
-CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
-CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
-#CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
-#CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
+#CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
+#CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -0 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
+CCOPTSS = -oaxes -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
+CCOPTST = -oaxet -oh -ol+ -zp1 -bt=dos -2 -j -zq -s -mm -wx -za99 -DFLAT_SPAN
 
 CPU = i8088
 #CPU = i286

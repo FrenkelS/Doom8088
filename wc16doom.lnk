@@ -12,7 +12,7 @@ libpath %WATCOM%\lib286\dos
 lib noemu87.lib
 format dos
 name DOOM16WC
-alias source=_source, nearcolormap=_nearcolormap, dest=_dest, R_DrawColumn2_=R_DrawColumn2
+alias source=_source, colormap=_colormap, dest=_dest, R_DrawColumn2_=R_DrawColumn2, R_DrawColumnFlat2_=R_DrawColumnFlat2
 alias FixedReciprocal_=FixedReciprocal, FixedReciprocalSmall_=FixedReciprocalSmall, FixedReciprocalBig_=FixedReciprocalBig
 alias XMSControl=_XMSControl, Z_AllocateExtendedMemoryBlock_=Z_AllocateExtendedMemoryBlock, Z_FreeExtendedMemoryBlock_=Z_FreeExtendedMemoryBlock, Z_MoveExtendedMemoryBlock_=Z_MoveExtendedMemoryBlock
 
