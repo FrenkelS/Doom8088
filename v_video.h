@@ -48,7 +48,7 @@
 // VIDEO
 //
 
-void V_DrawBackground(void);
+void V_DrawBackground(int16_t backgroundnum);
 
 void V_DrawRaw(int16_t num, uint16_t offset);
 void V_DrawRawFullScreen(int16_t num);
@@ -65,9 +65,9 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch);
 #define V_DrawNamePatchScaled(x,y,name) V_DrawNumPatchScaled(x,y,W_GetNumForName(name))
 
 
-void V_FillRect(byte colour);
-
-
+void V_ClearViewWindow(void);
+void V_InitDrawLine(void);
+void V_ShutdownDrawLine(void);
 void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color);
 
 

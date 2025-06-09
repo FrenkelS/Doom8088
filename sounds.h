@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -46,9 +46,6 @@ struct sfxinfo_struct;
 typedef struct sfxinfo_struct sfxinfo_t;
 
 struct sfxinfo_struct {
-
-  // up to 6-character name
-  const char *name; // CPhipps - const
 
   // Sfx priority
   int8_t priority;
@@ -142,7 +139,6 @@ typedef enum {
   sfx_noway,
   sfx_barexp,
   sfx_punch,
-  sfx_chgun,
   sfx_tink,
   sfx_getpow,
   NUMSFX

@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -34,7 +34,6 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include <math.h>
 #include <stdint.h>
 
 #include "d_player.h"
@@ -471,7 +470,8 @@ static void P_GroupLines (void)
 {
     const line_t __far* li;
     sector_t __far* sector;
-    int16_t i,j, total = _g_numlines;
+    int16_t i, total = _g_numlines;
+    uint16_t j;
 
     // figgi
     for (i=0 ; i<numsubsectors ; i++)

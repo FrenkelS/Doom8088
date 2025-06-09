@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@ static void D_UpdateFPS(void);
 
 
 //jff 1/22/98 parms for disabling music and sound
-const boolean nosfxparm   = false;
+      boolean nosfxparm   = false;
 const boolean nomusicparm = true;
 
 const boolean nodrawers = false;
@@ -258,7 +258,7 @@ static void TryRunTics (void)
 //  calls all ?_Responder, ?_Ticker, and ?_Drawer,
 //  calls I_GetTime and I_StartTic
 //
-static void _Noreturn D_DoomLoop(void)
+_Noreturn static void D_DoomLoop(void)
 {
     for (;;)
     {
@@ -384,7 +384,7 @@ static int16_t  demosequence;
  * This cycles through the demo sequences.
  */
 
-void D_DoAdvanceDemo(void)
+static void D_DoAdvanceDemo(void)
 {
     _g_player.playerstate = PST_LIVE;  /* not reborn */
     advancedemo = _g_usergame = false;
@@ -451,6 +451,11 @@ static void D_Init(void)
 static void D_DoomMainSetup(void)
 {
     // init subsystems
+    I_InitKeyboard();
+
+    I_InitTimer();
+
+    I_InitSound();
 
     printf("Z_Init: Init zone memory allocation daemon.\n");
     Z_Init();
@@ -459,6 +464,8 @@ static void D_DoomMainSetup(void)
 
     printf("W_Init: Init WADfiles.\n");
     W_Init(); // CPhipps - handling of wadfiles init changed
+
+    I_InitSound2();
 
     D_Init();
     F_Init();

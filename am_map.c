@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -59,21 +59,68 @@
 enum automapmode_e automapmode; // Mode that the automap is in
 
 
-#if NR_OF_COLORS == 136
-static const uint8_t mapcolor_back = 0x00;
-static const uint8_t mapcolor_wall = 0x44;
-static const uint8_t mapcolor_fchg = 0x66;
-static const uint8_t mapcolor_cchg = 0x66;
-static const uint8_t mapcolor_clsd = 0xff;
-static const uint8_t mapcolor_rdor = 0xcc;
-static const uint8_t mapcolor_bdor = 0x11;
-static const uint8_t mapcolor_ydor = 0xee;
-static const uint8_t mapcolor_tele = 0x22;
-static const uint8_t mapcolor_secr = 0xdd;
-static const uint8_t mapcolor_unsn = 0x88;
-static const uint8_t mapcolor_sngl = 0xff;
+#if NR_OF_COLORS == 1
+static const uint8_t mapcolor_wall = 0xb0;
+static const uint8_t mapcolor_fchg = 0xb1;
+static const uint8_t mapcolor_cchg = 0xb1;
+static const uint8_t mapcolor_clsd = 0xdb;
+static const uint8_t mapcolor_rdor = 0xb2;
+static const uint8_t mapcolor_bdor = 0xb2;
+static const uint8_t mapcolor_ydor = 0xb2;
+static const uint8_t mapcolor_tele = 0xb0;
+static const uint8_t mapcolor_secr = 0xb0;
+static const uint8_t mapcolor_unsn = 0xb0;
+static const uint8_t mapcolor_sngl = 0xdb;
+#elif NR_OF_COLORS == 2
+#define WHITE	(1<<7)
+static const uint8_t mapcolor_wall = WHITE;
+static const uint8_t mapcolor_fchg = WHITE;
+static const uint8_t mapcolor_cchg = WHITE;
+static const uint8_t mapcolor_clsd = WHITE;
+static const uint8_t mapcolor_rdor = WHITE;
+static const uint8_t mapcolor_bdor = WHITE;
+static const uint8_t mapcolor_ydor = WHITE;
+static const uint8_t mapcolor_tele = WHITE;
+static const uint8_t mapcolor_secr = WHITE;
+static const uint8_t mapcolor_unsn = WHITE;
+static const uint8_t mapcolor_sngl = WHITE;
+#elif NR_OF_COLORS == 4
+#define CYAN	(1<<6)
+#define MAGENTA	(2<<6)
+#define WHITE	(3<<6)
+static const uint8_t mapcolor_wall = MAGENTA;
+static const uint8_t mapcolor_fchg = MAGENTA;
+static const uint8_t mapcolor_cchg = MAGENTA;
+static const uint8_t mapcolor_clsd = WHITE;
+static const uint8_t mapcolor_rdor = MAGENTA;
+static const uint8_t mapcolor_bdor = CYAN;
+static const uint8_t mapcolor_ydor = WHITE;
+static const uint8_t mapcolor_tele = CYAN;
+static const uint8_t mapcolor_secr = MAGENTA;
+static const uint8_t mapcolor_unsn = WHITE;
+static const uint8_t mapcolor_sngl = WHITE;
+#elif NR_OF_COLORS == 16
+#define BLUE			0x11
+#define GREEN			0x22
+#define RED				0x44
+#define BROWN			0x66
+#define DARK_GRAY		0x88
+#define LIGHT_RED		0xcc
+#define LIGHT_MAGENTA	0xdd
+#define YELLOW			0xee
+#define WHITE			0xff
+static const uint8_t mapcolor_wall = RED;
+static const uint8_t mapcolor_fchg = BROWN;
+static const uint8_t mapcolor_cchg = BROWN;
+static const uint8_t mapcolor_clsd = WHITE;
+static const uint8_t mapcolor_rdor = LIGHT_RED;
+static const uint8_t mapcolor_bdor = BLUE;
+static const uint8_t mapcolor_ydor = YELLOW;
+static const uint8_t mapcolor_tele = GREEN;
+static const uint8_t mapcolor_secr = LIGHT_MAGENTA;
+static const uint8_t mapcolor_unsn = DARK_GRAY;
+static const uint8_t mapcolor_sngl = WHITE;
 #else
-static const uint8_t mapcolor_back = 247;    // map background
 static const uint8_t mapcolor_wall = 23;    // normal 1s wall color
 static const uint8_t mapcolor_fchg = 55;    // line at floor height change color
 static const uint8_t mapcolor_cchg = 215;    // line at ceiling height change color
@@ -777,9 +824,6 @@ static void AM_drawMline(mline_t* ml, uint8_t color)
 {
     fline_t fl;
 
-    if (color==247) // jff 4/3/98 if color is 247 (xparent), use black
-        color=0;
-
     if (AM_clipMline(ml, &fl))
         V_DrawLine(fl.a.x, fl.a.y, fl.b.x, fl.b.y, color); // draws it on frame buffer using fb coords
 }
@@ -1017,9 +1061,12 @@ void AM_Drawer (void)
     // CPhipps - all automap modes put into one enum
     if (!(automapmode & am_active)) return;
 
+    V_InitDrawLine();
+
     if (!(automapmode & am_overlay)) // cph - If not overlay mode, clear background for the automap
-        V_FillRect(mapcolor_back); //jff 1/5/98 background default color
+        V_ClearViewWindow();
 
     AM_drawWalls();
     AM_drawPlayers();
+    V_ShutdownDrawLine();
 }

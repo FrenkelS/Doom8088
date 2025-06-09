@@ -37,6 +37,7 @@ file m_menu.obj
 file m_random.obj
 file p_doors.obj
 file p_enemy.obj
+file p_enemy2.obj
 file p_floor.obj
 file p_inter.obj
 file p_lights.obj

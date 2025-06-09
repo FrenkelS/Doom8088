@@ -25,10 +25,10 @@ cpu 286
 
 bits 16
 
-SCREENWIDTH equ 240
+PLANEWIDTH equ 60
 
 extern source
-extern nearcolormap
+extern colormap
 extern dest
 
 last_pixel_jump_table:
@@ -49,6 +49,25 @@ last_pixel_jump_table:
 	dw last_pixel14,
 	dw last_pixel15
 
+last_pixel_flat_jump_table:
+	dw last_pixel_flat0,
+	dw last_pixel_flat1,
+	dw last_pixel_flat2,
+	dw last_pixel_flat3,
+	dw last_pixel_flat4,
+	dw last_pixel_flat5,
+	dw last_pixel_flat6,
+	dw last_pixel_flat7,
+	dw last_pixel_flat8,
+	dw last_pixel_flat9,
+	dw last_pixel_flat10,
+	dw last_pixel_flat11,
+	dw last_pixel_flat12,
+	dw last_pixel_flat13,
+	dw last_pixel_flat14,
+	dw last_pixel_flat15
+
+
 ;
 ; input:
 ;   ax = fracstep
@@ -65,39 +84,35 @@ R_DrawColumn2:
 
 	xchg bp, ax						; bp = fracstep
 
+	mov bx, cx						; bx = count
+
+	mov ah, cl						; 1 <= ah <= 128
+%ifidn CPU, i8088
+	mov cl, 4
+	shr ah, cl						; 0 <= ah <= 8
+%else
+	shr ah, 4						; 0 <= ah <= 8
+%endif
+
+	mov cx, [colormap]
+
 	les di, [dest]					; es:di = dest
 	lds si, [source]				; ds:si = source
 
-	mov bx, cx						; bx = count
-
-	mov al, cl						; 1 <= al <= 128
-%ifidn CPU, i8088
-	mov cl, 4
-	shr al, cl						; 0 <= al <= 8
-%else
-	shr al, 4						; 0 <= al <= 8
-%endif
-
-	mov cx, nearcolormap
-
-	or al, al						; if al = 0
+	or ah, ah						; if ah = 0
 	jz last_pixels					;  then jump to last_pixels
 
 	push bx							; push count
 
 loop_pixels:
-	push ax
-
 	mov al, dh						; al = hi byte of frac
 	shr al, 1						; 0 <= al <= 127
 	mov bx, si						; bx = source
 	xlat							; al = source[al]
-	mov bx, cx						; bx = nearcolormap
-	ss xlat							; al = nearcolormap[al]
-	mov ah, al
-	stosw							; write pixel
-	stosw
-	add di, SCREENWIDTH-4			; point to next line
+	mov bx, cx						; bx = colormap
+	ss xlat							; al = colormap[al]
+	stosb							; write pixel
+	add di, PLANEWIDTH-1			; point to next line
 	add dx, bp						; frac += fracstep
 
 	mov al, dh
@@ -106,10 +121,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -118,10 +131,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -130,10 +141,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -142,10 +151,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -154,10 +161,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -166,10 +171,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -178,10 +181,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -190,10 +191,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -202,10 +201,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -214,10 +211,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -226,10 +221,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -238,10 +231,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -250,10 +241,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -262,10 +251,8 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 	mov al, dh
@@ -274,15 +261,12 @@ loop_pixels:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
-	pop ax
-	dec al
-	jnz loop_pixels					; if --al != 0 then jump to loop_pixels
+	dec ah
+	jnz loop_pixels					; if --ah != 0 then jump to loop_pixels
 
 	pop bx							; pop count
 
@@ -300,10 +284,8 @@ last_pixel15:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel14:
@@ -313,10 +295,8 @@ last_pixel14:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel13:
@@ -326,10 +306,8 @@ last_pixel13:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel12:
@@ -339,10 +317,8 @@ last_pixel12:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel11:
@@ -352,10 +328,8 @@ last_pixel11:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel10:
@@ -365,10 +339,8 @@ last_pixel10:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel9:
@@ -378,10 +350,8 @@ last_pixel9:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel8:
@@ -391,10 +361,8 @@ last_pixel8:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel7:
@@ -404,10 +372,8 @@ last_pixel7:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel6:
@@ -417,10 +383,8 @@ last_pixel6:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel5:
@@ -430,10 +394,8 @@ last_pixel5:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel4:
@@ -443,10 +405,8 @@ last_pixel4:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel3:
@@ -456,10 +416,8 @@ last_pixel3:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel2:
@@ -469,10 +427,8 @@ last_pixel2:
 	xlat
 	mov bx, cx
 	ss xlat
-	mov ah, al
-	stosw
-	stosw
-	add di, SCREENWIDTH-4
+	stosb
+	add di, PLANEWIDTH-1
 	add dx, bp
 
 last_pixel1:
@@ -481,16 +437,141 @@ last_pixel1:
 	mov bx, si
 	xlat
 	mov bx, cx
-	ss xlat
-	mov ah, al
-	stosw
-	stosw
+	mov dx, ss
+	mov ds, dx
+	xlat
+	stosb
+	pop bp
+	pop es
+	pop di
+	pop si
+	retf
 
 last_pixel0:
 	pop bp
 	pop es
 	pop di
 	pop si
-	push ss
-	pop ds
+	mov ax, ss
+	mov ds, ax
+	retf
+
+
+;
+; input:
+;   al = color
+;   dx = yl
+;   cx = count		1 <= count <= 128	=>	ch = 0
+;
+
+global R_DrawColumnFlat2
+R_DrawColumnFlat2:
+	push di
+
+	lds di, [dest]					; ds:di = dest
+
+	mov bx, cx						; bx = count
+	and bl, 15						; 0 <= count <= 15
+	shl bl, 1
+
+	mov ah, al
+%ifidn CPU, i8088
+	ror ah, 1
+	ror ah, 1
+	ror ah, 1
+	ror ah, 1						; ah = al with nibbles swapped
+
+	shr cx, 1
+	shr cx, 1
+	shr cx, 1
+	shr cx, 1						; 0 <= cx <= 8
+%else
+	ror ah, 4						; ah = al with nibbles swapped
+
+	shr cx, 4						; 0 <= cx <= 8
+%endif
+
+	shr dx, 1						; if yl is odd
+	jnc label_a						;  then jump to label_a
+	xchg ah, al						; swap al and ah
+
+label_a:
+	jcxz last_pixels_flat				; if cx = 0 then jump to last_pixels_flat
+
+
+lab:
+	mov [di + PLANEWIDTH *  0], al	; write pixels
+	mov [di + PLANEWIDTH *  1], ah
+	mov [di + PLANEWIDTH *  2], al
+	mov [di + PLANEWIDTH *  3], ah
+	mov [di + PLANEWIDTH *  4], al
+	mov [di + PLANEWIDTH *  5], ah
+	mov [di + PLANEWIDTH *  6], al
+	mov [di + PLANEWIDTH *  7], ah
+	mov [di + PLANEWIDTH *  8], al
+	mov [di + PLANEWIDTH *  9], ah
+	mov [di + PLANEWIDTH * 10], al
+	mov [di + PLANEWIDTH * 11], ah
+	mov [di + PLANEWIDTH * 12], al
+	mov [di + PLANEWIDTH * 13], ah
+	mov [di + PLANEWIDTH * 14], al
+	mov [di + PLANEWIDTH * 15], ah
+	add  di , PLANEWIDTH * 16		; point to next line
+
+	loop lab				; if --cx != 0 then jump to lab
+
+
+last_pixels_flat:
+	cs jmp last_pixel_flat_jump_table[bx]
+
+
+last_pixel_flat15:
+	mov [di + PLANEWIDTH * 14], al
+
+last_pixel_flat14:
+	mov [di + PLANEWIDTH * 13], ah
+
+last_pixel_flat13:
+	mov [di + PLANEWIDTH * 12], al
+
+last_pixel_flat12:
+	mov [di + PLANEWIDTH * 11], ah
+
+last_pixel_flat11:
+	mov [di + PLANEWIDTH * 10], al
+
+last_pixel_flat10:
+	mov [di + PLANEWIDTH *  9], ah
+
+last_pixel_flat9:
+	mov [di + PLANEWIDTH *  8], al
+
+last_pixel_flat8:
+	mov [di + PLANEWIDTH *  7], ah
+
+last_pixel_flat7:
+	mov [di + PLANEWIDTH *  6], al
+
+last_pixel_flat6:
+	mov [di + PLANEWIDTH *  5], ah
+
+last_pixel_flat5:
+	mov [di + PLANEWIDTH *  4], al
+
+last_pixel_flat4:
+	mov [di + PLANEWIDTH *  3], ah
+
+last_pixel_flat3:
+	mov [di + PLANEWIDTH *  2], al
+
+last_pixel_flat2:
+	mov [di + PLANEWIDTH *  1], ah
+
+last_pixel_flat1:
+	mov [di + PLANEWIDTH *  0], al
+
+last_pixel_flat0:
+	pop di
+	mov ax, ss
+	mov ds, ax
 	retf

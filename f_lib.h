@@ -27,6 +27,6 @@
 #ifndef __F_LIB__
 #define __F_LIB__
 
-void F_TextWrite(int32_t finalecount, int32_t textSpeed);
+void F_TextWrite(int32_t count);
 
 #endif

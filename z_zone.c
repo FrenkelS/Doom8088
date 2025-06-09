@@ -439,7 +439,7 @@ static void Z_ChangeTag(const void __far* ptr, uint_fast8_t tag)
 {
 #if defined RANGECHECK
 	if ((((uint32_t) ptr) & (PARAGRAPH_SIZE - 1)) != 0)
-		I_Error("Z_ChangeTag: pointer is not aligned: 0x%lx %s %i", ptr, f, l);
+		I_Error("Z_ChangeTag: pointer is not aligned: 0x%lx", ptr);
 #endif
 
 #if defined _M_I86

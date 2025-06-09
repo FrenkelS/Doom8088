@@ -33,18 +33,12 @@
 #include "i_vtext.h"
 #include "v_video.h"
 
-void F_TextWrite(int32_t finalecount, int32_t textSpeed)
+void F_TextWrite(int32_t count)
 {
-	V_DrawBackground();
-
 	// draw some of the text onto the screen
 	int16_t         cx = (VIEWWINDOWWIDTH  - 32) / 2;
 	int16_t         cy = (VIEWWINDOWHEIGHT - 12) / 2;
 	const char* ch = E1TEXT;
-	int32_t         count = (finalecount - 10)*100/textSpeed;
-
-	if (count < 0)
-		count = 0;
 
 	for ( ; count ; count-- )
 	{

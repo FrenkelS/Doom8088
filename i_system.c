@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2023-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -38,7 +38,7 @@
 
 
 void I_InitGraphicsHardwareSpecificCode(void);
-void I_ShutdownGraphicsHardwareSpecificCode(void);
+void I_ShutdownGraphics(void);
 
 
 static boolean isGraphicsModeSet = false;
@@ -64,13 +64,6 @@ void I_InitGraphics(void)
 }
 
 
-static void I_ShutdownGraphics(void)
-{
-	I_ShutdownGraphicsHardwareSpecificCode();
-	I_SetScreenMode(3);
-}
-
-
 //**************************************************************************************
 //
 // Keyboard code
@@ -85,10 +78,10 @@ static boolean isKeyboardIsrSet = false;
 #if defined __DJGPP__ 
 static _go32_dpmi_seginfo oldkeyboardisr, newkeyboardisr;
 #else
-static void (__interrupt *oldkeyboardisr)(void);
+static void __interrupt __far (*oldkeyboardisr)(void);
 #endif
 
-static void __interrupt I_KeyboardISR(void)	
+static void __interrupt __far I_KeyboardISR(void)	
 {
 	// Get the scan code
 	keyboardqueue[kbdhead & (KBDQUESIZE - 1)] = inp(0x60);
@@ -103,10 +96,9 @@ static void __interrupt I_KeyboardISR(void)
 	outp(0x20, 0x20);
 }
 
-void I_InitScreen(void)
-{
-	I_SetScreenMode(3);
 
+void I_InitKeyboard(void)
+{
 	replaceInterrupt(oldkeyboardisr, newkeyboardisr, KEYBOARDINT, I_KeyboardISR);
 	isKeyboardIsrSet = true;
 }
@@ -138,6 +130,12 @@ void I_InitScreen(void)
 #define SC_L	0x26
 #define SC_Z	0x2c
 #define SC_M	0x32
+
+
+#if defined VIDEO_MODE_CGA
+#define SC_F5				0x3f
+void I_SwitchPalette(void);
+#endif
 
 
 void I_StartTic(void)
@@ -233,6 +231,13 @@ void I_StartTic(void)
 				ev.data1 = KEYD_BRACKET_RIGHT;
 				break;
 
+#if defined VIDEO_MODE_CGA
+			case SC_F5:
+				if (ev.type == ev_keydown)
+					I_SwitchPalette();
+				continue;
+#endif
+
 			case SC_F10:
 				I_Quit();
 			default:
@@ -286,7 +291,6 @@ int32_t I_GetTime(void)
 void I_InitTimer(void)
 {
 	TS_ScheduleTask(I_TimerISR, TICRATE, TIMER_PRIORITY);
-	TS_Dispatch();
 
 	isTimerSet = true;
 }
@@ -324,12 +328,14 @@ static void I_Shutdown(void)
 }
 
 
+segment_t I_GetTextModeVideoMemorySegment(void);
+
 void I_Quit(void)
 {
 	I_Shutdown();
 
 	int16_t lumpnum = W_GetNumForName("ENDOOM");
-	W_ReadLumpByNum(lumpnum, D_MK_FP(0xb800, __djgpp_conventional_base));
+	W_ReadLumpByNum(lumpnum, D_MK_FP(I_GetTextModeVideoMemorySegment(), 0 + __djgpp_conventional_base));
 
 	union REGS regs;
 	regs.h.ah = 2;

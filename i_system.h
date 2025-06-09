@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -41,10 +41,10 @@
 void I_InitTimer(void);
 int32_t I_GetTime(void);
 
-void _Noreturn I_Quit(void);
-void _Noreturn I_Error(const char *error, ...);
+_Noreturn void I_Quit(void);
+_Noreturn void I_Error(const char *error, ...);
 
-void I_InitScreen(void);
+void I_InitKeyboard(void);
 
 void I_InitGraphics(void);
 

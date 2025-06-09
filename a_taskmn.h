@@ -1,6 +1,6 @@
 /*
 Copyright (C) 1994-1995 Apogee Software, Ltd.
-Copyright (C) 2023 Frenkel Smeijers
+Copyright (C) 2023-2025 Frenkel Smeijers
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -35,6 +35,5 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 void TS_Shutdown(void);
 void TS_ScheduleTask(void (*function)(void), int16_t rate, int16_t priority);
 void TS_Terminate(int16_t priority);
-void TS_Dispatch(void);
 
 #endif

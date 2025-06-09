@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2023-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -28,9 +28,14 @@
 #include "w_wad.h"
 
 
-#define FLAT_SKY_COLOR 100
+#if !defined FLAT_SKY_COLOR
+#define FLAT_SKY_COLOR 99
+#endif
+
 
 #define ANGLETOSKYSHIFT         22
+
+#define COLEXTRABITS (8 - 1)
 
 
 #if defined FLAT_SPAN
@@ -74,7 +79,7 @@ void R_DrawSky(draw_column_vars_t *dcvars)
 		if (!(dcvars->colormap = fixedcolormap))
 			dcvars->colormap = fullcolormap;
 
-		dcvars->iscale = (FRACUNIT * SCREENHEIGHT_VGA) / (VIEWWINDOWHEIGHT + 16);
+		dcvars->fracstep = ((FRACUNIT * SCREENHEIGHT_VGA) / (VIEWWINDOWHEIGHT + 16)) >> COLEXTRABITS;
 
 		int16_t xc = viewangle >> FRACBITS;
 		xc += xtoviewangleTable[dcvars->x];
@@ -84,7 +89,7 @@ void R_DrawSky(draw_column_vars_t *dcvars)
 		const column_t __far* column = (const column_t __far*) ((const byte __far*)skypatch + (uint16_t)skypatch->columnofs[xc]);
 
 		dcvars->source = (const byte __far*)column + 3;
-		R_DrawColumn(dcvars);
+		R_DrawColumnWall(dcvars);
 	}
 }
 
@@ -127,7 +132,7 @@ void R_DrawSky(visplane_t __far* pl)
 	if (!(dcvars.colormap = fixedcolormap))
 		dcvars.colormap = fullcolormap;
 
-	dcvars.iscale = (FRACUNIT * SCREENHEIGHT_VGA) / (VIEWWINDOWHEIGHT + 16);
+	dcvars.fracstep = ((FRACUNIT * SCREENHEIGHT_VGA) / (VIEWWINDOWHEIGHT + 16)) >> COLEXTRABITS;
 
 	for (int16_t x = pl->minx; (dcvars.x = x) <= pl->maxx; x++)
 	{

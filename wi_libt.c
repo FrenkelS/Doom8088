@@ -148,14 +148,14 @@ void WI_drawStats(int16_t cnt_kills, int16_t cnt_items, int16_t cnt_secret, int3
 	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 6, cnt_secret);
 
 	// Put the times on the screen
-	V_DrawString(1, 22, 12, "Time");
-	WI_drawTime(15, 22, cnt_time);
+	V_DrawString(1, VIEWWINDOWHEIGHT - 3, 12, "Time");
+	WI_drawTime(15, VIEWWINDOWHEIGHT - 3, cnt_time);
 
-	V_DrawString(1, 23, 12, "Total");
-	WI_drawTime(15, 23, cnt_total_time);
+	V_DrawString(1, VIEWWINDOWHEIGHT - 2, 12, "Total");
+	WI_drawTime(15, VIEWWINDOWHEIGHT - 2, cnt_total_time);
 
-	V_DrawString(VIEWWINDOWWIDTH - 13, 22, 12, "Par");
-	WI_drawTime(VIEWWINDOWWIDTH - 1, 22, cnt_par);
+	V_DrawString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 3, 12, "Par");
+	WI_drawTime(VIEWWINDOWWIDTH - 1, VIEWWINDOWHEIGHT - 3, cnt_par);
 }
 
 

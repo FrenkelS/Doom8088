@@ -67,7 +67,7 @@ static visplane_t __far*__far* freehead;
 #if defined FLAT_SPAN
 byte R_GetPlaneColor(int16_t picnum, int16_t lightlevel)
 {
-	const uint8_t __far* colormap = R_LoadColorMap(lightlevel);
+	const uint8_t* colormap = R_LoadColorMap(lightlevel);
 
 	if (picnum == -3)
 		picnum = nukage;

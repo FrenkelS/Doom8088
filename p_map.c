@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -68,8 +68,7 @@ fixed_t   _g_tmdropoffz; // dropoff on other side of line you're crossing
 // so missiles don't explode against sky hack walls
 
 const line_t    __far* _g_ceilingline;
-static const line_t        __far* blockline;    /* blocking linedef */
-static boolean         tmunstuck;     /* killough 8/1/98: whether to allow unsticking */
+
 
 // keep track of special lines as they are hit,
 // but don't process them until the move is proven valid
@@ -238,21 +237,6 @@ boolean P_TeleportMove(mobj_t __far* thing, fixed_t x, fixed_t y, boolean boss)
 //
 
 
-/* killough 8/1/98: used to test intersection between thing and line
- * assuming NO movement occurs -- used to avoid sticky situations.
- */
-
-static boolean untouched(const line_t __far* ld)
-{
-  fixed_t x, y, tmbbox[4];
-  return
-    (tmbbox[BOXRIGHT] = (x=tmthing->x)+tmthing->radius) <= (fixed_t)ld->bbox[BOXLEFT]<<FRACBITS ||
-    (tmbbox[BOXLEFT] = x-tmthing->radius) >= (fixed_t)ld->bbox[BOXRIGHT]<<FRACBITS ||
-    (tmbbox[BOXTOP] = (y=tmthing->y)+tmthing->radius) <= (fixed_t)ld->bbox[BOXBOTTOM]<<FRACBITS ||
-    (tmbbox[BOXBOTTOM] = y-tmthing->radius) >= (fixed_t)ld->bbox[BOXTOP]<<FRACBITS ||
-    P_BoxOnLineSide(tmbbox, ld) != -1;
-}
-
 //
 // PIT_CheckLine
 // Adjusts tmfloorz and tmceilingz as lines are contacted
@@ -279,23 +263,17 @@ static boolean PIT_CheckLine (line_t __far* ld)
   // so two special lines that are only 8 pixels apart
   // could be crossed in either order.
 
-  // killough 7/24/98: allow player to move out of 1s wall, to prevent sticking
   if (!LN_BACKSECTOR(ld)) // one sided line
     {
-      blockline = ld;
-      return tmunstuck && !untouched(ld) &&
-  FixedMul(tmx-tmthing->x,ld->dy) > FixedMul(tmy-tmthing->y,ld->dx);
+      return false;
     }
 
-  // killough 8/10/98: allow bouncing objects to pass through as missiles
-  if (!(tmthing->flags & (MF_MISSILE)))
+  if (!(tmthing->flags & MF_MISSILE))
     {
       if (ld->flags & ML_BLOCKING)           // explicitly blocking everything
-  return tmunstuck && !untouched(ld);  // killough 8/1/98: allow escape
+  return false;
 
-      // killough 8/9/98: monster-blockers don't affect friends
-      if (!(tmthing->flags & MF_FRIEND || P_MobjIsPlayer(tmthing))
-    && ld->flags & ML_BLOCKMONSTERS)
+      if (!P_MobjIsPlayer(tmthing) && ld->flags & ML_BLOCKMONSTERS)
   return false; // block monsters only
     }
 
@@ -310,13 +288,11 @@ static boolean PIT_CheckLine (line_t __far* ld)
     {
       _g_tmceilingz = _g_opentop;
       _g_ceilingline = ld;
-      blockline = ld;
     }
 
   if (_g_openbottom > _g_tmfloorz)
     {
       _g_tmfloorz = _g_openbottom;
-      blockline = ld;
     }
 
   if (_g_lowfloor < _g_tmdropoffz)
@@ -480,11 +456,8 @@ boolean P_CheckPosition(mobj_t __far* thing, fixed_t x, fixed_t y)
   _g_tmbbox[BOXLEFT] = x - tmthing->radius;
 
   newsubsec = R_PointInSubsector (x,y);
-  blockline = _g_ceilingline = NULL;
+  _g_ceilingline = NULL;
 
-  // Whether object can get out of a sticky situation:
-  tmunstuck = P_MobjIsPlayer(thing) &&          /* only players */
-    P_MobjIsPlayer(thing)->mo == thing; /* not under old demos */
 
   // The base floor / ceiling is from the subsector
   // that contains the point.
@@ -735,9 +708,6 @@ boolean P_TryMove(mobj_t __far* thing, fixed_t x, fixed_t y)
 }
 
 
-// for more intelligent autoaiming
-static uint32_t aim_flags_mask;
-
 static fixed_t  aimslope;
 
 
@@ -800,12 +770,6 @@ static boolean PTR_AimTraverse (intercept_t* in)
 
     if (!(th->flags&MF_SHOOTABLE))
         return true;    // corpse or something
-
-    /* killough 7/19/98, 8/2/98:
-   * friends don't aim at friends (except players), at least not first
-   */
-    if (th->flags & shootthing->flags & aim_flags_mask && !P_MobjIsPlayer(th))
-        return true;
 
     // check angles to see if the thing can be aimed at
 
@@ -1003,7 +967,7 @@ static boolean PTR_ShootTraverse (intercept_t* in)
 //
 // P_AimLineAttack
 //
-fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boolean friend)
+fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance)
   {
   fixed_t x2;
   fixed_t y2;
@@ -1022,9 +986,6 @@ fixed_t P_AimLineAttack(mobj_t __far* t1, angle_t angle, fixed_t distance, boole
 
   attackrange = distance;
   _g_linetarget  = NULL;
-
-  // prevent friends from aiming at friends
-  aim_flags_mask = friend ? MF_FRIEND : 0;
 
   P_PathTraverse(t1->x,t1->y,x2,y2,PT_ADDLINES|PT_ADDTHINGS,PTR_AimTraverse);
 

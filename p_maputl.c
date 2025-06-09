@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -151,26 +151,51 @@ static void P_MakeDivline(const line_t __far* li, divline_t *dl)
 }
 
 
-union int64_u {
-	int64_t ll;
-	PACKEDATTR_PRE struct {
-		int16_t wl;
-		fixed_t dw;
-		int16_t wh;
-	} PACKEDATTR_POST s;
-};
-
-typedef char assertInt64_uSize[sizeof(union int64_u) == 8 ? 1 : -1];
-
-
 static inline fixed_t CONSTFUNC FixedDiv(fixed_t a, fixed_t b)
 {
-	union int64_u r;
-	// r.ll = (int64_t)a << FRACBITS;
-	r.s.wl = 0;
-	r.s.dw = a;
-	r.s.wh = (a < 0) ? 0xffff : 0x0000;
-	return r.ll / b;
+	if (a < 0)
+	{
+		a = -a;
+		b = -b;
+	}
+
+	uint16_t ibit = 1;
+	while (b < a)
+	{
+		b    <<= 1;
+		ibit <<= 1;
+	}
+
+	int16_t ch = 0;
+	for (; ibit != 0; ibit >>= 1)
+	{
+		if (a >= b)
+		{
+			a  -= b;
+			ch |= ibit;
+		}
+		a <<= 1;
+	}
+
+	uint16_t cl = 0;
+	if (a >= b) {a -= b; cl |= 0x8000;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x4000;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x2000;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x1000;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0800;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0400;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0200;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0100;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0080;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0040;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0020;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0010;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0008;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0004;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0002;} a <<= 1;
+	if (a >= b) {a -= b; cl |= 0x0001;}
+
+	return (((fixed_t)ch) << FRACBITS) | cl;
 }
 
 
@@ -566,7 +591,7 @@ static boolean PIT_AddThingIntercepts(mobj_t __far* thing)
 // for all lines.
 //
 
-static boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
+static boolean P_TraverseIntercepts(traverser_t func)
 {
   intercept_t *in = NULL;
   int16_t count = intercept_p - intercepts;
@@ -577,7 +602,7 @@ static boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
       for (scan = intercepts; scan < intercept_p; scan++)
         if (scan->frac < dist)
           dist = (in=scan)->frac;
-      if (dist > maxfrac)
+      if (dist > FRACUNIT)
         return true;    // checked everything in range
       if (!func(in))
         return false;           // don't bother going farther
@@ -593,7 +618,6 @@ static boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
 // Returns true if the traverser function returns true
 // for all lines.
 //
-// killough 5/3/98: reformatted, cleaned up
 
 boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
                        int16_t flags, boolean trav(intercept_t *))
@@ -601,7 +625,6 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
   int16_t xt1, yt1;
   int16_t xt2, yt2;
   fixed_t xstep, ystep;
-  fixed_t partial;
   fixed_t xintercept, yintercept;
   int16_t     mapx, mapy;
   int16_t     mapxstep, mapystep;
@@ -632,48 +655,48 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
   yt2 = y2>>MAPBLOCKSHIFT;
 
   if (xt2 > xt1)
-    {
-      mapxstep = 1;
-      partial = FRACUNIT - ((x1>>MAPBTOFRAC)&(FRACUNIT-1));
-      ystep = FixedApproxDiv (y2-y1,D_abs(x2-x1));
-    }
-  else
-    if (xt2 < xt1)
-      {
-        mapxstep = -1;
-        partial = (x1>>MAPBTOFRAC)&(FRACUNIT-1);
-        ystep = FixedApproxDiv (y2-y1,D_abs(x2-x1));
-      }
-    else
-      {
-        mapxstep = 0;
-        partial = FRACUNIT;
-        ystep = 256*FRACUNIT;
-      }
+  {
+    mapxstep = 1;
+    fixed_t partial = FRACUNIT - ((x1>>MAPBTOFRAC)&(FRACUNIT-1));
+    ystep = FixedApproxDiv (y2-y1,x2-x1);
+    yintercept = (y1>>MAPBTOFRAC) + FixedMul3216(ystep, partial);
+  }
+  else if (xt2 < xt1)
+  {
+    mapxstep = -1;
+    fixed_t partial = (x1>>MAPBTOFRAC)&(FRACUNIT-1);
+    ystep = FixedApproxDiv (y2-y1,x1-x2);
+    yintercept = (y1>>MAPBTOFRAC) + FixedMul3216(ystep, partial);
+  }
+  else // xt2 == xt1
+  {
+    mapxstep = 0;
+    ystep = 256*FRACUNIT;
+    yintercept = (y1>>MAPBTOFRAC) + ystep;
+  }
 
-  yintercept = (y1>>MAPBTOFRAC) + FixedMul(ystep, partial);
 
   if (yt2 > yt1)
-    {
-      mapystep = 1;
-      partial = FRACUNIT - ((y1>>MAPBTOFRAC)&(FRACUNIT-1));
-      xstep = FixedApproxDiv (x2-x1,D_abs(y2-y1));
-    }
-  else
-    if (yt2 < yt1)
-      {
-        mapystep = -1;
-        partial = (y1>>MAPBTOFRAC)&(FRACUNIT-1);
-        xstep = FixedApproxDiv (x2-x1,D_abs(y2-y1));
-      }
-    else
-      {
-        mapystep = 0;
-        partial = FRACUNIT;
-        xstep = 256*FRACUNIT;
-      }
+  {
+    mapystep = 1;
+    fixed_t partial = FRACUNIT - ((y1>>MAPBTOFRAC)&(FRACUNIT-1));
+    xstep = FixedApproxDiv (x2-x1,y2-y1);
+    xintercept = (x1>>MAPBTOFRAC) + FixedMul3216(xstep, partial);
+  }
+  else if (yt2 < yt1)
+  {
+    mapystep = -1;
+    fixed_t partial = (y1>>MAPBTOFRAC)&(FRACUNIT-1);
+    xstep = FixedApproxDiv (x2-x1,y1-y2);
+    xintercept = (x1>>MAPBTOFRAC) + FixedMul3216(xstep, partial);
+  }
+  else // yt2 == yt1
+  {
+    mapystep = 0;
+    xstep = 256*FRACUNIT;
+    xintercept = (x1>>MAPBTOFRAC) + xstep;
+  }
 
-  xintercept = (x1>>MAPBTOFRAC) + FixedMul(xstep, partial);
 
   // Step through map blocks.
   // Count is present to prevent a round off error
@@ -709,5 +732,5 @@ boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
     }
 
   // go through the sorted list
-  return P_TraverseIntercepts(trav, FRACUNIT);
+  return P_TraverseIntercepts(trav);
 }

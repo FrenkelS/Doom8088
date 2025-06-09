@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -199,20 +199,7 @@ static void S_StartSoundAtVolume(mobj_t __far* origin, sfxenum_t sfx_id, int16_t
 
     sfx = &S_sfx[sfx_id];
 
-    // Initialize sound parameters
-    if (strcmp("chgun", sfx->name) == 0)
-    {
-        volume += 150;
-
-        if (volume < 1)
-            return;
-
-        if (volume > snd_SfxVolume)
-            volume = snd_SfxVolume;
-    }
-
     // Check to see if it is audible, modify the params
-    // killough 3/7/98, 4/25/98: code rearranged slightly
 
     if (!origin || origin == _g_player.mo)
     {
@@ -324,24 +311,16 @@ void S_UpdateSounds(void)
 	
 	for (cnum=0 ; cnum<numChannels ; cnum++)
 	{
-        const sfxinfo_t *sfx;
-        channel_t *c = &channels[cnum];
-		
+		const sfxinfo_t *sfx;
+		channel_t *c = &channels[cnum];
+
 		if ((sfx = c->sfxinfo))
 		{
-            if (S_SoundIsPlaying(c->handle))
+			if (!S_SoundIsPlaying(c->handle))
 			{
-				if (strcmp("chgun", sfx->name) == 0)
-				{
-					if (snd_SfxVolume + 150 < 1)
-					{
-						S_StopChannel(cnum);
-						continue;
-					}
-				}
-			}
-			else   // if channel is allocated but sound has stopped, free it
+				// if channel is allocated but sound has stopped, free it
 				S_StopChannel(cnum);
+			}
 		}
 	}
 }
@@ -443,7 +422,7 @@ static void S_StopChannel(int16_t cnum)
                 break;
 
         // degrade usefulness of sound data
-        c->sfxinfo = 0;
+        c->sfxinfo = NULL;
         c->tickend = 0;
     }
 }
@@ -558,8 +537,8 @@ static int16_t S_getChannel(void __far* origin, const sfxinfo_t *sfxinfo, boolea
     }
 
     c = &channels[cnum];              // channel is decided to be cnum.
-    c->sfxinfo = sfxinfo;
-    c->origin = origin;
+    c->sfxinfo   = sfxinfo;
+    c->origin    = origin;
     c->is_pickup = is_pickup;
     return cnum;
 }

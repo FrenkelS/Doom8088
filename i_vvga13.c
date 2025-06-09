@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2024 Frenkel Smeijers
+ *  Copyright (C) 2023-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +20,9 @@
  *
  * DESCRIPTION:
  *      Video code for VGA Mode 13h 320x200 256 colors
+ *      Effective resolutions  60x128
+ *                            120x128
+ *                            240x128
  *
  *-----------------------------------------------------------------------------*/
  
@@ -159,9 +162,9 @@ static void I_DrawBuffer(uint8_t __far* buffer)
 }
 
 
-void I_ShutdownGraphicsHardwareSpecificCode(void)
+void I_ShutdownGraphics(void)
 {
-	// Do nothing
+	I_SetScreenMode(3);
 }
 
 
@@ -206,8 +209,7 @@ void I_FinishUpdate(void)
 #define COLEXTRABITS (8 - 1)
 #define COLBITS (8 + 1)
 
-uint8_t nearcolormap[256];
-static uint16_t nearcolormapoffset = 0xffff;
+const uint8_t* colormap;
 
 const uint8_t __far* source;
 uint8_t __far* dest;
@@ -215,12 +217,24 @@ uint8_t __far* dest;
 
 inline static void R_DrawColumnPixel(uint8_t __far* dest, const byte __far* source, uint16_t frac)
 {
-	uint16_t color = nearcolormap[source[frac>>COLBITS]];
+#if VIEWWINDOWWIDTH == 60
+	uint16_t color = colormap[source[frac>>COLBITS]];
 	color = (color | (color << 8));
 
 	uint16_t __far* d = (uint16_t __far*) dest;
 	*d++ = color;
 	*d   = color;
+#elif VIEWWINDOWWIDTH == 120
+	uint16_t color = colormap[source[frac>>COLBITS]];
+	color = (color | (color << 8));
+
+	uint16_t __far* d = (uint16_t __far*) dest;
+	*d   = color;
+#elif VIEWWINDOWWIDTH == 240
+	*dest = colormap[source[frac>>COLBITS]];
+#else
+#error unsupported VIEWWINDOWWIDTH value
+#endif
 }
 
 
@@ -275,7 +289,7 @@ void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count);
 #endif
 
 
-void R_DrawColumn(const draw_column_vars_t *dcvars)
+void R_DrawColumnSprite(const draw_column_vars_t *dcvars)
 {
 	int16_t count = (dcvars->yh - dcvars->yl) + 1;
 
@@ -285,16 +299,12 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 
 	source = dcvars->source;
 
-	if (nearcolormapoffset != D_FP_OFF(dcvars->colormap))
-	{
-		_fmemcpy(nearcolormap, dcvars->colormap, 256);
-		nearcolormapoffset = D_FP_OFF(dcvars->colormap);
-	}
+	colormap = dcvars->colormap;
 
-	dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
+	dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x * 4 * 60 / VIEWWINDOWWIDTH);
 
-	const uint16_t fracstep = (dcvars->iscale >> COLEXTRABITS);
-	uint16_t frac = (dcvars->texturemid + (dcvars->yl - CENTERY) * dcvars->iscale) >> COLEXTRABITS;
+	const uint16_t fracstep = dcvars->fracstep;
+	uint16_t frac = (dcvars->texturemid >> COLEXTRABITS) + (dcvars->yl - CENTERY) * fracstep;
 
 	// Inner loop that does the actual texture mapping,
 	//  e.g. a DDA-lile scaling.
@@ -304,19 +314,21 @@ void R_DrawColumn(const draw_column_vars_t *dcvars)
 }
 
 
-void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
+void R_DrawColumnWall(const draw_column_vars_t *dcvars)
 {
-	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+	R_DrawColumnSprite(dcvars);
+}
 
-	// Zero length, column does not exceed a pixel.
-	if (count <= 0)
-		return;
+
+#if defined C_ONLY
+static void R_DrawColumnFlat2(uint8_t col, uint8_t dontcare, int16_t count)
+{
+	UNUSED(dontcare);
 
 	uint16_t color = col;
 	color = (color << 8) | col;
 
-	uint8_t __far* dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x << 2);
-	uint16_t __far* d = (uint16_t __far*) dest;
+	uint16_t __far* d = (uint16_t __far*)dest;
 
 	uint16_t l = count >> 4;
 
@@ -345,26 +357,43 @@ void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
 
 	switch (count & 15)
 	{
-		case 15: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 14: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 13: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 12: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 11: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case 10: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  9: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  8: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  7: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  6: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  5: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  4: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  3: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  2: *d++ = color; *d = color; d += (SCREENWIDTH / 2) - 1;
-		case  1: *d++ = color; *d = color;
+		case 15: d[(SCREENWIDTH / 2) * 14] = color; d[(SCREENWIDTH / 2) * 14 + 1] = color;
+		case 14: d[(SCREENWIDTH / 2) * 13] = color; d[(SCREENWIDTH / 2) * 13 + 1] = color;
+		case 13: d[(SCREENWIDTH / 2) * 12] = color; d[(SCREENWIDTH / 2) * 12 + 1] = color;
+		case 12: d[(SCREENWIDTH / 2) * 11] = color; d[(SCREENWIDTH / 2) * 11 + 1] = color;
+		case 11: d[(SCREENWIDTH / 2) * 10] = color; d[(SCREENWIDTH / 2) * 10 + 1] = color;
+		case 10: d[(SCREENWIDTH / 2) *  9] = color; d[(SCREENWIDTH / 2) *  9 + 1] = color;
+		case  9: d[(SCREENWIDTH / 2) *  8] = color; d[(SCREENWIDTH / 2) *  8 + 1] = color;
+		case  8: d[(SCREENWIDTH / 2) *  7] = color; d[(SCREENWIDTH / 2) *  7 + 1] = color;
+		case  7: d[(SCREENWIDTH / 2) *  6] = color; d[(SCREENWIDTH / 2) *  6 + 1] = color;
+		case  6: d[(SCREENWIDTH / 2) *  5] = color; d[(SCREENWIDTH / 2) *  5 + 1] = color;
+		case  5: d[(SCREENWIDTH / 2) *  4] = color; d[(SCREENWIDTH / 2) *  4 + 1] = color;
+		case  4: d[(SCREENWIDTH / 2) *  3] = color; d[(SCREENWIDTH / 2) *  3 + 1] = color;
+		case  3: d[(SCREENWIDTH / 2) *  2] = color; d[(SCREENWIDTH / 2) *  2 + 1] = color;
+		case  2: d[(SCREENWIDTH / 2) *  1] = color; d[(SCREENWIDTH / 2) *  1 + 1] = color;
+		case  1: d[(SCREENWIDTH / 2) *  0] = color; d[(SCREENWIDTH / 2) *  0 + 1] = color;
 	}
+}
+#else
+void R_DrawColumnFlat2(uint8_t col, uint8_t dontcare, int16_t count);
+#endif
+
+
+void R_DrawColumnFlat(uint8_t col, const draw_column_vars_t *dcvars)
+{
+	int16_t count = (dcvars->yh - dcvars->yl) + 1;
+
+	// Zero length, column does not exceed a pixel.
+	if (count <= 0)
+		return;
+
+	dest = _s_screen + (dcvars->yl * SCREENWIDTH) + (dcvars->x * 4 * 60 / VIEWWINDOWWIDTH);
+
+	R_DrawColumnFlat2(col, col, count);
 }
 
 
-#define FUZZOFF (VIEWWINDOWWIDTH)
+#define FUZZOFF 120 /* SCREENWIDTH / 2 so it fits in an int8_t */
 #define FUZZTABLE 50
 
 static const int8_t fuzzoffset[FUZZTABLE] =
@@ -405,19 +434,15 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 	if (count <= 0)
 		return;
 
-	if (nearcolormapoffset != D_FP_OFF(&fullcolormap[6 * 256]))
-	{
-		_fmemcpy(nearcolormap, &fullcolormap[6 * 256], 256);
-		nearcolormapoffset = D_FP_OFF(&fullcolormap[6 * 256]);
-	}
+	colormap = &fullcolormap[6 * 256];
 
-	uint8_t __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + (dcvars->x << 2);
+	uint8_t __far* dest = _s_screen + (dc_yl * SCREENWIDTH) + (dcvars->x * 4 * 60 / VIEWWINDOWWIDTH);
 
 	static int16_t fuzzpos = 0;
 
 	do
 	{
-		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 4], 0);
+		R_DrawColumnPixel(dest, &dest[fuzzoffset[fuzzpos] * 2], 0);
 		dest += SCREENWIDTH;
 
 		fuzzpos++;
@@ -500,11 +525,23 @@ void R_DrawSpan(uint16_t y, uint16_t x1, uint16_t x2, const draw_span_vars_t *ds
 
 
 //
-// V_FillRect
+// V_ClearViewWindow
 //
-void V_FillRect(byte colour)
+void V_ClearViewWindow(void)
 {
-	_fmemset(_s_screen, colour, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
+	_fmemset(_s_screen, 0, SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT));
+}
+
+
+void V_InitDrawLine(void)
+{
+	// Do nothing
+}
+
+
+void V_ShutdownDrawLine(void)
+{
+	// Do nothing
 }
 
 
@@ -557,19 +594,19 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
  * cphipps - used to have M_DrawBackground, but that was used the framebuffer
  * directly, so this is my code from the equivalent function in f_finale.c
  */
-void V_DrawBackground(void)
+void V_DrawBackground(int16_t backgroundnum)
 {
 	/* erase the entire screen to a tiled background */
-	const byte __far* src = W_GetLumpByName("FLOOR4_8");
+	const byte __far* src = W_GetLumpByNum(backgroundnum);
 
-	for(uint8_t y = 0; y < SCREENHEIGHT; y++)
+	for (int16_t y = 0; y < SCREENHEIGHT; y++)
 	{
-		for(uint16_t x = 0; x < SCREENWIDTH; x+=64)
+		for (int16_t x = 0; x < SCREENWIDTH; x += 64)
 		{
 			uint8_t __far* d = &_s_screen[y * SCREENWIDTH + x];
-			const byte __far* s = &src[((y&63) * 64) + (x&63)];
+			const byte __far* s = &src[((y & 63) * 64)];
 
-			uint8_t len = 64;
+			size_t len = 64;
 
 			if (SCREENWIDTH - x < 64)
 				len = SCREENWIDTH - x;
@@ -627,20 +664,50 @@ void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
 
 			uint16_t count = column->length;
 
-			uint16_t l = count >> 2;
-			while (l--)
+			if (count == 7)
 			{
 				*dest = *source++; dest += SCREENWIDTH;
 				*dest = *source++; dest += SCREENWIDTH;
 				*dest = *source++; dest += SCREENWIDTH;
 				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++;
 			}
-
-			switch (count & 3)
+			else if (count == 3)
 			{
-				case 3: *dest = *source++; dest += SCREENWIDTH;
-				case 2: *dest = *source++; dest += SCREENWIDTH;
-				case 1: *dest = *source++;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++;
+			}
+			else if (count == 5)
+			{
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++;
+			}
+			else if (count == 6)
+			{
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++;
+			}
+			else if (count == 2)
+			{
+				*dest = *source++; dest += SCREENWIDTH;
+				*dest = *source++;
+			}
+			else
+			{
+				while (count--)
+				{
+					*dest = *source++; dest += SCREENWIDTH;
+				}
 			}
 
 			column = (const column_t __far*)((const byte __far*)column + column->length + 4);
@@ -787,7 +854,7 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 static void wipe_initMelt()
 {
-	wipe_y_lookup = Z_MallocStatic(SCREENWIDTH);
+	wipe_y_lookup = Z_MallocStatic((SCREENWIDTH / 2) * sizeof(int16_t));
 
 	// setup initial column positions (y<0 => not ready to scroll yet)
 	wipe_y_lookup[0] = -(M_Random() % 16);
