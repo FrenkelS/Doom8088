@@ -1773,9 +1773,11 @@ static uint16_t FindColumnCacheItem(int16_t texture, int16_t column)
 
 static const byte __far* R_ComposeColumn(const int16_t texture, const texture_t __far* tex, int16_t texcolumn)
 {
-    uint16_t colmask = 0xfffc;
-
-    const int16_t xc = (texcolumn & colmask) & tex->widthmask;
+#if defined HIGH_DETAIL
+    const int16_t xc = texcolumn & tex->widthmask;
+#else
+    const int16_t xc = (texcolumn & 0xfffc) & tex->widthmask;
+#endif
 
     uint16_t cachekey = FindColumnCacheItem(texture, xc);
 
