@@ -507,6 +507,10 @@ void R_DrawFuzzColumn(const draw_column_vars_t *dcvars)
 
 void V_ClearViewWindow(void)
 {
+#if VIEWWINDOWWIDTH != 60
+		outp(SC_INDEX + 1, 15);
+#endif
+
 	for (int16_t y = 0; y < SCREENHEIGHT - ST_HEIGHT; y++)
 		_fmemset(_s_screen + y * PLANEWIDTH, 0, SCREENWIDTH / 4);
 }
