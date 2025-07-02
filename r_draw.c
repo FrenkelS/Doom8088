@@ -676,15 +676,30 @@ static PUREFUNC int8_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far
 
 subsector_t __far* R_PointInSubsector(fixed_t x, fixed_t y)
 {
-    int16_t nodenum = numnodes-1;
+	static fixed_t prevx;
+	static fixed_t prevy;
+	static subsector_t __far* prevr;
 
-    // special case for trivial maps (single subsector, no nodes)
-    if (numnodes == 0)
-        return _g_subsectors;
+	if (prevx == x && prevy == y)
+		return prevr;
 
-    while (!(nodenum & NF_SUBSECTOR))
-        nodenum = nodes[nodenum].children[R_PointOnSide(x, y, nodes+nodenum)];
-    return &_g_subsectors[(int16_t)(nodenum & ~NF_SUBSECTOR)];
+	prevx = x;
+	prevy = y;
+
+	int16_t nodenum = numnodes-1;
+
+	// special case for trivial maps (single subsector, no nodes)
+	if (numnodes == 0)
+	{
+		prevr = _g_subsectors;
+		return prevr;
+	}
+
+	while (!(nodenum & NF_SUBSECTOR))
+		nodenum = nodes[nodenum].children[R_PointOnSide(x, y, nodes+nodenum)];
+
+	prevr = &_g_subsectors[(int16_t)(nodenum & ~NF_SUBSECTOR)];
+	return prevr;
 }
 
 
@@ -1281,7 +1296,21 @@ static void R_DrawSprite (const vissprite_t* spr)
         // clip this piece of the sprite
         // killough 3/27/98: optimized and made much shorter
 
-        if (ds->silhouette & SIL_BOTTOM && spr->gz < ds->bsilheight) //bottom sil
+        fixed_t gzt = spr->gz + (((int32_t)spr->patch_topoffset) << FRACBITS);
+
+        if ((ds->silhouette & SIL_BOTTOM && spr->gz < ds->bsilheight)  // bottom sil
+         && (ds->silhouette & SIL_TOP    && gzt     > ds->tsilheight)) // top sil
+        {
+            for (int16_t x = r1; x <= r2; x++)
+            {
+                if (clipbot[x] == VIEWWINDOWHEIGHT)
+                    clipbot[x] = ds->sprbottomclip[x];
+
+                if (cliptop[x] == -1)
+                    cliptop[x] = ds->sprtopclip[x];
+            }
+        }
+        else if (ds->silhouette & SIL_BOTTOM && spr->gz < ds->bsilheight) // bottom sil
         {
             for (int16_t x = r1; x <= r2; x++)
             {
@@ -1289,10 +1318,7 @@ static void R_DrawSprite (const vissprite_t* spr)
                     clipbot[x] = ds->sprbottomclip[x];
             }
         }
-
-        fixed_t gzt = spr->gz + (((int32_t)spr->patch_topoffset) << FRACBITS);
-
-        if (ds->silhouette & SIL_TOP && gzt > ds->tsilheight)   // top sil
+        else if (ds->silhouette & SIL_TOP && gzt > ds->tsilheight) // top sil
         {
             for (int16_t x = r1; x <= r2; x++)
             {
