@@ -232,10 +232,14 @@ static boolean P_CrossBSPNode(int16_t bspnum)
 
 static uint32_t linearAddress(const void __far* ptr)
 {
+#if defined _M_I86
 	uint32_t seg = D_FP_SEG(ptr);
 	uint16_t off = D_FP_OFF(ptr);
 
 	return seg * 16 + off;
+#else
+	return (uint32_t)ptr;
+#endif
 }
 
 
@@ -249,15 +253,15 @@ static uint32_t linearAddress(const void __far* ptr)
 
 boolean P_CheckSight(mobj_t __far* t1, mobj_t __far* t2)
 {
-  static mobj_t __far* prevt1;
-  static mobj_t __far* prevt2;
+  static uint32_t prevlat1;
+  static uint32_t prevlat2;
   static boolean prevr;
 
-  if (linearAddress(prevt1) == linearAddress(t1)
-   && linearAddress(prevt2) == linearAddress(t2))
+  if (prevlat1 == linearAddress(t1)
+   && prevlat2 == linearAddress(t2))
     return prevr;
-  prevt1 = t1;
-  prevt2 = t2;
+  prevlat1 = linearAddress(t1);
+  prevlat2 = linearAddress(t2);
 
   const sector_t __far* s1 = t1->subsector->sector;
   const sector_t __far* s2 = t2->subsector->sector;
