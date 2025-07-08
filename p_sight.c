@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -230,6 +230,15 @@ static boolean P_CrossBSPNode(int16_t bspnum)
 }
 
 
+static uint32_t linearAddress(const void __far* ptr)
+{
+	uint32_t seg = D_FP_SEG(ptr);
+	uint16_t off = D_FP_OFF(ptr);
+
+	return seg * 16 + off;
+}
+
+
 //
 // P_CheckSight
 // Returns true
@@ -240,6 +249,16 @@ static boolean P_CrossBSPNode(int16_t bspnum)
 
 boolean P_CheckSight(mobj_t __far* t1, mobj_t __far* t2)
 {
+  static mobj_t __far* prevt1;
+  static mobj_t __far* prevt2;
+  static boolean prevr;
+
+  if (linearAddress(prevt1) == linearAddress(t1)
+   && linearAddress(prevt2) == linearAddress(t2))
+    return prevr;
+  prevt1 = t1;
+  prevt2 = t2;
+
   const sector_t __far* s1 = t1->subsector->sector;
   const sector_t __far* s2 = t2->subsector->sector;
   int16_t pnum = (s1-_g_sectors)*_g_numsectors + (s2-_g_sectors);
@@ -250,13 +269,19 @@ boolean P_CheckSight(mobj_t __far* t1, mobj_t __far* t2)
   // Check in REJECT table.
 
   if (_g_rejectmatrix[pnum>>3] & (1 << (pnum&7)))   // can't possibly be connected
-    return false;
+  {
+    prevr = false;
+    return prevr;
+  }
 
   /* killough 11/98: shortcut for melee situations
    * same subsector? obviously visible
    * cph - compatibility optioned for demo sync, cf HR06-UV.LMP */
   if (t1->subsector == t2->subsector)
-    return true;
+  {
+    prevr = true;
+    return prevr;
+  }
 
   // An unobstructed LOS is possible.
   // Now look from eyes of t1 to any part of t2.
@@ -283,5 +308,6 @@ boolean P_CheckSight(mobj_t __far* t1, mobj_t __far* t2)
     los.maxz = INT32_MAX; los.minz = INT32_MIN;
 
   // the head node is the last node output
-  return P_CrossBSPNode(numnodes-1);
+  prevr = P_CrossBSPNode(numnodes-1);
+  return prevr;
 }
