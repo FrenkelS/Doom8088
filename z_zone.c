@@ -4,7 +4,7 @@
 // $Id:$
 //
 // Copyright (C) 1993-1996 by id Software, Inc.
-// Copyright (C) 2023-2024 by Frenkel Smeijers
+// Copyright (C) 2023-2025 by Frenkel Smeijers
 //
 // This source is available for distribution and/or modification
 // only under the terms of the DOOM Source Code License as
@@ -104,6 +104,12 @@ static memblock_t __far* segmentToPointer(segment_t seg)
 }
 
 
+boolean Z_EqualNames(const char __far* farName, const char* nearName)
+{
+	return _fmemcmp(farName, nearName, 8) == 0;
+}
+
+
 #define	EMS_INT			0x67
 
 #define	EMS_STATUS		0x40
@@ -123,9 +129,9 @@ static segment_t Z_InitExpandedMemory(void)
 
 #if defined _M_I86
 	segment_t __far* emsInterruptVectorSegment = D_MK_FP(0, EMS_INT * 4 + 2);
-	uint64_t __far* actualEmsDeviceName = D_MK_FP(*emsInterruptVectorSegment, 0x000a);
-	uint64_t expectedEmsDeviceName = *(uint64_t*)"EMMXXXX0";
-	if (*actualEmsDeviceName != expectedEmsDeviceName)
+	char __far* actualEmsDeviceName = D_MK_FP(*emsInterruptVectorSegment, 0x000a);
+	const char expectedEmsDeviceName[8] = "EMMXXXX0";
+	if (!Z_EqualNames(actualEmsDeviceName, expectedEmsDeviceName))
 		return 0;
 
 	// EMS detected

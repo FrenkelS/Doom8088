@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2025 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -144,8 +144,8 @@ static void R_LoadTexture(int16_t texture_num)
         patch->originx = mpatch->originx;
         patch->originy = mpatch->originy;
 
-        uint64_t pnameint = *(uint64_t __far*)&pnames[mpatch->patch * 8];
-        char* pname = (char*)&pnameint;
+        char pname[8];
+        _fmemcpy(pname, &pnames[mpatch->patch * 8], sizeof(pname));
 
         patch->patch_num   = W_GetNumForName(pname);
         patch->patch_width = V_NumPatchWidthDontCache(patch->patch_num);
@@ -213,9 +213,8 @@ const texture_t __far* R_GetTexture(int16_t texture)
 
 static int16_t R_GetTextureNumForName(const char* tex_name)
 {
-    char tex_name_temp[8];
-    strncpy(tex_name_temp, tex_name, 8);
-    int64_t tex_name_int = *(int64_t*)tex_name_temp;
+    char name8[8];
+    strncpy(name8, tex_name, sizeof(name8));
 
     const int32_t __far* maptex = W_GetLumpByName("TEXTURE1");
     const int32_t __far* directory = maptex+1;
@@ -226,7 +225,7 @@ static int16_t R_GetTextureNumForName(const char* tex_name)
 
         const maptexture_t __far* mtexture = (const maptexture_t __far*) ( (const byte __far*)maptex + offset);
 
-        if (tex_name_int == *(int64_t __far*)mtexture->name)
+        if (Z_EqualNames(mtexture->name, name8))
         {
             Z_ChangeTagToCache(maptex);
             return i;

@@ -4,7 +4,7 @@
 // $Id:$
 //
 // Copyright (C) 1993-1996 by id Software, Inc.
-// Copyright (C) 2023-2024 by Frenkel Smeijers
+// Copyright (C) 2023-2025 by Frenkel Smeijers
 //
 // This source is available for distribution and/or modification
 // only under the terms of the DOOM Source Code License as
@@ -46,5 +46,7 @@ void Z_ChangeTagToCache(const void __far* ptr);
 void Z_Free(const void __far* ptr);
 void Z_FreeTags(void);
 void Z_CheckHeap(void);
+
+boolean Z_EqualNames(const char __far* farName, const char* nearName);
 
 #endif
