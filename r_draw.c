@@ -129,10 +129,9 @@ static const angle_t tantoangleTable[2049];
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 static const angle16_t* tantoangle16Table = ((angle16_t*)&tantoangleTable[0]) + 1;
-#elif BYTE_ORDER == BIG_ENDIAN
+#endif
+#if BYTE_ORDER == BIG_ENDIAN
 static const angle16_t* tantoangle16Table = ((angle16_t*)&tantoangleTable[0]);
-#else
-#error unknown byte order
 #endif
 
 #define tantoangle(t) tantoangleTable[t]
