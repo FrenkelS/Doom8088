@@ -72,18 +72,18 @@ static const uint8_t mapcolor_secr = 0xb0;
 static const uint8_t mapcolor_unsn = 0xb0;
 static const uint8_t mapcolor_sngl = 0xdb;
 #elif NR_OF_COLORS == 2
-#define WHITE	(1<<7)
-static const uint8_t mapcolor_wall = WHITE;
-static const uint8_t mapcolor_fchg = WHITE;
-static const uint8_t mapcolor_cchg = WHITE;
-static const uint8_t mapcolor_clsd = WHITE;
-static const uint8_t mapcolor_rdor = WHITE;
-static const uint8_t mapcolor_bdor = WHITE;
-static const uint8_t mapcolor_ydor = WHITE;
-static const uint8_t mapcolor_tele = WHITE;
-static const uint8_t mapcolor_secr = WHITE;
-static const uint8_t mapcolor_unsn = WHITE;
-static const uint8_t mapcolor_sngl = WHITE;
+#define IGNORED	0
+static const uint8_t mapcolor_wall = IGNORED;
+static const uint8_t mapcolor_fchg = IGNORED;
+static const uint8_t mapcolor_cchg = IGNORED;
+static const uint8_t mapcolor_clsd = IGNORED;
+static const uint8_t mapcolor_rdor = IGNORED;
+static const uint8_t mapcolor_bdor = IGNORED;
+static const uint8_t mapcolor_ydor = IGNORED;
+static const uint8_t mapcolor_tele = IGNORED;
+static const uint8_t mapcolor_secr = IGNORED;
+static const uint8_t mapcolor_unsn = IGNORED;
+static const uint8_t mapcolor_sngl = IGNORED;
 #elif NR_OF_COLORS == 4
 #define CYAN	(1<<6)
 #define MAGENTA	(2<<6)
