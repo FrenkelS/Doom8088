@@ -54,12 +54,11 @@ static int16_t palettelumpnum;
 
 void I_ReloadPalette(void)
 {
-	char lumpName[9] = "PLAYPAL0";
-
-	if (_g_gamma == 0)
-		lumpName[7] = 0;
-	else
+	char lumpName[8] = "PLAYPAL";
+	if (_g_gamma != 0)
+	{
 		lumpName[7] = '0' + _g_gamma;
+	}
 
 	palettelumpnum = W_GetNumForName(lumpName);
 }

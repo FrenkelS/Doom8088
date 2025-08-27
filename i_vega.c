@@ -82,13 +82,10 @@ uint16_t colorsoffset;
 
 void I_ReloadPalette(void)
 {
-	char* lumpName;
-
-	if (_g_gamma == 0)
-		lumpName = "COLORMAP";
-	else
+	char lumpName[8] = "COLORMAP";
+	if (_g_gamma != 0)
 	{
-		lumpName = "COLORMP0";
+		lumpName[6] = 'P';
 		lumpName[7] = '0' + _g_gamma;
 	}
 

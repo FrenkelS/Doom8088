@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2024-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -84,13 +84,10 @@ static uint8_t __far* _s_screen;
 
 void I_ReloadPalette(void)
 {
-	char* lumpName;
-
-	if (_g_gamma == 0)
-		lumpName = "COLORMAP";
-	else
+	char lumpName[8] = "COLORMAP";
+	if (_g_gamma != 0)
 	{
-		lumpName = "COLORMP0";
+		lumpName[6] = 'P';
 		lumpName[7] = '0' + _g_gamma;
 	}
 
