@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2024-2025 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -119,7 +119,7 @@ void WI_drawLF(int16_t map)
 	// draw "Finished!"
 	const patch_t __far* finishedpatch = W_GetLumpByName(finished);
 	V_DrawPatchScaled((SCREENWIDTH_VGA - finishedpatch->width)/2, y, finishedpatch);
-	Z_ChangeTagToCache(finished);
+	Z_ChangeTagToCache(finishedpatch);
 }
 
 
