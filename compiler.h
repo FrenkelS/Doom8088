@@ -64,8 +64,7 @@ typedef uint32_t segment_t;
 
 
 #if defined __WATCOMC__
-#define LITTLE_ENDIAN 1234
-#define BYTE_ORDER LITTLE_ENDIAN
+#include <endian.h>
 #else
 #include <machine/endian.h>
 #endif
