@@ -191,7 +191,11 @@ void I_SetPalette(int8_t pal)
 
 #define NO_PALETTE_CHANGE 100
 
-static uint16_t st_needrefresh = 0;
+static int16_t st_needrefreshammo = 0;
+static int16_t st_needrefreshhealth = 0;
+static int16_t st_needrefresharms = 0;
+static int16_t st_needrefreshfaceandarmor = 0;
+static int16_t st_needrefreshkeysandammo = 0;
 
 void I_FinishUpdate(void)
 {
@@ -202,12 +206,13 @@ void I_FinishUpdate(void)
 		newpal = NO_PALETTE_CHANGE;
 	}
 
-	// status bar
-	if (st_needrefresh)
-	{
-		st_needrefresh--;
 
-		if (st_needrefresh != 2)
+	// status bar
+	if (st_needrefreshammo)
+	{
+		st_needrefreshammo--;
+
+		if (st_needrefreshammo != 2)
 		{
 #if VIEWWINDOWWIDTH != 60
 			outp(SC_INDEX + 1, 15);
@@ -230,7 +235,7 @@ void I_FinishUpdate(void)
 			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
 			for (int16_t y = 0; y < ST_HEIGHT; y++)
 			{
-				for (int16_t x = 0; x < SCREENWIDTH / 4; x++)
+				for (int16_t x = 0; x < 8; x++)
 				{
 					volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
 					dest[y * PLANEWIDTH + x] = 0;
@@ -241,6 +246,147 @@ void I_FinishUpdate(void)
 			outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
 		}
 	}
+
+	if (st_needrefreshhealth)
+	{
+		st_needrefreshhealth--;
+
+		if (st_needrefreshhealth != 2)
+		{
+			// set write mode 1
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+#if defined _M_I86
+			uint8_t __far* src = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, D_FP_OFF(_s_screen));
+			if (D_FP_SEG(src) == PAGEMINUS1)
+				src = D_MK_FP(PAGE2, D_FP_OFF(src));
+#else
+			uint8_t __far* src = _s_screen - (PAGE_SIZE << 4);
+			if ((((uint32_t)src) & (PAGEMINUS1 << 4)) == (PAGEMINUS1 << 4))
+				src += (0x10000 - (PAGE_SIZE << 4));
+#endif
+			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			for (int16_t y = 0; y < ST_HEIGHT; y++)
+			{
+				for (int16_t x = 8; x < 19; x++)
+				{
+					volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+					dest[y * PLANEWIDTH + x] = 0;
+				}
+			}
+
+			// set write mode 0
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+		}
+	}
+
+	if (st_needrefresharms)
+	{
+		st_needrefresharms--;
+
+		if (st_needrefresharms != 2)
+		{
+			// set write mode 1
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+#if defined _M_I86
+			uint8_t __far* src = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, D_FP_OFF(_s_screen));
+			if (D_FP_SEG(src) == PAGEMINUS1)
+				src = D_MK_FP(PAGE2, D_FP_OFF(src));
+#else
+			uint8_t __far* src = _s_screen - (PAGE_SIZE << 4);
+			if ((((uint32_t)src) & (PAGEMINUS1 << 4)) == (PAGEMINUS1 << 4))
+				src += (0x10000 - (PAGE_SIZE << 4));
+#endif
+			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			for (int16_t y = 0; y < ST_HEIGHT; y++)
+			{
+				for (int16_t x = 19; x < 26; x++)
+				{
+					volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+					dest[y * PLANEWIDTH + x] = 0;
+				}
+			}
+
+			// set write mode 0
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+		}
+	}
+
+	if (st_needrefreshfaceandarmor)
+	{
+		st_needrefreshfaceandarmor--;
+
+		if (st_needrefreshfaceandarmor != 2)
+		{
+			// set write mode 1
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+#if defined _M_I86
+			uint8_t __far* src = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, D_FP_OFF(_s_screen));
+			if (D_FP_SEG(src) == PAGEMINUS1)
+				src = D_MK_FP(PAGE2, D_FP_OFF(src));
+#else
+			uint8_t __far* src = _s_screen - (PAGE_SIZE << 4);
+			if ((((uint32_t)src) & (PAGEMINUS1 << 4)) == (PAGEMINUS1 << 4))
+				src += (0x10000 - (PAGE_SIZE << 4));
+#endif
+			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			for (int16_t y = 0; y < ST_HEIGHT; y++)
+			{
+				for (int16_t x = 26; x < 44; x++)
+				{
+					volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+					dest[y * PLANEWIDTH + x] = 0;
+				}
+			}
+
+			// set write mode 0
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+		}
+	}
+
+	if (st_needrefreshkeysandammo)
+	{
+		st_needrefreshkeysandammo--;
+
+		if (st_needrefreshkeysandammo != 2)
+		{
+			// set write mode 1
+			outp(GC_INDEX, GC_MODE);
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+#if defined _M_I86
+			uint8_t __far* src = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, D_FP_OFF(_s_screen));
+			if (D_FP_SEG(src) == PAGEMINUS1)
+				src = D_MK_FP(PAGE2, D_FP_OFF(src));
+#else
+			uint8_t __far* src = _s_screen - (PAGE_SIZE << 4);
+			if ((((uint32_t)src) & (PAGEMINUS1 << 4)) == (PAGEMINUS1 << 4))
+				src += (0x10000 - (PAGE_SIZE << 4));
+#endif
+			src += (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+			for (int16_t y = 0; y < ST_HEIGHT; y++)
+			{
+				for (int16_t x = 44; x < 60; x++)
+				{
+					volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+					dest[y * PLANEWIDTH + x] = 0;
+				}
+			}
+
+			// set write mode 0
+			outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+		}
+	}
+
 
 	// page flip between segments A000, A400 and A800
 	outp(CRTC_INDEX, CRTC_STARTHIGH);
@@ -670,10 +816,124 @@ void V_DrawRaw(int16_t num, uint16_t offset)
 
 void ST_Drawer(void)
 {
-	if (ST_NeedUpdate())
+	if (ST_NeedUpdateAmmo())
 	{
-		ST_doRefresh();
-		st_needrefresh = 3; //3 screen pages
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+		uint8_t __far* src  = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+		for (int16_t y = 0; y < ST_HEIGHT; y++)
+		{
+			for (int16_t x = 0; x < 8; x++)
+			{
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
+			}
+		}
+
+		// set write mode 0
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+
+		ST_drawAmmo();
+		st_needrefreshammo = 3;
+	}
+
+	if (ST_NeedUpdateHealth())
+	{
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+		uint8_t __far* src  = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+		for (int16_t y = 0; y < ST_HEIGHT; y++)
+		{
+			for (int16_t x = 8; x < 19; x++)
+			{
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
+			}
+		}
+
+		// set write mode 0
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+
+		ST_drawHealth();
+		st_needrefreshhealth = 3;
+	}
+
+	if (ST_NeedUpdateArms())
+	{
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+		uint8_t __far* src  = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+		for (int16_t y = 0; y < ST_HEIGHT; y++)
+		{
+			for (int16_t x = 19; x < 26; x++)
+			{
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
+			}
+		}
+
+		// set write mode 0
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+
+		ST_drawArms();
+		st_needrefresharms = 3;
+	}
+
+	if (ST_NeedUpdateFaceAndArmor())
+	{
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+		uint8_t __far* src  = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+		for (int16_t y = 0; y < ST_HEIGHT; y++)
+		{
+			for (int16_t x = 26; x < 44; x++)
+			{
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
+			}
+		}
+
+		// set write mode 0
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+
+		ST_drawFaceAndArmor();
+		st_needrefreshfaceandarmor = 3;
+	}
+
+	if (ST_NeedUpdateKeysAndAmmo())
+	{
+		// set write mode 1
+		outp(GC_INDEX, GC_MODE);
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) | 1);
+
+		uint8_t __far* src  = D_MK_FP(PAGE3, 0 + __djgpp_conventional_base);
+		uint8_t __far* dest = _s_screen + (SCREENHEIGHT - ST_HEIGHT) * PLANEWIDTH;
+		for (int16_t y = 0; y < ST_HEIGHT; y++)
+		{
+			for (int16_t x = 44; x < 60; x++)
+			{
+				volatile uint8_t loadLatches = src[y * PLANEWIDTH + x];
+				dest[y * PLANEWIDTH + x] = 0;
+			}
+		}
+
+		// set write mode 0
+		outp(GC_INDEX + 1, inp(GC_INDEX + 1) & ~1);
+
+		ST_drawKeysAndAmmo();
+		st_needrefreshkeysandammo = 3;
 	}
 }
 
