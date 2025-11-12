@@ -12,6 +12,9 @@ libpath %WATCOM%\lib286\dos
 lib noemu87.lib
 format dos
 name DOOM16WC
+alias source=_source, colormap=_colormap, dest=_dest, R_DrawColumn2_=R_DrawColumn2, R_DrawColumnFlat2_=R_DrawColumnFlat2
+alias FixedReciprocal_=FixedReciprocal, FixedReciprocalSmall_=FixedReciprocalSmall, FixedReciprocalBig_=FixedReciprocalBig
+alias XMSControl=_XMSControl, Z_AllocateExtendedMemoryBlock_=Z_AllocateExtendedMemoryBlock, Z_FreeExtendedMemoryBlock_=Z_FreeExtendedMemoryBlock, Z_MoveExtendedMemoryBlock_=Z_MoveExtendedMemoryBlock
 
 file a_pcfx.obj
 file a_taskmn.obj
@@ -26,8 +29,10 @@ file i_audio.obj
 file i_main.obj
 file i_system.obj
 file i_vmodey.obj
+file i_vmodya.obj
 file info.obj
 file m_cheat.obj
+file m_fixed.obj
 file m_menu.obj
 file m_random.obj
 file p_doors.obj
@@ -63,4 +68,5 @@ file w_wad.obj
 file wi_lib.obj
 file wi_stuff.obj
 file z_bmallo.obj
+file z_xms.obj
 file z_zone.obj
