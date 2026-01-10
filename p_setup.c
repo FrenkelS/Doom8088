@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023-2025 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -335,7 +335,7 @@ static void P_LoadLineDefs (int16_t lump)
 			_g_lines[i].slopetype = ST_VERTICAL;
 		else if (_g_lines[i].dy == 0)
 			_g_lines[i].slopetype = ST_HORIZONTAL;
-		else if (((fixed_t)_g_lines[i].dy << FRACBITS) / _g_lines[i].dx > 0)
+		else if ((_g_lines[i].dy ^ _g_lines[i].dx) >= 0)
 			_g_lines[i].slopetype = ST_POSITIVE;
 		else
 			_g_lines[i].slopetype = ST_NEGATIVE;
