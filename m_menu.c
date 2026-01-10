@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -990,13 +990,9 @@ static char __far* Z_Strdup(const char* s)
 {
     const size_t len = strlen(s);
 
-    if(!len)
-        return NULL;
-
     char __far* ptr = Z_MallocStatic(len+1);
 
-    if(ptr)
-        _fstrcpy(ptr, s);
+    _fstrcpy(ptr, s);
 
     return ptr;
 }
