@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 2023 Frenkel Smeijers
+; Copyright (C) 2023-2026 Frenkel Smeijers
 ;
 ; This program is free software; you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License
@@ -18,6 +18,116 @@
 cpu 8086
 
 bits 16
+
+
+; Based on https://github.com/sqpat/RealDOOM/blob/master/math.asm
+;
+; input:
+;   dx:ax [bp+8]:[bp+6]
+;
+; output:
+;   dx:ax
+
+global FixedMul
+FixedMul:
+	push bp
+	mov bp, sp
+	push si
+
+	mov si, dx
+	mov bx, [bp + 6]
+	mov cx, [bp + 8]
+
+	jcxz bhw_zero
+
+	; ax = alw, bx = blw, cx = bhw, dx = ahw, si = ahw
+	push ax
+	mul bx
+	push dx
+	mov ax, si
+	mul cx
+	xchg ax, si
+	cwd
+	and dx, bx
+	sub si, dx
+	mul bx
+	pop bx
+	add bx, ax
+	adc si, dx
+	mov ax, cx
+	cwd
+	pop cx
+	and dx, cx
+	sub si, dx
+	mul cx
+	add ax, bx
+	adc dx, si
+
+	pop si
+	pop bp
+	retf 4
+
+bhw_zero:
+	; ax = alw, bx = blw, cx = 0, dx = ahw, si = ahw
+	mul bx
+	mov cx, dx
+	mov ax, si
+	cwd
+	and dx, bx
+	xor si, si
+	sub si, dx
+	mul bx
+	add ax, cx
+	adc dx, si
+
+	pop si
+	pop bp
+	retf 4
+
+
+; Based on https://github.com/sqpat/RealDOOM/blob/master/math.asm
+;
+; input:
+;   dx:ax [bp+8]:[bp+6]
+;
+; output:
+;   dx:ax
+
+global FixedMul3232
+FixedMul3232:
+	push bp
+	mov bp, sp
+	push si
+
+	mov si, dx
+	mov cx, [bp + 8]
+	mov bx, [bp + 6]
+
+	push ax
+	mul bx
+	push dx
+	mov ax, si
+	mul cx
+	xchg ax, si
+	cwd
+	and dx, bx
+	sub si, dx
+	mul bx
+	pop bx
+	add bx, ax
+	adc si, dx
+	mov ax, cx
+	cwd
+	pop cx
+	and dx, cx
+	sub si, dx
+	mul cx
+	add ax, bx
+	adc dx, si
+
+	pop si
+	pop bp
+	retf 4
 
 
 ; Divide FFFFFFFFh by a 32-bit number.
@@ -134,4 +244,4 @@ shift_loop_big:
 	add     ax, dx             ; correct quotient if necessary           ax += dx
 	pop     di                 ; restore temp  
 	pop     si                 ;  variables
-	retf                       ; return quotient in dx:ax
+	retf                       ; return quotient in ax

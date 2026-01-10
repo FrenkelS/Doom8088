@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023-2025 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -537,6 +537,7 @@ static const uint16_t PSPRITEYFRACSTEP = (FRACUNIT * SCREENHEIGHT_VGA / (VIEWWIN
 static const angle16_t clipangle = 0x2008; // = xtoviewangleTable[0]
 
 
+#if defined C_ONLY
 #if defined __WATCOMC__
 //
 #else
@@ -564,8 +565,10 @@ fixed_t CONSTFUNC FixedMul(fixed_t a, fixed_t b)
 		return (a * bhw) + (ll >> FRACBITS) + hl;
 	}
 }
+#endif
 
 
+#if defined C_ONLY
 inline static fixed_t CONSTFUNC FixedMul3232(fixed_t a, fixed_t b)
 {
 	uint16_t alw = a;
@@ -577,6 +580,9 @@ inline static fixed_t CONSTFUNC FixedMul3232(fixed_t a, fixed_t b)
 	 int32_t hl = ( int32_t) ahw * blw;
 	return (a * bhw) + (ll >> FRACBITS) + hl;
 }
+#else
+fixed_t FixedMul3232(fixed_t a, fixed_t b);
+#endif
 
 
 //
@@ -590,13 +596,8 @@ inline
 #endif
 fixed_t CONSTFUNC FixedMulAngle(fixed_t a, fixed_t b)
 {
-	uint16_t alw = a;
-	 int16_t ahw = a >> FRACBITS;
 	uint16_t blw = b;
-
-	uint32_t ll = (uint32_t) alw * blw;
-	 int32_t hl = ( int32_t) ahw * blw;
-	fixed_t r = (ll >> FRACBITS) + hl;
+	fixed_t r = FixedMul3216(a, blw);
 
 	if (b < 0)
 		r -= a;
@@ -615,9 +616,31 @@ fixed_t CONSTFUNC FixedMul3216(fixed_t a, uint16_t blw)
 	uint16_t alw = a;
 	 int16_t ahw = a >> FRACBITS;
 
+#if defined C_ONLY
 	uint32_t ll = (uint32_t) alw * blw;
 	 int32_t hl = ( int32_t) ahw * blw;
 	return (ll >> FRACBITS) + hl;
+#else
+	fixed_t result;
+	asm
+	(
+		"mov %%dx, %%si\n"
+		"mul %%cx\n"
+		"mov %%dx, %%bx\n"
+		"mov %%si, %%ax\n"
+		"cwd\n"
+		"and %%cx, %%dx\n"
+		"xor %%si, %%si\n"
+		"sub %%dx, %%si\n"
+		"mul %%cx\n"
+		"add %%bx, %%ax\n"
+		"adc %%si, %%dx"
+		: "=A" (result)
+		: "a" (alw), "d" (ahw), "c" (blw)
+		: "bx", "si"
+	);
+	return result;
+#endif
 }
 
 
