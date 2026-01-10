@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023-2025 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -165,9 +165,6 @@ static void R_LoadTexture(int16_t texture_num)
 
         for (uint8_t k = j + 1; k < texture->patchcount; k++)
         {
-            if (k == j)
-                continue;
-
             const texpatch_t __far* p2 = &texture->patches[k];
 
             //Check for patch overlaps.
