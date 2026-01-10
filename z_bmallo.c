@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023-2025 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -50,6 +50,12 @@ typedef struct bmalpool_s {
 	size_t             blocks;
 	byte               used[];
 } bmalpool_t;
+
+#if defined _M_I86
+typedef char assertBmalpoolSize[sizeof(bmalpool_t) == 6 ? 1 : -1];
+#else
+typedef char assertBmalpoolSize[sizeof(bmalpool_t) == 8 ? 1 : -1];
+#endif
 
 
 inline static void __far* getelem(bmalpool_t __far* p, size_t size, size_t n)
