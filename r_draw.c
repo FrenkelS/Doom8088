@@ -666,7 +666,7 @@ fixed_t CONSTFUNC FixedApproxDiv(fixed_t a, fixed_t b)
 // Returns side 0 (front) or 1 (back).
 //
 
-static PUREFUNC int8_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
+static PUREFUNC int16_t R_PointOnSide(fixed_t x, fixed_t y, const mapnode_t __far* node)
 {
 	int16_t ix = x >> FRACBITS;
 
@@ -2836,11 +2836,11 @@ static boolean R_RenderBspSubsector(int16_t bspnum)
 static void R_RenderBSPNode(int16_t bspnum)
 {
     static int16_t stack_bsp[MAX_BSP_DEPTH];
-    static int8_t  stack_side[MAX_BSP_DEPTH];
+    static int16_t stack_side[MAX_BSP_DEPTH];
     int16_t sp = 0;
 
     const mapnode_t __far* bsp;
-    int8_t side;
+    int16_t side;
 
     while (true)
     {
@@ -2905,7 +2905,7 @@ static void R_RenderBSPNode(int16_t bspnum)
 //
 // decide which side the view point is on
 //
-	int8_t side = R_PointOnSide(viewx, viewy, bsp);
+	int16_t side = R_PointOnSide(viewx, viewy, bsp);
 
 	R_RenderBSPNode(bsp->children[side]); // recursively divide front space
 
