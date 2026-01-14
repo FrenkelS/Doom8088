@@ -614,27 +614,42 @@ static void STlib_drawNum(st_number_t* n)
 }
 
 
-static void ST_drawWidgets(void)
+void ST_drawAmmo(void)
 {
-    STlib_drawNum(&w_ready);
-	
-	// Restore the ammo numbers for backpack stats I guess, etc ~Kippykip
-	for (int8_t i = 0; i < NUMAMMO; i++)
-    {
+	STlib_drawNum(&w_ready);
+}
+
+
+void ST_drawHealth(void)
+{
+	STlib_drawNum(&st_health);
+}
+
+
+void ST_drawArms(void)
+{
+	for (int16_t i = 0; i < 6; i++)
+		STlib_updateMultIcon(&w_arms[i]);
+}
+
+
+void ST_drawFaceAndArmor(void)
+{
+	STlib_drawNum(&st_armor);
+	STlib_updateMultIcon(&w_faces);
+}
+
+
+void ST_drawKeysAndAmmo(void)
+{
+	for (int16_t i = 0; i < 3 ;i++)
+		STlib_updateMultIcon(&w_keyboxes[i]);
+
+	for (int16_t i = 0; i < NUMAMMO; i++)
+	{
 		STlib_drawNum(&w_ammo[i]);
 		STlib_drawNum(&w_maxammo[i]);
-    }
-
-    STlib_drawNum(&st_health);
-    STlib_drawNum(&st_armor);
-
-    STlib_updateMultIcon(&w_faces);
-
-    for (int8_t i = 0; i < 3 ;i++)
-        STlib_updateMultIcon(&w_keyboxes[i]);
-
-    for (int8_t i = 0; i < 6; i++)
-        STlib_updateMultIcon(&w_arms[i]);
+	}
 }
 
 
@@ -645,55 +660,49 @@ static void ST_refreshBackground(void)
 }
 
 
-void ST_doRefresh(void)
+boolean ST_NeedUpdateAmmo(void)
 {
-#if !defined DISABLE_STATUS_BAR
-  // draw status bar background to off-screen buff
-  ST_refreshBackground();
-
-  // and refresh all widgets
-  ST_drawWidgets();
-#endif
+	return w_ready.oldnum != *w_ready.num;
 }
 
-boolean ST_NeedUpdate(void)
+
+boolean ST_NeedUpdateHealth(void)
 {
-	// ready weapon ammo
-	if(w_ready.oldnum != *w_ready.num)
-        return true;
-	
-    if(st_health.oldnum != *st_health.num)
-        return true;
+	return st_health.oldnum != *st_health.num;
+}
 
-    if(st_armor.oldnum != *st_armor.num)
-        return true;
 
-    if(w_faces.oldinum != *w_faces.inum)
-        return true;
-	
-	// ammo
-    for(int8_t i=0; i<NUMAMMO; i++)
-    {
-        if(w_ammo[i].oldnum != *w_ammo[i].num)
-            return true;
-		if(w_maxammo[i].oldnum != *w_maxammo[i].num)
-            return true;
-    }
+boolean ST_NeedUpdateArms(void)
+{
+	for (int16_t i = 0; i < 6; i++)
+		if (w_arms[i].oldinum != *w_arms[i].inum)
+			return true;
 
-    // weapons owned
-    for(int8_t i=0; i<6; i++)
-    {
-        if(w_arms[i].oldinum != *w_arms[i].inum)
-            return true;
-    }
+	return false;
+}
 
-    for(int8_t i = 0; i < 3; i++)
-    {
-        if(w_keyboxes[i].oldinum != *w_keyboxes[i].inum)
-            return true;
-    }
 
-    return false;
+boolean ST_NeedUpdateFaceAndArmor(void)
+{
+	return (w_faces.oldinum != *w_faces.inum) || (st_armor.oldnum != *st_armor.num);
+}
+
+
+boolean ST_NeedUpdateKeysAndAmmo(void)
+{
+	for (int16_t i = 0; i < NUMAMMO; i++)
+	{
+		if (w_ammo[i].oldnum != *w_ammo[i].num)
+			return true;
+		if (w_maxammo[i].oldnum != *w_maxammo[i].num)
+			return true;
+	}
+
+	for (int16_t i = 0; i < 3; i++)
+		if (w_keyboxes[i].oldinum != *w_keyboxes[i].inum)
+			return true;
+
+	return false;
 }
 
 
@@ -867,6 +876,7 @@ void ST_Start(void)
     ST_Stop();
   ST_initData();
   ST_createWidgets();
+  ST_refreshBackground();
   st_stopped = false;
 }
 
