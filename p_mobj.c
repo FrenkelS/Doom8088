@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023-2025 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -882,7 +882,7 @@ mobj_t __far* P_SpawnMobj(fixed_t x,fixed_t y,fixed_t z,mobjtype_t type)
 
     mobj->thinker.function = P_ThinkerFunctionForType(type, mobj);
 
-    mobj->target = mobj->tracer = mobj->lastenemy = NULL;
+    mobj->target = mobj->lastenemy = NULL;
     P_AddThinker (&mobj->thinker);
     if (!((mobj->flags ^ MF_COUNTKILL) & MF_COUNTKILL))
         _g_totallive++;
@@ -917,7 +917,6 @@ void P_RemoveMobj(mobj_t __far* mobj)
   if (!_g_demoplayback)
   {
     mobj->target    = NULL;
-    mobj->tracer    = NULL;
     mobj->lastenemy = NULL;
   }
   // free block

@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023-2025 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -214,7 +214,7 @@ typedef struct mobj_s
 
     //More drawing info: to determine current sprite.
     angle_t             angle;  // orientation
-    uint16_t            sprite; // used to find patch_t and flip value
+    spritenum_t         sprite; // used to find patch_t and flip value
     uint16_t            frame;  // might be ORed with FF_FULLBRIGHT
 
     // Interaction info, by BLOCKMAP.
@@ -269,9 +269,6 @@ typedef struct mobj_s
     // Reaction time: if non 0, don't attack yet.
     // Used by player to freeze a bit after teleporting.
     int16_t             reactiontime;
-
-    // Thing being chased/attacked for tracers.
-    struct mobj_s __far*      tracer;
 
     // new field: last known enemy -- killough 2/15/98
     struct mobj_s __far*      lastenemy;
