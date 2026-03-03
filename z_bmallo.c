@@ -45,22 +45,16 @@
 #include "z_bmallo.h"
 #include "i_system.h"
 
+
 typedef struct bmalpool_s {
 	struct bmalpool_s __far* nextpool;
-	size_t             blocks;
-	byte               used[];
+	uint32_t               used;
 } bmalpool_t;
-
-#if defined _M_I86
-typedef char assertBmalpoolSize[sizeof(bmalpool_t) == 6 ? 1 : -1];
-#else
-typedef char assertBmalpoolSize[sizeof(bmalpool_t) == 8 ? 1 : -1];
-#endif
 
 
 inline static void __far* getelem(bmalpool_t __far* p, size_t size, size_t n)
 {
-	return (((byte __far*)p) + sizeof(bmalpool_t) + sizeof(byte) * (p->blocks) + size * n);
+	return ((byte __far*)p) + sizeof(bmalpool_t) + size * n;
 }
 
 
@@ -72,37 +66,47 @@ inline static PUREFUNC int16_t iselem(const bmalpool_t __far* pool, size_t size,
 
 	uint16_t dif = D_FP_OFF(p) - D_FP_OFF(pool);
 	dif -= sizeof(bmalpool_t);
-	dif -= pool->blocks;
 	dif /= size;
 	return dif;
 #else
 	int32_t dif = (const char*)p - (const char*)pool;
-
-	dif -= sizeof(bmalpool_t);
-	dif -= pool->blocks;
 	if (dif < 0)
 		return -1;
 
+	dif -= sizeof(bmalpool_t);
 	dif /= size;
-	return (((size_t)dif >= pool->blocks) ? -1 : dif);
+	return dif >= 8 * sizeof(uint32_t) ? -1 : dif;
 #endif
 }
 
 
-enum { unused_block = 0, used_block = 1};
+#if !defined __GNUC__
+static size_t __builtin_ctzl(uint32_t v)
+{
+	int c = 0; 
+
+	v = (v ^ (v - 1)) >> 1;
+	while (v)
+	{
+		v >>= 1;
+		c++;
+	}
+	return c;
+}
+#endif
 
 
 void __far* Z_BMalloc(struct block_memory_alloc_s *pzone)
 {
 	bmalpool_t __far*__far* pool = (bmalpool_t __far*__far*)&(pzone->firstpool);
 	while (*pool != NULL) {
-		byte __far* p = _fmemchr((*pool)->used, unused_block, (*pool)->blocks); // Scan for unused marker
-		if (p) {
-			int16_t n = p - (*pool)->used;
-			(*pool)->used[n] = used_block;
-			return getelem(*pool, pzone->size, n);
-		} else
+		if ((*pool)->used == 0xffffffff) {
 			pool = &((*pool)->nextpool);
+		} else {
+			size_t n = __builtin_ctzl(~(*pool)->used);
+			(*pool)->used |= (1UL << n);
+			return getelem(*pool, pzone->size, n);
+		}
 	}
 
 	// Nothing available, must allocate a new pool
@@ -110,12 +114,10 @@ void __far* Z_BMalloc(struct block_memory_alloc_s *pzone)
 
 	// CPhipps: Allocate new memory, initialised to 0
 
-	*pool = newpool = Z_CallocLevel(sizeof(*newpool) + (sizeof(byte) + pzone->size) * (pzone->perpool));
-	newpool->nextpool = NULL; // NULL = (void*)0 so this is redundant
+	*pool = newpool = Z_CallocLevel(sizeof(bmalpool_t) + pzone->size * 8 * sizeof(uint32_t));
 
 	// Return element 0 from this pool to satisfy the request
-	newpool->used[0] = used_block;
-	newpool->blocks = pzone->perpool;
+	newpool->used = 1;
 	return getelem(newpool, pzone->size, 0);
 }
 
@@ -127,8 +129,8 @@ void Z_BFree(struct block_memory_alloc_s *pzone, void __far* p)
 	while (*pool != NULL) {
 		int16_t n = iselem(*pool, pzone->size, p);
 		if (n >= 0) {
-			(*pool)->used[n] = unused_block;
-			if (_fmemchr(((*pool)->used), used_block, (*pool)->blocks) == NULL) {
+			(*pool)->used &= ~(1UL << n);
+			if ((*pool)->used == 0) {
 				// Block is all unused, can be freed
 				bmalpool_t __far* oldpool = *pool;
 				*pool = (*pool)->nextpool;
