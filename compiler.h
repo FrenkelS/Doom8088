@@ -1,6 +1,6 @@
 //
 //
-// Copyright (C) 2023-2025 Frenkel Smeijers
+// Copyright (C) 2023-2026 Frenkel Smeijers
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -45,7 +45,6 @@ typedef uint32_t segment_t;
 
 #define __far
 
-#define _fmemchr	memchr
 #define _fmemcmp	memcmp
 #define _fmemcpy	memcpy
 #define _fmemset	memset
