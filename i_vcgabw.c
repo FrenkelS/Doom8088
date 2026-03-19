@@ -449,8 +449,7 @@ void V_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 
 	while (true)
 	{
-		uint8_t c = _s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)];
-		_s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)] = c | bitmask;
+		_s_screen[y0 * VIEWWINDOWWIDTH + (x0 >> 3)] |= bitmask;
 
 		if (x0 == x1 && y0 == y1)
 			break;
