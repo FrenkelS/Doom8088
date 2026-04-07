@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024-2025 Frenkel Smeijers
+ *  Copyright (C) 2024-2026 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
  *      Video code for MDA 80x25 monochrome text mode
  *
  *-----------------------------------------------------------------------------*/
- 
+
 #include <conio.h>
 #include <dos.h>
 #include <stdint.h>
@@ -502,7 +502,6 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 	while (ticks--)
 	{
-		I_DrawBuffer(frontbuffer);
 		for (int16_t i = 0; i < VIEWWINDOWWIDTH; i++)
 		{
 			if (wipe_y_lookup[i] < 0)
@@ -549,6 +548,8 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 			}
 		}
 	}
+
+	I_DrawBuffer(frontbuffer);
 
 	return done;
 }

@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2023-2025 Frenkel Smeijers
+ *  Copyright (C) 2023-2026 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@
  *                            240x128
  *
  *-----------------------------------------------------------------------------*/
- 
+
 #include <conio.h>
 #include <dos.h>
 #include <stdint.h>
@@ -793,7 +793,6 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 	while (ticks--)
 	{
-		I_DrawBuffer((uint8_t __far*)frontbuffer);
 		for (int16_t i = 0; i < SCREENWIDTH / 2; i++)
 		{
 			if (wipe_y_lookup[i] < 0)
@@ -846,6 +845,8 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 			}
 		}
 	}
+
+	I_DrawBuffer((uint8_t __far*)frontbuffer);
 
 	return done;
 }

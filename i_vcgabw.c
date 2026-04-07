@@ -22,7 +22,7 @@
  *      Video code for CGA 640x200 2 color
  *
  *-----------------------------------------------------------------------------*/
- 
+
 #include <conio.h>
 #include <dos.h>
 #include <stdint.h>
@@ -688,7 +688,6 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 
 	while (ticks--)
 	{
-		I_DrawBuffer(frontbuffer);
 		for (int16_t i = 0; i < VIEWWINDOWWIDTH; i++)
 		{
 			if (wipe_y_lookup[i] < 0)
@@ -736,6 +735,8 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 			}
 		}
 	}
+
+	I_DrawBuffer(frontbuffer);
 
 	return done;
 }
