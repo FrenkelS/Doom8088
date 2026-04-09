@@ -107,12 +107,6 @@ void I_InitGraphicsHardwareSpecificCode(void)
 }
 
 
-static void I_DrawBuffer(uint8_t __far* buffer)
-{
-	_fmemcpy(videomemory, buffer, PLANEWIDTH * VIEWWINDOWHEIGHT);
-}
-
-
 void I_ShutdownGraphics(void)
 {
 	I_SetScreenMode(isMDA ? 7 : 3);
@@ -127,7 +121,7 @@ void I_SetPalette(int8_t pal)
 
 void I_FinishUpdate(void)
 {
-	I_DrawBuffer(_s_screen);
+	_fmemcpy(videomemory, _s_screen, PLANEWIDTH * VIEWWINDOWHEIGHT);
 }
 
 
@@ -479,18 +473,12 @@ void I_InitScreenPages(void)
 }
 
 
-static uint8_t __far* frontbuffer;
 static int16_t __far* wipe_y_lookup;
 
 
 void wipe_StartScreen(void)
 {
-	frontbuffer = Z_TryMallocStatic(PLANEWIDTH * VIEWWINDOWHEIGHT);
-	if (frontbuffer)
-	{
-		// copy back buffer to front buffer
-		_fmemcpy(frontbuffer, _s_screen, PLANEWIDTH * VIEWWINDOWHEIGHT);
-	}
+	// Do nothing
 }
 
 
@@ -498,7 +486,8 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 {
 	boolean done = true;
 
-	uint8_t __far* backbuffer = _s_screen;
+	uint8_t __far* frontbuffer = videomemory;
+	uint8_t __far* backbuffer  = _s_screen;
 
 	while (ticks--)
 	{
@@ -549,8 +538,6 @@ static boolean wipe_ScreenWipe(int16_t ticks)
 		}
 	}
 
-	I_DrawBuffer(frontbuffer);
-
 	return done;
 }
 
@@ -577,9 +564,6 @@ static void wipe_initMelt()
 
 void D_Wipe(void)
 {
-	if (!frontbuffer)
-		return;
-
 	wipe_initMelt();
 
 	boolean done;
@@ -602,7 +586,6 @@ void D_Wipe(void)
 
 	} while (!done);
 
-	Z_Free(frontbuffer);
 	Z_Free(wipe_y_lookup);
 }
 
