@@ -72,6 +72,7 @@
 #define PAGE1		(PAGE0+PAGE_SIZE)
 #define PAGE2		(PAGE1+PAGE_SIZE)
 #define PAGE3		(PAGE2+PAGE_SIZE)
+#define PAGEMINUS1	(PAGE0-PAGE_SIZE)
 
 
 #define DITHER_CHARACTER 0xb1
@@ -149,13 +150,13 @@ static videocardsenum_t I_DetectVideoCard(void)
 		return MDA;
 
 	uint8_t __far* fp;
-	fp = D_MK_FP(0xffff, 0x000e);
+	fp = D_MK_FP(0xffff, 0x000e + __djgpp_conventional_base);
 	if (*fp == 0xfd)
 		return PCJR;
 
 	if (*fp == 0xff)
 	{
-		fp = D_MK_FP(0xfc00, 0);
+		fp = D_MK_FP(0xfc00, 0 + __djgpp_conventional_base);
 		if (*fp == 0x21)
 			return TANDY;
 	}
@@ -306,9 +307,16 @@ void I_FinishUpdate(void)
 	// B800, B900, BA00 for 40x50
 	// B800, BA00, BC00 for 80x50
 	outp(0x3d5, (D_FP_SEG(_s_screen) >> 5) & 0x3f);
+
+#if defined _M_I86
 	_s_screen = D_MK_FP(D_FP_SEG(_s_screen) + PAGE_SIZE, 1 + __djgpp_conventional_base);
 	if (D_FP_SEG(_s_screen) == PAGE3)
 		_s_screen = D_MK_FP(PAGE0, 1 + __djgpp_conventional_base);
+#else
+	_s_screen += (PAGE_SIZE << 4);
+	if ((((uint32_t)_s_screen) & (PAGE3 << 4)) == (PAGE3 << 4))
+		_s_screen = D_MK_FP(PAGE0, 1 + __djgpp_conventional_base);
+#endif
 }
 
 
@@ -326,6 +334,37 @@ static void R_DrawColumn2(uint16_t fracstep, uint16_t frac, int16_t count)
 {
 	switch (count)
 	{
+#if VIEWWINDOWHEIGHT >= 50
+		case 50: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 49: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 48: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 47: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 46: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 45: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 44: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+#endif
+
+#if VIEWWINDOWHEIGHT >= 43
+		case 43: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 42: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 41: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 40: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 39: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 38: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 37: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 36: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 35: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 34: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 33: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 32: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 31: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 30: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 29: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 28: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 27: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+		case 26: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
+#endif
+
 		case 25: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
 		case 24: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
 		case 23: *dest = colormap[source[frac >> COLBITS]]; dest += PLANEWIDTH; frac += fracstep;
@@ -811,9 +850,15 @@ static void wipe_initMelt()
 
 void D_Wipe(void)
 {
+#if defined _M_I86
 	frontbuffer = D_MK_FP(D_FP_SEG(_s_screen) - PAGE_SIZE, 0 + __djgpp_conventional_base);
-	if (D_FP_SEG(frontbuffer) == (PAGE0 - PAGE_SIZE))
+	if (D_FP_SEG(frontbuffer) == PAGEMINUS1)
 		frontbuffer = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
+#else
+	frontbuffer	= _s_screen - 1 - (PAGE_SIZE << 4);
+	if ((((uint32_t)frontbuffer) & (PAGEMINUS1 << 4)) == (PAGEMINUS1 << 4))
+		frontbuffer = D_MK_FP(PAGE2, 0 + __djgpp_conventional_base);
+#endif
 
 	wipe_initMelt();
 
