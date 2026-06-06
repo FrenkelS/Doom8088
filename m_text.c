@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2024-2026 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -603,7 +603,7 @@ static const menu_t SoundDef =
 
 static void M_DrawSound(void)
 {
-	V_DrawNamePatchScaled(60, 38, "M_SVOL");
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 2, 12, "SOUND VOLUME");
 
 	M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (sfx_vol   + 1), 16, snd_SfxVolume);
 
