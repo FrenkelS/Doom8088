@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024-2025 Frenkel Smeijers
+ *  Copyright (C) 2024-2026 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -595,10 +595,8 @@ void V_DrawBackground(int16_t backgroundnum)
 }
 
 
-void V_DrawRaw(int16_t num, uint16_t offset)
+void V_DrawRawFullScreen(int16_t num)
 {
-	UNUSED(offset);
-
 	if (cachedLumpNum != num)
 	{
 		const uint8_t __far* lump = W_TryGetLumpByNum(num);
