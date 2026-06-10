@@ -389,22 +389,6 @@ void V_DrawRawFullScreen(int16_t num)
 }
 
 
-void V_DrawPatchNotScaled(int16_t x, int16_t y, const patch_t __far* patch)
-{
-	UNUSED(x);
-	UNUSED(y);
-	UNUSED(patch);
-}
-
-
-void V_DrawPatchScaled(int16_t x, int16_t y, const patch_t __far* patch)
-{
-	UNUSED(x);
-	UNUSED(y);
-	UNUSED(patch);
-}
-
-
 void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c)
 {
 	_s_screen[y * PLANEWIDTH + x * 2 + 0] = c;
