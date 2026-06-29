@@ -75,7 +75,7 @@ inline static PUREFUNC int16_t iselem(const bmalpool_t __far* pool, size_t size,
 
 	dif -= sizeof(bmalpool_t);
 	dif /= size;
-	return dif >= 8 * sizeof(uint32_t) ? -1 : dif;
+	return dif >= CHAR_BIT * sizeof(uint32_t) ? -1 : dif;
 #endif
 }
 
@@ -114,7 +114,7 @@ void __far* Z_BMalloc(struct block_memory_alloc_s *pzone)
 
 	// CPhipps: Allocate new memory, initialised to 0
 
-	*pool = newpool = Z_CallocLevel(sizeof(bmalpool_t) + pzone->size * 8 * sizeof(uint32_t));
+	*pool = newpool = Z_CallocLevel(sizeof(bmalpool_t) + pzone->size * CHAR_BIT * sizeof(uint32_t));
 
 	// Return element 0 from this pool to satisfy the request
 	newpool->used = 1;
