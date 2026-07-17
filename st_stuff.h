@@ -57,9 +57,17 @@ void ST_doPaletteStuff(void);
 // Called by main loop.
 void ST_Drawer(void);
 
-void ST_doRefresh(void);
+void ST_drawAmmo(void);
+void ST_drawHealth(void);
+void ST_drawArms(void);
+void ST_drawFaceAndArmor(void);
+void ST_drawKeysAndAmmo(void);
 
-boolean ST_NeedUpdate(void);
+boolean ST_NeedUpdateAmmo(void);
+boolean ST_NeedUpdateHealth(void);
+boolean ST_NeedUpdateArms(void);
+boolean ST_NeedUpdateFaceAndArmor(void);
+boolean ST_NeedUpdateKeysAndAmmo(void);
 
 // Called when the console player is spawned on each level.
 void ST_Start(void);
