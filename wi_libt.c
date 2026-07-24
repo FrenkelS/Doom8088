@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2024-2026 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -58,10 +58,10 @@ void WI_drawLF(int16_t map)
 	int16_t x;
 
 	x = (VIEWWINDOWWIDTH - strlen(mapnames[map])) / 2;
-	V_DrawString(x, 0, 15, mapnames[map]);
+	V_DrawString(x, 0, D_WHITE, mapnames[map]);
 
 	x = (VIEWWINDOWWIDTH - 8) / 2;
-	V_DrawString(x, 1, 12, "FINISHED");
+	V_DrawString(x, 1, D_LIGHT_RED, "FINISHED");
 }
 
 
@@ -76,10 +76,10 @@ void WI_drawEL(int16_t map)
 	int16_t x;
 
 	x = (VIEWWINDOWWIDTH - 8) / 2;
-	V_DrawString(x, 0, 12, "ENTERING");
+	V_DrawString(x, 0, D_LIGHT_RED, "ENTERING");
 
 	x = (VIEWWINDOWWIDTH - strlen(mapnames[map])) / 2;
-	V_DrawString(x, 1, 15, mapnames[map]);
+	V_DrawString(x, 1, D_WHITE, mapnames[map]);
 }
 
 
@@ -91,19 +91,19 @@ int16_t WI_getColonWidth(void)
 
 void WI_drawColon(int16_t x, int16_t y)
 {
-	V_DrawCharacter(x, y, 12, ':');
+	V_DrawCharacter(x, y, D_LIGHT_RED, ':');
 }
 
 
 void WI_drawSucks(int16_t x, int16_t y)
 {
-	V_DrawString(x - 8, y, 12, "Sucks");
+	V_DrawString(x - 8, y, D_LIGHT_RED, "Sucks");
 }
 
 
 void WI_drawPercentSign(int16_t x, int16_t y)
 {
-	V_DrawCharacter(x, y, 12, '%');
+	V_DrawCharacter(x, y, D_LIGHT_RED, '%');
 }
 
 
@@ -122,7 +122,7 @@ int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits)
 	while (digits--)
 	{
 		x -= 1;
-		V_DrawCharacter(x, y, 12, '0' + (n % 10));
+		V_DrawCharacter(x, y, D_LIGHT_RED, '0' + (n % 10));
 		n /= 10;
 	}
 
@@ -138,23 +138,23 @@ int16_t WI_drawNum(int16_t x, int16_t y, int16_t n, int16_t digits)
 //
 void WI_drawStats(int16_t cnt_kills, int16_t cnt_items, int16_t cnt_secret, int32_t cnt_time, int32_t cnt_total_time, int16_t cnt_par)
 {
-	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 4, 12, "Kills");
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 4, D_LIGHT_RED, "Kills");
 	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 4, cnt_kills);
 
-	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 5, 12, "Items");
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 5, D_LIGHT_RED, "Items");
 	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 5, cnt_items);
 
-	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 6, 12, "Secret");
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 6, D_LIGHT_RED, "Secret");
 	WI_drawPercent((VIEWWINDOWWIDTH - 12) / 2 + 10, 6, cnt_secret);
 
 	// Put the times on the screen
-	V_DrawString(1, VIEWWINDOWHEIGHT - 3, 12, "Time");
+	V_DrawString(1, VIEWWINDOWHEIGHT - 3, D_LIGHT_RED, "Time");
 	WI_drawTime(15, VIEWWINDOWHEIGHT - 3, cnt_time);
 
-	V_DrawString(1, VIEWWINDOWHEIGHT - 2, 12, "Total");
+	V_DrawString(1, VIEWWINDOWHEIGHT - 2, D_LIGHT_RED, "Total");
 	WI_drawTime(15, VIEWWINDOWHEIGHT - 2, cnt_total_time);
 
-	V_DrawString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 3, 12, "Par");
+	V_DrawString(VIEWWINDOWWIDTH - 13, VIEWWINDOWHEIGHT - 3, D_LIGHT_RED, "Par");
 	WI_drawTime(VIEWWINDOWWIDTH - 1, VIEWWINDOWHEIGHT - 3, cnt_par);
 }
 
@@ -183,11 +183,11 @@ static const point_t lnodes[NUMMAPS] =
 
 void WI_drawSplat(int16_t i)
 {
-	V_DrawCharacterForeground(lnodes[i].x, lnodes[i].y, 12, '\x0f');
+	V_DrawCharacterForeground(lnodes[i].x, lnodes[i].y, D_LIGHT_RED, '\x0f');
 }
 
 
 void WI_drawYouAreHere(int16_t i)
 {
-	V_DrawCharacterForeground(lnodes[i].x, lnodes[i].y, 12, '\x02');
+	V_DrawCharacterForeground(lnodes[i].x, lnodes[i].y, D_LIGHT_RED, '\x02');
 }

@@ -224,7 +224,7 @@ static const menu_t MainDef =
 
 static void M_DrawMainMenu(void)
 {
-	V_DrawString((VIEWWINDOWWIDTH - 4) / 2, 1, 14, "DOOM");
+	V_DrawString((VIEWWINDOWWIDTH - 4) / 2, 1, D_YELLOW, "DOOM");
 }
 
 
@@ -267,8 +267,8 @@ static const menu_t NewDef =
 
 static void M_DrawNewGame(void)
 {
-	V_DrawString((VIEWWINDOWWIDTH -  8) / 2, 2, 12, "NEW GAME");
-	V_DrawString((VIEWWINDOWWIDTH - 19) / 2, 4, 12, "Choose Skill Level:");
+	V_DrawString((VIEWWINDOWWIDTH -  8) / 2, 2, D_LIGHT_RED, "NEW GAME");
+	V_DrawString((VIEWWINDOWWIDTH - 19) / 2, 4, D_LIGHT_RED, "Choose Skill Level:");
 }
 
 static void M_NewGame(int16_t choice)
@@ -351,7 +351,7 @@ static const menu_t LoadDef =
 
 static void M_DrawSaveLoad(const char* name)
 {
-	V_DrawString((VIEWWINDOWWIDTH - strlen(name)) / 2, 2, 12, name);
+	V_DrawString((VIEWWINDOWWIDTH - strlen(name)) / 2, 2, D_LIGHT_RED, name);
 
 	for (int16_t i = 0; i < load_end; i++)
 		M_WriteText(LoadDef.x, i + 4, _g_savegamestrings[i]);
@@ -545,11 +545,11 @@ static const char msgNames[2][4]  = {"Off","On"};
 
 static void M_DrawOptions(void)
 {
-	V_DrawString((VIEWWINDOWWIDTH - 7) / 2, 2, 12, "OPTIONS");
+	V_DrawString((VIEWWINDOWWIDTH - 7) / 2, 2, D_LIGHT_RED, "OPTIONS");
 
-	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * messages,  12, msgNames[showMessages]);
+	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * messages,  D_LIGHT_RED, msgNames[showMessages]);
 
-	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * alwaysrun, 12, msgNames[_g_alwaysRun]);
+	V_DrawString(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * alwaysrun, D_LIGHT_RED, msgNames[_g_alwaysRun]);
 
 	M_DrawThermo(OptionsDef.x + 13, OptionsDef.y + LINEHEIGHT * gamma, 6, _g_gamma);
 }
@@ -603,7 +603,7 @@ static const menu_t SoundDef =
 
 static void M_DrawSound(void)
 {
-	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 2, 12, "SOUND VOLUME");
+	V_DrawString((VIEWWINDOWWIDTH - 12) / 2, 2, D_LIGHT_RED, "SOUND VOLUME");
 
 	M_DrawThermo(SoundDef.x, SoundDef.y + LINEHEIGHT * (sfx_vol   + 1), 16, snd_SfxVolume);
 
@@ -1015,12 +1015,12 @@ void M_Drawer (void)
 		for (i=0;i<max;i++)
 		{
 			if (currentMenu->menuitems[i].name[0])
-				V_DrawString(x, y, 12, currentMenu->menuitems[i].name);
+				V_DrawString(x, y, D_LIGHT_RED, currentMenu->menuitems[i].name);
 			y += LINEHEIGHT;
 		}
 
 		// DRAW SKULL
-		V_DrawCharacter(x + SKULLXOFF, currentMenu->y + itemOn*LINEHEIGHT, 12, skullName[whichSkull]);
+		V_DrawCharacter(x + SKULLXOFF, currentMenu->y + itemOn*LINEHEIGHT, D_LIGHT_RED, skullName[whichSkull]);
 	}
 }
 
@@ -1087,9 +1087,9 @@ static void M_StartMessage (const char* string, void (*routine)(boolean))
 static void M_DrawThermo(int16_t x, int16_t y, int16_t thermWidth, int16_t thermDot )
 {
 	for (int16_t w = 0; w < thermWidth; w++)
-		V_DrawCharacter(x + w, y, 8, '-');
+		V_DrawCharacter(x + w, y, D_DARK_GRAY, '-');
 
-	V_DrawCharacter(x + thermDot, y, 9, '|');
+	V_DrawCharacter(x + thermDot, y, D_LIGHT_BLUE, '|');
 }
 
 /////////////////////////////
@@ -1130,7 +1130,7 @@ static void M_WriteText (int16_t x, int16_t y, const char __far* string)
 			continue;
 		}
 
-		V_DrawCharacter(cx, cy, 12, c);
+		V_DrawCharacter(cx, cy, D_LIGHT_RED, c);
 		cx++;
 	}
 }

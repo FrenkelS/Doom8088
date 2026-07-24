@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2024-2026 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -26,11 +26,21 @@
 #ifndef __I_TEXT_MODE__
 #define __I_TEXT_MODE__
 
-void V_DrawCharacter(int16_t x, int16_t y, uint8_t color, char c);
-void V_DrawSTCharacter(int16_t x, int16_t y, uint8_t color, char c);
+
+#define D_RED         4 /* #AA0000 */
+#define D_LIGHT_GRAY  7 /* #AAAAAA */
+#define D_DARK_GRAY   8 /* #555555 */
+#define D_LIGHT_BLUE  9 /* #5555FF */
+#define D_LIGHT_RED  12 /* #FF5555 */
+#define D_YELLOW     14 /* #FFFF55 */
+#define D_WHITE      15 /* #FFFFFF */
+
+
+void V_DrawCharacter(          int16_t x, int16_t y, uint8_t color, char c);
+void V_DrawSTCharacter(        int16_t x, int16_t y, uint8_t color, char c);
 void V_DrawCharacterForeground(int16_t x, int16_t y, uint8_t color, char c);
-void V_DrawString(int16_t x, int16_t y, uint8_t color, const char* s);
-void V_DrawSTString(int16_t x, int16_t y, uint8_t color, const char* s);
+void V_DrawString(             int16_t x, int16_t y, uint8_t color, const char* s);
+void V_DrawSTString(           int16_t x, int16_t y, uint8_t color, const char* s);
 void V_SetSTPalette(void);
 void V_ClearString(int16_t y, size_t len);
 void I_InitScreenPage(void);

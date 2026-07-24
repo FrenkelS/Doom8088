@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *
  *
- *  Copyright (C) 2024 Frenkel Smeijers
+ *  Copyright (C) 2024-2026 Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ void F_TextWrite(int32_t count)
 			continue;
 		}
 
-		V_DrawCharacter(cx, cy, 12, c);
+		V_DrawCharacter(cx, cy, D_LIGHT_RED, c);
 		cx++;
 	}
 }
