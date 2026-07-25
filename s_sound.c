@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023-2025 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -130,7 +130,7 @@ void S_Init(int16_t sfxVolume, int16_t musicVolume)
         // simultaneously) within zone memory.
         // CPhipps - calloc
         channels =
-                (channel_t *) calloc(numChannels,sizeof(channel_t));
+                (channel_t *) Z_MallocStatic(numChannels * sizeof(channel_t));
     }
 
     // CPhipps - music init reformatted
