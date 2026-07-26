@@ -212,7 +212,7 @@ void R_InitSprites(void)
           while ((j = hash[j].next) >= 0);
 
           // check the frames that were found for completeness
-          if ((sprites[i].numframes = ++maxframe))  // killough 1/31/98
+          if (++maxframe)
             {
               int8_t frame;
               for (frame = 0; frame < maxframe; frame++)
