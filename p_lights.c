@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -66,9 +66,6 @@ typedef struct
   int16_t count;
   int16_t maxlight;
   int16_t minlight;
-  int16_t maxtime;
-  int16_t mintime;
-
 } lightflash_t;
 
 static void T_LightFlash (lightflash_t __far* flash)
@@ -78,13 +75,13 @@ static void T_LightFlash (lightflash_t __far* flash)
 
   if (flash->sector->lightlevel == flash->maxlight)
   {
-    flash-> sector->lightlevel = flash->minlight;
-    flash->count = (P_Random()&flash->mintime)+1;
+    flash->sector->lightlevel = flash->minlight;
+    flash->count = (P_Random() & 7) + 1;
   }
   else
   {
-    flash-> sector->lightlevel = flash->maxlight;
-    flash->count = (P_Random()&flash->maxtime)+1;
+    flash->sector->lightlevel = flash->maxlight;
+    flash->count = (P_Random() & 64) + 1;
   }
 
 }
@@ -106,8 +103,6 @@ typedef struct
   int16_t minlight;
   int16_t maxlight;
   int16_t darktime;
-  int16_t brighttime;
-
 } strobe_t;
 
 static void T_StrobeFlash (strobe_t __far*   flash)
@@ -118,7 +113,7 @@ static void T_StrobeFlash (strobe_t __far*   flash)
   if (flash->sector->lightlevel == flash->minlight)
   {
     flash-> sector->lightlevel = flash->maxlight;
-    flash->count = flash->brighttime;
+    flash->count = STROBEBRIGHT;
   }
   else
   {
@@ -142,7 +137,7 @@ typedef struct
   sector_t __far* sector;
   int16_t minlight;
   int16_t maxlight;
-  int16_t direction;
+  int8_t  direction;
 } glow_t;
 
 static void T_Glow(glow_t __far* g)
@@ -235,9 +230,7 @@ void P_SpawnLightFlash (sector_t __far* sector)
   flash->maxlight = sector->lightlevel;
 
   flash->minlight = P_FindMinSurroundingLight(sector,sector->lightlevel);
-  flash->maxtime = 64;
-  flash->mintime = 7;
-  flash->count = (P_Random()&flash->maxtime)+1;
+  flash->count = (P_Random() & 64) + 1;
 }
 
 //
@@ -260,7 +253,6 @@ void P_SpawnStrobeFlash(sector_t __far* sector, int16_t fastOrSlow, boolean inSy
 
   flash->sector = sector;
   flash->darktime = fastOrSlow;
-  flash->brighttime = STROBEBRIGHT;
   flash->thinker.function = T_StrobeFlash;
   flash->maxlight = sector->lightlevel;
   flash->minlight = P_FindMinSurroundingLight(sector, sector->lightlevel);

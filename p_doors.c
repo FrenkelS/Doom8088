@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -199,7 +199,7 @@ void T_VerticalDoor(vldoor_t __far* door)
         {
           case normal:           // regular open/close doors start waiting
             door->direction = 0; // wait at top with delay
-            door->topcountdown = door->topwait;
+            door->topcountdown = VDOORWAIT;
             break;
 
           case close30ThenOpen:  // close and close/open doors are done
@@ -257,7 +257,6 @@ boolean EV_DoDoor(const line_t __far* line, vldoor_e type)
     door->thinker.function = T_VerticalDoor;
     door->sector = sec;
     door->type = type;
-    door->topwait = VDOORWAIT;
     door->speed = VDOORSPEED;
     door->line = line; // jff 1/31/98 remember line that triggered us
     door->lighttag = 0; /* killough 10/98: no light effects with tagged doors */

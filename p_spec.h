@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -200,10 +200,8 @@ typedef struct
   fixed_t speed;
 
   // 1 = up, 0 = waiting at top, -1 = down
-  int16_t direction;
+  int8_t direction;
 
-  // tics to wait at the top
-  int16_t topwait;
   // (keep in case a door going down is reset)
   // when it reaches 0, start going down
   int16_t topcountdown;
@@ -254,8 +252,8 @@ void T_VerticalDoor(vldoor_t __far* door);
 
 // p_floor
 
-result_e T_MovePlaneFloor  (sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction);
-result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction);
+result_e T_MovePlaneFloor  (sector_t __far* sector, fixed_t speed, fixed_t dest, int8_t direction);
+result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest, int8_t direction);
 
 
 ////////////////////////////////////////////////////////////////

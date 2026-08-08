@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -215,7 +215,7 @@ static boolean P_CheckSector(sector_t __far* sector)
 //  pastdest - plane moved normally and is now at destination height
 //  crushed - plane encountered an obstacle, is holding until removed
 //
-result_e T_MovePlaneFloor(sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction)
+result_e T_MovePlaneFloor(sector_t __far* sector, fixed_t speed, fixed_t dest, int8_t direction)
 {
   boolean       flag;
   fixed_t       lastpos;
@@ -288,7 +288,7 @@ result_e T_MovePlaneFloor(sector_t __far* sector, fixed_t speed, fixed_t dest, i
 }
 
 
-result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest, int16_t direction)
+result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest, int8_t direction)
 {
   boolean       flag;
   fixed_t       lastpos;
@@ -375,13 +375,12 @@ result_e T_MovePlaneCeiling(sector_t __far* sector, fixed_t speed, fixed_t dest,
 typedef struct
 {
   thinker_t thinker;
-  floor_e type;
   sector_t __far* sector;
-  int16_t direction;
+  floor_e type;
+  int8_t  direction;
   int16_t texture;
   fixed_t floordestheight;
   fixed_t speed;
-
 } floormove_t;
 
 static void T_MoveFloor(floormove_t __far* floor)

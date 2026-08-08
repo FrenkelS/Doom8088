@@ -10,7 +10,7 @@
  *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
  *  Copyright 2005, 2006 by
  *  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
- *  Copyright 2023, 2024 by
+ *  Copyright 2023-2026 by
  *  Frenkel Smeijers
  *
  *  This program is free software; you can redistribute it and/or
@@ -321,35 +321,14 @@ static void EV_VerticalDoor(line_t __far* line, mobj_t __far* thing)
      */
     if (door->thinker.function == T_VerticalDoor)
     {
-      /* cph - we are writing outval to door->direction iff it is non-zero */
-      int16_t outval = 0;
-
       /* An already moving repeatable door which is being re-pressed, or a
        * monster is trying to open a closing door - so change direction
        * DEMOSYNC: we only read door->direction now if it really is a door.
        */
       if (door->thinker.function == T_VerticalDoor && door->direction == -1) {
-        outval = 1; /* go back up */
+        door->direction = 1; /* go back up */
       } else if (player) {
-        outval = -1; /* go back down */
-      }
-
-      /* Write this to the thinker. In demo compatibility mode, we might be 
-       *  overwriting a field of a non-vldoor_t thinker - we need to add any 
-       *  other thinker types here if any demos depend on specific fields
-       *  being corrupted by this.
-       */
-      if (outval) {
-        if (door->thinker.function == T_VerticalDoor) {
-          door->direction = outval;
-        } else if (door->thinker.function == T_PlatRaise) {
-          plat_t __far* p = (plat_t __far*)door;
-          p->wait = outval;
-        } else {
-          printf("EV_VerticalDoor: unknown thinker.function in thinker corruption emulation\n");
-        }
-
-        return;
+        door->direction = -1; /* go back down */
       }
     }
     /* Either we're in prboom >=v2.3 and it's not a door, or it's a door but
@@ -369,7 +348,6 @@ static void EV_VerticalDoor(line_t __far* line, mobj_t __far* thing)
   door->sector = sec;
   door->direction = 1;
   door->speed = VDOORSPEED;
-  door->topwait = VDOORWAIT;
   door->line = line; // jff 1/31/98 remember line that triggered us
 
   /* killough 10/98: use gradual lighting changes if nonzero tag given */
